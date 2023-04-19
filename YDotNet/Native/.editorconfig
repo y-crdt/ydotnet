@@ -1,0 +1,6 @@
+[*.cs]
+
+# StyleCop rules
+
+# Documentation rules
+dotnet_diagnostic.SA1600.severity = suggestion # Elements should be documented
