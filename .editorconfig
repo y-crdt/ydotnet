@@ -1,0 +1,27 @@
+﻿[*.cs]
+
+# Charset
+charset = utf-8
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = lf
+insert_final_newline = true
+
+# StyleCop rules
+
+# Special rules
+dotnet_diagnostic.SA0001.severity = none # XML comment analysis disabled
+
+# Readability rules
+dotnet_diagnostic.SA1101.severity = suggestion # Prefix local calls with this
+
+# Ordering rules
+dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
+
+# Documentation rules
+dotnet_diagnostic.SA1633.severity = suggestion # File should have header
