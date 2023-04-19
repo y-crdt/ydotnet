@@ -30,11 +30,13 @@ public class Doc : IDisposable
     /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
-    internal nint Handle { get; }
+    internal nint Handle { get; private set; }
 
     /// <inheritdoc />
     public void Dispose()
     {
         DocChannel.Destroy(Handle);
+
+        Handle = default;
     }
 }
