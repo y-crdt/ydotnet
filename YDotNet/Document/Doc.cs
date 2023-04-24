@@ -28,6 +28,11 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Gets the unique client identifier of the document.
+    /// </summary>
+    public ulong Id => DocChannel.Id(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; private set; }
