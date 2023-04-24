@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using YDotNet.Document;
 
@@ -26,5 +27,33 @@ public class DocTests
 
         // Assert
         Assert.That(doc.Handle, Is.EqualTo(nint.Zero));
+    }
+
+    [Test]
+    public void GetIdOnActive()
+    {
+        // Arrange
+        var doc = new Doc();
+
+        // Act
+        var id = doc.Id;
+
+        // Assert
+        Assert.That(id, Is.GreaterThan(expected: 0));
+    }
+
+    [Test]
+    public void GetIdOnDisposed()
+    {
+        // Arrange
+        var doc = new Doc();
+        doc.Dispose();
+
+        // Act and Assert
+        Assert.Throws<SEHException>(
+            () =>
+            {
+                var _ = doc.Id;
+            });
     }
 }
