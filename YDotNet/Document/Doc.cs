@@ -1,4 +1,5 @@
-using YDotNet.Native;
+using YDotNet.Document.Options;
+using YDotNet.Native.Doc;
 
 namespace YDotNet.Document;
 
@@ -25,6 +26,15 @@ public class Doc : IDisposable
     public Doc()
     {
         Handle = DocChannel.New();
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Doc" /> class with the specified <paramref name="options" />.
+    /// </summary>
+    /// <param name="options">The options to be used when initializing this document.</param>
+    public Doc(DocOptions options)
+    {
+        Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
     }
 
     /// <summary>
