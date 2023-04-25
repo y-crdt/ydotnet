@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Options;
 
 namespace YDotNet.Tests.Unit.Document;
 
@@ -14,6 +15,35 @@ public class DocTests
 
         // Assert
         Assert.That(doc.Handle, Is.GreaterThan(nint.Zero));
+    }
+
+    [Test]
+    public void CreateWithSampleOptions()
+    {
+        // Arrange
+        var options = new DocOptions
+        {
+            Id = 2718,
+            Guid = Guid.Parse("6811c0f5-320a-4a59-805d-ebe857a8b3f4"),
+            CollectionId = "sample_collection",
+            Encoding = DocEncoding.Uf16,
+            SkipGarbageCollection = false,
+            AutoLoad = false,
+            ShouldLoad = false
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.Handle, Is.GreaterThan(nint.Zero));
+        Assert.That(doc.Id, Is.EqualTo(expected: 2718));
+        // TODO Add assertion for Guid.
+        // TODO Add assertion for CollectionId.
+        // TODO Add assertion for Encoding.
+        // TODO Add assertion for SkipGarbageCollection.
+        // TODO Add assertion for AutoLoad.
+        // TODO Add assertion for ShouldLoad.
     }
 
     [Test]
