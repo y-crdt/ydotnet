@@ -4,7 +4,7 @@ namespace YDotNet.Native.Convert;
 
 public static class StringConverter
 {
-    public static byte[] ToBytes(this string? value)
+    public static byte[] ToUtf8Bytes(this string? value)
     {
         if (value is null)
         {

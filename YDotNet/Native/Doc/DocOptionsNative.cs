@@ -26,8 +26,8 @@ public class DocOptionsNative
         return new DocOptionsNative
         {
             Id = options.Id ?? 0,
-            Guid = options.Guid?.ToString().ToBytes(),
-            CollectionId = options.CollectionId?.ToBytes(),
+            Guid = options.Guid?.ToString().ToUtf8Bytes(),
+            CollectionId = options.CollectionId?.ToUtf8Bytes(),
             Encoding = (byte) (options.Encoding ?? DocEncoding.Utf8),
             SkipGc = (byte) (options.SkipGarbageCollection ?? false ? 1 : 0),
             AutoLoad = (byte) (options.AutoLoad ?? false ? 1 : 0),
