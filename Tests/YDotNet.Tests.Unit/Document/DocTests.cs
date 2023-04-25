@@ -47,6 +47,84 @@ public class DocTests
     }
 
     [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithDefaultNullOptions()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithNegativeId()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithZeroId()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithEmptyCollectionId()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithEncodingUtf8()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithEncodingUtf16()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithEncodingUtf32()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithSkipGarbageCollectionEnabled()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithSkipGarbageCollectionDisabled()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithAutoLoadEnabled()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithAutoLoadDisabled()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithShouldLoadEnabled()
+    {
+    }
+
+    [Test]
+    [Ignore("Not implemented yet.")]
+    public void CreateWithShouldLoadDisabled()
+    {
+    }
+
+    [Test]
     public void Dispose()
     {
         // Arrange
