@@ -1,24 +1,13 @@
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Options;
 
 namespace YDotNet.Tests.Unit.Document;
 
-public class DocTests
+public class NewWithOptionsTests
 {
     [Test]
-    public void Create()
-    {
-        // Arrange and Act
-        var doc = new Doc();
-
-        // Assert
-        Assert.That(doc.Handle, Is.GreaterThan(nint.Zero));
-    }
-
-    [Test]
-    public void CreateWithSampleOptions()
+    public void SampleOptions()
     {
         // Arrange
         var options = new DocOptions
@@ -48,120 +37,79 @@ public class DocTests
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithDefaultNullOptions()
+    public void DefaultNullOptions()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithNegativeId()
+    public void NegativeId()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithZeroId()
+    public void ZeroId()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithEmptyCollectionId()
+    public void EmptyCollectionId()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithEncodingUtf8()
+    public void EncodingUtf8()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithEncodingUtf16()
+    public void EncodingUtf16()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithEncodingUtf32()
+    public void EncodingUtf32()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithSkipGarbageCollectionEnabled()
+    public void SkipGarbageCollectionEnabled()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithSkipGarbageCollectionDisabled()
+    public void SkipGarbageCollectionDisabled()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithAutoLoadEnabled()
+    public void AutoLoadEnabled()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithAutoLoadDisabled()
+    public void AutoLoadDisabled()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithShouldLoadEnabled()
+    public void ShouldLoadEnabled()
     {
     }
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void CreateWithShouldLoadDisabled()
+    public void ShouldLoadDisabled()
     {
-    }
-
-    [Test]
-    public void Dispose()
-    {
-        // Arrange
-        var doc = new Doc();
-
-        // Act
-        doc.Dispose();
-
-        // Assert
-        Assert.That(doc.Handle, Is.EqualTo(nint.Zero));
-    }
-
-    [Test]
-    public void GetIdOnActive()
-    {
-        // Arrange
-        var doc = new Doc();
-
-        // Act
-        var id = doc.Id;
-
-        // Assert
-        Assert.That(id, Is.GreaterThan(expected: 0));
-    }
-
-    [Test]
-    public void GetIdOnDisposed()
-    {
-        // Arrange
-        var doc = new Doc();
-        doc.Dispose();
-
-        // Act and Assert
-        Assert.Throws<SEHException>(
-            () =>
-            {
-                var _ = doc.Id;
-            });
     }
 }
