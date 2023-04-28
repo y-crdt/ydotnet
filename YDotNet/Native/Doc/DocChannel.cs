@@ -16,4 +16,7 @@ internal static class DocChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_id")]
     public static extern ulong Id(nint doc);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_guid")]
+    public static extern nint Guid(nint doc);
 }

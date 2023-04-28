@@ -1,4 +1,5 @@
 using YDotNet.Document.Options;
+using YDotNet.Native.Convert;
 using YDotNet.Native.Doc;
 
 namespace YDotNet.Document;
@@ -38,9 +39,16 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets the unique client identifier of the document.
+    ///     Gets the unique client identifier of this <see cref="Doc" /> instance.
     /// </summary>
     public ulong Id => DocChannel.Id(Handle);
+
+    /// <summary>
+    ///     Gets the unique document identifier of this <see cref="Doc" /> instance.
+    /// </summary>
+    // TODO [LSViana] Check if this should be of type `Guid`.
+    // There's a complication due to string format losing zero to the left in hexadecimal representation.
+    public string? Guid => DocChannel.Guid(Handle).FromUtf8Bytes();
 
     /// <summary>
     ///     Gets the handle to the native resource.
