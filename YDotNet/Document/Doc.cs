@@ -59,6 +59,15 @@ public class Doc : IDisposable
     public string? CollectionId => DocChannel.CollectionId(Handle).FromUtf8Bytes();
 
     /// <summary>
+    ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
+    /// </summary>
+    /// <remarks>
+    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" />
+    ///     instance requested a data load.
+    /// </remarks>
+    public bool ShouldLoad => DocChannel.ShouldLoad(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; private set; }
