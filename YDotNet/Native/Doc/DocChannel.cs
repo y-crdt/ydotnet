@@ -26,4 +26,7 @@ internal static class DocChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_should_load")]
     public static extern bool ShouldLoad(nint doc);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_auto_load")]
+    public static extern bool AutoLoad(nint doc);
 }

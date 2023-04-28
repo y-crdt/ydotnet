@@ -68,6 +68,15 @@ public class Doc : IDisposable
     public bool ShouldLoad => DocChannel.ShouldLoad(Handle);
 
     /// <summary>
+    ///     Gets a value indicating whether this <see cref="Doc" /> instance will auto load.
+    /// </summary>
+    /// <remarks>
+    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent
+    ///     <see cref="Doc" /> instances.
+    /// </remarks>
+    public bool AutoLoad => DocChannel.AutoLoad(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; private set; }
