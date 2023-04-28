@@ -51,6 +51,14 @@ public class Doc : IDisposable
     public string Guid => DocChannel.Guid(Handle).FromUtf8Bytes()!;
 
     /// <summary>
+    ///     Gets the collection identifier of this <see cref="Doc" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     If none was defined, a <c>null</c> will be returned.
+    /// </remarks>
+    public string? CollectionId => DocChannel.CollectionId(Handle).FromUtf8Bytes();
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; private set; }
