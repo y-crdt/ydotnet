@@ -48,7 +48,7 @@ public class Doc : IDisposable
     /// </summary>
     // TODO [LSViana] Check if this should be of type `Guid`.
     // There's a complication due to string format losing zero to the left in hexadecimal representation.
-    public string? Guid => DocChannel.Guid(Handle).FromUtf8Bytes();
+    public string Guid => DocChannel.Guid(Handle).FromUtf8Bytes()!;
 
     /// <summary>
     ///     Gets the handle to the native resource.
