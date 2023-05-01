@@ -112,14 +112,34 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void ShouldLoadEnabled()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            ShouldLoad = false
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.ShouldLoad, Is.False);
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void ShouldLoadDisabled()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            ShouldLoad = false
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.ShouldLoad, Is.False);
     }
 }
