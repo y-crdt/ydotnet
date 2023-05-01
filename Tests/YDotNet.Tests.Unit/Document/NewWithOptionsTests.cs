@@ -81,36 +81,6 @@ public class NewWithOptionsTests
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void EncodingUtf8()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
-    public void EncodingUtf16()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
-    public void EncodingUtf32()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
-    public void SkipGarbageCollectionEnabled()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
-    public void SkipGarbageCollectionDisabled()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
     public void AutoLoadEnabled()
     {
     }
