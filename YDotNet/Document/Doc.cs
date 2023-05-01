@@ -130,10 +130,6 @@ public class Doc : IDisposable
         DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
-            (state, length, data) =>
-            {
-                var update = UpdateEvent.From(length, data);
-                action(update);
-            });
+            (state, length, data) => action(UpdateEvent.From(length, data)));
     }
 }
