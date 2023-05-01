@@ -4,6 +4,8 @@ namespace YDotNet.Native.Doc;
 
 internal static class DocChannel
 {
+    public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
     public static extern nint New();
 
@@ -36,4 +38,8 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_write_transaction")]
     public static extern nint WriteTransaction(nint doc, uint originLength, nint origin);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_updates_v1")]
+    public static extern uint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
 }

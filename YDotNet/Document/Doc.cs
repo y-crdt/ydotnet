@@ -1,3 +1,4 @@
+using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
@@ -115,5 +116,24 @@ public class Doc : IDisposable
     public Transaction WriteTransaction()
     {
         return new Transaction(DocChannel.WriteTransaction(Handle, originLength: 0, nint.Zero));
+    }
+
+    /// <summary>
+    ///     Subscribe callback function for any changes performed within transaction scope.
+    /// </summary>
+    /// <remarks>
+    ///     The updates are encoded using `lib0` V1 encoding and they can be  passed to remote peers right away.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a transaction is committed.</param>
+    public void ObserveUpdatesV1(Action<UpdateEvent> action)
+    {
+        DocChannel.ObserveUpdatesV1(
+            Handle,
+            nint.Zero,
+            (state, length, data) =>
+            {
+                var update = UpdateEvent.From(length, data);
+                action(update);
+            });
     }
 }
