@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
-using YDotNet.Native.Convert;
 
 namespace YDotNet.Native.Doc;
 
@@ -9,9 +8,9 @@ public class DocOptionsNative
 {
     public ulong Id { get; init; }
 
-    public byte[]? Guid { get; init; }
+    public string? Guid { get; init; }
 
-    public byte[]? CollectionId { get; init; }
+    public string? CollectionId { get; init; }
 
     public byte Encoding { get; init; }
 
@@ -26,8 +25,8 @@ public class DocOptionsNative
         return new DocOptionsNative
         {
             Id = options.Id ?? 0,
-            Guid = options.Guid?.ToString().ToUtf8Bytes(),
-            CollectionId = options.CollectionId?.ToUtf8Bytes(),
+            Guid = options.Guid,
+            CollectionId = options.CollectionId,
             Encoding = (byte) (options.Encoding ?? DocEncoding.Utf8),
             SkipGc = (byte) (options.SkipGarbageCollection ?? false ? 1 : 0),
             AutoLoad = (byte) (options.AutoLoad ?? false ? 1 : 0),

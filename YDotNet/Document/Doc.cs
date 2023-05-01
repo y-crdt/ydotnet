@@ -1,5 +1,4 @@
 using YDotNet.Document.Options;
-using YDotNet.Native.Convert;
 using YDotNet.Native.Doc;
 
 namespace YDotNet.Document;
@@ -48,7 +47,7 @@ public class Doc : IDisposable
     /// </summary>
     // TODO [LSViana] Check if this should be of type `Guid`.
     // There's a complication due to string format losing zero to the left in hexadecimal representation.
-    public string Guid => DocChannel.Guid(Handle).FromUtf8Bytes()!;
+    public string Guid => DocChannel.Guid(Handle);
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
@@ -56,7 +55,7 @@ public class Doc : IDisposable
     /// <remarks>
     ///     If none was defined, a <c>null</c> will be returned.
     /// </remarks>
-    public string? CollectionId => DocChannel.CollectionId(Handle).FromUtf8Bytes();
+    public string? CollectionId => DocChannel.CollectionId(Handle);
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.

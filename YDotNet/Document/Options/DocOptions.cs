@@ -21,15 +21,15 @@ public class DocOptions
     public ulong? Id { get; init; }
 
     /// <summary>
-    ///     Gets the globally unique UUID v4 compatible <c>null</c>-terminated string identifier of this <see cref="Doc" />.
+    ///     Gets the globally unique UUID v4 compatible string identifier of this <see cref="Doc" />.
     /// </summary>
     /// <remarks>
     ///     If passed as <c>null</c>, a random UUID will be generated instead.
     /// </remarks>
-    public Guid? Guid { get; init; }
+    public string? Guid { get; init; }
 
     /// <summary>
-    ///     Gets the UTF-8 encoded, <c>null</c>-terminated string of a collection that this <see cref="Doc" /> belongs to.
+    ///     Gets the UTF-8 encoded, string of a collection that this <see cref="Doc" /> belongs to.
     /// </summary>
     /// <remarks>
     ///     It's used only by providers.
