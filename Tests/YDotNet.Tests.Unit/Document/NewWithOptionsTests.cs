@@ -13,7 +13,7 @@ public class NewWithOptionsTests
         var options = new DocOptions
         {
             Id = 2718,
-            Guid = Guid.Parse("6811c0f5-320a-4a59-805d-ebe857a8b3f4"),
+            Guid = "6811c0f5-320a-4a59-805d-ebe857a8b3f4",
             CollectionId = "sample_collection",
             Encoding = DocEncoding.Uf16,
             SkipGarbageCollection = false,
@@ -27,12 +27,12 @@ public class NewWithOptionsTests
         // Assert
         Assert.That(doc.Handle, Is.GreaterThan(nint.Zero));
         Assert.That(doc.Id, Is.EqualTo(expected: 2718));
-        // TODO Add assertion for Guid.
-        // TODO Add assertion for CollectionId.
-        // TODO Add assertion for Encoding.
-        // TODO Add assertion for SkipGarbageCollection.
-        // TODO Add assertion for AutoLoad.
-        // TODO Add assertion for ShouldLoad.
+        Assert.That(doc.Guid, Is.EqualTo("6811c0f5-320a-4a59-805d-ebe857a8b3f4"));
+        Assert.That(doc.CollectionId, Is.EqualTo("sample_collection"));
+        Assert.That(doc.AutoLoad, Is.EqualTo(expected: false));
+        Assert.That(doc.ShouldLoad, Is.EqualTo(expected: false));
+
+        // The properties `Encoding` and `SkipGarbageCollection` aren't accessible after construction.
     }
 
     [Test]
