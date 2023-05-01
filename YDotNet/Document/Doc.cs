@@ -119,10 +119,10 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribe callback function for any changes performed within transaction scope.
+    ///     Subscribes callback function for changes performed within transaction scope.
     /// </summary>
     /// <remarks>
-    ///     The updates are encoded using `lib0` V1 encoding and they can be  passed to remote peers right away.
+    ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
     /// <param name="action">The callback to be executed when a transaction is committed.</param>
     public void ObserveUpdatesV1(Action<UpdateEvent> action)
