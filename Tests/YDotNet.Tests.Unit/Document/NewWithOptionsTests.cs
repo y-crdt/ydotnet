@@ -80,15 +80,35 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void AutoLoadEnabled()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            AutoLoad = true
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.AutoLoad, Is.True);
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void AutoLoadDisabled()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            AutoLoad = false
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.AutoLoad, Is.False);
     }
 
     [Test]
