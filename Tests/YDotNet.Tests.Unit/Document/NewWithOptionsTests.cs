@@ -36,9 +36,15 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void DefaultNullOptions()
     {
+        // Assert
+        Assert.Throws<ArgumentNullException>(
+            () =>
+            {
+                // Arrange and Act
+                var _ = new Doc(options: null);
+            });
     }
 
     [Test]
