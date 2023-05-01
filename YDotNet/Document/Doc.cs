@@ -125,11 +125,24 @@ public class Doc : IDisposable
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
     /// <param name="action">The callback to be executed when a transaction is committed.</param>
-    public void ObserveUpdatesV1(Action<UpdateEvent> action)
+    /// <returns>The subscription for event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
     {
-        DocChannel.ObserveUpdatesV1(
+        var subscriptionId = DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
             (state, length, data) => action(UpdateEvent.From(length, data)));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed within transaction scope.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveUpdatesV1(EventSubscription subscription)
+    {
+        DocChannel.UnobserveUpdatesV1(Handle, subscription.Id);
     }
 }

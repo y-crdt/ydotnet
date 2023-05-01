@@ -42,4 +42,10 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_updates_v1")]
     public static extern uint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ydoc_unobserve_updates_v1")]
+    public static extern uint UnobserveUpdatesV1(nint doc, uint subscriptionId);
 }
