@@ -64,9 +64,19 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void EmptyCollectionId()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            CollectionId = string.Empty
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.CollectionId, Is.EqualTo(string.Empty));
     }
 
     [Test]
