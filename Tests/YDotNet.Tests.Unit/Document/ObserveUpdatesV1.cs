@@ -6,16 +6,16 @@ namespace YDotNet.Tests.Unit.Document;
 public class ObserveUpdatesV1
 {
     [Test]
-    public void TriggersOnceWhenTransactionIsCommitted()
+    public void TriggersWhenTransactionIsCommittedUntilUnobserve()
     {
         // Arrange
         var doc = new Doc();
 
-        byte[] data = null;
+        byte[]? data = null;
         var called = 0;
 
         var text = doc.Text("country");
-        doc.ObserveUpdatesV1(
+        var subscription = doc.ObserveUpdatesV1(
             e =>
             {
                 called++;
@@ -31,5 +31,28 @@ public class ObserveUpdatesV1
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(data, Is.Not.Null);
         Assert.That(data, Has.Length.EqualTo(expected: 26));
+
+        // Act
+        data = null;
+        transaction = doc.WriteTransaction();
+        text.Insert(transaction, index: 0, "Great ");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(called, Is.EqualTo(expected: 2));
+        Assert.That(data, Is.Not.Null);
+        Assert.That(data, Has.Length.EqualTo(expected: 23));
+
+        // Act
+        data = null;
+        doc.UnobserveUpdatesV1(subscription);
+
+        transaction = doc.WriteTransaction();
+        text.Insert(transaction, index: 0, "The ");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(called, Is.EqualTo(expected: 2));
+        Assert.That(data, Is.Null);
     }
 }
