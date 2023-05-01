@@ -48,9 +48,19 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    [Ignore("Not implemented yet.")]
     public void ZeroId()
     {
+        // Arrange
+        var options = new DocOptions
+        {
+            Id = 0
+        };
+
+        // Act
+        var doc = new Doc(options);
+
+        // Assert
+        Assert.That(doc.Id, Is.EqualTo(expected: 0));
     }
 
     [Test]
