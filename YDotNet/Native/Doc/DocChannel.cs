@@ -29,4 +29,11 @@ internal static class DocChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_auto_load")]
     public static extern bool AutoLoad(nint doc);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext")]
+    public static extern nint Text(nint doc, string name);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_write_transaction")]
+    public static extern nint WriteTransaction(nint doc, uint originLength, nint origin);
 }

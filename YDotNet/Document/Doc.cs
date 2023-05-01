@@ -1,4 +1,6 @@
 using YDotNet.Document.Options;
+using YDotNet.Document.Transactions;
+using YDotNet.Document.Types;
 using YDotNet.Native.Doc;
 
 namespace YDotNet.Document;
@@ -91,5 +93,27 @@ public class Doc : IDisposable
         DocChannel.Destroy(Handle);
 
         Handle = default;
+    }
+
+    /// <summary>
+    ///     Gets or creates a new shared <see cref="Text" /> data type instance as a root-level type of a given document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
+    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided.</returns>
+    public Text Text(string name)
+    {
+        return new Text(DocChannel.Text(Handle, name));
+    }
+
+    /// <summary>
+    ///     Starts a new read-write transaction on a given document.
+    /// </summary>
+    /// <returns>The transaction to perform operations in the document.</returns>
+    public Transaction WriteTransaction()
+    {
+        return new Transaction(DocChannel.WriteTransaction(Handle, originLength: 0, nint.Zero));
     }
 }
