@@ -49,12 +49,6 @@ public class NewWithOptionsTests
 
     [Test]
     [Ignore("Not implemented yet.")]
-    public void NegativeId()
-    {
-    }
-
-    [Test]
-    [Ignore("Not implemented yet.")]
     public void ZeroId()
     {
     }
