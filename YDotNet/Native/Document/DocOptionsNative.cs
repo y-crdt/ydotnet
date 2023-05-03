@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
 
-namespace YDotNet.Native.Doc;
+namespace YDotNet.Native.Document;
 
 [StructLayout(LayoutKind.Sequential)]
 public class DocOptionsNative

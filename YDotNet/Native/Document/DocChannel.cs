@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace YDotNet.Native.Doc;
+namespace YDotNet.Native.Document;
 
 internal static class DocChannel
 {
