@@ -1,9 +1,12 @@
 using System.Runtime.InteropServices;
+using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Native.Document;
 
 internal static class DocChannel
 {
+    public delegate void ObserveAfterTransactionCallback(nint state, AfterTransactionEventNative afterTransactionEvent);
+
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
@@ -58,4 +61,16 @@ internal static class DocChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_unobserve_updates_v2")]
     public static extern uint UnobserveUpdatesV2(nint doc, uint subscriptionId);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ydoc_observe_after_transaction")]
+    public static extern uint ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ydoc_unobserve_after_transaction")]
+    public static extern uint UnobserveAfterTransaction(nint doc, uint subscriptionId);
 }

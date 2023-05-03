@@ -2,7 +2,8 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
-using YDotNet.Native.Doc;
+using YDotNet.Native.Document;
+using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Document;
 
@@ -172,5 +173,33 @@ public class Doc : IDisposable
     public void UnobserveUpdatesV2(EventSubscription subscription)
     {
         DocChannel.UnobserveUpdatesV2(Handle, subscription.Id);
+    }
+
+    /// <summary>
+    ///     Subscribes callback function for changes performed within transaction scope.
+    /// </summary>
+    /// <remarks>
+    ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a transaction is committed.</param>
+    /// <returns>The subscription for event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
+    {
+        var subscriptionId = DocChannel.ObserveAfterTransaction(
+            Handle,
+            nint.Zero,
+            (state, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed within transaction scope.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveAfterTransaction(EventSubscription subscription)
+    {
+        DocChannel.UnobserveAfterTransaction(Handle, subscription.Id);
     }
 }
