@@ -36,18 +36,6 @@ public class NewWithOptionsTests
     }
 
     [Test]
-    public void DefaultNullOptions()
-    {
-        // Assert
-        Assert.Throws<ArgumentNullException>(
-            () =>
-            {
-                // Arrange and Act
-                var _ = new Doc(options: null);
-            });
-    }
-
-    [Test]
     public void ZeroId()
     {
         // Arrange

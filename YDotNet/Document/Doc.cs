@@ -38,11 +38,6 @@ public class Doc : IDisposable
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
     {
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
-
         Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
     }
 
