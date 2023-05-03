@@ -127,7 +127,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEvent.From(length, data)));
+            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -155,7 +155,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV2(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEvent.From(length, data)));
+            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
