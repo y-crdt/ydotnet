@@ -7,6 +7,8 @@ internal static class DocChannel
 {
     public delegate void ObserveAfterTransactionCallback(nint state, AfterTransactionEventNative afterTransactionEvent);
 
+    public delegate void ObserveClearCallback(nint state, nint doc);
+
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
@@ -45,6 +47,14 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_clear")]
     public static extern void Clear(nint doc);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_clear")]
+    public static extern uint ObserveClear(nint doc, nint state, ObserveClearCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_unobserve_clear")]
+    public static extern uint UnobserveClear(nint doc, uint subscriptionId);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_updates_v1")]

@@ -124,13 +124,38 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Subscribes callback function to be called when the <see cref="Clear" /> method is called.
+    /// </summary>
+    /// <param name="action">The callback function.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveClear(Action<ClearEvent> action)
+    {
+        var subscriptionId = DocChannel.ObserveClear(
+            Handle,
+            nint.Zero,
+            (state, doc) => action(ClearEventNative.From(this).ToClearEvent()));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance,
+    ///     for the <see cref="Clear" /> method.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveClear(EventSubscription subscription)
+    {
+        DocChannel.UnobserveClear(Handle, subscription.Id);
+    }
+
+    /// <summary>
     ///     Subscribes callback function for changes performed within transaction scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
     /// <param name="action">The callback to be executed when a transaction is committed.</param>
-    /// <returns>The subscription for event. It may be used to unsubscribe later.</returns>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
     {
         var subscriptionId = DocChannel.ObserveUpdatesV1(
@@ -158,7 +183,7 @@ public class Doc : IDisposable
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
     /// <param name="action">The callback to be executed when a transaction is committed.</param>
-    /// <returns>The subscription for event. It may be used to unsubscribe later.</returns>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV2(Action<UpdateEvent> action)
     {
         var subscriptionId = DocChannel.ObserveUpdatesV2(
@@ -186,7 +211,7 @@ public class Doc : IDisposable
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
     /// <param name="action">The callback to be executed when a transaction is committed.</param>
-    /// <returns>The subscription for event. It may be used to unsubscribe later.</returns>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
         var subscriptionId = DocChannel.ObserveAfterTransaction(
