@@ -43,6 +43,10 @@ internal static class DocChannel
     public static extern nint WriteTransaction(nint doc, uint originLength, nint origin);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_clear")]
+    public static extern void Clear(nint doc);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_updates_v1")]
     public static extern uint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
 

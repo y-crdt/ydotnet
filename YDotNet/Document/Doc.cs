@@ -115,6 +115,15 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Destroys the current document, sending a <c>destroy</c> event and
+    ///     clearing up all the registered callbacks.
+    /// </summary>
+    public void Clear()
+    {
+        DocChannel.Clear(Handle);
+    }
+
+    /// <summary>
     ///     Subscribes callback function for changes performed within transaction scope.
     /// </summary>
     /// <remarks>
