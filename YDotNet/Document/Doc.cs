@@ -2,6 +2,7 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
 
@@ -30,6 +31,7 @@ public class Doc : IDisposable
     public Doc()
     {
         Handle = DocChannel.New();
+        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -39,6 +41,7 @@ public class Doc : IDisposable
     public Doc(DocOptions options)
     {
         Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
+        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -83,6 +86,11 @@ public class Doc : IDisposable
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; private set; }
+
+    /// <summary>
+    ///     Gets the <see cref="ReferenceAccessor" /> used by this document.
+    /// </summary>
+    private ReferenceAccessor ReferenceAccessor { get; }
 
     /// <inheritdoc />
     public void Dispose()
