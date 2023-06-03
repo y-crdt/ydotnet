@@ -123,6 +123,21 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Starts a new read-only transaction on this document.
+    /// </summary>
+    /// <returns>
+    ///     <para>The transaction to perform operations in the document or <c>null</c>.</para>
+    ///     <para>
+    ///         Returns <c>null</c> if the transaction could not be created because, for example, another
+    ///         read-write transaction already exists and was not committed yet.
+    ///     </para>
+    /// </returns>
+    public Transaction? ReadTransaction()
+    {
+        return ReferenceAccessor.Access(new Transaction(DocChannel.ReadTransaction(Handle)));
+    }
+
+    /// <summary>
     ///     Destroys the current document, sending a <c>destroy</c> event and
     ///     clearing up all the registered callbacks.
     /// </summary>
