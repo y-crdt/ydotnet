@@ -53,6 +53,10 @@ internal static class DocChannel
     public static extern void Clear(nint doc);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_load")]
+    public static extern void Load(nint doc);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_clear")]
     public static extern uint ObserveClear(nint doc, nint state, ObserveClearCallback callback);
 

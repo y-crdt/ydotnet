@@ -154,6 +154,17 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Manually send a load request to the parent document of this sub-document.
+    /// </summary>
+    /// <remarks>
+    ///     Works only if current document is a sub-document of an another document.
+    /// </remarks>
+    public void Load()
+    {
+        DocChannel.Load(Handle);
+    }
+
+    /// <summary>
     ///     Subscribes callback function to be called when the <see cref="Clear" /> method is called.
     /// </summary>
     /// <param name="action">The callback function.</param>
