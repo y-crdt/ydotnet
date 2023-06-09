@@ -40,6 +40,9 @@ internal static class DocChannel
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext")]
     public static extern nint Text(nint doc, string name);
 
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap")]
+    public static extern nint Map(nint doc, string name);
+
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_read_transaction")]
     public static extern nint ReadTransaction(nint doc);
