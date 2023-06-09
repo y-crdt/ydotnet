@@ -114,6 +114,19 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Gets or creates a new shared <see cref="Map" /> data type instance as a root-level type in this document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
+    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided.</returns>
+    public Map Map(string name)
+    {
+        return new Map(DocChannel.Map(Handle, name));
+    }
+
+    /// <summary>
     ///     Starts a new read-write transaction on this document.
     /// </summary>
     /// <returns>
