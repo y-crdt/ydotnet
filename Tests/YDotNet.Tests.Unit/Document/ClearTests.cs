@@ -38,7 +38,7 @@ public class ClearTests
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(clearEvent, Is.Not.Null);
-        Assert.That(clearEvent.Doc, Is.EqualTo(doc));
+        Assert.That(clearEvent.Doc.Id, Is.EqualTo(doc.Id));
     }
 
     [Test]
