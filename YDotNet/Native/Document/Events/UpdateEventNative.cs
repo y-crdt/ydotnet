@@ -4,7 +4,7 @@ using YDotNet.Document.Events;
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-public class UpdateEventNative
+internal struct UpdateEventNative
 {
     public uint Length { get; init; }
 

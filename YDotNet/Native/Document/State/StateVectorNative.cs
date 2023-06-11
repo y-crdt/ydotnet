@@ -4,13 +4,13 @@ using YDotNet.Document.State;
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-public class StateVectorNative
+internal struct StateVectorNative
 {
-    public uint EntriesCount { get; init; }
+    public uint EntriesCount { get; }
 
-    public ulong[] ClientIds { get; init; }
+    public ulong[] ClientIds { get; }
 
-    public nint Clocks { get; init; }
+    public nint Clocks { get; }
 
     public StateVector ToStateVector()
     {

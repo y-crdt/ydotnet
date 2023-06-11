@@ -4,11 +4,11 @@ using YDotNet.Document.State;
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-public class IdRangeSequenceNative
+internal struct IdRangeSequenceNative
 {
-    public uint Length { get; init; }
+    public uint Length { get; }
 
-    public nint Sequence { get; init; }
+    public nint Sequence { get; }
 
     public IdRange[] ToIdRanges()
     {

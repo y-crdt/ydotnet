@@ -4,13 +4,13 @@ using YDotNet.Document.State;
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-public class DeleteSetNative
+internal struct DeleteSetNative
 {
-    public uint EntriesCount { get; init; }
+    public uint EntriesCount { get; }
 
-    public nint ClientIds { get; init; }
+    public nint ClientIds { get; }
 
-    public nint Ranges { get; init; }
+    public nint Ranges { get; }
 
     public DeleteSet ToDeleteSet()
     {

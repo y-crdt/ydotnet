@@ -5,13 +5,13 @@ using YDotNet.Native.Document.State;
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-public class AfterTransactionEventNative
+internal struct AfterTransactionEventNative
 {
-    public StateVectorNative BeforeState { get; init; }
+    public StateVectorNative BeforeState { get; }
 
-    public StateVectorNative AfterState { get; init; }
+    public StateVectorNative AfterState { get; }
 
-    public DeleteSetNative DeleteSet { get; set; }
+    public DeleteSetNative DeleteSet { get; }
 
     public AfterTransactionEvent ToAfterTransactionEvent()
     {

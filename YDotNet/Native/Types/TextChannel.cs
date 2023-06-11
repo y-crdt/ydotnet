@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace YDotNet.Native.Types;
 
-public static class TextChannel
+internal static class TextChannel
 {
     // TODO [LSViana] Add class for `attributes` parameter.
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert")]

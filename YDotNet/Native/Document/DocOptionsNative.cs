@@ -4,7 +4,7 @@ using YDotNet.Document.Options;
 namespace YDotNet.Native.Document;
 
 [StructLayout(LayoutKind.Sequential)]
-public class DocOptionsNative
+internal struct DocOptionsNative
 {
     public ulong Id { get; init; }
 
