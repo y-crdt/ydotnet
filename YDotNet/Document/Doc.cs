@@ -45,6 +45,16 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="Doc" /> class with the specified <see cref="Handle" />.
+    /// </summary>
+    /// <param name="handle">The pointer to be used by this document to manage the native resource.</param>
+    internal Doc(nint handle)
+    {
+        Handle = handle;
+        ReferenceAccessor = new ReferenceAccessor();
+    }
+
+    /// <summary>
     ///     Gets the unique client identifier of this <see cref="Doc" /> instance.
     /// </summary>
     public ulong Id => DocChannel.Id(Handle);
@@ -284,5 +294,30 @@ public class Doc : IDisposable
     public void UnobserveAfterTransaction(EventSubscription subscription)
     {
         DocChannel.UnobserveAfterTransaction(Handle, subscription.Id);
+    }
+
+    /// <summary>
+    ///     Subscribes callback function for changes in the sub-documents.
+    /// </summary>
+    /// <param name="action">The callback to be executed when a sub-document changes.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
+    {
+        var subscriptionId = DocChannel.ObserveSubdocs(
+            Handle,
+            nint.Zero,
+            (state, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed in the sub-documents.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveSubDocs(EventSubscription subscription)
+    {
+        DocChannel.UnobserveSubdocs(Handle, subscription.Id);
     }
 }
