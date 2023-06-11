@@ -111,6 +111,16 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Creates a copy of the current <see cref="Doc" /> instance.
+    /// </summary>
+    /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
+    /// <returns>A new <see cref="Doc" /> instance that controls the same document.</returns>
+    public Doc Clone()
+    {
+        return new Doc(DocChannel.Clone(Handle));
+    }
+
+    /// <summary>
     ///     Gets or creates a new shared <see cref="Text" /> data type instance as a root-level type in this document.
     /// </summary>
     /// <remarks>

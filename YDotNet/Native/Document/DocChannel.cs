@@ -20,6 +20,10 @@ internal static class DocChannel
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new_with_options")]
     public static extern nint NewWithOptions(DocOptionsNative options);
 
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_clone")]
+    public static extern nint Clone(nint doc);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_destroy")]
     public static extern void Destroy(nint doc);
 
