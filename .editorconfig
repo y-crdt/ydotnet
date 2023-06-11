@@ -12,16 +12,25 @@ tab_width = 4
 end_of_line = lf
 insert_final_newline = true
 
-# StyleCop rules
+# StyleCop rules (https://dotnetanalyzers.github.io/StyleCopAnalyzers/)
 
 # Special rules
 dotnet_diagnostic.SA0001.severity = none # XML comment analysis disabled
+
+# Spacing rules
+dotnet_diagnostic.SA1003.severity = suggestion # Symbols should be spaced correctly
+dotnet_diagnostic.SA1008.severity = suggestion # Opening parenthesis should be spaced correctly
+dotnet_diagnostic.SA1009.severity = suggestion # Closing parenthesis should be spaced correctly
 
 # Readability rules
 dotnet_diagnostic.SA1101.severity = suggestion # Prefix local calls with this
 
 # Ordering rules
 dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
+
+# Maintainability rules
+dotnet_diagnostic.SA1407.severity = suggestion # Arithmetic expressions should declare precedence
+dotnet_diagnostic.SA1413.severity = suggestion # Use trailing comma in multi-line initializers
 
 # Documentation rules
 dotnet_diagnostic.SA1633.severity = suggestion # File should have header
