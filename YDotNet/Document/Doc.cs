@@ -197,7 +197,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveClear(
             Handle,
             nint.Zero,
-            (state, doc) => action(ClearEventNative.From(this).ToClearEvent()));
+            (state, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
 
         return new EventSubscription(subscriptionId);
     }
