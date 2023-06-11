@@ -37,6 +37,17 @@ public class Map
         Insert(transaction, key, InputChannel.Doc(doc.Handle));
     }
 
+    /// <summary>
+    ///     Remove an entry, specified as a key, from the current <see cref="Map" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="key">The key to be used to identify this entry.</param>
+    /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
+    public bool Remove(Transaction transaction, string key)
+    {
+        return MapChannel.Remove(Handle, transaction.Handle, key);
+    }
+
     private void Insert(Transaction transaction, string key, Input input)
     {
         MapChannel.Insert(Handle, transaction.Handle, key, input);
