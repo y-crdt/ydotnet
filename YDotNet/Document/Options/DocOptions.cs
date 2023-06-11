@@ -58,10 +58,10 @@ public class DocOptions
     public bool? SkipGarbageCollection { get; init; }
 
     /// <summary>
-    ///     Gets the flag that determines whether subdocuments should be loaded automatically.
+    ///     Gets the flag that determines whether sub-documents should be loaded automatically.
     /// </summary>
     /// <remarks>
-    ///     If this is a subdocument, remote peers will automatically load the <see cref="Doc" /> as well.
+    ///     If this is a sub-document, remote peers will automatically load the <see cref="Doc" /> as well.
     /// </remarks>
     public bool? AutoLoad { get; init; }
 
