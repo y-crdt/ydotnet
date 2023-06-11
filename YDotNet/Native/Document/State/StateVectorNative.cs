@@ -8,7 +8,7 @@ internal struct StateVectorNative
 {
     public uint EntriesCount { get; }
 
-    public ulong[] ClientIds { get; }
+    public nint ClientIds { get; }
 
     public nint Clocks { get; }
 
