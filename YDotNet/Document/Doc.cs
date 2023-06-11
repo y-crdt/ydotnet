@@ -111,7 +111,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Text" /> data type instance as a root-level type of a given document.
+    ///     Gets or creates a new shared <see cref="Text" /> data type instance as a root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
