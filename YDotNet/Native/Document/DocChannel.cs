@@ -9,6 +9,8 @@ internal static class DocChannel
 
     public delegate void ObserveClearCallback(nint state, nint doc);
 
+    public delegate void ObserveSubdocsCallback(nint state, SubDocsEventNative subDocsEvent);
+
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
@@ -98,4 +100,12 @@ internal static class DocChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_unobserve_after_transaction")]
     public static extern uint UnobserveAfterTransaction(nint doc, uint subscriptionId);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_subdocs")]
+    public static extern uint ObserveSubDocs(nint doc, nint state, ObserveSubdocsCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_unobserve_subdocs")]
+    public static extern uint UnobserveSubDocs(nint doc, uint subscriptionId);
 }

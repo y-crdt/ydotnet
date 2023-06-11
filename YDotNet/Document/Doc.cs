@@ -303,7 +303,7 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveSubdocs(
+        var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
             (state, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
@@ -318,6 +318,6 @@ public class Doc : IDisposable
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void UnobserveSubDocs(EventSubscription subscription)
     {
-        DocChannel.UnobserveSubdocs(Handle, subscription.Id);
+        DocChannel.UnobserveSubDocs(Handle, subscription.Id);
     }
 }
