@@ -23,12 +23,10 @@ public class SubDocsEvent
     /// </summary>
     public Doc[] Added { get; }
 
-
     /// <summary>
     ///     Gets the sub-documents that were removed to the <see cref="Doc" /> instance that emitted this event.
     /// </summary>
     public Doc[] Removed { get; }
-
 
     /// <summary>
     ///     Gets the sub-documents that were loaded to the <see cref="Doc" /> instance that emitted this event.
