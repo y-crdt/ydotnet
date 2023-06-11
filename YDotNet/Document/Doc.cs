@@ -192,9 +192,9 @@ public class Doc : IDisposable
     /// <remarks>
     ///     Works only if current document is a sub-document of an another document.
     /// </remarks>
-    public void Load()
+    public void Load(Transaction transaction)
     {
-        DocChannel.Load(Handle);
+        DocChannel.Load(Handle, transaction.Handle);
     }
 
     /// <summary>

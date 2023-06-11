@@ -63,7 +63,7 @@ internal static class DocChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_load")]
-    public static extern void Load(nint doc);
+    public static extern void Load(nint doc, nint transaction);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_observe_clear")]
