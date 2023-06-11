@@ -17,7 +17,7 @@ public class ClearTests
     }
 
     [Test]
-    public void TriggersWhenSubscribed()
+    public void TriggersWhenObserved()
     {
         // Arrange
         var doc = new Doc();
@@ -42,7 +42,7 @@ public class ClearTests
     }
 
     [Test]
-    public void DoesNotTriggerWhenUnsubscribed()
+    public void DoesNotTriggerWhenUnobserved()
     {
         // Arrange
         var doc = new Doc();
