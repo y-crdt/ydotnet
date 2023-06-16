@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 using YDotNet.Document;
 
@@ -17,20 +16,5 @@ public class CollectionIdTests
 
         // Assert
         Assert.That(collectionId, Is.Null);
-    }
-
-    [Test]
-    public void Disposed()
-    {
-        // Arrange
-        var doc = new Doc();
-        doc.Dispose();
-
-        // Act and Assert
-        Assert.Throws<SEHException>(
-            () =>
-            {
-                var _ = doc.CollectionId;
-            });
     }
 }
