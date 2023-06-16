@@ -27,17 +27,17 @@ internal struct SubDocsEventNative
 
         for (var i = 0; i < AddedLength; i++)
         {
-            added[i] = new Doc(Marshal.ReadIntPtr(Added, i * nint.Size));
+            added[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Added, i * nint.Size)));
         }
 
         for (var i = 0; i < RemovedLength; i++)
         {
-            removed[i] = new Doc(Marshal.ReadIntPtr(Removed, i * nint.Size));
+            removed[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Removed, i * nint.Size)));
         }
 
         for (var i = 0; i < LoadedLength; i++)
         {
-            loaded[i] = new Doc(Marshal.ReadIntPtr(Loaded, i * nint.Size));
+            loaded[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Loaded, i * nint.Size)));
         }
 
         return new SubDocsEvent(added, removed, loaded);
