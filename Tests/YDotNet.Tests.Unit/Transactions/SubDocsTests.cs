@@ -20,7 +20,7 @@ public class SubDocsTests
     }
 
     [Test]
-    public void ReadAndWrite()
+    public void ReadWrite()
     {
         // Arrange
         var (doc, subDocs) = ArrangeDoc(subDocs: 3);
