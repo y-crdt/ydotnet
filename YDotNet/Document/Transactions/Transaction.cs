@@ -59,4 +59,40 @@ public class Transaction
 
         return docs;
     }
+
+    /// <summary>
+    ///     Returns the state vector of the <see cref="Doc" /> associated to this <see cref="Transaction" />,
+    ///     serialized using lib0 v1 encoding.
+    /// </summary>
+    /// <remarks>
+    ///     Payload created by this function can then be send over the network to a remote peer,
+    ///     where it can be used as a parameter to <see cref="StateDiffV1" /> in order to produce a delta
+    ///     update payload, that can be sent back and applied locally in order to efficiently propagate
+    ///     updates from one peer to another.
+    /// </remarks>
+    /// <returns>
+    ///     The lib0 v1 encoded state vector of the <see cref="Doc" /> associated to this <see cref="Transaction" />.
+    /// </returns>
+    public byte[] StateVectorV1()
+    {
+        var handle = TransactionChannel.StateVectorV1(Handle, out var length);
+        var data = new byte[length];
+        var bytesRead = 0;
+        UnmanagedMemoryStream stream;
+
+        unsafe
+        {
+            stream = new UnmanagedMemoryStream((byte*) handle.ToPointer(), length);
+        }
+
+        do
+        {
+            bytesRead = stream.Read(data, offset: 0, data.Length);
+        }
+        while (bytesRead < data.Length);
+
+        stream.Dispose();
+
+        return data;
+    }
 }
