@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Native.Transaction;
 
 namespace YDotNet.Document.Transactions;
@@ -34,5 +35,23 @@ public class Transaction
     public void Commit()
     {
         TransactionChannel.Commit(Handle);
+    }
+
+    /// <summary>
+    ///     Returns the sub-documents existing within current document.
+    /// </summary>
+    /// <returns>The sub-documents existing within current document.</returns>
+    public Doc[] SubDocs()
+    {
+        var handle = TransactionChannel.SubDocs(Handle, out var length);
+        var docs = new Doc[length];
+
+        for (var i = 0; i < length; i++)
+        {
+            var doc = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
+            docs[i] = doc;
+        }
+
+        return docs;
     }
 }
