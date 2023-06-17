@@ -21,14 +21,14 @@ public class Transaction
     }
 
     /// <summary>
+    ///     Gets a value indicating whether the transaction is writeable.
+    /// </summary>
+    public bool Writeable => TransactionChannel.Writeable(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
-
-    /// <summary>
-    ///     Gets if the transaction is writeable.
-    /// </summary>
-    public bool Writeable => TransactionChannel.Writeable(Handle);
 
     /// <summary>
     ///     Commit and dispose provided read-write transaction.
