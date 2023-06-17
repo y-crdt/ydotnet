@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class GuidTests
 {
     [Test]
-    public void Active()
+    public void Guid()
     {
         // Arrange
         var doc = new Doc();

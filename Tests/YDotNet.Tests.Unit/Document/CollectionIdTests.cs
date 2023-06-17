@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class CollectionIdTests
 {
     [Test]
-    public void Active()
+    public void CollectionId()
     {
         // Arrange
         var doc = new Doc();

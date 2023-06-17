@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class AutoLoadTests
 {
     [Test]
-    public void Active()
+    public void AutoLoad()
     {
         // Arrange
         var doc = new Doc();

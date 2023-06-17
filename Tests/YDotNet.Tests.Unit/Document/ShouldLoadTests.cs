@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class ShouldLoadTests
 {
     [Test]
-    public void Active()
+    public void ShouldLoad()
     {
         // Arrange
         var doc = new Doc();
