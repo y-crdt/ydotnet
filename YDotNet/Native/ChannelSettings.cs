@@ -5,6 +5,6 @@ internal static class ChannelSettings
 #if WINDOWS
     public const string NativeLib = "yrs.dll";
 #else
-    public const string NativeLib = "yrs.dylib";
+    public const string NativeLib = "libyrs.dylib";
 #endif
 }
