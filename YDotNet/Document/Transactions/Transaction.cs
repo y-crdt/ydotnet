@@ -26,6 +26,11 @@ public class Transaction
     internal nint Handle { get; }
 
     /// <summary>
+    ///     Gets if the transaction is writeable.
+    /// </summary>
+    public bool Writeable => TransactionChannel.Writeable(Handle);
+
+    /// <summary>
     ///     Commit and dispose provided read-write transaction.
     /// </summary>
     /// <remarks>

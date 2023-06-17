@@ -11,4 +11,8 @@ internal static class TransactionChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_subdocs")]
     public static extern nint SubDocs(nint transaction, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_writeable")]
+    public static extern bool Writeable(nint transaction);
 }
