@@ -24,7 +24,7 @@ public class Transaction
     /// <summary>
     ///     Gets a value indicating whether the transaction is writeable.
     /// </summary>
-    public bool Writeable => TransactionChannel.Writeable(Handle);
+    public bool Writeable => TransactionChannel.Writeable(Handle) == 1;
 
     /// <summary>
     ///     Gets the handle to the native resource.
@@ -272,8 +272,7 @@ public class Transaction
         do
         {
             bytesRead = stream.Read(data, offset: 0, data.Length);
-        }
-        while (bytesRead < data.Length);
+        } while (bytesRead < data.Length);
 
         stream.Dispose();
 

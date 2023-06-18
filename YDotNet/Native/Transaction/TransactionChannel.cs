@@ -14,7 +14,7 @@ internal static class TransactionChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_writeable")]
-    public static extern bool Writeable(nint transaction);
+    public static extern byte Writeable(nint transaction);
 
     [DllImport(
         ChannelSettings.NativeLib,
