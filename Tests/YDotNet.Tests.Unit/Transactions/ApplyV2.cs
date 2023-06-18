@@ -26,6 +26,8 @@ public class ApplyV2
         Assert.That(text, Is.EqualTo("Lucas"));
     }
 
+    // TODO [LSViana] Add transaction to ensure that read-only transactions can't use `Apply`.
+
     private static Doc ArrangeSenderDoc()
     {
         var doc = new Doc();
