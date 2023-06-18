@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Native.Cells;
 
-namespace YDotNet.Native.Document;
+namespace YDotNet.Native.Types;
 
 internal static class MapChannel
 {
