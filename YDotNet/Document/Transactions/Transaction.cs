@@ -272,7 +272,8 @@ public class Transaction
         do
         {
             bytesRead = stream.Read(data, offset: 0, data.Length);
-        } while (bytesRead < data.Length);
+        }
+        while (bytesRead < data.Length);
 
         stream.Dispose();
 
