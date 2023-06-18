@@ -76,14 +76,49 @@ public class Transaction
     public byte[] StateVectorV1()
     {
         var handle = TransactionChannel.StateVectorV1(Handle, out var length);
-        var data = new byte[length];
-        var bytesRead = 0;
-        UnmanagedMemoryStream stream;
+        var data = ReadBytes(handle, length);
 
-        unsafe
-        {
-            stream = new UnmanagedMemoryStream((byte*) handle.ToPointer(), length);
-        }
+        return data;
+    }
+
+    /// <summary>
+    ///     Returns the state difference between current state of the <see cref="Doc" /> associated to this
+    ///     <see cref="Transaction" /> and a state vector.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <see cref="stateVector" /> sent to this method can be generated using <see cref="StateVectorV1" />
+    ///         through a <see cref="Transaction" /> in the remote document.
+    ///     </para>
+    ///     <para>
+    ///         Such state difference can be sent back to the <see cref="Transaction" /> of the sender in order to propagate
+    ///         and apply (using <see cref="Apply" />) all updates known to a current document.
+    ///     </para>
+    ///     <para>
+    ///         This method uses lib0 v1 encoding.
+    ///     </para>
+    /// </remarks>
+    /// <param name="stateVector">
+    ///     The state vector to be used as base for comparison and generation of the difference.
+    /// </param>
+    /// <returns>
+    ///     The lib0 v1 encoded state difference between the <see cref="Doc" /> of this <see cref="Transaction" /> and the
+    ///     remote <see cref="Doc" />.
+    /// </returns>
+    public byte[] StateDiffV1(byte[] stateVector)
+    {
+        var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) stateVector.Length, out var length);
+        var data = ReadBytes(handle, length);
+
+        return data;
+    }
+
+    // TODO: Consider extracting this to an infrastructure class.
+    private static unsafe byte[] ReadBytes(nint handle, uint length)
+    {
+        var data = new byte[length];
+        var stream = new UnmanagedMemoryStream((byte*) handle.ToPointer(), length);
+        int bytesRead;
 
         do
         {

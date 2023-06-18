@@ -21,4 +21,14 @@ internal static class TransactionChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ytransaction_state_vector_v1")]
     public static extern nint StateVectorV1(nint transaction, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_state_diff_v1")]
+    public static extern nint StateDiffV1(
+        nint transaction,
+        byte[] stateVector,
+        uint stateVectorLength,
+        out uint length);
 }
