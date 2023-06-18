@@ -108,9 +108,8 @@ public class Transaction
     public byte[] StateDiffV1(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) stateVector.Length, out var length);
-        var data = ReadBytes(handle, length);
 
-        return data;
+        return ReadBytes(handle, length);
     }
 
     /// <summary>
@@ -140,9 +139,8 @@ public class Transaction
     public byte[] StateDiffV2(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVector.Length, out var length);
-        var data = ReadBytes(handle, length);
 
-        return data;
+        return ReadBytes(handle, length);
     }
 
     /// <summary>
@@ -187,9 +185,8 @@ public class Transaction
     public byte[] Snapshot()
     {
         var handle = TransactionChannel.Snapshot(Handle, out var length);
-        var data = ReadBytes(handle, length);
 
-        return data;
+        return ReadBytes(handle, length);
     }
 
     // TODO [LSViana] Consider extracting this to an infrastructure class.
