@@ -106,8 +106,6 @@ public class Doc : IDisposable
     public void Dispose()
     {
         DocChannel.Destroy(Handle);
-
-        Handle = default;
     }
 
     /// <summary>
