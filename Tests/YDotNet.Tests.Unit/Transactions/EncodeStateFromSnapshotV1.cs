@@ -6,6 +6,7 @@ namespace YDotNet.Tests.Unit.Transactions;
 
 public class EncodeStateFromSnapshotV1
 {
+    // TODO [LSViana] Check with the team if this is how this feature is supposed to be used.
     [Test]
     public void CreateAndApplySnapshot()
     {
