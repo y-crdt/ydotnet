@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
 using YDotNet.Native.Transaction;
+using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Transactions;
 
@@ -78,6 +79,7 @@ public class Transaction
     {
         var handle = TransactionChannel.StateVectorV1(Handle, out var length);
         var data = ReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
         return data;
     }
@@ -109,8 +111,10 @@ public class Transaction
     public byte[] StateDiffV1(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) stateVector.Length, out var length);
+        var data = ReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
-        return ReadBytes(handle, length);
+        return data;
     }
 
     /// <summary>
@@ -140,8 +144,10 @@ public class Transaction
     public byte[] StateDiffV2(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVector.Length, out var length);
+        var data = ReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
-        return ReadBytes(handle, length);
+        return data;
     }
 
     /// <summary>
@@ -186,8 +192,10 @@ public class Transaction
     public byte[] Snapshot()
     {
         var handle = TransactionChannel.Snapshot(Handle, out var length);
+        var data = ReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
-        return ReadBytes(handle, length);
+        return data;
     }
 
     /// <summary>
@@ -222,8 +230,10 @@ public class Transaction
             snapshot,
             (uint) snapshot.Length,
             out var length);
+        var data = TryReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
-        return TryReadBytes(handle, length);
+        return data;
     }
 
     /// <summary>
@@ -258,8 +268,10 @@ public class Transaction
             snapshot,
             (uint) snapshot.Length,
             out var length);
+        var data = TryReadBytes(handle, length);
+        BinaryChannel.Destroy(handle, length);
 
-        return TryReadBytes(handle, length);
+        return data;
     }
 
     // TODO [LSViana] Consider extracting these methods to an infrastructure class.
