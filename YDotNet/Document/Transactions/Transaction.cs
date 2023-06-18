@@ -173,6 +173,25 @@ public class Transaction
         return (TransactionUpdateResult) TransactionChannel.ApplyV2(Handle, stateDiff, (uint) stateDiff.Length);
     }
 
+    /// <summary>
+    ///     Returns a snapshot descriptor of a current state of the <see cref="Doc" /> associated to this
+    ///     <see cref="Transaction" />.
+    /// </summary>
+    /// <remarks>
+    ///     This snapshot information can be then used to encode <see cref="Doc" /> state at a particular point in time
+    ///     with <see cref="EncodeStateFromSnapshotV1" /> or <see cref="EncodeStateFromSnapshotV2" />.
+    /// </remarks>
+    /// <returns>
+    ///     A snapshot descriptor of a current state of the <see cref="Doc" /> associated to this <see cref="Transaction" />.
+    /// </returns>
+    public byte[] Snapshot()
+    {
+        var handle = TransactionChannel.Snapshot(Handle, out var length);
+        var data = ReadBytes(handle, length);
+
+        return data;
+    }
+
     // TODO [LSViana] Consider extracting this to an infrastructure class.
     private static unsafe byte[] ReadBytes(nint handle, uint length)
     {

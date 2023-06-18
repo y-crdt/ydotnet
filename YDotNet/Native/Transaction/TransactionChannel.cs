@@ -55,4 +55,8 @@ internal static class TransactionChannel
         nint transaction,
         byte[] stateDiff,
         uint stateDiffLength);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_snapshot")]
+    public static extern nint Snapshot(nint transaction, out uint length);
 }
