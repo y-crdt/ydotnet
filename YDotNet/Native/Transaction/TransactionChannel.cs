@@ -41,4 +41,13 @@ internal static class TransactionChannel
         byte[] stateVector,
         uint stateVectorLength,
         out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_apply")]
+    public static extern byte ApplyV1(
+        nint transaction,
+        byte[] stateDiff,
+        uint stateDiffLength);
 }
