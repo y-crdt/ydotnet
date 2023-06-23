@@ -4,7 +4,7 @@ using YDotNet.Document.Options;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class EncodeStateFromSnapshotV2
+public class EncodeStateFromSnapshotV2Tests
 {
     // TODO [LSViana] Check with the team if this is how this feature is supposed to be used.
     [Test]

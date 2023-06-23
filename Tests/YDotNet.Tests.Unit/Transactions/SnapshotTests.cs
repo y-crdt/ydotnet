@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class Snapshot
+public class SnapshotTests
 {
     [Test]
     public void ReadOnly()

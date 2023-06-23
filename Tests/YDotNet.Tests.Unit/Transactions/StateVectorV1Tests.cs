@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class StateVectorV1
+public class StateVectorV1Tests
 {
     [Test]
     public void ReadOnly()

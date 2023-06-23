@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class Writeable
+public class WriteableTests
 {
     [Test]
     public void ReadOnly()

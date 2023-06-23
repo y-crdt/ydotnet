@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class StateDiffV1
+public class StateDiffV2Tests
 {
     [Test]
     public void ReadOnly()
@@ -14,11 +14,11 @@ public class StateDiffV1
 
         // Act
         var stateVector = receiverDoc.ReadTransaction().StateVectorV1();
-        var stateDiff = senderDoc.ReadTransaction().StateDiffV1(stateVector);
+        var stateDiff = senderDoc.ReadTransaction().StateDiffV2(stateVector);
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.InRange(from: 21, to: 22));
+        Assert.That(stateDiff.Length, Is.EqualTo(expected: 33));
     }
 
     [Test]
@@ -30,11 +30,11 @@ public class StateDiffV1
 
         // Act
         var stateVector = receiverDoc.ReadTransaction().StateVectorV1();
-        var stateDiff = senderDoc.WriteTransaction().StateDiffV1(stateVector);
+        var stateDiff = senderDoc.WriteTransaction().StateDiffV2(stateVector);
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.InRange(from: 21, to: 22));
+        Assert.That(stateDiff.Length, Is.EqualTo(expected: 33));
     }
 
     private static Doc ArrangeSenderDoc()

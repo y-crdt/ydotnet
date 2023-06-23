@@ -4,7 +4,7 @@ using YDotNet.Document.Transactions;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
-public class ApplyV2
+public class ApplyV1Tests
 {
     [Test]
     public void ApplyAndCheckChanges()
@@ -17,8 +17,8 @@ public class ApplyV2
         var senderTransaction = senderDoc.ReadTransaction();
 
         // Act
-        var stateDiff = senderTransaction.StateDiffV2(receiverTransaction.StateVectorV1());
-        var result = receiverTransaction.ApplyV2(stateDiff);
+        var stateDiff = senderTransaction.StateDiffV1(receiverTransaction.StateVectorV1());
+        var result = receiverTransaction.ApplyV1(stateDiff);
         var text = receiverText.String(receiverTransaction);
 
         // Assert
