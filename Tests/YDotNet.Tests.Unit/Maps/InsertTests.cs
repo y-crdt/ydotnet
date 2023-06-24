@@ -47,9 +47,22 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertLong()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+        var value1 = 2469L;
+        var value2 = -420L;
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(transaction, "value1", Input.Long(value1));
+        map.Insert(transaction, "value2", Input.Long(value2));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 2));
     }
 
     [Test]
