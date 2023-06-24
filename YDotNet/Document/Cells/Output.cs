@@ -37,7 +37,20 @@ public class Output : IDisposable
         {
             var value = OutputChannel.Boolean(Handle);
 
-            return value == nint.Zero ? null : Marshal.ReadByte(value) == 1;
+            return value == nint.Zero ? null : Marshal.PtrToStructure<byte>(value) == 1;
+        }
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="double" /> or <c>null</c> if this output cell contains a different type stored.
+    /// </summary>
+    public double? Double
+    {
+        get
+        {
+            var value = OutputChannel.Double(Handle);
+
+            return value == nint.Zero ? null : Marshal.PtrToStructure<double>(value);
         }
     }
 
