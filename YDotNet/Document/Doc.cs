@@ -31,7 +31,6 @@ public class Doc : IDisposable
     public Doc()
     {
         Handle = DocChannel.New();
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -41,7 +40,6 @@ public class Doc : IDisposable
     public Doc(DocOptions options)
     {
         Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -51,7 +49,6 @@ public class Doc : IDisposable
     internal Doc(nint handle)
     {
         Handle = handle;
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -95,12 +92,7 @@ public class Doc : IDisposable
     /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
-    internal nint Handle { get; private set; }
-
-    /// <summary>
-    ///     Gets the <see cref="ReferenceAccessor" /> used by this document.
-    /// </summary>
-    private ReferenceAccessor ReferenceAccessor { get; }
+    internal nint Handle { get; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -113,9 +105,9 @@ public class Doc : IDisposable
     /// </summary>
     /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
     /// <returns>A new <see cref="Doc" /> instance that controls the same document.</returns>
-    public Doc Clone()
+    public Doc? Clone()
     {
-        return new Doc(DocChannel.Clone(Handle));
+        return ReferenceAccessor.Access(new Doc(DocChannel.Clone(Handle)));
     }
 
     /// <summary>
@@ -125,10 +117,10 @@ public class Doc : IDisposable
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
     /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
-    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided.</returns>
-    public Text Text(string name)
+    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Text? Text(string name)
     {
-        return new Text(DocChannel.Text(Handle, name));
+        return ReferenceAccessor.Access(new Text(DocChannel.Text(Handle, name)));
     }
 
     /// <summary>
@@ -138,10 +130,10 @@ public class Doc : IDisposable
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
     /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
-    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided.</returns>
-    public Map Map(string name)
+    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Map? Map(string name)
     {
-        return new Map(DocChannel.Map(Handle, name));
+        return ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, name)));
     }
 
     /// <summary>
