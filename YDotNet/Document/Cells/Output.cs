@@ -55,6 +55,19 @@ public class Output : IDisposable
     }
 
     /// <summary>
+    ///     Gets the <see cref="long" /> or <c>null</c> if this output cell contains a different type stored.
+    /// </summary>
+    public long? Long
+    {
+        get
+        {
+            var value = OutputChannel.Long(Handle);
+
+            return value == nint.Zero ? null : Marshal.PtrToStructure<long>(value);
+        }
+    }
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
