@@ -45,9 +45,21 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetLong()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Long(value: 2469L)),
+            ("value2", Input.Long(value: -420L))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Long;
+        var value2 = map.Get(transaction, "value2").Long;
+
+        // Assert
+        Assert.That(value1, Is.EqualTo(expected: 2469L));
+        Assert.That(value2, Is.EqualTo(expected: -420L));
     }
 
     [Test]
