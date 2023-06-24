@@ -1,4 +1,5 @@
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
 
@@ -22,6 +23,11 @@ internal static class ReferenceAccessor
     }
 
     public static Doc? Access(Doc instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static Output? Access(Output instance)
     {
         return Access(instance, instance.Handle);
     }
