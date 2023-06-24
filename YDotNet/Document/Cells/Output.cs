@@ -27,6 +27,11 @@ public class Output : IDisposable
     /// </summary>
     public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
 
+    /// <summary>
+    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
+    /// </summary>
+    public string? String => OutputChannel.String(Handle);
+
     /// <inheritdoc />
     public void Dispose()
     {
