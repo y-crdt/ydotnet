@@ -58,4 +58,14 @@ public sealed class Input
     {
         return new Input(InputChannel.Double(value));
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Long(long value)
+    {
+        return new Input(InputChannel.Long(value));
+    }
 }
