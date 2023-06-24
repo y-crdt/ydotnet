@@ -27,9 +27,20 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertString()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+        var name = "Lucas";
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(transaction, "name", new Input(name));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
