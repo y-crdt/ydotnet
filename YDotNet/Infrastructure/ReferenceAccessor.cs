@@ -1,25 +1,32 @@
+using YDotNet.Document;
 using YDotNet.Document.Transactions;
+using YDotNet.Document.Types;
 
 namespace YDotNet.Infrastructure;
 
-/// <summary>
-///     Used to translate native pointers to references.
-/// </summary>
-public class ReferenceAccessor
+internal static class ReferenceAccessor
 {
-    /// <summary>
-    ///     Accesses a <see cref="Transaction" /> instance based on <see cref="Transaction.Handle" />.
-    /// </summary>
-    /// <param name="instance">The <see cref="Transaction" /> instance to be returned.</param>
-    /// <returns>
-    ///     The same instance provided or <c>null</c> if the internal pointer is <see cref="nint.Zero" />.
-    /// </returns>
-    public Transaction? Access(Transaction instance)
+    public static Transaction? Access(Transaction instance)
     {
         return Access(instance, instance.Handle);
     }
 
-    private T? Access<T>(T instance, IntPtr pointer)
+    public static Map? Access(Map instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static Text? Access(Text instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static Doc? Access(Doc instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    private static T? Access<T>(T instance, IntPtr pointer)
         where T : class
     {
         return pointer == nint.Zero ? null : instance;
