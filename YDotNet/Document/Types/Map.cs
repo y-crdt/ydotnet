@@ -1,5 +1,6 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types;
@@ -46,11 +47,11 @@ public class Map
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="key">The key to be used to identify this entry.</param>
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
-    public Output Get(Transaction transaction, string key)
+    public Output? Get(Transaction transaction, string key)
     {
         var handle = MapChannel.Get(Handle, transaction.Handle, key);
 
-        return new Output(handle);
+        return ReferenceAccessor.Access(new Output(handle));
     }
 
     /// <summary>
