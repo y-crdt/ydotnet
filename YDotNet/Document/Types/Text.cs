@@ -33,7 +33,7 @@ public class Text
         TextChannel.Insert(Handle, transaction.Handle, index, value, nint.Zero);
     }
 
-    // TODO [LSViana] Add documentation
+    // TODO [LSViana] Add documentation and dispose the returned string.
     public string String(Transaction transaction)
     {
         return TextChannel.String(Handle, transaction.Handle);
