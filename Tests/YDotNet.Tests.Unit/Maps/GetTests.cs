@@ -27,9 +27,21 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetDouble()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Double(value: 24.69)),
+            ("value2", Input.Double(value: -4.20))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Double;
+        var value2 = map.Get(transaction, "value2").Double;
+
+        // Assert
+        Assert.That(value1, Is.EqualTo(expected: 24.69));
+        Assert.That(value2, Is.EqualTo(expected: -4.20));
     }
 
     [Test]
