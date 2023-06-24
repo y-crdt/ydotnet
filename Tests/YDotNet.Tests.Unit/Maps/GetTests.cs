@@ -30,7 +30,7 @@ public class GetTests
     public void GetString()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc("name", new Input("Lucas"));
+        var (map, transaction) = ArrangeDoc("name", Input.String("Lucas"));
 
         // Act
         var value = map.Get(transaction, "name").String;
@@ -104,7 +104,7 @@ public class GetTests
     {
         // Arrange
         var subDoc = new Doc();
-        var (map, transaction) = ArrangeDoc("sub-doc", new Input(subDoc));
+        var (map, transaction) = ArrangeDoc("sub-doc", Input.Doc(subDoc));
 
         // Act
         var subDocFromMap = map.Get(transaction, "sub-doc").Doc;

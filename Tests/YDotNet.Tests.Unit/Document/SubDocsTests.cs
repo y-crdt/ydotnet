@@ -132,7 +132,7 @@ public class SubDocsTests
             {
                 ShouldLoad = false
             });
-        map.Insert(transaction, key, new Input(subDoc1));
+        map.Insert(transaction, key, Input.Doc(subDoc1));
 
         transaction.Commit();
 
@@ -144,7 +144,7 @@ public class SubDocsTests
         var transaction = doc.WriteTransaction();
 
         var subDoc1 = new Doc();
-        map.Insert(transaction, key, new Input(subDoc1));
+        map.Insert(transaction, key, Input.Doc(subDoc1));
 
         transaction.Commit();
 

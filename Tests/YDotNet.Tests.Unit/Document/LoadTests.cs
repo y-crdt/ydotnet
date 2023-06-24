@@ -24,7 +24,7 @@ public class LoadTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        map.Insert(transaction, "sub-doc", new Input(subDoc));
+        map.Insert(transaction, "sub-doc", Input.Doc(subDoc));
         transaction.Commit();
 
         // Assert

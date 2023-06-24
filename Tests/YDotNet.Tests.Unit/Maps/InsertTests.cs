@@ -37,7 +37,7 @@ public class InsertTests
         Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
 
         // Act
-        map.Insert(transaction, "name", new Input(name));
+        map.Insert(transaction, "name", Input.String(name));
 
         // Assert
         Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
@@ -114,7 +114,7 @@ public class InsertTests
         Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
 
         // Act
-        map.Insert(transaction, "sub-doc", new Input(subDoc));
+        map.Insert(transaction, "sub-doc", Input.Doc(subDoc));
 
         // Assert
         Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));

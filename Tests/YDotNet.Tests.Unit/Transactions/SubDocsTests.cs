@@ -44,7 +44,7 @@ public class SubDocsTests
         for (var i = 0; i < subDocs; i++)
         {
             subDocuments[i] = new Doc();
-            map.Insert(transaction, $"sub-doc-{i - 1}", new Input(subDocuments[i]));
+            map.Insert(transaction, $"sub-doc-{i - 1}", Input.Doc(subDocuments[i]));
         }
 
         transaction.Commit();
