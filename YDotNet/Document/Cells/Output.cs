@@ -24,11 +24,6 @@ public class Output : IDisposable
     public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
 
     /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
     ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
     public string? String => OutputChannel.String(Handle);
@@ -45,6 +40,11 @@ public class Output : IDisposable
             return value == nint.Zero ? null : Marshal.ReadByte(value) == 1;
         }
     }
+
+    /// <summary>
+    ///     Gets the handle to the native resource.
+    /// </summary>
+    internal nint Handle { get; }
 
     /// <inheritdoc />
     public void Dispose()
