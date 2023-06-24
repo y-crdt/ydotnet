@@ -1,0 +1,7 @@
+[*.cs]
+
+# StyleCop rules
+
+# Documentation rules
+dotnet_diagnostic.SA1600.severity = suggestion # Elements should be documented
+dotnet_diagnostic.SA1602.severity = suggestion # Enumeration items should be documented
