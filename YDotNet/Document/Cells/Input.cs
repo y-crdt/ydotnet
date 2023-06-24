@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Native.Cells.Inputs;
 
 namespace YDotNet.Document.Cells;
@@ -10,10 +11,20 @@ public class Input
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="doc">The <see cref="Doc" /> instance to be stored in the cell.</param>
-    public Input(Doc doc)
+    /// <param name="value">The <see cref="Doc" /> instance to be stored in the cell.</param>
+    public Input(Doc value)
     {
-        InputNative = InputChannel.Doc(doc.Handle);
+        InputNative = InputChannel.Doc(value.Handle);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="string" /> value to be stored in the cell.</param>
+    public Input(string value)
+    {
+        // TODO [LSViana] Free the memory allocated here.
+        InputNative = InputChannel.String(Marshal.StringToHGlobalAuto(value));
     }
 
     /// <summary>
