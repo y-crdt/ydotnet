@@ -54,6 +54,17 @@ public class Map
     }
 
     /// <summary>
+    ///     Gets the number of entries stored in the <see cref="Map" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The number of entries stored in the <see cref="Map" />.</returns>
+    // TODO [LSViana] Check if the `Transaction` parameter is really needed here.
+    public uint Length(Transaction transaction)
+    {
+        return MapChannel.Length(Handle, transaction.Handle);
+    }
+
+    /// <summary>
     ///     Remove an entry, specified as a key, from the current <see cref="Map" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
