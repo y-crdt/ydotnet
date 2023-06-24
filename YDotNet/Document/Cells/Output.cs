@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 
@@ -18,19 +19,32 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
     ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
     public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the handle to the native resource.
+    /// </summary>
+    internal nint Handle { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
     public string? String => OutputChannel.String(Handle);
+
+    /// <summary>
+    ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
+    /// </summary>
+    public bool? Boolean
+    {
+        get
+        {
+            var value = OutputChannel.Boolean(Handle);
+
+            return value == nint.Zero ? null : Marshal.ReadByte(value) == 1;
+        }
+    }
 
     /// <inheritdoc />
     public void Dispose()
