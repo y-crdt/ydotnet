@@ -38,4 +38,14 @@ public sealed class Input
         // TODO [LSViana] Free the memory allocated here.
         return new Input(InputChannel.String(Marshal.StringToHGlobalAuto(value)));
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="string" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Boolean(bool value)
+    {
+        return new Input(InputChannel.Boolean(value));
+    }
 }
