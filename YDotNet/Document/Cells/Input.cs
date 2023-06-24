@@ -42,10 +42,20 @@ public sealed class Input
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="value">The <see cref="string" /> value to be stored in the cell.</param>
+    /// <param name="value">The <see cref="bool" /> value to be stored in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Boolean(bool value)
     {
         return new Input(InputChannel.Boolean(value));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="double" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Double(double value)
+    {
+        return new Input(InputChannel.Double(value));
     }
 }

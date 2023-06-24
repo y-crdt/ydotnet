@@ -12,4 +12,7 @@ internal static class InputChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_bool")]
     public static extern InputNative Boolean(bool value);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_float")]
+    public static extern InputNative Double(double value);
 }
