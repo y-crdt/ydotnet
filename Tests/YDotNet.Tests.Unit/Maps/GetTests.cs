@@ -9,9 +9,21 @@ namespace YDotNet.Tests.Unit.Maps;
 public class GetTests
 {
     [Test]
-    [Ignore("To be implemented.")]
     public void GetBoolean()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Boolean(value: true)),
+            ("value2", Input.Boolean(value: false))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Boolean;
+        var value2 = map.Get(transaction, "value2").Boolean;
+
+        // Assert
+        Assert.That(value1, Is.True);
+        Assert.That(value2, Is.False);
     }
 
     [Test]
@@ -30,7 +42,7 @@ public class GetTests
     public void GetString()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc("name", Input.String("Lucas"));
+        var (map, transaction) = ArrangeDoc(("name", Input.String("Lucas")));
 
         // Act
         var value = map.Get(transaction, "name").String;
@@ -104,7 +116,7 @@ public class GetTests
     {
         // Arrange
         var subDoc = new Doc();
-        var (map, transaction) = ArrangeDoc("sub-doc", Input.Doc(subDoc));
+        var (map, transaction) = ArrangeDoc(("sub-doc", Input.Doc(subDoc)));
 
         // Act
         var subDocFromMap = map.Get(transaction, "sub-doc").Doc;
@@ -125,13 +137,16 @@ public class GetTests
     {
     }
 
-    private (Map?, Transaction?) ArrangeDoc(string key, Input input)
+    private (Map?, Transaction?) ArrangeDoc(params (string Key, Input Value)[] values)
     {
         var doc = new Doc();
         var map = doc.Map("map");
         var transaction = doc.WriteTransaction();
 
-        map.Insert(transaction, key, input);
+        foreach (var value in values)
+        {
+            map.Insert(transaction, value.Key, value.Value);
+        }
 
         return (map, transaction);
     }
