@@ -120,6 +120,18 @@ public class InsertTests
         Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
+    [Test]
+    [Ignore("To be implemented.")]
+    public void InsertEqualTypeOnExistingKey()
+    {
+    }
+
+    [Test]
+    [Ignore("To be implemented.")]
+    public void InsertDifferentTypeOnExistingKey()
+    {
+    }
+
     private (Map?, Transaction?) ArrangeDoc()
     {
         var doc = new Doc();

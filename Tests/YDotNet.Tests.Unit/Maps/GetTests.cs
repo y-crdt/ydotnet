@@ -113,6 +113,18 @@ public class GetTests
         Assert.That(subDoc.Id, Is.EqualTo(subDocFromMap.Id));
     }
 
+    [Test]
+    [Ignore("To be implemented.")]
+    public void GetWrongTypeOnExistingKeyReturnsNull()
+    {
+    }
+
+    [Test]
+    [Ignore("To be implemented.")]
+    public void GetNewKeyReturnsNull()
+    {
+    }
+
     private (Map?, Transaction?) ArrangeDoc(string key, Input input)
     {
         var doc = new Doc();
