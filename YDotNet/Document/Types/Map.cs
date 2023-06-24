@@ -38,6 +38,22 @@ public class Map
     }
 
     /// <summary>
+    ///     Gets an entry, based on the key, from the <see cref="Map" />.
+    /// </summary>
+    /// <remarks>
+    ///     If the entry key does not exist, returns <c>null</c>.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this read operation.</param>
+    /// <param name="key">The key to be used to identify this entry.</param>
+    /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
+    public Output Get(Transaction transaction, string key)
+    {
+        var handle = MapChannel.Get(Handle, transaction.Handle, key);
+
+        return new Output(handle);
+    }
+
+    /// <summary>
     ///     Remove an entry, specified as a key, from the current <see cref="Map" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this write operation.</param>
