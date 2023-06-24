@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 
 namespace YDotNet.Tests.Unit.Transactions;
 
@@ -43,7 +44,7 @@ public class SubDocsTests
         for (var i = 0; i < subDocs; i++)
         {
             subDocuments[i] = new Doc();
-            map.Insert(transaction, $"sub-doc-{i - 1}", subDocuments[i]);
+            map.Insert(transaction, $"sub-doc-{i - 1}", new Input(subDocuments[i]));
         }
 
         transaction.Commit();

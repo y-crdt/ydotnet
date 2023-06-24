@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Types;
@@ -131,7 +132,7 @@ public class SubDocsTests
             {
                 ShouldLoad = false
             });
-        map.Insert(transaction, key, subDoc1);
+        map.Insert(transaction, key, new Input(subDoc1));
 
         transaction.Commit();
 
@@ -143,7 +144,7 @@ public class SubDocsTests
         var transaction = doc.WriteTransaction();
 
         var subDoc1 = new Doc();
-        map.Insert(transaction, key, subDoc1);
+        map.Insert(transaction, key, new Input(subDoc1));
 
         transaction.Commit();
 
