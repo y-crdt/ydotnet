@@ -94,9 +94,21 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetNull()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Null()),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Null;
+        var value2 = map.Get(transaction, "value2").Null;
+
+        // Assert
+        Assert.That(value1, Is.True);
+        Assert.That(value2, Is.False);
     }
 
     [Test]
