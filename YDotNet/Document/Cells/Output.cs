@@ -73,6 +73,11 @@ public class Output : IDisposable
     public bool Null => OutputChannel.Null(Handle);
 
     /// <summary>
+    ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
+    /// </summary>
+    public bool Undefined => OutputChannel.Undefined(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
