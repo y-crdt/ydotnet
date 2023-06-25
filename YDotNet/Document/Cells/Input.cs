@@ -68,4 +68,13 @@ public sealed class Input
     {
         return new Input(InputChannel.Long(value));
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Null()
+    {
+        return new Input(InputChannel.Null());
+    }
 }
