@@ -99,22 +99,40 @@ public class GetTests
         // Arrange
         var (map, transaction) = ArrangeDoc(
             ("value1", Input.Null()),
-            ("value2", Input.Boolean(value: true))
+            ("value2", Input.Undefined()),
+            ("value3", Input.Boolean(value: true))
         );
 
         // Act
         var value1 = map.Get(transaction, "value1").Null;
         var value2 = map.Get(transaction, "value2").Null;
+        var value3 = map.Get(transaction, "value3").Null;
 
         // Assert
         Assert.That(value1, Is.True);
         Assert.That(value2, Is.False);
+        Assert.That(value3, Is.False);
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetUndefined()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Undefined()),
+            ("value2", Input.Null()),
+            ("value3", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Undefined;
+        var value2 = map.Get(transaction, "value2").Undefined;
+        var value3 = map.Get(transaction, "value3").Undefined;
+
+        // Assert
+        Assert.That(value1, Is.True);
+        Assert.That(value2, Is.False);
+        Assert.That(value3, Is.False);
     }
 
     [Test]
