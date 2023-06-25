@@ -76,9 +76,21 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetBytes()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Bytes(new byte[] { 2, 4, 6, 9 })),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Bytes;
+        var value2 = map.Get(transaction, "value2").Bytes;
+
+        // Assert
+        Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
