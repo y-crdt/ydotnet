@@ -19,6 +19,9 @@ internal static class InputChannel
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_long")]
     public static extern InputNative Long(long value);
 
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_binary")]
+    public static extern InputNative Bytes(byte[] value, uint length);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_null")]
     public static extern InputNative Null();
 

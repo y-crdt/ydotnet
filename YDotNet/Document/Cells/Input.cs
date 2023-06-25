@@ -72,6 +72,16 @@ public sealed class Input
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Bytes(byte[] value)
+    {
+        return new Input(InputChannel.Bytes(value, (uint) value.Length));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Null()
     {
