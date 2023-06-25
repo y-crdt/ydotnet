@@ -83,9 +83,20 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertBytes()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+        var value = new byte[] { 2, 4, 6, 9 };
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(transaction, "value", Input.Bytes(value));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
