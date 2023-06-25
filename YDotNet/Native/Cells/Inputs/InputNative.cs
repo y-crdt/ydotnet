@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace YDotNet.Native.Cells.Inputs;
 
+// TODO [LSViana] Check if the `Size` value can be reduced without breaking the features.
 [StructLayout(LayoutKind.Explicit, Size = 24)]
 internal struct InputNative
 {
@@ -10,7 +11,4 @@ internal struct InputNative
 
     [field: FieldOffset(offset: 4)]
     public uint Length { get; }
-
-    [field: FieldOffset(offset: 8)]
-    public nint Content { get; }
 }
