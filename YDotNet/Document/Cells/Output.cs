@@ -68,6 +68,11 @@ public class Output : IDisposable
     }
 
     /// <summary>
+    ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
+    /// </summary>
+    public bool Null => OutputChannel.Null(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
