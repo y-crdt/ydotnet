@@ -101,9 +101,19 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertNull()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(transaction, "value", Input.Null());
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
