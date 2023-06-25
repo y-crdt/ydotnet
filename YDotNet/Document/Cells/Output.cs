@@ -16,6 +16,9 @@ public class Output : IDisposable
     internal Output(nint handle)
     {
         Handle = handle;
+
+        // TODO [LSViana] Use `youtput_destroy` to release the native resource.
+        OutputNative = Marshal.PtrToStructure<OutputNative>(handle);
     }
 
     /// <summary>
@@ -68,6 +71,11 @@ public class Output : IDisposable
     }
 
     /// <summary>
+    ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Length);
+
+    /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
     public bool Null => OutputChannel.Null(Handle);
@@ -81,6 +89,11 @@ public class Output : IDisposable
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <summary>
+    ///     Gets the native output cell represented by this cell.
+    /// </summary>
+    private OutputNative OutputNative { get; }
 
     /// <inheritdoc />
     public void Dispose()
