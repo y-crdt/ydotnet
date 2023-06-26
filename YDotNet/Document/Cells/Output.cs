@@ -78,12 +78,12 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
-    public bool Null => OutputChannel.Null(Handle);
+    public bool Null => OutputChannel.Null(Handle) == 1;
 
     /// <summary>
     ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
     /// </summary>
-    public bool Undefined => OutputChannel.Undefined(Handle);
+    public bool Undefined => OutputChannel.Undefined(Handle) == 1;
 
     /// <summary>
     ///     Gets the handle to the native resource.

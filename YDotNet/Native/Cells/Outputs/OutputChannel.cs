@@ -30,11 +30,11 @@ internal static class OutputChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_json_null")]
-    public static extern bool Null(nint output);
+    public static extern byte Null(nint output);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "youtput_read_json_undefined")]
-    public static extern bool Undefined(nint output);
+    public static extern byte Undefined(nint output);
 }
