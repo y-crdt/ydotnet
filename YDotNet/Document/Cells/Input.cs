@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Inputs;
 
 namespace YDotNet.Document.Cells;
@@ -36,7 +36,7 @@ public sealed class Input
     public static Input String(string value)
     {
         // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.String(Marshal.StringToHGlobalAuto(value)));
+        return new Input(InputChannel.String(MemoryWriter.WriteUtf8String(value).Pointer));
     }
 
     /// <summary>
