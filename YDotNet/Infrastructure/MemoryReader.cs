@@ -23,4 +23,22 @@ internal static class MemoryReader
     {
         return handle == nint.Zero ? null : ReadBytes(handle, length);
     }
+
+    internal static nint[] ReadIntPtrArray(nint handle, uint length, int size)
+    {
+        var result = new nint[length];
+
+        for (var i = 0; i < result.Length; i++)
+        {
+            var output = handle + i * size;
+            result[i] = output;
+        }
+
+        return result;
+    }
+
+    internal static nint[]? TryReadIntPtrArray(nint handle, uint length, int size)
+    {
+        return handle == nint.Zero ? null : ReadIntPtrArray(handle, length, size);
+    }
 }
