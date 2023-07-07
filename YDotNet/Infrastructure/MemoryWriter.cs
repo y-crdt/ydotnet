@@ -5,7 +5,7 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryWriter
 {
-    public static unsafe (Stream Stream, nint Pointer) WriteUtf8String(string value)
+    internal static unsafe (Stream Stream, nint Pointer) WriteUtf8String(string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value + "\0");
         var pointer = Marshal.AllocHGlobal(bytes.Length);
