@@ -29,6 +29,10 @@ internal static class OutputChannel
     public static extern nint Bytes(nint output);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_json_array")]
+    public static extern nint Collection(nint output);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_json_null")]
     public static extern byte Null(nint output);
 

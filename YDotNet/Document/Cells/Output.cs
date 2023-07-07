@@ -76,6 +76,15 @@ public class Output : IDisposable
     public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Length);
 
     /// <summary>
+    ///     Gets the <see cref="Input" /> array or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public Output[]? Collection =>
+        MemoryReader.TryReadIntPtrArray(
+                OutputChannel.Collection(Handle), OutputNative.Length, Marshal.SizeOf<OutputNative>())
+            ?.Select(x => new Output(x))
+            .ToArray();
+
+    /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
     public bool Null => OutputChannel.Null(Handle) == 1;
