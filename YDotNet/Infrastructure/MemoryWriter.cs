@@ -21,4 +21,18 @@ internal static class MemoryWriter
 
         return (stream, pointer);
     }
+
+    internal static nint WriteStructArray<T>(T[] value)
+        where T : struct
+    {
+        var size = Marshal.SizeOf<T>();
+        var handle = Marshal.AllocHGlobal(size * value.Length);
+
+        for (var i = 0; i < value.Length; i++)
+        {
+            Marshal.StructureToPtr(value[i], handle + i * size, fDeleteOld: false);
+        }
+
+        return handle;
+    }
 }
