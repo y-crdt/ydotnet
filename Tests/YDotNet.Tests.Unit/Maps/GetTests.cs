@@ -94,9 +94,29 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetCollection()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Collection(
+                new[]
+                {
+                    Input.Long(value: 2469L),
+                    Input.Long(value: -420L)
+                })),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Collection;
+        var value2 = map.Get(transaction, "value2").Collection;
+
+        // Assert
+        //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
+        Assert.That(value1.Length, Is.EqualTo(expected: 2));
+        Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
