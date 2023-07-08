@@ -95,6 +95,21 @@ public sealed class Input
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Object(IDictionary<string, Input> value)
+    {
+        // TODO [LSViana] Free the memory allocated here.
+        var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
+
+        return new Input(
+            InputChannel.Object(keys, values, (uint) value.Count));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Null()
     {

@@ -24,7 +24,11 @@ internal static class InputChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_json_array")]
-    public static extern InputNative Collection(nint value, uint length);
+    public static extern InputNative Collection(nint values, uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_json_map")]
+    public static extern InputNative Object(nint keys, nint values, uint length);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_null")]
     public static extern InputNative Null();
