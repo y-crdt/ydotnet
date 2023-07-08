@@ -1,7 +1,7 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Types;
+using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types;
 
