@@ -22,6 +22,20 @@ internal static class MemoryWriter
         return (stream, pointer);
     }
 
+    internal static nint WriteUtf8StringArray(string[] values)
+    {
+        var size = Marshal.SizeOf<nint>();
+        var pointer = Marshal.AllocHGlobal(size * values.Length);
+
+        for (var i = 0; i < values.Length; i++)
+        {
+            // TODO [LSViana] Free the memory allocated here.
+            Marshal.WriteIntPtr(pointer + i * size, WriteUtf8String(values[i]).Pointer);
+        }
+
+        return pointer;
+    }
+
     internal static nint WriteStructArray<T>(T[] value)
         where T : struct
     {
