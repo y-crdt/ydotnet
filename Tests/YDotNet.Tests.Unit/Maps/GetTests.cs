@@ -120,9 +120,29 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetObject()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Object(
+                new Dictionary<string, Input>
+                {
+                    { "value1-1", Input.Long(value: 2469L) },
+                    { "value1-2", Input.Long(value: -420L) }
+                })),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Object;
+        var value2 = map.Get(transaction, "value2").Object;
+
+        // Assert
+        //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
+        Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
+        Assert.That(value1["value1-1"].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1["value1-2"].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
