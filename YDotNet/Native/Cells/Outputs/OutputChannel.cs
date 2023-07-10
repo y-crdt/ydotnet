@@ -33,6 +33,10 @@ internal static class OutputChannel
     public static extern nint Collection(nint output);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_json_map")]
+    public static extern nint Object(nint output);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_json_null")]
     public static extern byte Null(nint output);
 

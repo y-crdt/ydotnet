@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
+using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Cells;
 
@@ -76,13 +77,45 @@ public class Output : IDisposable
     public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Length);
 
     /// <summary>
-    ///     Gets the <see cref="Input" /> array or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
     public Output[]? Collection =>
         MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Collection(Handle), OutputNative.Length, Marshal.SizeOf<OutputNative>())
             ?.Select(x => new Output(x))
             .ToArray();
+
+    /// <summary>
+    ///     Gets the <see cref="Input" /> dictionary or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public IDictionary<string, Output>? Object
+    {
+        get
+        {
+            // TODO [LSViana] Refactor this method to extract shared logic with other flows.
+            var handles = MemoryReader.TryReadIntPtrArray(
+                OutputChannel.Object(Handle), OutputNative.Length, Marshal.SizeOf<MapEntryNative>());
+
+            if (handles == null)
+            {
+                return null;
+            }
+
+            // This pointer size is used to offset the `MapEntryNative.Field` value (which is a string pointer).
+            var pointerSize = Marshal.SizeOf<nint>();
+            var result = new Dictionary<string, Output>();
+
+            foreach (var handle in handles)
+            {
+                var mapEntry = Marshal.PtrToStructure<MapEntryNative>(handle);
+                var outputNativeHandle = handle + pointerSize;
+
+                result[mapEntry.Field] = new Output(outputNativeHandle);
+            }
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
