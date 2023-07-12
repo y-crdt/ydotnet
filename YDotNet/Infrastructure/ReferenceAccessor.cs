@@ -2,6 +2,7 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
+using Array = YDotNet.Document.Types.Array;
 
 namespace YDotNet.Infrastructure;
 
@@ -13,6 +14,11 @@ internal static class ReferenceAccessor
     }
 
     public static Map? Access(Map instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static Array? Access(Array instance)
     {
         return Access(instance, instance.Handle);
     }
