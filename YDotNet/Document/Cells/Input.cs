@@ -103,8 +103,7 @@ public sealed class Input
         var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
         var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new Input(
-            InputChannel.Object(keys, values, (uint) value.Count));
+        return new Input(InputChannel.Object(keys, values, (uint) value.Count));
     }
 
     /// <summary>
@@ -136,5 +135,18 @@ public sealed class Input
 
         // TODO [LSViana] Free the memory allocated here.
         return new Input(InputChannel.Array(MemoryWriter.WriteStructArray(inputs), (uint) value.Length));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Map(IDictionary<string, Input> value)
+    {
+        var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
+
+        return new Input(InputChannel.Map(keys, values, (uint) value.Count));
     }
 }
