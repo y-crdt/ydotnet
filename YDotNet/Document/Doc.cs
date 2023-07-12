@@ -5,6 +5,7 @@ using YDotNet.Document.Types;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
+using Array = YDotNet.Document.Types.Array;
 
 namespace YDotNet.Document;
 
@@ -134,6 +135,19 @@ public class Doc : IDisposable
     public Map? Map(string name)
     {
         return ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, name)));
+    }
+
+    /// <summary>
+    ///     Gets or creates a new shared <see cref="Types.Array" /> data type instance as a root-level type in this document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="Types.Array" /> instance to get.</param>
+    /// <returns>The <see cref="Types.Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Array? Array(string name)
+    {
+        return ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, name)));
     }
 
     /// <summary>
