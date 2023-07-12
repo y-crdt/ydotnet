@@ -138,7 +138,6 @@ public class GetTests
         var value2 = map.Get(transaction, "value2").Object;
 
         // Assert
-        //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
         Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
         Assert.That(value1["value1-1"].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1["value1-2"].Long, Is.EqualTo(expected: -420L));
