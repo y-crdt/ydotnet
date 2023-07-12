@@ -187,9 +187,22 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetText()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Text("Lucas")),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Text;
+        var value2 = map.Get(transaction, "value2").Text;
+
+        // Assert
+        Assert.That(value1, Is.Not.Null);
+        Assert.That(value1.String(transaction), Is.EqualTo("Lucas"));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
