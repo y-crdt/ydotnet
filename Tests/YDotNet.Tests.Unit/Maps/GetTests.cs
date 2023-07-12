@@ -218,9 +218,29 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetMap()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Map(
+                new Dictionary<string, Input>
+                {
+                    { "value1-1", Input.Long(value: 2469L) },
+                    { "value1-2", Input.Long(value: -420L) }
+                })),
+            ("value2", Input.Boolean(value: true))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Map;
+        var value2 = map.Get(transaction, "value2").Map;
+
+        // Assert
+        Assert.That(value1, Is.Not.Null);
+        Assert.That(value1.Length(transaction), Is.EqualTo(expected: 2));
+        Assert.That(value1.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
+        Assert.That(value1.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
