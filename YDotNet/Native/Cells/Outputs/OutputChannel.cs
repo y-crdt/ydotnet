@@ -45,4 +45,8 @@ internal static class OutputChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "youtput_read_json_undefined")]
     public static extern byte Undefined(nint output);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_yarray")]
+    public static extern nint Array(nint output);
 }

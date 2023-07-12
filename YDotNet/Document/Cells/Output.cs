@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
+using Array = YDotNet.Document.Types.Array;
 
 namespace YDotNet.Document.Cells;
 
@@ -126,6 +127,11 @@ public class Output : IDisposable
     ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
     /// </summary>
     public bool Undefined => OutputChannel.Undefined(Handle) == 1;
+
+    /// <summary>
+    ///     Gets the <see cref="Types.Array" /> or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public Array? Array => ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle)));
 
     /// <summary>
     ///     Gets the handle to the native resource.
