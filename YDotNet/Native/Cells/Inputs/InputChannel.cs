@@ -35,4 +35,7 @@ internal static class InputChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_undefined")]
     public static extern InputNative Undefined();
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_yarray")]
+    public static extern InputNative Array(nint values, uint length);
 }

@@ -124,4 +124,17 @@ public sealed class Input
     {
         return new Input(InputChannel.Undefined());
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Array(Input[] value)
+    {
+        var inputs = value.Select(x => x.InputNative).ToArray();
+
+        // TODO [LSViana] Free the memory allocated here.
+        return new Input(InputChannel.Array(MemoryWriter.WriteStructArray(inputs), (uint) value.Length));
+    }
 }
