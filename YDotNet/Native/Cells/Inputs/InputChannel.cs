@@ -41,4 +41,7 @@ internal static class InputChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_ymap")]
     public static extern InputNative Map(nint keys, nint values, uint length);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_ytext")]
+    public static extern InputNative Text(nint value);
 }

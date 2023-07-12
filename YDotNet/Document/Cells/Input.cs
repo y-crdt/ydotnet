@@ -149,4 +149,15 @@ public sealed class Input
 
         return new Input(InputChannel.Map(keys, values, (uint) value.Count));
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input Text(string value)
+    {
+        // TODO [LSViana] Free the memory allocated here.
+        return new Input(InputChannel.Text(MemoryWriter.WriteUtf8String(value).Pointer));
+    }
 }
