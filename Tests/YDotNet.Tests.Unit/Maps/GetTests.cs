@@ -194,9 +194,27 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetArray()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Array(
+                new[]
+                {
+                    Input.Long(value: 2469L),
+                    Input.Long(value: -420L)
+                })),
+            ("value2", Input.Null())
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Array;
+        var value2 = map.Get(transaction, "value2").Array;
+
+        // Assert
+        Assert.That(value1, Is.Not.Null);
+        Assert.That(value1.Length, Is.EqualTo(expected: 2));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
