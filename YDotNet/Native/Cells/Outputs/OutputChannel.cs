@@ -49,4 +49,8 @@ internal static class OutputChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_yarray")]
     public static extern nint Array(nint output);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_ymap")]
+    public static extern nint Map(nint output);
 }
