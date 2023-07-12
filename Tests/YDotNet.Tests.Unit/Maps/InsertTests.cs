@@ -204,9 +204,25 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertMap()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(
+            transaction, "value", Input.Map(
+                new Dictionary<string, Input>
+                {
+                    { "value1", Input.Long(value: 2469L) },
+                    { "value2", Input.Long(value: -420L) }
+                }));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
