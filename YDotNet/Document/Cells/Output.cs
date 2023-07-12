@@ -135,9 +135,14 @@ public class Output : IDisposable
     public Array? Array => ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Types.Array" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Types.Map" /> or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
     public Map? Map => ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle)));
+
+    /// <summary>
+    ///     Gets the <see cref="Types.Text" /> or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public Text? Text => ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle)));
 
     /// <summary>
     ///     Gets the handle to the native resource.
