@@ -113,7 +113,8 @@ public class InsertTests
             transaction, "value", Input.Collection(
                 new[]
                 {
-                    Input.Long(value: 2469L)
+                    Input.Long(value: 2469L),
+                    Input.Long(value: -420L)
                 }));
 
         // Assert
@@ -181,9 +182,25 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertArray()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(
+            transaction, "value", Input.Array(
+                new[]
+                {
+                    Input.Long(value: 2469L),
+                    Input.Long(value: -420L)
+                }));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
