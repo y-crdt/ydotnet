@@ -266,6 +266,12 @@ public class InsertTests
     {
     }
 
+    [Test]
+    [Ignore("To be implemented.")]
+    public void InsertSameInstanceOnMultipleKeys()
+    {
+    }
+
     private (Map?, Transaction?) ArrangeDoc()
     {
         var doc = new Doc();
