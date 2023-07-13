@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Tests.Unit.Arrays;
 
-public class ArrayTests
+public class CreateTests
 {
     [Test]
     public void Create()
