@@ -275,9 +275,22 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetXmlText()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.XmlText("Lucas")),
+            ("value2", Input.Null())
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").XmlText;
+        var value2 = map.Get(transaction, "value2").XmlText;
+
+        // Assert
+        Assert.That(value1, Is.Not.Null);
+        Assert.That(value1.Length(transaction), Is.EqualTo(expected: 5));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
