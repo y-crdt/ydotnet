@@ -145,6 +145,11 @@ public class Output : IDisposable
     public Text? Text => ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle)));
 
     /// <summary>
+    ///     Gets the <see cref="Types.XmlElement" /> or <c>null</c> if this output cells contains a different type stored.
+    /// </summary>
+    public XmlElement? XmlElement => ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle)));
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
