@@ -28,6 +28,11 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
+    public static XmlElement? Access(XmlElement instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
     public static Doc? Access(Doc instance)
     {
         return Access(instance, instance.Handle);
