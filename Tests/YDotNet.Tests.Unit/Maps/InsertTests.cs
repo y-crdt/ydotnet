@@ -252,9 +252,19 @@ public class InsertTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertXmlText()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc();
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+
+        // Act
+        map.Insert(transaction, "value", Input.XmlText("Lucas"));
+
+        // Assert
+        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
     }
 
     [Test]
