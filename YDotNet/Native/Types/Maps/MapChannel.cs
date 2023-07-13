@@ -15,7 +15,7 @@ internal static class MapChannel
     public static extern uint Length(nint map, nint transaction);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_remove")]
-    public static extern bool Remove(nint map, nint transaction, string key);
+    public static extern byte Remove(nint map, nint transaction, string key);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_remove_all")]
     public static extern void RemoveAll(nint map, nint transaction);

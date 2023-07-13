@@ -73,7 +73,7 @@ public class Map
     /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
     public bool Remove(Transaction transaction, string key)
     {
-        return MapChannel.Remove(Handle, transaction.Handle, key);
+        return MapChannel.Remove(Handle, transaction.Handle, key) == 1;
     }
 
     /// <summary>
