@@ -160,4 +160,15 @@ public sealed class Input
         // TODO [LSViana] Free the memory allocated here.
         return new Input(InputChannel.Text(MemoryWriter.WriteUtf8String(value).Pointer));
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Input" /> class.
+    /// </summary>
+    /// <param name="name">The <see cref="string" /> value to name the <see cref="Types.XmlElement" /> in the cell.</param>
+    /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
+    public static Input XmlElement(string name)
+    {
+        // TODO [LSViana] Free the memory allocated here.
+        return new Input(InputChannel.XmlElement(MemoryWriter.WriteUtf8String(name).Pointer));
+    }
 }
