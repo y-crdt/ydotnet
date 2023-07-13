@@ -33,6 +33,11 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
+    public static XmlText? Access(XmlText instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
     public static Doc? Access(Doc instance)
     {
         return Access(instance, instance.Handle);
