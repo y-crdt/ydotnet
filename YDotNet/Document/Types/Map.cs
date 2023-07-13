@@ -66,7 +66,7 @@ public class Map
     }
 
     /// <summary>
-    ///     Remove an entry, specified as a key, from the current <see cref="Map" />.
+    ///     Removes an entry, specified as a key, from the current <see cref="Map" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="key">The key to be used to identify this entry.</param>
@@ -74,5 +74,14 @@ public class Map
     public bool Remove(Transaction transaction, string key)
     {
         return MapChannel.Remove(Handle, transaction.Handle, key);
+    }
+
+    /// <summary>
+    ///     Removes all entries from the current <see cref="Map" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    public void RemoveAll(Transaction transaction)
+    {
+        MapChannel.RemoveAll(Handle, transaction.Handle);
     }
 }
