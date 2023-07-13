@@ -47,4 +47,7 @@ internal static class InputChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_yxmlelem")]
     public static extern InputNative XmlElement(nint value);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yinput_yxmltext")]
+    public static extern InputNative XmlText(nint value);
 }
