@@ -256,9 +256,22 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetXmlElement()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.XmlElement("person")),
+            ("value2", Input.Null())
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").XmlElement;
+        var value2 = map.Get(transaction, "value2").XmlElement;
+
+        // Assert
+        Assert.That(value1, Is.Not.Null);
+        Assert.That(value1.Tag, Is.EqualTo("person"));
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
