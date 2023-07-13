@@ -61,4 +61,8 @@ internal static class OutputChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_yxmlelem")]
     public static extern nint XmlElement(nint output);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_yxmltext")]
+    public static extern nint XmlText(nint output);
 }
