@@ -1,7 +1,12 @@
+using System.Runtime.InteropServices;
+using YDotNet.Native.Types.Maps;
+
 namespace YDotNet.Infrastructure;
 
 internal static class MemoryReader
 {
+    private static readonly int PointerSize = Marshal.SizeOf<nint>();
+
     internal static unsafe byte[] ReadBytes(nint handle, uint length)
     {
         var data = new byte[length];
@@ -40,5 +45,11 @@ internal static class MemoryReader
     internal static nint[]? TryReadIntPtrArray(nint handle, uint length, int size)
     {
         return handle == nint.Zero ? null : ReadIntPtrArray(handle, length, size);
+    }
+
+    internal static (MapEntryNative MapEntryNative, nint OutputHandle) ReadMapEntryAndOutputHandle(nint handle)
+    {
+        // TODO [LSViana] Use `ymap_entry_destroy` to release the native resource.
+        return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + PointerSize);
     }
 }
