@@ -104,15 +104,13 @@ public class Output : IDisposable
             }
 
             // This pointer size is used to offset the `MapEntryNative.Field` value (which is a string pointer).
-            var pointerSize = Marshal.SizeOf<nint>();
             var result = new Dictionary<string, Output>();
 
             foreach (var handle in handles)
             {
-                var mapEntry = Marshal.PtrToStructure<MapEntryNative>(handle);
-                var outputNativeHandle = handle + pointerSize;
+                var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
 
-                result[mapEntry.Field] = new Output(outputNativeHandle);
+                result[mapEntry.Field] = new Output(outputHandle);
             }
 
             return result;
