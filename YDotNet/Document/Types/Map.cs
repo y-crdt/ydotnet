@@ -84,4 +84,15 @@ public class Map
     {
         MapChannel.RemoveAll(Handle, transaction.Handle);
     }
+
+    /// <summary>
+    ///     Returns a <see cref="MapIterator" />, which can be used to traverse over all key-value pairs of a
+    ///     <see cref="Map" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The <see cref="MapIterator" /> instance or <c>null</c> if failed.</returns>
+    public MapIterator? Iterate(Transaction transaction)
+    {
+        return ReferenceAccessor.Access(new MapIterator(MapChannel.Iterator(Handle, transaction.Handle)));
+    }
 }
