@@ -18,6 +18,11 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
+    public static MapIterator? Access(MapIterator instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
     public static Array? Access(Array instance)
     {
         return Access(instance, instance.Handle);
@@ -48,7 +53,7 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
-    private static T? Access<T>(T instance, IntPtr pointer)
+    private static T? Access<T>(T instance, nint pointer)
         where T : class
     {
         return pointer == nint.Zero ? null : instance;
