@@ -308,9 +308,21 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetWrongTypeOnExistingKeyReturnsNull()
     {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("value1", Input.Long(value: 2469L)),
+            ("value2", Input.Double(value: 4.20))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "value1").Double;
+        var value2 = map.Get(transaction, "value2").Long;
+
+        // Assert
+        Assert.That(value1, Is.Null);
+        Assert.That(value2, Is.Null);
     }
 
     [Test]
