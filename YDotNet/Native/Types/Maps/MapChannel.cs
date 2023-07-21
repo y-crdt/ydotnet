@@ -5,6 +5,8 @@ namespace YDotNet.Native.Types.Maps;
 
 internal static class MapChannel
 {
+    public delegate void ObserveCallback(nint state, nint eventHandle);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_insert")]
     public static extern void Insert(nint map, nint transaction, string key, InputNative inputNative);
 
@@ -33,4 +35,7 @@ internal static class MapChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_entry_destroy")]
     public static extern nint EntryDestroy(nint mapEntry);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_observe")]
+    public static extern uint Observe(nint map, nint state, ObserveCallback callback);
 }

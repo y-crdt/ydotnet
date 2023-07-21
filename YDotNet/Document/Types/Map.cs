@@ -1,5 +1,7 @@
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
@@ -94,5 +96,23 @@ public class Map
     public MapIterator? Iterate(Transaction transaction)
     {
         return ReferenceAccessor.Access(new MapIterator(MapChannel.Iterator(Handle, transaction.Handle)));
+    }
+
+    /// <summary>
+    ///     Subscribes a callback function for changes performed within the <see cref="Map" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is commited.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription Observe(Action<MapObserveEvent> action)
+    {
+        var subscriptionId = MapChannel.Observe(
+            Handle,
+            nint.Zero,
+            (state, eventHandle) => action(new MapObserveEvent(eventHandle)));
+
+        return new EventSubscription(subscriptionId);
     }
 }
