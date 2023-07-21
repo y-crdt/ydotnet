@@ -203,7 +203,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function to be called when the <see cref="Clear" /> method is called.
+    ///     Subscribes a callback function to be called when the <see cref="Clear" /> method is called.
     /// </summary>
     /// <param name="action">The callback function.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
@@ -228,7 +228,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -256,7 +256,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -284,7 +284,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -312,7 +312,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes in the sub-documents.
+    ///     Subscribes a callback function for changes in the sub-documents.
     /// </summary>
     /// <param name="action">The callback to be executed when a sub-document changes.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
