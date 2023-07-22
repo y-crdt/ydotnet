@@ -38,4 +38,7 @@ internal static class MapChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_observe")]
     public static extern uint Observe(nint map, nint state, ObserveCallback callback);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_event_keys")]
+    public static extern nint ObserveEventKeys(nint map, out uint length);
 }
