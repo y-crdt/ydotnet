@@ -1,7 +1,7 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
-using YDotNet.Document.Types.Events;
+using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
