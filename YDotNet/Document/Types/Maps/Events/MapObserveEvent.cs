@@ -29,7 +29,8 @@ public class MapObserveEvent
     ///     Gets the keys that changed within the <see cref="Map" /> instance and triggered this event.
     /// </summary>
     /// <remarks>
-    ///     Check the documentation of <see cref="MapEventKeyChange" /> for more information.
+    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
+    ///     <para>Check the documentation of <see cref="MapEventKeyChange" /> for more information.</para>
     /// </remarks>
     public IEnumerable<MapEventKeyChange>? Keys
     {
