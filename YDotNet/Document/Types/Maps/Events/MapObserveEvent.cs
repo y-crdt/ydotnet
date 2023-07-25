@@ -51,6 +51,11 @@ public class MapObserveEvent : IDisposable
     }
 
     /// <summary>
+    ///     Gets the <see cref="Map" /> instance that is related to this <see cref="MapObserveEvent" /> instance.
+    /// </summary>
+    public Map? Target => ReferenceAccessor.Access(new Map(MapChannel.ObserveEventTarget(Handle)));
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
