@@ -115,4 +115,14 @@ public class Map
 
         return new EventSubscription(subscriptionId);
     }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed within <see cref="Map" /> scope.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void Unobserve(EventSubscription subscription)
+    {
+        MapChannel.Unobserve(Handle, subscription.Id);
+    }
 }
