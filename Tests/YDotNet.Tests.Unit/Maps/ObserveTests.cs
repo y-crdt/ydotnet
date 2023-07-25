@@ -1,12 +1,32 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Types;
 using YDotNet.Document.Types.Maps.Events;
 
 namespace YDotNet.Tests.Unit.Maps;
 
 public class ObserveTests
 {
+    [Test]
+    public void ObserveHasTarget()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+        Map? target = null;
+        map.Observe(e => target = e.Target);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value", Input.Long(value: 2469L));
+        transaction.Commit();
+
+        // Assert
+        Assert.That(target, Is.Not.Null);
+        Assert.That(target.Handle, Is.Not.EqualTo(nint.Zero));
+    }
+
     [Test]
     public void ObserveHasKeysWhenAdded()
     {
