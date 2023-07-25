@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 using YDotNet.Native.Types.Maps.Events;
 
@@ -14,8 +15,11 @@ namespace YDotNet.Document.Types.Maps.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Map" /> instance.
 /// </summary>
-public class MapObserveEvent
+public class MapObserveEvent : IDisposable
 {
+    private nint? keysHandle;
+    private uint keysLength;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MapObserveEvent" /> class.
     /// </summary>
@@ -36,10 +40,10 @@ public class MapObserveEvent
     {
         get
         {
-            // TODO [LSViana] Use `yevent_keys_destroy` here.
-            var keysHandle = MapChannel.ObserveEventKeys(Handle, out var length);
+            keysHandle = MapChannel.ObserveEventKeys(Handle, out keysLength);
 
-            return MemoryReader.TryReadIntPtrArray(keysHandle, length, Marshal.SizeOf<MapEventKeyChangeNative>())
+            return MemoryReader.TryReadIntPtrArray(
+                    keysHandle.Value, keysLength, Marshal.SizeOf<MapEventKeyChangeNative>())
                 ?.Select(Marshal.PtrToStructure<MapEventKeyChangeNative>)
                 .Select(x => x.ToMapEventKeyChange())
                 .ToArray();
@@ -50,4 +54,18 @@ public class MapObserveEvent
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        DisposeKeys();
+    }
+
+    private void DisposeKeys()
+    {
+        if (keysHandle.HasValue)
+        {
+            EventChannel.Destroy(keysHandle.Value, keysLength);
+        }
+    }
 }
