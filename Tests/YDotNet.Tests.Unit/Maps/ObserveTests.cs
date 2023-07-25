@@ -86,9 +86,43 @@ public class ObserveTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void ObserveHasKeysWhenRemovedAll()
     {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value", Input.Long(value: 2469L));
+        transaction.Commit();
+
+        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        var called = 0;
+
+        var subscription = map.Observe(
+            e =>
+            {
+                called++;
+                keyChanges = e.Keys.ToArray();
+            });
+
+        // Act
+        transaction = doc.WriteTransaction();
+        map.RemoveAll(transaction);
+        transaction.Commit();
+
+        // Assert
+        var firstKey = keyChanges.First();
+
+        Assert.That(called, Is.EqualTo(expected: 1));
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        Assert.That(keyChanges, Is.Not.Null);
+        Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
+        Assert.That(firstKey.Key, Is.EqualTo("value"));
+        Assert.That(firstKey.Tag, Is.EqualTo(MapEventKeyChangeTag.Remove));
+        Assert.That(firstKey.OldValue, Is.Not.Null);
+        Assert.That(firstKey.NewValue, Is.Null);
+        Assert.That(firstKey.OldValue.Long, Is.EqualTo(expected: 2469L));
+        Assert.That(firstKey.OldValue.Double, Is.Null);
     }
 
     [Test]
