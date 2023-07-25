@@ -53,7 +53,7 @@ public class Map
     {
         var handle = MapChannel.Get(Handle, transaction.Handle, key);
 
-        return ReferenceAccessor.Access(new Output(handle));
+        return handle == nint.Zero ? null : new Output(handle);
     }
 
     /// <summary>
