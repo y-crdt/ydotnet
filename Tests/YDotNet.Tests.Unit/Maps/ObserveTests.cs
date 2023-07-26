@@ -2,7 +2,7 @@ using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types;
-using YDotNet.Document.Types.Maps.Events;
+using YDotNet.Document.Types.Events;
 
 namespace YDotNet.Tests.Unit.Maps;
 
@@ -34,7 +34,7 @@ public class ObserveTests
         var doc = new Doc();
         var map = doc.Map("map");
 
-        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        IEnumerable<EventKeyChange>? keyChanges = null;
         var called = 0;
 
         var subscription = map.Observe(
@@ -57,7 +57,7 @@ public class ObserveTests
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(firstKey.Key, Is.EqualTo("value"));
-        Assert.That(firstKey.Tag, Is.EqualTo(MapEventKeyChangeTag.Add));
+        Assert.That(firstKey.Tag, Is.EqualTo(EventKeyChangeTag.Add));
         Assert.That(firstKey.OldValue, Is.Null);
         Assert.That(firstKey.NewValue, Is.Not.Null);
         Assert.That(firstKey.NewValue.Long, Is.EqualTo(expected: 2469L));
@@ -74,7 +74,7 @@ public class ObserveTests
         map.Insert(transaction, "value", Input.Long(value: 2469L));
         transaction.Commit();
 
-        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        IEnumerable<EventKeyChange>? keyChanges = null;
         var called = 0;
 
         var subscription = map.Observe(
@@ -98,7 +98,7 @@ public class ObserveTests
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(firstKey.Key, Is.EqualTo("value"));
-        Assert.That(firstKey.Tag, Is.EqualTo(MapEventKeyChangeTag.Remove));
+        Assert.That(firstKey.Tag, Is.EqualTo(EventKeyChangeTag.Remove));
         Assert.That(firstKey.OldValue, Is.Not.Null);
         Assert.That(firstKey.NewValue, Is.Null);
         Assert.That(firstKey.OldValue.Long, Is.EqualTo(expected: 2469L));
@@ -115,7 +115,7 @@ public class ObserveTests
         map.Insert(transaction, "value", Input.Long(value: 2469L));
         transaction.Commit();
 
-        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        IEnumerable<EventKeyChange>? keyChanges = null;
         var called = 0;
 
         var subscription = map.Observe(
@@ -138,7 +138,7 @@ public class ObserveTests
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(firstKey.Key, Is.EqualTo("value"));
-        Assert.That(firstKey.Tag, Is.EqualTo(MapEventKeyChangeTag.Remove));
+        Assert.That(firstKey.Tag, Is.EqualTo(EventKeyChangeTag.Remove));
         Assert.That(firstKey.OldValue, Is.Not.Null);
         Assert.That(firstKey.NewValue, Is.Null);
         Assert.That(firstKey.OldValue.Long, Is.EqualTo(expected: 2469L));
@@ -155,7 +155,7 @@ public class ObserveTests
         map.Insert(transaction, "value", Input.Long(value: 2469L));
         transaction.Commit();
 
-        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        IEnumerable<EventKeyChange>? keyChanges = null;
         var called = 0;
 
         var subscription = map.Observe(
@@ -178,7 +178,7 @@ public class ObserveTests
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(firstKey.Key, Is.EqualTo("value"));
-        Assert.That(firstKey.Tag, Is.EqualTo(MapEventKeyChangeTag.Update));
+        Assert.That(firstKey.Tag, Is.EqualTo(EventKeyChangeTag.Update));
         Assert.That(firstKey.OldValue, Is.Not.Null);
         Assert.That(firstKey.NewValue, Is.Not.Null);
         Assert.That(firstKey.OldValue.Long, Is.EqualTo(expected: 2469L));
@@ -198,7 +198,7 @@ public class ObserveTests
         map.Insert(transaction, "value2", Input.Long(value: -420L));
         transaction.Commit();
 
-        IEnumerable<MapEventKeyChange>? keyChanges = null;
+        IEnumerable<EventKeyChange>? keyChanges = null;
         var called = 0;
 
         var subscription = map.Observe(
@@ -224,11 +224,11 @@ public class ObserveTests
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 3));
-        Assert.That(keyChanges.Count(x => x.Tag == MapEventKeyChangeTag.Update), Is.EqualTo(expected: 1));
-        Assert.That(keyChanges.Count(x => x.Tag == MapEventKeyChangeTag.Remove), Is.EqualTo(expected: 1));
-        Assert.That(keyChanges.Count(x => x.Tag == MapEventKeyChangeTag.Add), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.Count(x => x.Tag == EventKeyChangeTag.Update), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.Count(x => x.Tag == EventKeyChangeTag.Remove), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.Count(x => x.Tag == EventKeyChangeTag.Add), Is.EqualTo(expected: 1));
 
-        var update = keyChanges.First(x => x.Tag == MapEventKeyChangeTag.Update);
+        var update = keyChanges.First(x => x.Tag == EventKeyChangeTag.Update);
         Assert.That(update.OldValue, Is.Not.Null);
         Assert.That(update.NewValue, Is.Not.Null);
         Assert.That(update.OldValue.Long, Is.EqualTo(expected: 2469L));
@@ -236,13 +236,13 @@ public class ObserveTests
         Assert.That(update.NewValue.Long, Is.EqualTo(expected: -420L));
         Assert.That(update.NewValue.Double, Is.Null);
 
-        var remove = keyChanges.First(x => x.Tag == MapEventKeyChangeTag.Remove);
+        var remove = keyChanges.First(x => x.Tag == EventKeyChangeTag.Remove);
         Assert.That(remove.OldValue, Is.Not.Null);
         Assert.That(remove.NewValue, Is.Null);
         Assert.That(remove.OldValue.Long, Is.EqualTo(expected: -420L));
         Assert.That(remove.OldValue.Double, Is.Null);
 
-        var add = keyChanges.First(x => x.Tag == MapEventKeyChangeTag.Add);
+        var add = keyChanges.First(x => x.Tag == EventKeyChangeTag.Add);
         Assert.That(add.OldValue, Is.Null);
         Assert.That(add.NewValue, Is.Not.Null);
         Assert.That(add.NewValue.Long, Is.EqualTo(expected: -1337L));
