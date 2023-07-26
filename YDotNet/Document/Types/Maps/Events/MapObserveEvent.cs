@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices;
+using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
-using YDotNet.Native.Types.Maps.Events;
 
 namespace YDotNet.Document.Types.Maps.Events;
 
@@ -15,11 +13,8 @@ namespace YDotNet.Document.Types.Maps.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Map" /> instance.
 /// </summary>
-public class MapObserveEvent : IDisposable
+public class MapObserveEvent
 {
-    private nint? keysHandle;
-    private uint keysLength;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="MapObserveEvent" /> class.
     /// </summary>
@@ -36,17 +31,13 @@ public class MapObserveEvent : IDisposable
     ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
     ///     <para>Check the documentation of <see cref="MapEventKeyChange" /> for more information.</para>
     /// </remarks>
-    public IEnumerable<MapEventKeyChange>? Keys
+    public EventKeys Keys
     {
         get
         {
-            keysHandle = MapChannel.ObserveEventKeys(Handle, out keysLength);
+            var handle = MapChannel.ObserveEventKeys(Handle, out var length);
 
-            return MemoryReader.TryReadIntPtrArray(
-                    keysHandle.Value, keysLength, Marshal.SizeOf<MapEventKeyChangeNative>())
-                ?.Select(Marshal.PtrToStructure<MapEventKeyChangeNative>)
-                .Select(x => x.ToMapEventKeyChange())
-                .ToArray();
+            return new EventKeys(handle, length);
         }
     }
 
@@ -59,18 +50,4 @@ public class MapObserveEvent : IDisposable
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        DisposeKeys();
-    }
-
-    private void DisposeKeys()
-    {
-        if (keysHandle.HasValue)
-        {
-            EventChannel.Destroy(keysHandle.Value, keysLength);
-        }
-    }
 }
