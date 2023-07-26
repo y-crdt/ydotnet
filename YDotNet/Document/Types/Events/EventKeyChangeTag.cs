@@ -1,9 +1,9 @@
-namespace YDotNet.Document.Types.Maps.Events;
+namespace YDotNet.Document.Types.Events;
 
 /// <summary>
-///     Represents the tags to identify the kind of operation done within an <see cref="Map" /> under a certain key.
+///     Represents the tags to identify the kind of operation done within the parent instance under a certain key.
 /// </summary>
-public enum MapEventKeyChangeTag
+public enum EventKeyChangeTag
 {
     /// <summary>
     ///     Represents that the value under this key was added.
