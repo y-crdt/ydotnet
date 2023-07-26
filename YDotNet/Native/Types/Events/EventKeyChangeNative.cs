@@ -15,7 +15,7 @@ internal struct EventKeyChangeNative
 
     public nint NewValue { get; }
 
-    public EventKeyChange ToMapEventKeyChange()
+    public EventKeyChange ToEventKeyChange()
     {
         var tag = TagNative switch
         {

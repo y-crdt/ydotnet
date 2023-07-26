@@ -29,7 +29,7 @@ public class MapObserveEvent
     /// </summary>
     /// <remarks>
     ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="MapEventKeyChange" /> for more information.</para>
+    ///     <para>Check the documentation of <see cref="EventKeyChange" /> for more information.</para>
     /// </remarks>
     public EventKeys Keys
     {

@@ -20,7 +20,7 @@ public class EventKeys : IEnumerable<EventKeyChange>, IDisposable
 
         collection = MemoryReader.TryReadIntPtrArray(Handle, Length, Marshal.SizeOf<EventKeyChangeNative>())
             ?.Select(Marshal.PtrToStructure<EventKeyChangeNative>)
-            .Select(x => x.ToMapEventKeyChange())
+            .Select(x => x.ToEventKeyChange())
             .ToArray();
     }
 
