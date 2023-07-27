@@ -10,7 +10,7 @@ namespace YDotNet.Tests.Unit.Maps;
 public class ObserveDeepTests
 {
     [Test]
-    public void ObserveHasPathWhenAdded()
+    public void ObserveDeepHasPathWhenAdded()
     {
         // Arrange
         var (doc, map1, _, map3) = ArrangeDoc();
@@ -35,7 +35,7 @@ public class ObserveDeepTests
     }
 
     [Test]
-    public void ObserveHasPathWhenRemovedByKey()
+    public void ObserveDeepHasPathWhenRemovedByKey()
     {
         // Arrange
         var (doc, map1, _, map3) = ArrangeDoc();
@@ -64,7 +64,7 @@ public class ObserveDeepTests
     }
 
     [Test]
-    public void ObserveHasPathWhenRemovedAll()
+    public void ObserveDeepHasPathWhenRemovedAll()
     {
         // Arrange
         var (doc, map1, _, map3) = ArrangeDoc();
@@ -93,7 +93,7 @@ public class ObserveDeepTests
     }
 
     [Test]
-    public void ObserveHasPathWhenUpdated()
+    public void ObserveDeepHasPathWhenUpdated()
     {
         // Arrange
         var (doc, map1, _, map3) = ArrangeDoc();
@@ -122,7 +122,7 @@ public class ObserveDeepTests
     }
 
     [Test]
-    public void ObserveHasPathWhenAddedAndRemovedAndUpdated()
+    public void ObserveDeepHasPathWhenAddedAndRemovedAndUpdated()
     {
         // Arrange
         var (doc, map1, _, map3) = ArrangeDoc();
@@ -157,7 +157,7 @@ public class ObserveDeepTests
     }
 
     [Test]
-    public void ObserveHasMultipleEventsForMultipleInstanceChanges()
+    public void ObserveDeepHasMultipleEventsForMultipleInstanceChanges()
     {
         // Arrange
         var (doc, map1, map2, map3) = ArrangeDoc();
