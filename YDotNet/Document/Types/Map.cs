@@ -144,7 +144,7 @@ public class Map
             nint.Zero,
             (state, length, eventsHandle) =>
             {
-                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 16)!
+                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
                     .Select(x => new EventBranch(x))
                     .ToArray();
 
