@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Types;
 using YDotNet.Document.Types.Events;
 
 namespace YDotNet.Tests.Unit.Maps;
@@ -11,17 +12,7 @@ public class ObserveDeepTests
     public void ObserveHasPathWhenAdded()
     {
         // Arrange
-        var doc = new Doc();
-        var map1 = doc.Map("map-1");
-
-        var transaction = doc.WriteTransaction();
-        map1.Insert(transaction, "map-2", Input.Map(new Dictionary<string, Input>()));
-
-        var map2 = map1.Get(transaction, "map-2").Map;
-        map2.Insert(transaction, "map-3", Input.Map(new Dictionary<string, Input>()));
-
-        var map3 = map2.Get(transaction, "map-3").Map;
-        transaction.Commit();
+        var (doc, map1, _, map3) = ArrangeDoc();
 
         IEnumerable<EventPathSegment>? pathSegments = null;
         var called = 0;
@@ -34,7 +25,7 @@ public class ObserveDeepTests
             });
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         map3.Insert(transaction, "value", Input.Long(value: 2469L));
         transaction.Commit();
 
@@ -79,5 +70,22 @@ public class ObserveDeepTests
     [Ignore("To be implemented.")]
     public void ObserveHasPathWhenAddedAndRemovedAndUpdated()
     {
+    }
+
+    private static (Doc, Map, Map, Map) ArrangeDoc()
+    {
+        var doc = new Doc();
+        var map1 = doc.Map("map-1");
+
+        var transaction = doc.WriteTransaction();
+        map1.Insert(transaction, "map-2", Input.Map(new Dictionary<string, Input>()));
+
+        var map2 = map1.Get(transaction, "map-2").Map;
+        map2.Insert(transaction, "map-3", Input.Map(new Dictionary<string, Input>()));
+
+        var map3 = map2.Get(transaction, "map-3").Map;
+        transaction.Commit();
+
+        return (doc, map1, map2, map3);
     }
 }
