@@ -122,9 +122,38 @@ public class ObserveDeepTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void ObserveHasPathWhenAddedAndRemovedAndUpdated()
     {
+        // Arrange
+        var (doc, map1, _, map3) = ArrangeDoc();
+
+        var transaction = doc.WriteTransaction();
+        map3.Insert(transaction, "value1", Input.Long(value: 2469L));
+        map3.Insert(transaction, "value2", Input.Long(value: -420L));
+        transaction.Commit();
+
+        IEnumerable<EventPathSegment>? pathSegments = null;
+        var called = 0;
+
+        var subscription = map1.ObserveDeep(
+            events =>
+            {
+                called++;
+                pathSegments = events.First().MapEvent.Path.ToArray();
+            });
+
+        // Act
+        transaction = doc.WriteTransaction();
+
+        // Update, remove, and add, respectively
+        map3.Insert(transaction, "value1", Input.Long(value: -420L));
+        map3.Remove(transaction, "value2");
+        map3.Insert(transaction, "value3", Input.Long(value: -1337L));
+
+        transaction.Commit();
+
+        // Act
+        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
     }
 
     private static (Doc, Map, Map, Map) ArrangeDoc()
