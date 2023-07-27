@@ -219,7 +219,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(keyChanges, Is.Not.Null);
