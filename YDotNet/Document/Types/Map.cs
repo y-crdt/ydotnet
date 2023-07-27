@@ -1,8 +1,10 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types;
@@ -104,14 +106,14 @@ public class Map
     /// <remarks>
     ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
     /// </remarks>
-    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is commited.</param>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<MapObserveEvent> action)
+    public EventSubscription Observe(Action<MapEvent> action)
     {
         var subscriptionId = MapChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new MapObserveEvent(eventHandle)));
+            (state, eventHandle) => action(new MapEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }
