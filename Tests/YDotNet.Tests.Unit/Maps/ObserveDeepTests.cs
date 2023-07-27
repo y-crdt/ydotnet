@@ -156,6 +156,37 @@ public class ObserveDeepTests
         AssertPath(called, subscription, pathSegments, "map-2", "map-3");
     }
 
+    [Test]
+    public void ObserveHasMultipleEventsForMultipleInstanceChanges()
+    {
+        // Arrange
+        var (doc, map1, map2, map3) = ArrangeDoc();
+
+        IEnumerable<EventPath>? mapEvents = null;
+        var called = 0;
+
+        var subscription = map1.ObserveDeep(
+            events =>
+            {
+                called++;
+                mapEvents = events.Select(x => x.MapEvent.Path).ToArray();
+            });
+
+        // Act
+        var transaction = doc.WriteTransaction();
+
+        map1.Insert(transaction, "value", Input.Long(value: 2469L));
+        map2.Insert(transaction, "value", Input.Long(value: -420L));
+        map3.Insert(transaction, "value", Input.Boolean(value: true));
+
+        transaction.Commit();
+
+        // Act
+        AssertPath(called, subscription, mapEvents.ElementAt(index: 0));
+        AssertPath(called, subscription, mapEvents.ElementAt(index: 1), "map-2");
+        AssertPath(called, subscription, mapEvents.ElementAt(index: 2), "map-2", "map-3");
+    }
+
     private static (Doc, Map, Map, Map) ArrangeDoc()
     {
         var doc = new Doc();
