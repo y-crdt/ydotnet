@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 using YDotNet.Document.Types;
 using YDotNet.Document.Types.Events;
 
@@ -30,21 +31,7 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(called, Is.EqualTo(expected: 1));
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
-        Assert.That(pathSegments, Is.Not.Null);
-        Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
-
-        var first = pathSegments.ElementAt(index: 0);
-        var second = pathSegments.ElementAt(index: 1);
-
-        Assert.That(first.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(first.Key, Is.EqualTo("map-2"));
-        Assert.That(first.Index, Is.Null);
-
-        Assert.That(second.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(second.Key, Is.EqualTo("map-3"));
-        Assert.That(second.Index, Is.Null);
+        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -73,21 +60,7 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(called, Is.EqualTo(expected: 1));
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
-        Assert.That(pathSegments, Is.Not.Null);
-        Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
-
-        var first = pathSegments.ElementAt(index: 0);
-        var second = pathSegments.ElementAt(index: 1);
-
-        Assert.That(first.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(first.Key, Is.EqualTo("map-2"));
-        Assert.That(first.Index, Is.Null);
-
-        Assert.That(second.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(second.Key, Is.EqualTo("map-3"));
-        Assert.That(second.Index, Is.Null);
+        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -116,21 +89,7 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(called, Is.EqualTo(expected: 1));
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
-        Assert.That(pathSegments, Is.Not.Null);
-        Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
-
-        var first = pathSegments.ElementAt(index: 0);
-        var second = pathSegments.ElementAt(index: 1);
-
-        Assert.That(first.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(first.Key, Is.EqualTo("map-2"));
-        Assert.That(first.Index, Is.Null);
-
-        Assert.That(second.Tag, Is.EqualTo(EventPathSegmentTag.Key));
-        Assert.That(second.Key, Is.EqualTo("map-3"));
-        Assert.That(second.Index, Is.Null);
+        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -160,5 +119,26 @@ public class ObserveDeepTests
         transaction.Commit();
 
         return (doc, map1, map2, map3);
+    }
+
+    private static void AssertPath(
+        int called,
+        EventSubscription subscription,
+        IEnumerable<EventPathSegment>? pathSegments,
+        params string[] path)
+    {
+        Assert.That(called, Is.EqualTo(expected: 1));
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        Assert.That(pathSegments, Is.Not.Null);
+        Assert.That(pathSegments.Count(), Is.EqualTo(path.Length));
+
+        for (var i = 0; i < path.Length; i++)
+        {
+            var segment = pathSegments.ElementAt(i);
+
+            Assert.That(segment.Tag, Is.EqualTo(EventPathSegmentTag.Key));
+            Assert.That(segment.Key, Is.EqualTo(path[i]));
+            Assert.That(segment.Index, Is.Null);
+        }
     }
 }
