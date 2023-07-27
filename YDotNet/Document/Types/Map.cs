@@ -127,4 +127,30 @@ public class Map
     {
         MapChannel.Unobserve(Handle, subscription.Id);
     }
+
+    /// <summary>
+    ///     Subscribes a callback function for changes performed within the <see cref="Map" /> instance
+    ///     and all nested types.
+    /// </summary>
+    /// <remarks>
+    ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveDeep(Action<IEnumerable<EventBranch>> action)
+    {
+        var subscriptionId = BranchChannel.ObserveDeep(
+            Handle,
+            nint.Zero,
+            (state, length, eventsHandle) =>
+            {
+                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 16)!
+                    .Select(x => new EventBranch(x))
+                    .ToArray();
+
+                action(events);
+            });
+
+        return new EventSubscription(subscriptionId);
+    }
 }
