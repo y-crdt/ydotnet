@@ -13,13 +13,13 @@ namespace YDotNet.Document.Types.Maps.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Map" /> instance.
 /// </summary>
-public class MapObserveEvent
+public class MapEvent
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MapObserveEvent" /> class.
+    ///     Initializes a new instance of the <see cref="MapEvent" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
-    internal MapObserveEvent(nint handle)
+    internal MapEvent(nint handle)
     {
         Handle = handle;
     }
@@ -29,7 +29,7 @@ public class MapObserveEvent
     /// </summary>
     /// <remarks>
     ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventKeyChange" /> for more information.</para>
+    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
     /// </remarks>
     public EventKeys Keys
     {
@@ -42,7 +42,24 @@ public class MapObserveEvent
     }
 
     /// <summary>
-    ///     Gets the <see cref="Map" /> instance that is related to this <see cref="MapObserveEvent" /> instance.
+    ///     Gets the path from the root type down to the current <see cref="Map" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
+    ///     <para>Check the documentation of <see cref="EventPath" /> for more information.</para>
+    /// </remarks>
+    public EventPath Path
+    {
+        get
+        {
+            var handle = MapChannel.ObserveEventPath(Handle, out var length);
+
+            return new EventPath(handle, length);
+        }
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> instance that is related to this <see cref="MapEvent" /> instance.
     /// </summary>
     public Map? Target => ReferenceAccessor.Access(new Map(MapChannel.ObserveEventTarget(Handle)));
 
