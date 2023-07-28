@@ -5,7 +5,7 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryWriter
 {
-    internal static unsafe (Stream Stream, nint Pointer) WriteUtf8String(string value)
+    internal static unsafe nint WriteUtf8String(string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value + "\0");
         var pointer = Marshal.AllocHGlobal(bytes.Length);
@@ -14,26 +14,27 @@ internal static class MemoryWriter
             (byte*) pointer.ToPointer(),
             length: 0,
             bytes.Length,
-            FileAccess.Write
-        );
+            FileAccess.Write);
 
         stream.Write(bytes);
 
-        return (stream, pointer);
+        return pointer;
     }
 
-    internal static nint WriteUtf8StringArray(string[] values)
+    internal static (nint Head, nint[] Pointers) WriteUtf8StringArray(string[] values)
     {
         var size = Marshal.SizeOf<nint>();
-        var pointer = Marshal.AllocHGlobal(size * values.Length);
+        var head = Marshal.AllocHGlobal(size * values.Length);
+        var pointers = new nint[values.Length];
 
         for (var i = 0; i < values.Length; i++)
         {
-            // TODO [LSViana] Free the memory allocated here.
-            Marshal.WriteIntPtr(pointer + i * size, WriteUtf8String(values[i]).Pointer);
+            pointers[i] = WriteUtf8String(values[i]);
+
+            Marshal.WriteIntPtr(head + i * size, pointers[i]);
         }
 
-        return pointer;
+        return (head, pointers);
     }
 
     internal static nint WriteStructArray<T>(T[] value)
@@ -48,5 +49,18 @@ internal static class MemoryWriter
         }
 
         return handle;
+    }
+
+    internal static void Release(nint pointer)
+    {
+        Marshal.FreeHGlobal(pointer);
+    }
+
+    internal static void ReleaseArray(nint[] pointers)
+    {
+        foreach (var pointer in pointers)
+        {
+            Release(pointer);
+        }
     }
 }
