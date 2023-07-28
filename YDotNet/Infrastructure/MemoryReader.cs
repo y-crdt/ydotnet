@@ -49,7 +49,6 @@ internal static class MemoryReader
 
     internal static (MapEntryNative MapEntryNative, nint OutputHandle) ReadMapEntryAndOutputHandle(nint handle)
     {
-        // TODO [LSViana] Use `ymap_entry_destroy` to release the native resource.
         return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + PointerSize);
     }
 }
