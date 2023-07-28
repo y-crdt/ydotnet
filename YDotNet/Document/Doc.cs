@@ -106,8 +106,6 @@ public class Doc : IDisposable
     public void Dispose()
     {
         DocChannel.Destroy(Handle);
-
-        Handle = default;
     }
 
     /// <summary>
@@ -147,13 +145,13 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Starts a new read-write transaction on this document.
+    ///     Starts a new read-write <see cref="Transaction" /> on this document.
     /// </summary>
     /// <returns>
-    ///     <para>The transaction to perform operations in the document or <c>null</c>.</para>
+    ///     <para>The <see cref="Transaction" /> to perform operations in the document or <c>null</c>.</para>
     ///     <para>
-    ///         Returns <c>null</c> if the transaction could not be created because, for example, another
-    ///         read-write transaction already exists and was not committed yet.
+    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
+    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
     ///     </para>
     /// </returns>
     public Transaction? WriteTransaction()
@@ -163,13 +161,13 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Starts a new read-only transaction on this document.
+    ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
     /// <returns>
-    ///     <para>The transaction to perform operations in the document or <c>null</c>.</para>
+    ///     <para>The <see cref="Transaction" /> to perform operations in the document or <c>null</c>.</para>
     ///     <para>
-    ///         Returns <c>null</c> if the transaction could not be created because, for example, another
-    ///         read-write transaction already exists and was not committed yet.
+    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
+    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
     ///     </para>
     /// </returns>
     public Transaction? ReadTransaction()
@@ -192,6 +190,7 @@ public class Doc : IDisposable
     /// <remarks>
     ///     Works only if current document is a sub-document of an another document.
     /// </remarks>
+    /// <param name="transaction">A read-only <see cref="Transaction" /> of the parent document.</param>
     public void Load(Transaction transaction)
     {
         DocChannel.Load(Handle, transaction.Handle);
@@ -223,12 +222,12 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within transaction scope.
+    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
-    /// <param name="action">The callback to be executed when a transaction is committed.</param>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
     {
@@ -242,7 +241,7 @@ public class Doc : IDisposable
 
     /// <summary>
     ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within transaction scope.
+    ///     performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void UnobserveUpdatesV1(EventSubscription subscription)
@@ -251,12 +250,12 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within transaction scope.
+    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
-    /// <param name="action">The callback to be executed when a transaction is committed.</param>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV2(Action<UpdateEvent> action)
     {
@@ -270,7 +269,7 @@ public class Doc : IDisposable
 
     /// <summary>
     ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within transaction scope.
+    ///     performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void UnobserveUpdatesV2(EventSubscription subscription)
@@ -279,12 +278,12 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within transaction scope.
+    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
     /// </remarks>
-    /// <param name="action">The callback to be executed when a transaction is committed.</param>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
@@ -298,7 +297,7 @@ public class Doc : IDisposable
 
     /// <summary>
     ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within transaction scope.
+    ///     performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void UnobserveAfterTransaction(EventSubscription subscription)

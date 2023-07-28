@@ -32,4 +32,10 @@ public class Text
     {
         TextChannel.Insert(Handle, transaction.Handle, index, value, nint.Zero);
     }
+
+    // TODO [LSViana] Add documentation
+    public string String(Transaction transaction)
+    {
+        return TextChannel.String(Handle, transaction.Handle);
+    }
 }

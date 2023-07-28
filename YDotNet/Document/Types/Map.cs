@@ -1,6 +1,6 @@
 using YDotNet.Document.Transactions;
 using YDotNet.Native.Cells;
-using YDotNet.Native.Document;
+using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types;
 

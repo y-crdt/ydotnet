@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
-using YDotNet.Native.Cells;
 
-namespace YDotNet.Native.Document;
+namespace YDotNet.Native.Cells;
 
 internal static class InputChannel
 {
