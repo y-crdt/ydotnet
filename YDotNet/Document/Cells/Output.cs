@@ -13,15 +13,21 @@ namespace YDotNet.Document.Cells;
 /// </summary>
 public class Output : IDisposable
 {
+    private readonly bool disposable;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Output" /> class.
     /// </summary>
     /// <param name="handle">The pointer to the native resource that represents the storage.</param>
-    internal Output(nint handle)
+    /// <param name="disposable">
+    ///     The flag determines if the resource associated with <see cref="Handle" /> should be disposed
+    ///     by this <see cref="Output" /> instance.
+    /// </param>
+    internal Output(nint handle, bool disposable = false)
     {
-        Handle = handle;
+        this.disposable = disposable;
 
-        // TODO [LSViana] Use `youtput_destroy` to release the native resource.
+        Handle = handle;
         OutputNative = Marshal.PtrToStructure<OutputNative>(handle);
     }
 
@@ -166,6 +172,11 @@ public class Output : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        // TODO [LSViana] Use `youtput_destroy` here.
+        if (!disposable)
+        {
+            return;
+        }
+
+        OutputChannel.Destroy(Handle);
     }
 }
