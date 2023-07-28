@@ -5,5 +5,5 @@ namespace YDotNet.Native.Types;
 internal static class XmlElementChannel
 {
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_tag")]
-    public static extern string Tag(nint handle);
+    public static extern nint Tag(nint handle);
 }
