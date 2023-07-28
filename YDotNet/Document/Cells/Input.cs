@@ -6,17 +6,15 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 ///     Represents a cell used to send information to be stored.
 /// </summary>
-public sealed class Input
+public abstract class Input : IDisposable
 {
-    private Input(InputNative inputNative)
-    {
-        InputNative = inputNative;
-    }
-
     /// <summary>
-    ///     Gets the native input cell represented by this cell.
+    ///     Gets or sets the native input cell represented by this cell.
     /// </summary>
-    internal InputNative InputNative { get; }
+    internal InputNative InputNative { get; set; }
+
+    /// <inheritdoc />
+    public abstract void Dispose();
 
     /// <summary>
     ///     Creates a new instance of the <see cref="Input" /> class.
@@ -25,7 +23,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Doc(Doc value)
     {
-        return new Input(InputChannel.Doc(value.Handle));
+        return new InputEmpty(InputChannel.Doc(value.Handle));
     }
 
     /// <summary>
@@ -35,8 +33,9 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input String(string value)
     {
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.String(MemoryWriter.WriteUtf8String(value).Pointer));
+        var pointer = MemoryWriter.WriteUtf8String(value);
+
+        return new InputPointer(InputChannel.String(pointer), pointer);
     }
 
     /// <summary>
@@ -46,7 +45,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Boolean(bool value)
     {
-        return new Input(InputChannel.Boolean(value));
+        return new InputEmpty(InputChannel.Boolean(value));
     }
 
     /// <summary>
@@ -56,7 +55,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Double(double value)
     {
-        return new Input(InputChannel.Double(value));
+        return new InputEmpty(InputChannel.Double(value));
     }
 
     /// <summary>
@@ -66,7 +65,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Long(long value)
     {
-        return new Input(InputChannel.Long(value));
+        return new InputEmpty(InputChannel.Long(value));
     }
 
     /// <summary>
@@ -76,7 +75,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
-        return new Input(InputChannel.Bytes(value, (uint) value.Length));
+        return new InputEmpty(InputChannel.Bytes(value, (uint) value.Length));
     }
 
     /// <summary>
@@ -87,9 +86,9 @@ public sealed class Input
     public static Input Collection(Input[] value)
     {
         var inputs = value.Select(x => x.InputNative).ToArray();
+        var pointer = MemoryWriter.WriteStructArray(inputs);
 
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.Collection(MemoryWriter.WriteStructArray(inputs), (uint) value.Length));
+        return new InputPointer(InputChannel.Collection(pointer, (uint) value.Length), pointer);
     }
 
     /// <summary>
@@ -99,11 +98,12 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Object(IDictionary<string, Input> value)
     {
-        // TODO [LSViana] Free the memory allocated here.
         var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
         var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Object(keys, values, (uint) value.Count));
+        return new InputPointerArray(
+            InputChannel.Object(keys.Head, values, (uint) value.Count),
+            keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Null()
     {
-        return new Input(InputChannel.Null());
+        return new InputEmpty(InputChannel.Null());
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Undefined()
     {
-        return new Input(InputChannel.Undefined());
+        return new InputEmpty(InputChannel.Undefined());
     }
 
     /// <summary>
@@ -132,9 +132,9 @@ public sealed class Input
     public static Input Array(Input[] value)
     {
         var inputs = value.Select(x => x.InputNative).ToArray();
+        var pointer = MemoryWriter.WriteStructArray(inputs);
 
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.Array(MemoryWriter.WriteStructArray(inputs), (uint) value.Length));
+        return new InputPointer(InputChannel.Array(pointer, (uint) value.Length), pointer);
     }
 
     /// <summary>
@@ -147,7 +147,9 @@ public sealed class Input
         var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
         var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Map(keys, values, (uint) value.Count));
+        return new InputPointerArray(
+            InputChannel.Map(keys.Head, values, (uint) value.Count),
+            keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
     }
 
     /// <summary>
@@ -157,8 +159,9 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Text(string value)
     {
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.Text(MemoryWriter.WriteUtf8String(value).Pointer));
+        var pointer = MemoryWriter.WriteUtf8String(value);
+
+        return new InputPointer(InputChannel.Text(pointer), pointer);
     }
 
     /// <summary>
@@ -168,8 +171,9 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlElement(string name)
     {
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.XmlElement(MemoryWriter.WriteUtf8String(name).Pointer));
+        var pointer = MemoryWriter.WriteUtf8String(name);
+
+        return new InputPointer(InputChannel.XmlElement(pointer), pointer);
     }
 
     /// <summary>
@@ -179,7 +183,8 @@ public sealed class Input
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlText(string value)
     {
-        // TODO [LSViana] Free the memory allocated here.
-        return new Input(InputChannel.XmlText(MemoryWriter.WriteUtf8String(value).Pointer));
+        var pointer = MemoryWriter.WriteUtf8String(value);
+
+        return new InputPointer(InputChannel.XmlText(pointer), pointer);
     }
 }
