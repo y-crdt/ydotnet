@@ -6,7 +6,6 @@ namespace YDotNet.Tests.Unit.Transactions;
 
 public class EncodeStateFromSnapshotV2Tests
 {
-    // TODO [LSViana] Check with the team if this is how this feature is supposed to be used.
     [Test]
     [Ignore("Checking a possible bug on the Rust library.")]
     public void CreateAndApplySnapshot()
