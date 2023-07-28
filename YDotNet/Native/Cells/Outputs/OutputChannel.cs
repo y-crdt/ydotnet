@@ -65,4 +65,7 @@ internal static class OutputChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_read_yxmltext")]
     public static extern nint XmlText(nint output);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "youtput_destroy")]
+    public static extern void Destroy(nint output);
 }
