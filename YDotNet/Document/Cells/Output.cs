@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Types;
+using YDotNet.Document.Types.Maps;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
@@ -133,7 +134,7 @@ public class Output : IDisposable
     public Array? Array => ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Types.Map" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Types.Maps.Map" /> or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
     public Map? Map => ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle)));
 

@@ -1,7 +1,7 @@
 using System.Collections;
 using YDotNet.Native.Types.Maps;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
 ///     Represents the iterator to provide instances of <see cref="MapEntry" /> or <c>null</c> to

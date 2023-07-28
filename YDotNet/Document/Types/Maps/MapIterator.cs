@@ -1,7 +1,7 @@
 using System.Collections;
 using YDotNet.Native.Types.Maps;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
 ///     Represents an enumerable to read <see cref="MapEntry" /> instances from a <see cref="Map" />.

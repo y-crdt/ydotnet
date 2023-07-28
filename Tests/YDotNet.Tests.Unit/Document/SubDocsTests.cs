@@ -3,7 +3,7 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
-using YDotNet.Document.Types;
+using YDotNet.Document.Types.Maps;
 
 namespace YDotNet.Tests.Unit.Document;
 

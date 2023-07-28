@@ -7,7 +7,7 @@ using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
 ///     A shared data type that represents a map.

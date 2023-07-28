@@ -2,6 +2,7 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
+using YDotNet.Document.Types.Maps;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;

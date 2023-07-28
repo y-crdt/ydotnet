@@ -2,7 +2,7 @@ using YDotNet.Document.Cells;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
 ///     Represents an entry of a <see cref="Map" />. It contains a <see cref="Key" /> and <see cref="Value" />.
