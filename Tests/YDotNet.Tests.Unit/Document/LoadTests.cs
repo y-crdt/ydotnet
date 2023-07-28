@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Options;
 
 namespace YDotNet.Tests.Unit.Document;
@@ -23,7 +24,7 @@ public class LoadTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        map.Insert(transaction, "sub-doc", subDoc);
+        map.Insert(transaction, "sub-doc", Input.Doc(subDoc));
         transaction.Commit();
 
         // Assert

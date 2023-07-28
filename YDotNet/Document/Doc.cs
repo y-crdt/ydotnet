@@ -2,9 +2,11 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
+using YDotNet.Document.Types.Maps;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
+using Array = YDotNet.Document.Types.Array;
 
 namespace YDotNet.Document;
 
@@ -31,7 +33,6 @@ public class Doc : IDisposable
     public Doc()
     {
         Handle = DocChannel.New();
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -41,7 +42,6 @@ public class Doc : IDisposable
     public Doc(DocOptions options)
     {
         Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -51,7 +51,6 @@ public class Doc : IDisposable
     internal Doc(nint handle)
     {
         Handle = handle;
-        ReferenceAccessor = new ReferenceAccessor();
     }
 
     /// <summary>
@@ -95,12 +94,7 @@ public class Doc : IDisposable
     /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
-    internal nint Handle { get; private set; }
-
-    /// <summary>
-    ///     Gets the <see cref="ReferenceAccessor" /> used by this document.
-    /// </summary>
-    private ReferenceAccessor ReferenceAccessor { get; }
+    internal nint Handle { get; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -113,9 +107,9 @@ public class Doc : IDisposable
     /// </summary>
     /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
     /// <returns>A new <see cref="Doc" /> instance that controls the same document.</returns>
-    public Doc Clone()
+    public Doc? Clone()
     {
-        return new Doc(DocChannel.Clone(Handle));
+        return ReferenceAccessor.Access(new Doc(DocChannel.Clone(Handle)));
     }
 
     /// <summary>
@@ -125,10 +119,10 @@ public class Doc : IDisposable
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
     /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
-    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided.</returns>
-    public Text Text(string name)
+    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Text? Text(string name)
     {
-        return new Text(DocChannel.Text(Handle, name));
+        return ReferenceAccessor.Access(new Text(DocChannel.Text(Handle, name)));
     }
 
     /// <summary>
@@ -138,10 +132,23 @@ public class Doc : IDisposable
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
     /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
-    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided.</returns>
-    public Map Map(string name)
+    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Map? Map(string name)
     {
-        return new Map(DocChannel.Map(Handle, name));
+        return ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, name)));
+    }
+
+    /// <summary>
+    ///     Gets or creates a new shared <see cref="Types.Array" /> data type instance as a root-level type in this document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="Types.Array" /> instance to get.</param>
+    /// <returns>The <see cref="Types.Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public Array? Array(string name)
+    {
+        return ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, name)));
     }
 
     /// <summary>
@@ -197,7 +204,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function to be called when the <see cref="Clear" /> method is called.
+    ///     Subscribes a callback function to be called when the <see cref="Clear" /> method is called.
     /// </summary>
     /// <param name="action">The callback function.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
@@ -222,7 +229,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -250,7 +257,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -278,7 +285,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes performed within <see cref="Transaction" /> scope.
+    ///     Subscribes a callback function for changes performed within <see cref="Transaction" /> scope.
     /// </summary>
     /// <remarks>
     ///     The updates are encoded using <c>lib0</c> V1 encoding and they can be  passed to remote peers right away.
@@ -306,7 +313,7 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Subscribes callback function for changes in the sub-documents.
+    ///     Subscribes a callback function for changes in the sub-documents.
     /// </summary>
     /// <param name="action">The callback to be executed when a sub-document changes.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>

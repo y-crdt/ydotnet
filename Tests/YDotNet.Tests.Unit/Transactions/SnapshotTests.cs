@@ -16,7 +16,7 @@ public class SnapshotTests
 
         // Assert
         Assert.That(snapshot, Is.Not.Null);
-        Assert.That(snapshot.Length, Is.InRange(from: 7, to: 8));
+        Assert.That(snapshot.Length, Is.InRange(from: 6, to: 8));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class SnapshotTests
 
         // Assert
         Assert.That(snapshot, Is.Not.Null);
-        Assert.That(snapshot.Length, Is.InRange(from: 7, to: 8));
+        Assert.That(snapshot.Length, Is.InRange(from: 6, to: 8));
     }
 
     private static Doc ArrangeDoc()

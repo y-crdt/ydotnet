@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Transaction;
 using YDotNet.Native.Types;
 
@@ -78,7 +79,7 @@ public class Transaction
     public byte[] StateVectorV1()
     {
         var handle = TransactionChannel.StateVectorV1(Handle, out var length);
-        var data = ReadBytes(handle, length);
+        var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
@@ -111,7 +112,7 @@ public class Transaction
     public byte[] StateDiffV1(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) stateVector.Length, out var length);
-        var data = ReadBytes(handle, length);
+        var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
@@ -144,7 +145,7 @@ public class Transaction
     public byte[] StateDiffV2(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVector.Length, out var length);
-        var data = ReadBytes(handle, length);
+        var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
@@ -192,7 +193,7 @@ public class Transaction
     public byte[] Snapshot()
     {
         var handle = TransactionChannel.Snapshot(Handle, out var length);
-        var data = ReadBytes(handle, length);
+        var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
@@ -230,7 +231,7 @@ public class Transaction
             snapshot,
             (uint) snapshot.Length,
             out var length);
-        var data = TryReadBytes(handle, length);
+        var data = MemoryReader.TryReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
@@ -268,32 +269,9 @@ public class Transaction
             snapshot,
             (uint) snapshot.Length,
             out var length);
-        var data = TryReadBytes(handle, length);
+        var data = MemoryReader.TryReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
         return data;
-    }
-
-    // TODO [LSViana] Consider extracting these methods to an infrastructure class.
-    private static unsafe byte[] ReadBytes(nint handle, uint length)
-    {
-        var data = new byte[length];
-        var stream = new UnmanagedMemoryStream((byte*) handle.ToPointer(), length);
-        int bytesRead;
-
-        do
-        {
-            bytesRead = stream.Read(data, offset: 0, data.Length);
-        }
-        while (bytesRead < data.Length);
-
-        stream.Dispose();
-
-        return data;
-    }
-
-    private static byte[]? TryReadBytes(nint handle, uint length)
-    {
-        return handle == nint.Zero ? null : ReadBytes(handle, length);
     }
 }
