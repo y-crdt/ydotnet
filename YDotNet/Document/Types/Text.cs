@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Document.Transactions;
 using YDotNet.Native.Types;
 
@@ -33,9 +34,20 @@ public class Text
         TextChannel.Insert(Handle, transaction.Handle, index, value, nint.Zero);
     }
 
-    // TODO [LSViana] Add documentation and dispose the returned string.
+    /// <summary>
+    ///     Returns the full string stored in the instance.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this read operation.</param>
+    /// <returns>The full string stored in the instance.</returns>
     public string String(Transaction transaction)
     {
-        return TextChannel.String(Handle, transaction.Handle);
+        // Get the string pointer and read it into a managed instance.
+        var pointer = TextChannel.String(Handle, transaction.Handle);
+        var result = Marshal.PtrToStringAnsi(pointer);
+
+        // Dispose the resources used by the underlying string.
+        StringChannel.Destroy(pointer);
+
+        return result;
     }
 }

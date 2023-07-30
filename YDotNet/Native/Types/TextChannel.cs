@@ -10,5 +10,5 @@ internal static class TextChannel
 
     // TODO [LSViana] Check if the transaction reference is really needed here.
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_string")]
-    public static extern string String(nint text, nint transaction);
+    public static extern nint String(nint text, nint transaction);
 }
