@@ -51,6 +51,28 @@ internal static class MemoryWriter
         return handle;
     }
 
+    internal static nint WriteStruct<T>(T value)
+    {
+        var handle = Marshal.AllocHGlobal(Marshal.SizeOf(value));
+        Marshal.StructureToPtr(value, handle, fDeleteOld: false);
+
+        return handle;
+    }
+
+    internal static bool TryToWriteStruct<T>(T? value, out nint handle)
+    {
+        if (value == null)
+        {
+            handle = nint.Zero;
+
+            return false;
+        }
+
+        handle = WriteStruct<T>(value);
+
+        return true;
+    }
+
     internal static void Release(nint pointer)
     {
         Marshal.FreeHGlobal(pointer);
@@ -62,5 +84,17 @@ internal static class MemoryWriter
         {
             Release(pointer);
         }
+    }
+
+    internal static bool TryRelease(nint pointer)
+    {
+        if (pointer == nint.Zero)
+        {
+            return false;
+        }
+
+        Release(pointer);
+
+        return true;
     }
 }
