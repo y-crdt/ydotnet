@@ -50,4 +50,17 @@ public class Text
 
         return result;
     }
+
+    /// <summary>
+    ///     Returns the length of the string, in bytes, stored in the instance.
+    /// </summary>
+    /// <remarks>
+    ///     The returned value doesn't include the null terminator.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this read operation.</param>
+    /// <returns>The length, in bytes, of the string stored in the instance.</returns>
+    public uint Length(Transaction transaction)
+    {
+        return TextChannel.Length(Handle, transaction.Handle);
+    }
 }
