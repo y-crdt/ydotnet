@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types;
@@ -29,9 +31,15 @@ public class Text
     /// <param name="transaction">The transaction that wraps this write operation.</param>
     /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
     /// <param name="value">The text to be inserted.</param>
-    public void Insert(Transaction transaction, uint index, string value)
+    /// <param name="attributes">
+    ///     Optional, the attributes to be added to the inserted text. The value must be the result of a call to
+    ///     <see cref="Input" />.<see cref="Input.Object" />.
+    /// </param>
+    public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
-        TextChannel.Insert(Handle, transaction.Handle, index, value, nint.Zero);
+        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
+        TextChannel.Insert(Handle, transaction.Handle, index, value, attributesPointer);
+        MemoryWriter.TryRelease(attributesPointer);
     }
 
     /// <summary>
