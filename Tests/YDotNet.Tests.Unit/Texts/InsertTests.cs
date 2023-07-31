@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Texts;
 public class InsertTests
 {
     [Test]
-    public void AddsTextAtBeginningText()
+    public void AddsTextAtBeginning()
     {
         // Arrange
         var doc = new Doc();
@@ -22,7 +22,7 @@ public class InsertTests
     }
 
     [Test]
-    public void AddsTextAtEndingText()
+    public void AddsTextAtEnding()
     {
         // Arrange
         var doc = new Doc();
