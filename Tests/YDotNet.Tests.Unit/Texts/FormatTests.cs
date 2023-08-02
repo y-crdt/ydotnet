@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Types;
+using YDotNet.Document.Types.Texts;
 
 namespace YDotNet.Tests.Unit.Texts;
 

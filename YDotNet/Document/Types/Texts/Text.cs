@@ -4,7 +4,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Texts;
 
 /// <summary>
 ///     A shared data type that represents a text string.

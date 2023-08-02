@@ -3,6 +3,7 @@ using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
 using YDotNet.Document.Types.Maps;
+using YDotNet.Document.Types.Texts;
 using Array = YDotNet.Document.Types.Array;
 
 namespace YDotNet.Infrastructure;
