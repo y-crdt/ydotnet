@@ -44,6 +44,25 @@ public class Text
     }
 
     /// <summary>
+    ///     Inserts a content in the given `index`.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
+    /// <param name="content">The text to be inserted.</param>
+    /// <param name="attributes">
+    ///     Optional, the attributes to be added to the inserted text. The value must be the result of a call to
+    ///     <see cref="Input" />.<see cref="Input.Object" />.
+    /// </param>
+    public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
+    {
+        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
+        MemoryWriter.TryToWriteStruct(content.InputNative, out var contentPointer);
+        TextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
+        MemoryWriter.TryRelease(attributesPointer);
+        MemoryWriter.TryRelease(contentPointer);
+    }
+
+    /// <summary>
     ///     Formats a string in the given range defined by <c>index</c> and <c>length</c>.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this write operation.</param>
