@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace YDotNet.Native.Types;
+namespace YDotNet.Native.Types.Texts;
 
 internal static class TextChannel
 {
@@ -16,4 +16,7 @@ internal static class TextChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_len")]
     public static extern uint Length(nint text, nint transaction);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_chunks")]
+    public static extern nint Chunks(nint text, nint transaction, out uint length);
 }
