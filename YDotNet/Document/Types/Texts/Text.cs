@@ -44,7 +44,7 @@ public class Text
     }
 
     /// <summary>
-    ///     Inserts a content in the given `index`.
+    ///     Inserts a content in the given <c>index</c>.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this write operation.</param>
     /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
