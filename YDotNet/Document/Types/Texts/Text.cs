@@ -27,7 +27,7 @@ public class Text
     internal nint Handle { get; }
 
     /// <summary>
-    ///     Inserts a string in the given `index`.
+    ///     Inserts a string in the given <c>index</c>.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this write operation.</param>
     /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
@@ -60,6 +60,20 @@ public class Text
         TextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
         MemoryWriter.TryRelease(attributesPointer);
         MemoryWriter.TryRelease(contentPointer);
+    }
+
+    /// <summary>
+    ///     Removes a range of characters from the document.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
+    /// <param name="length">
+    ///     The length of the text to be removed, relative to the index and must not go over total
+    ///     <see cref="Length" />.
+    /// </param>
+    public void Remove(Transaction transaction, uint index, uint length)
+    {
+        TextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
     /// <summary>

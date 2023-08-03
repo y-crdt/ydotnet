@@ -11,6 +11,10 @@ internal static class TextChannel
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert_embed")]
     public static extern void InsertEmbed(nint text, nint transaction, uint index, nint content, nint attributes);
 
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_remove_range")]
+    public static extern void RemoveRange(nint text, nint transaction, uint index, uint length);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_format")]
     public static extern void Format(nint text, nint transaction, uint index, uint length, nint attributes);
 
