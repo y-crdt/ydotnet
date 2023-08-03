@@ -146,7 +146,8 @@ public class Output : IDisposable
     public Map? Map => ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Texts" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="YDotNet.Document.Types.Texts" /> or <c>null</c> if this output cells contains a different type
+    ///     stored.
     /// </summary>
     public Text? Text => ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle)));
 
