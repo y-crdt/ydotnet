@@ -24,7 +24,8 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
-        // TODO Assert using `ytext_chunks` later.
+        var chunks = text.Chunks(transaction);
+        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
     }
 
     [Test]
@@ -44,7 +45,8 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
-        // TODO Assert using `ytext_chunks` later.
+        var chunks = text.Chunks(transaction);
+        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
     }
 
     [Test]
@@ -64,7 +66,8 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
-        // TODO Assert using `ytext_chunks` later.
+        var chunks = text.Chunks(transaction);
+        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
     }
 
     private (Doc, Text) ArrangeText()
