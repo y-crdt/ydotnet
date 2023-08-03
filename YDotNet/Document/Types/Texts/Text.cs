@@ -3,6 +3,7 @@ using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts;
 
@@ -60,6 +61,18 @@ public class Text
         var attributesPointer = MemoryWriter.WriteStruct(attributes.InputNative);
         TextChannel.Format(Handle, transaction.Handle, index, length, attributesPointer);
         MemoryWriter.Release(attributesPointer);
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="TextChunks" /> that compose this <see cref="Text" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this read operation.</param>
+    /// <returns>The <see cref="TextChunks" /> that compose this <see cref="Text" />.</returns>
+    public TextChunks Chunks(Transaction transaction)
+    {
+        var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length);
+
+        return new TextChunks(handle, length);
     }
 
     /// <summary>
