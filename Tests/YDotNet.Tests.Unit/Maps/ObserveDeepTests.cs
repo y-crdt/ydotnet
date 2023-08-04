@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Events;
 using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.Maps;
 
@@ -31,7 +30,8 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -60,7 +60,8 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -89,7 +90,8 @@ public class ObserveDeepTests
         transaction.Commit();
 
         // Assert
-        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -117,8 +119,9 @@ public class ObserveDeepTests
         map3.Insert(transaction, "value", Input.Long(value: -420L));
         transaction.Commit();
 
-        // Act
-        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
+        // Assert
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -152,8 +155,9 @@ public class ObserveDeepTests
 
         transaction.Commit();
 
-        // Act
-        AssertPath(called, subscription, pathSegments, "map-2", "map-3");
+        // Assert
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
     [Test]
@@ -181,10 +185,11 @@ public class ObserveDeepTests
 
         transaction.Commit();
 
-        // Act
-        AssertPath(called, subscription, mapEvents.ElementAt(index: 0));
-        AssertPath(called, subscription, mapEvents.ElementAt(index: 1), "map-2");
-        AssertPath(called, subscription, mapEvents.ElementAt(index: 2), "map-2", "map-3");
+        // Assert
+        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
+        AssertPath(called, mapEvents.ElementAt(index: 0));
+        AssertPath(called, mapEvents.ElementAt(index: 1), "map-2");
+        AssertPath(called, mapEvents.ElementAt(index: 2), "map-2", "map-3");
     }
 
     private static (Doc, Map, Map, Map) ArrangeDoc()
@@ -204,14 +209,9 @@ public class ObserveDeepTests
         return (doc, map1, map2, map3);
     }
 
-    private static void AssertPath(
-        int called,
-        EventSubscription subscription,
-        IEnumerable<EventPathSegment>? pathSegments,
-        params string[] path)
+    private static void AssertPath(int called, IEnumerable<EventPathSegment>? pathSegments, params string[] path)
     {
         Assert.That(called, Is.EqualTo(expected: 1));
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(path.Length));
 
