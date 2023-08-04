@@ -1,7 +1,9 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Texts;
@@ -133,5 +135,30 @@ public class Text : Branch
     public uint Length(Transaction transaction)
     {
         return TextChannel.Length(Handle, transaction.Handle);
+    }
+
+    /// <summary>
+    ///     Subscribes a callback function for changes performed within <see cref="Text" /> scope.
+    /// </summary>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription Observe(Action<TextEvent> action)
+    {
+        var subscriptionId = TextChannel.Observe(
+            Handle,
+            nint.Zero,
+            (state, eventHandle) => action(new TextEvent(eventHandle)));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed within <see cref="Text" /> scope.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveAfterTransaction(EventSubscription subscription)
+    {
+        TextChannel.Unobserve(Handle, subscription.Id);
     }
 }

@@ -4,6 +4,8 @@ namespace YDotNet.Native.Types.Texts;
 
 internal static class TextChannel
 {
+    public delegate void ObserveCallback(nint state, nint textEvent);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert")]
     public static extern void Insert(nint text, nint transaction, uint index, string value, nint attributes);
 
@@ -27,4 +29,10 @@ internal static class TextChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_chunks")]
     public static extern nint Chunks(nint text, nint transaction, out uint length);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_observe")]
+    public static extern uint Observe(nint text, nint state, ObserveCallback callback);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_unobserve")]
+    public static extern uint Unobserve(nint text, uint subscriptionId);
 }
