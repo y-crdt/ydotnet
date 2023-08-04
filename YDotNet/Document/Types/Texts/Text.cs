@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Texts;
@@ -10,21 +11,17 @@ namespace YDotNet.Document.Types.Texts;
 /// <summary>
 ///     A shared data type that represents a text string.
 /// </summary>
-public class Text
+public class Text : Branch
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Text" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     internal Text(nint handle)
+        : base(handle)
     {
-        Handle = handle;
+        // Nothing here.
     }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 
     /// <summary>
     ///     Inserts a string in the given <c>index</c>.
