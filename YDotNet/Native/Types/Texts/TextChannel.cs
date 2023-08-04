@@ -33,6 +33,17 @@ internal static class TextChannel
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_observe")]
     public static extern uint Observe(nint text, nint state, ObserveCallback callback);
 
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_event_path")]
+    public static extern nint ObserveEventPath(nint textEvent, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_event_delta")]
+    public static extern nint ObserveEventDelta(nint textEvent, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_event_target")]
+    public static extern nint ObserveEventTarget(nint textEvent);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_unobserve")]
     public static extern uint Unobserve(nint text, uint subscriptionId);
 }
