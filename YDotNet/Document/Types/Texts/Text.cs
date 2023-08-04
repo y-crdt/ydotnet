@@ -157,7 +157,7 @@ public class Text : Branch
     ///     performed within <see cref="Text" /> scope.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveAfterTransaction(EventSubscription subscription)
+    public void Unobserve(EventSubscription subscription)
     {
         TextChannel.Unobserve(Handle, subscription.Id);
     }
