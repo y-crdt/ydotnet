@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Maps.Events;
+using YDotNet.Document.Types.Texts.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -27,6 +28,9 @@ public class EventBranch
             case EventBranchTag.Map:
                 MapEvent = new MapEvent(handle + offset);
                 break;
+            case EventBranchTag.Text:
+                TextEvent = new TextEvent(handle + offset);
+                break;
             default:
                 throw new NotImplementedException();
         }
@@ -42,6 +46,12 @@ public class EventBranch
     ///     otherwise.
     /// </summary>
     public MapEvent? MapEvent { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="TextEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.Text" />, or <c>null</c>
+    ///     otherwise.
+    /// </summary>
+    public TextEvent? TextEvent { get; }
 
     /// <summary>
     ///     Gets the handle to the native resource.

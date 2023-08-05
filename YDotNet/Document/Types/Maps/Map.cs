@@ -1,10 +1,9 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
-using YDotNet.Document.Types.Events;
+using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;
@@ -12,21 +11,17 @@ namespace YDotNet.Document.Types.Maps;
 /// <summary>
 ///     A shared data type that represents a map.
 /// </summary>
-public class Map
+public class Map : Branch
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Map" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     internal Map(nint handle)
+        : base(handle)
     {
-        Handle = handle;
+        // Nothing here.
     }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 
     /// <summary>
     ///     Inserts a new entry (specified as key-value pair) into the current <see cref="Map" />.
@@ -126,41 +121,5 @@ public class Map
     public void Unobserve(EventSubscription subscription)
     {
         MapChannel.Unobserve(Handle, subscription.Id);
-    }
-
-    /// <summary>
-    ///     Subscribes a callback function for changes performed within the <see cref="Map" /> instance
-    ///     and all nested types.
-    /// </summary>
-    /// <remarks>
-    ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
-    /// </remarks>
-    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
-    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveDeep(Action<IEnumerable<EventBranch>> action)
-    {
-        var subscriptionId = BranchChannel.ObserveDeep(
-            Handle,
-            nint.Zero,
-            (state, length, eventsHandle) =>
-            {
-                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
-                    .Select(x => new EventBranch(x))
-                    .ToArray();
-
-                action(events);
-            });
-
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Map" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveDeep(EventSubscription subscription)
-    {
-        BranchChannel.UnobserveDeep(Handle, subscription.Id);
     }
 }

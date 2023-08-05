@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document.Types.Branches;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types;
@@ -6,7 +7,7 @@ namespace YDotNet.Document.Types;
 /// <summary>
 ///     A shared data type that represents a XML element.
 /// </summary>
-public class XmlElement : IDisposable
+public class XmlElement : Branch, IDisposable
 {
     private nint? tagHandle;
 
@@ -15,8 +16,9 @@ public class XmlElement : IDisposable
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     internal XmlElement(nint handle)
+        : base(handle)
     {
-        Handle = handle;
+        // Nothing here.
     }
 
     /// <summary>
@@ -37,11 +39,6 @@ public class XmlElement : IDisposable
             return Marshal.PtrToStringAnsi(tagHandle.Value);
         }
     }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 
     /// <inheritdoc />
     public void Dispose()

@@ -43,7 +43,7 @@ public class EventKeys : IEnumerable<EventKeyChange>, IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        EventChannel.Destroy(Handle, Length);
+        EventChannel.KeysDestroy(Handle, Length);
     }
 
     /// <inheritdoc />
