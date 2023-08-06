@@ -39,4 +39,15 @@ public class Array : Branch
 
         ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
     }
+
+    /// <summary>
+    ///     Removes a range of items from the current instance of <see cref="Array" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The starting index to remove the items.</param>
+    /// <param name="length">The amount of items to remove.</param>
+    public void RemoveRange(Transaction transaction, uint index, uint length)
+    {
+        ArrayChannel.RemoveRange(Handle, transaction.Handle, index, length);
+    }
 }

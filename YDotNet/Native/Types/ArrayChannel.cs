@@ -10,4 +10,8 @@ internal static class ArrayChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_insert_range")]
     public static extern void InsertRange(nint array, nint transaction, uint index, nint items, uint itemsLength);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_remove_range")]
+    public static extern void RemoveRange(nint array, nint transaction, uint index, uint length);
 }
