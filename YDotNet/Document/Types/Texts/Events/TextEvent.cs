@@ -21,11 +21,11 @@ public class TextEvent
     }
 
     /// <summary>
-    ///     Gets the keys that changed within the <see cref="Map" /> instance and triggered this event.
+    ///     Gets the keys that changed within the <see cref="Text" /> instance and triggered this event.
     /// </summary>
     /// <remarks>
     ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
+    ///     <para>Check the documentation of <see cref="EventDelta" /> for more information.</para>
     /// </remarks>
     public EventDeltas Delta
     {
