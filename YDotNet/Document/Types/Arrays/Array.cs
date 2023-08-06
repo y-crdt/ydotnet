@@ -4,7 +4,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.Arrays;
 
 /// <summary>
 ///     A shared data type that represents an array.

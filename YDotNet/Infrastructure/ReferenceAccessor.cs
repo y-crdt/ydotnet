@@ -4,7 +4,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
-using Array = YDotNet.Document.Types.Array;
+using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Infrastructure;
 

@@ -5,7 +5,7 @@ using YDotNet.Document.Types.Texts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
-using Array = YDotNet.Document.Types.Array;
+using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document.Cells;
 

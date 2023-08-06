@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
-using Array = YDotNet.Document.Types.Array;
+using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Tests.Unit.Arrays;
 
