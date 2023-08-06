@@ -50,4 +50,21 @@ public class Array : Branch
     {
         ArrayChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
+
+    /// <summary>
+    ///     Gets the <see cref="Output" /> value at the given <see cref="index" /> or
+    ///     <c>null</c> if <see cref="index" /> is outside the bounds.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The index to get the item.</param>
+    /// <returns>
+    ///     The <see cref="Output" /> value at the given <see cref="index" /> or <c>null</c> if <see cref="index" /> is
+    ///     outside the bounds.
+    /// </returns>
+    public Output? Get(Transaction transaction, uint index)
+    {
+        var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
+
+        return handle == nint.Zero ? null : new Output(handle);
+    }
 }

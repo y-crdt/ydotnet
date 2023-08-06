@@ -14,4 +14,7 @@ internal static class ArrayChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_remove_range")]
     public static extern void RemoveRange(nint array, nint transaction, uint index, uint length);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_get")]
+    public static extern nint Get(nint array, nint transaction, uint index);
 }
