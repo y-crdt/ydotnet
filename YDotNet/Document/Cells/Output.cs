@@ -29,6 +29,9 @@ public class Output : IDisposable
         this.disposable = disposable;
 
         Handle = handle;
+
+        // TODO [LSViana] Consider skipping this call to make it easier to integrate with `ReferenceAccessor`.
+        // Search for "== nint.Zero ? null : new Output" to see affected places.
         OutputNative = Marshal.PtrToStructure<OutputNative>(handle);
     }
 
