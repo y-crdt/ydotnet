@@ -20,4 +20,14 @@ internal static class ArrayChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_move")]
     public static extern void Move(nint array, nint transaction, uint sourceIndex, uint targetIndex);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_iter")]
+    public static extern nint Iterator(nint array, nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_iter_destroy")]
+    public static extern nint IteratorDestroy(nint arrayIterator);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_iter_next")]
+    public static extern nint IteratorNext(nint arrayIterator);
 }

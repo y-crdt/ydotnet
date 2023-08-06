@@ -81,4 +81,15 @@ public class Array : Branch
     {
         ArrayChannel.Move(Handle, transaction.Handle, sourceIndex, targetIndex);
     }
+
+    /// <summary>
+    ///     Returns a <see cref="ArrayIterator" />, which can be used to traverse
+    ///     over all values of this <see cref="Array" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The <see cref="ArrayIterator" /> instance or <c>null</c> if failed.</returns>
+    public ArrayIterator? Iterate(Transaction transaction)
+    {
+        return ReferenceAccessor.Access(new ArrayIterator(ArrayChannel.Iterator(Handle, transaction.Handle)));
+    }
 }
