@@ -17,4 +17,7 @@ internal static class ArrayChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_get")]
     public static extern nint Get(nint array, nint transaction, uint index);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_move")]
+    public static extern void Move(nint array, nint transaction, uint sourceIndex, uint targetIndex);
 }

@@ -67,4 +67,18 @@ public class Array : Branch
 
         return handle == nint.Zero ? null : new Output(handle);
     }
+
+    /// <summary>
+    ///     Moves the element at <see cref="sourceIndex" /> to the <see cref="targetIndex" />.
+    /// </summary>
+    /// <remarks>
+    ///     Both indexes must be lower than the <see cref="Length" />.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="sourceIndex">The index of the item that will be moved.</param>
+    /// <param name="targetIndex">The index to which the item will be moved to.</param>
+    public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
+    {
+        ArrayChannel.Move(Handle, transaction.Handle, sourceIndex, targetIndex);
+    }
 }
