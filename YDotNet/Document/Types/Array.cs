@@ -1,4 +1,7 @@
+using YDotNet.Document.Cells;
+using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types;
@@ -22,4 +25,18 @@ public class Array : Branch
     ///     Gets the number of elements stored within current instance of <see cref="Types.Array" />.
     /// </summary>
     public uint Length => ArrayChannel.Length(Handle);
+
+    /// <summary>
+    ///     Inserts a range of <see cref="inputs" /> into the current instance of <see cref="Array" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The starting index to insert the items.</param>
+    /// <param name="inputs">The items to be inserted.</param>
+    public void InsertRange(Transaction transaction, uint index, IEnumerable<Input> inputs)
+    {
+        var inputsArray = inputs.Select(x => x.InputNative).ToArray();
+        var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
+
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
+    }
 }
