@@ -2,6 +2,7 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types;
+using YDotNet.Document.Types.Arrays;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using Array = YDotNet.Document.Types.Arrays.Array;
@@ -26,6 +27,11 @@ internal static class ReferenceAccessor
     }
 
     public static Array? Access(Array instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static ArrayIterator? Access(ArrayIterator instance)
     {
         return Access(instance, instance.Handle);
     }
