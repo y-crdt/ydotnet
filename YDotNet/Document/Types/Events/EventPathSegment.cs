@@ -28,7 +28,7 @@ public class EventPathSegment
                 break;
 
             case EventPathSegmentTag.Index:
-                Index = Marshal.ReadInt32(handle + offset);
+                Index = (uint) Marshal.ReadInt32(handle + offset);
                 break;
         }
     }
@@ -53,5 +53,5 @@ public class EventPathSegment
     ///     Gets the <see cref="int" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or
     ///     <c>null</c> otherwise.
     /// </summary>
-    public int? Index { get; }
+    public uint? Index { get; }
 }
