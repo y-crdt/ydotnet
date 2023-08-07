@@ -3,6 +3,7 @@ using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlElements;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
@@ -71,7 +72,7 @@ public class Doc : IDisposable
     /// <remarks>
     ///     If none was defined, a <c>null</c> will be returned.
     /// </remarks>
-    public string? CollectionId => DocChannel.CollectionId(Handle);
+    public string CollectionId => DocChannel.CollectionId(Handle);
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
@@ -139,13 +140,13 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Types.Array" /> data type instance as a root-level type in this document.
+    ///     Gets or creates a new shared <see cref="Array" /> data type instance as a root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="Types.Array" /> instance to get.</param>
-    /// <returns>The <see cref="Types.Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    /// <param name="name">The name of the <see cref="Array" /> instance to get.</param>
+    /// <returns>The <see cref="Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
     public Array? Array(string name)
     {
         return ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, name)));
