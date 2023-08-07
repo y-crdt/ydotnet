@@ -21,7 +21,7 @@ public class ArrayEvent
     }
 
     /// <summary>
-    ///     Gets the path from the root type down to the current <see cref="Array" /> instance.
+    ///     Gets the path from the observed instanced down to the current <see cref="Array" /> instance.
     /// </summary>
     /// <remarks>
     ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
