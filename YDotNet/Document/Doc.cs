@@ -153,6 +153,19 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Gets or creates a new shared <see cref="XmlElement" /> data type instance as a root-level type in this document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
+    /// <returns>The <see cref="XmlElement" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    public XmlElement? XmlElement(string name)
+    {
+        return ReferenceAccessor.Access(new XmlElement(DocChannel.Array(Handle, name)));
+    }
+
+    /// <summary>
     ///     Starts a new read-write <see cref="Transaction" /> on this document.
     /// </summary>
     /// <returns>
