@@ -27,7 +27,6 @@ public class ObserveTests
         Assert.That(target.Handle, Is.Not.EqualTo(nint.Zero));
     }
 
-
     [Test]
     public void ObserveHasDeltasWhenAdded()
     {
