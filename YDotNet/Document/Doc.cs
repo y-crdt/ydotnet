@@ -6,7 +6,7 @@ using YDotNet.Document.Types.Texts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
-using Array = YDotNet.Document.Types.Array;
+using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document;
 
