@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Native.Types;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.XmlElements;
 
 /// <summary>
 ///     A shared data type that represents a XML element.

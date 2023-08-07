@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Types;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlElements;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;

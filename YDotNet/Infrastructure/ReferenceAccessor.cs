@@ -5,6 +5,7 @@ using YDotNet.Document.Types;
 using YDotNet.Document.Types.Arrays;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlElements;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Infrastructure;
