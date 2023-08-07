@@ -4,6 +4,8 @@ namespace YDotNet.Native.Types;
 
 internal static class ArrayChannel
 {
+    public delegate void ObserveCallback(nint state, nint eventHandle);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_len")]
     public static extern uint Length(nint array);
 
@@ -30,4 +32,19 @@ internal static class ArrayChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_iter_next")]
     public static extern nint IteratorNext(nint arrayIterator);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_observe")]
+    public static extern uint Observe(nint array, nint state, ObserveCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_event_path")]
+    public static extern nint ObserveEventPath(nint arrayEvent, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_event_target")]
+    public static extern nint ObserveEventTarget(nint arrayEvent);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_event_delta")]
+    public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
 }
