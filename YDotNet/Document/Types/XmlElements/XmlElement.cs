@@ -70,6 +70,16 @@ public class XmlElement : Branch
         XmlElementChannel.InsertAttribute(Handle, transaction.Handle, name, value);
     }
 
+    /// <summary>
+    ///     Removes an attribute from this <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be removed.</param>
+    public void RemoveAttribute(Transaction transaction, string name)
+    {
+        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, name);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
