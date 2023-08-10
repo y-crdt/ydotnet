@@ -7,10 +7,8 @@ namespace YDotNet.Document.Types.XmlElements;
 /// <summary>
 ///     A shared data type that represents a XML element.
 /// </summary>
-public class XmlElement : Branch, IDisposable
+public class XmlElement : Branch
 {
-    private nint? tagHandle;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlElement" /> class.
     /// </summary>
@@ -25,27 +23,17 @@ public class XmlElement : Branch, IDisposable
     ///     Gets the name (or tag) of the <see cref="XmlElement" /> instance.
     /// </summary>
     /// <remarks>
-    ///     Root-level XML nodes use "UNDEFINED" as their tag names.
+    ///     This property returns <c>null</c> for root-level XML nodes.
     /// </remarks>
-    public string Tag
+    public string? Tag
     {
         get
         {
-            if (!tagHandle.HasValue)
-            {
-                tagHandle = XmlElementChannel.Tag(Handle);
-            }
+            var handle = XmlElementChannel.Tag(Handle);
+            var result = Marshal.PtrToStringAnsi(handle);
+            StringChannel.Destroy(handle);
 
-            return Marshal.PtrToStringAnsi(tagHandle.Value);
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (tagHandle.HasValue)
-        {
-            StringChannel.Destroy(tagHandle.Value);
+            return result;
         }
     }
 }
