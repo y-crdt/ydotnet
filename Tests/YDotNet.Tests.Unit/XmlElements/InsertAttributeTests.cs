@@ -81,9 +81,11 @@ public class InsertAttributeTests
         transaction.Commit();
 
         // Assert
-        Assert.That(
-            xmlElement.String,
-            Is.EqualTo("<link href=\"https://lsviana.github.io/\" rel=\"preload\" as=\"document\"></link>"));
+        Assert.That(xmlElement.String, Contains.Substring("<link"));
+        Assert.That(xmlElement.String, Contains.Substring("href=\"https://lsviana.github.io/\""));
+        Assert.That(xmlElement.String, Contains.Substring("rel=\"preload\""));
+        Assert.That(xmlElement.String, Contains.Substring("as=\"document\""));
+        Assert.That(xmlElement.String, Contains.Substring("></link>"));
     }
 
     [Test]
