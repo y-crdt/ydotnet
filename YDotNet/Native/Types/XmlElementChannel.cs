@@ -9,4 +9,8 @@ internal static class XmlElementChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_string")]
     public static extern nint String(nint handle);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_insert_attr")]
+    public static extern void InsertAttribute(nint handle, nint transaction, string name, string value);
 }

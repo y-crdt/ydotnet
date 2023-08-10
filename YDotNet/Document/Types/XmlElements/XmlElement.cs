@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Native.Types;
 
@@ -53,6 +54,20 @@ public class XmlElement : Branch
 
             return result;
         }
+    }
+
+    /// <summary>
+    ///     Inserts an attribute in this <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be added.</param>
+    /// <param name="value">The value of the attribute to be added.</param>
+    public void InsertAttribute(Transaction transaction, string name, string value)
+    {
+        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, name, value);
     }
 
     /// <inheritdoc />
