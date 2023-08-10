@@ -36,4 +36,28 @@ public class XmlElement : Branch
             return result;
         }
     }
+
+    /// <summary>
+    ///     Gets the string representation of the <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     The returned value has no padding or indentation spaces.
+    /// </remarks>
+    public string String
+    {
+        get
+        {
+            var handle = XmlElementChannel.String(Handle);
+            var result = Marshal.PtrToStringAnsi(handle);
+            StringChannel.Destroy(handle);
+
+            return result;
+        }
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return String;
+    }
 }
