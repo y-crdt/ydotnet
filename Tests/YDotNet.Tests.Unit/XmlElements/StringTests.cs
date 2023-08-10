@@ -72,11 +72,11 @@ public class StringTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = array.Get(transaction, index: 0).XmlElement.String;
+        var text = array.Get(transaction, index: 0).XmlElement.String;
         transaction.Commit();
 
         // Assert
-        Assert.That(tag, Is.EqualTo("color"));
+        Assert.That(text, Is.EqualTo("<color></color>"));
     }
 
     [Test]
