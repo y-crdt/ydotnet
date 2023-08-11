@@ -17,4 +17,8 @@ internal static class XmlElementChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_remove_attr")]
     public static extern void RemoveAttribute(nint handle, nint transaction, string name);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_get_attr")]
+    public static extern nint GetAttribute(nint handle, nint transaction, string name);
 }

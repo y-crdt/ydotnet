@@ -80,6 +80,21 @@ public class XmlElement : Branch
         XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, name);
     }
 
+    /// <summary>
+    ///     Gets an attribute with the given <see cref="name" /> from this <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be retrieved.</param>
+    /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
+    public string? GetAttribute(Transaction transaction, string name)
+    {
+        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, name);
+        var result = Marshal.PtrToStringAnsi(handle);
+        StringChannel.Destroy(handle);
+
+        return result;
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
