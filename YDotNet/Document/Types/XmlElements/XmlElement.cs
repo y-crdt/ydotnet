@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -93,6 +94,18 @@ public class XmlElement : Branch
         StringChannel.Destroy(handle);
 
         return result;
+    }
+
+    /// <summary>
+    ///     Returns a <see cref="XmlAttributeIterator" />, which can be used to traverse
+    ///     over all attributes of this <see cref="XmlElement" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
+    public XmlAttributeIterator? Iterate(Transaction transaction)
+    {
+        return ReferenceAccessor.Access(
+            new XmlAttributeIterator(XmlElementChannel.AttributeIterator(Handle, transaction.Handle)));
     }
 
     /// <inheritdoc />

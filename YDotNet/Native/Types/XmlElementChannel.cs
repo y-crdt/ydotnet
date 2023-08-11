@@ -21,4 +21,8 @@ internal static class XmlElementChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_get_attr")]
     public static extern nint GetAttribute(nint handle, nint transaction, string name);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_attr_iter")]
+    public static extern nint AttributeIterator(nint handle, nint transaction);
 }
