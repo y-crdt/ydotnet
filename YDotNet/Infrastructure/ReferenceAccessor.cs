@@ -52,6 +52,11 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
+    public static XmlAttributeIterator? Access(XmlAttributeIterator instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
     public static Doc? Access(Doc instance)
     {
         return Access(instance, instance.Handle);
