@@ -176,6 +176,23 @@ public class XmlElement : Branch
     }
 
     /// <summary>
+    ///     Returns the previous sibling of this <see cref="XmlElement" /> instance which can be either an
+    ///     <see cref="XmlElement" />
+    ///     or an <see cref="XmlText" /> or <c>null</c> if this node is the first child.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The previous sibling of this <see cref="XmlElement" /> instance which can be either an
+    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is the first child.
+    /// </returns>
+    public Output? PreviousSibling(Transaction transaction)
+    {
+        var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
+
+        return handle == nint.Zero ? null : new Output(handle);
+    }
+
+    /// <summary>
     ///     Returns the next sibling of this <see cref="XmlElement" /> instance which can be either an
     ///     <see cref="XmlElement" />
     ///     or an <see cref="XmlText" /> or <c>null</c> if this node is the last child.
