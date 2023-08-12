@@ -135,6 +135,20 @@ public class XmlElement : Branch
             new XmlText(XmlElementChannel.InsertText(Handle, transaction.Handle, index)));
     }
 
+    /// <summary>
+    ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
+    ///     <see cref="index" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
+    /// <param name="name">The name (or tag) of the <see cref="XmlElement" /> that will be inserted.</param>
+    /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
+    public XmlElement? InsertElement(Transaction transaction, uint index, string name)
+    {
+        return ReferenceAccessor.Access(
+            new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, name)));
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {

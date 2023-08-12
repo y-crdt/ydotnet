@@ -33,4 +33,8 @@ internal static class XmlElementChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_insert_text")]
     public static extern nint InsertText(nint handle, nint transaction, uint index);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_insert_elem")]
+    public static extern nint InsertElement(nint handle, nint transaction, uint index, string name);
 }
