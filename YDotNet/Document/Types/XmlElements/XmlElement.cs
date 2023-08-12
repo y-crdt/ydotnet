@@ -172,7 +172,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return handle == nint.Zero ? null : new Output(handle);
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle == nint.Zero ? null : new Output(handle);
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
 
     /// <summary>
@@ -206,7 +206,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle == nint.Zero ? null : new Output(handle);
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
 
     /// <summary>

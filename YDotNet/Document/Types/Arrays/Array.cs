@@ -67,7 +67,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return handle == nint.Zero ? null : new Output(handle);
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
 
     /// <summary>
