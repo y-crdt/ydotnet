@@ -223,6 +223,22 @@ public class XmlElement : Branch
         return ReferenceAccessor.Access(new XmlElement(XmlElementChannel.Parent(Handle, transaction.Handle)));
     }
 
+    /// <summary>
+    ///     Returns the first child of the current <see cref="XmlElement" /> node which can be an
+    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The first child of the current <see cref="XmlElement" /> node which can be an
+    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
+    /// </returns>
+    public Output? FirstChild(Transaction transaction)
+    {
+        var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
+
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
