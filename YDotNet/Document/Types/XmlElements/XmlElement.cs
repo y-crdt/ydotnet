@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
@@ -159,6 +160,19 @@ public class XmlElement : Branch
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
         XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
+    }
+
+    /// <summary>
+    ///     Returns an <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The index to retrieve the <see cref="Output" /> cell.</param>
+    /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.</returns>
+    public Output? Get(Transaction transaction, uint index)
+    {
+        var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
+
+        return handle == nint.Zero ? null : new Output(handle);
     }
 
     /// <inheritdoc />
