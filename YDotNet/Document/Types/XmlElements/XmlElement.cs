@@ -209,6 +209,20 @@ public class XmlElement : Branch
         return handle == nint.Zero ? null : new Output(handle);
     }
 
+    /// <summary>
+    ///     Returns the parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
+    ///     <c>null</c> if the current node is root-level node.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
+    ///     <c>null</c> if the current node is root-level node.
+    /// </returns>
+    public XmlElement? Parent(Transaction transaction)
+    {
+        return ReferenceAccessor.Access(new XmlElement(XmlElementChannel.Parent(Handle, transaction.Handle)));
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {

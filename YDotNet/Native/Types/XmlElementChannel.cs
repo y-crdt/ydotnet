@@ -44,4 +44,7 @@ internal static class XmlElementChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_get")]
     public static extern nint Get(nint handle, nint transaction, uint index);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_parent")]
+    public static extern nint Parent(nint handle, nint transaction);
 }
