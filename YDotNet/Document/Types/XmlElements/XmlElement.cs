@@ -149,6 +149,18 @@ public class XmlElement : Branch
             new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, name)));
     }
 
+    /// <summary>
+    ///     Removes a consecutive range of direct child nodes starting at the <see cref="index" /> through the
+    ///     <see cref="length" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The index to start removing the child nodes.</param>
+    /// <param name="length">The amount of child nodes to remove, starting at <see cref="index" />.</param>
+    public void RemoveRange(Transaction transaction, uint index, uint length)
+    {
+        XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
