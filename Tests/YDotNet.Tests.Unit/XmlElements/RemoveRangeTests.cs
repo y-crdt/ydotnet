@@ -87,7 +87,6 @@ public class RemoveRangeTests
         Assert.That(childLength, Is.EqualTo(expected: 0));
     }
 
-
     private (Doc, XmlElement) ArrangeDoc()
     {
         var doc = new Doc();
