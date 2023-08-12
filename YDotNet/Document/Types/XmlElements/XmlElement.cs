@@ -108,6 +108,20 @@ public class XmlElement : Branch
             new XmlAttributeIterator(XmlElementChannel.AttributeIterator(Handle, transaction.Handle)));
     }
 
+    /// <summary>
+    ///     Returns a number of direct child nodes (both <see cref="XmlElement" /> and <see cref="XmlText" />)
+    ///     of this <see cref="XmlElement" />.
+    /// </summary>
+    /// <remarks>
+    ///     This function doesn't count a recursive nodes, only direct children of this <see cref="XmlElement" />.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The number of direct child nodes of this <see cref="XmlElement" />.</returns>
+    public uint ChildLength(Transaction transaction)
+    {
+        return XmlElementChannel.ChildLength(Handle, transaction.Handle);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
