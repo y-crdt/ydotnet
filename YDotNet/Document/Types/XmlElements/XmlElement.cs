@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -237,6 +238,19 @@ public class XmlElement : Branch
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
         return handle == nint.Zero ? null : new Output(handle, disposable: true);
+    }
+
+    /// <summary>
+    ///     Returns an <see cref="XmlTreeWalker" /> for this <see cref="XmlElement" />.
+    /// </summary>
+    /// <remarks>
+    ///     Check the documentation of <see cref="XmlTreeWalker" /> for more information.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlElement" />.</returns>
+    public XmlTreeWalker? TreeWalker(Transaction transaction)
+    {
+        return ReferenceAccessor.Access(new XmlTreeWalker(XmlElementChannel.TreeWalker(Handle, transaction.Handle)));
     }
 
     /// <inheritdoc />

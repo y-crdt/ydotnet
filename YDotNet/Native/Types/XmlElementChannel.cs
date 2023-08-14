@@ -51,4 +51,20 @@ internal static class XmlElementChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_first_child")]
     public static extern nint FirstChild(nint handle, nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_tree_walker")]
+    public static extern nint TreeWalker(nint handle, nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "yxmlelem_tree_walker_next")]
+    public static extern nint TreeWalkerNext(nint handle);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "yxmlelem_tree_walker_destroy")]
+    public static extern void TreeWalkerDestroy(nint handle);
 }
