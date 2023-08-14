@@ -6,6 +6,7 @@ using YDotNet.Document.Types.Arrays;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlElements.Trees;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Infrastructure;
@@ -53,6 +54,11 @@ internal static class ReferenceAccessor
     }
 
     public static XmlAttributeIterator? Access(XmlAttributeIterator instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static XmlTreeWalker? Access(XmlTreeWalker instance)
     {
         return Access(instance, instance.Handle);
     }
