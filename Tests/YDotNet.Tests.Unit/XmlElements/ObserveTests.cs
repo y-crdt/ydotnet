@@ -134,6 +134,69 @@ public class ObserveTests
     }
 
     [Test]
+    public void ObserveHasKeysWhenUpdatedAttributes()
+    {
+        // Arrange
+        var doc = new Doc();
+        var parentXmlElement = doc.XmlElement("xml-element");
+
+        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
+        var transaction = doc.WriteTransaction();
+        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
+        xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
+        transaction.Commit();
+
+        IEnumerable<EventKeyChange>? keyChanges = null;
+        xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
+
+        // Act
+        transaction = doc.WriteTransaction();
+        xmlElement.InsertAttribute(transaction, "href", "https://github.com/LSViana/y-crdt");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(keyChanges, Is.Not.Null);
+        Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventKeyChangeTag.Update));
+        Assert.That(keyChanges.ElementAt(index: 0).Key, Is.EqualTo("href"));
+        Assert.That(keyChanges.ElementAt(index: 0).NewValue.String, Is.EqualTo("https://github.com/LSViana/y-crdt"));
+        Assert.That(keyChanges.ElementAt(index: 0).NewValue.Long, Is.Null);
+        Assert.That(keyChanges.ElementAt(index: 0).OldValue.String, Is.EqualTo("https://lsviana.github.io/"));
+        Assert.That(keyChanges.ElementAt(index: 0).OldValue.Long, Is.Null);
+    }
+
+    [Test]
+    public void ObserveHasKeysWhenRemovedAttributes()
+    {
+        // Arrange
+        var doc = new Doc();
+        var parentXmlElement = doc.XmlElement("xml-element");
+
+        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
+        var transaction = doc.WriteTransaction();
+        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
+        xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
+        transaction.Commit();
+
+        IEnumerable<EventKeyChange>? keyChanges = null;
+        xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
+
+        // Act
+        transaction = doc.WriteTransaction();
+        xmlElement.RemoveAttribute(transaction, "href");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(keyChanges, Is.Not.Null);
+        Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventKeyChangeTag.Remove));
+        Assert.That(keyChanges.ElementAt(index: 0).Key, Is.EqualTo("href"));
+        Assert.That(keyChanges.ElementAt(index: 0).NewValue, Is.Null);
+        Assert.That(keyChanges.ElementAt(index: 0).OldValue.String, Is.EqualTo("https://lsviana.github.io/"));
+        Assert.That(keyChanges.ElementAt(index: 0).OldValue.Long, Is.Null);
+    }
+
+    [Test]
     public void ObserveDoesNotHaveKeysWhenAddedXmlElementsAndTexts()
     {
         // Arrange
