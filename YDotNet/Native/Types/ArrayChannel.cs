@@ -49,5 +49,5 @@ internal static class ArrayChannel
     public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray_unobserve")]
-    public static extern uint Unobserve(nint array, uint subscriptionId);
+    public static extern void Unobserve(nint array, uint subscriptionId);
 }

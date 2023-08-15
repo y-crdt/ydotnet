@@ -50,5 +50,5 @@ internal static class MapChannel
     public static extern nint ObserveEventTarget(nint mapEvent);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_unobserve")]
-    public static extern uint Unobserve(nint map, uint subscriptionId);
+    public static extern void Unobserve(nint map, uint subscriptionId);
 }

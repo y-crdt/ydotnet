@@ -45,5 +45,5 @@ internal static class TextChannel
     public static extern nint ObserveEventTarget(nint textEvent);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_unobserve")]
-    public static extern uint Unobserve(nint text, uint subscriptionId);
+    public static extern void Unobserve(nint text, uint subscriptionId);
 }
