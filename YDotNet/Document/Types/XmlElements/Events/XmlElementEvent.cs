@@ -38,6 +38,23 @@ public class XmlElementEvent
     }
 
     /// <summary>
+    ///     Gets the path from the observed instanced down to the current <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
+    ///     <para>Check the documentation of <see cref="EventPath" /> for more information.</para>
+    /// </remarks>
+    public EventPath Path
+    {
+        get
+        {
+            var handle = XmlElementChannel.ObserveEventPath(Handle, out var length);
+
+            return new EventPath(handle, length);
+        }
+    }
+
+    /// <summary>
     ///     Gets the attributes that changed within the <see cref="XmlElement" /> instance and triggered this event.
     /// </summary>
     /// <remarks>

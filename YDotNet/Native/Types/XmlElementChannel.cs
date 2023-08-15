@@ -79,6 +79,10 @@ internal static class XmlElementChannel
     public static extern nint ObserveEventTarget(nint arrayEvent);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_path")]
+    public static extern nint ObserveEventPath(nint arrayEvent, out uint length);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_delta")]
     public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
 
