@@ -4,6 +4,8 @@ namespace YDotNet.Native.Types;
 
 internal static class XmlElementChannel
 {
+    public delegate void ObserveCallback(nint state, nint eventHandle);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_tag")]
     public static extern nint Tag(nint handle);
 
@@ -67,4 +69,24 @@ internal static class XmlElementChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmlelem_tree_walker_destroy")]
     public static extern void TreeWalkerDestroy(nint handle);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_observe")]
+    public static extern uint Observe(nint handle, nint state, ObserveCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_target")]
+    public static extern nint ObserveEventTarget(nint arrayEvent);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_delta")]
+    public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_keys")]
+    public static extern nint ObserveEventKeys(nint arrayEvent, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_unobserve")]
+    public static extern void Unobserve(nint handle, uint subscriptionId);
 }

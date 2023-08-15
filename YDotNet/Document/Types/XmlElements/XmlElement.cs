@@ -1,7 +1,9 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
@@ -253,9 +255,37 @@ public class XmlElement : Branch
         return ReferenceAccessor.Access(new XmlTreeWalker(XmlElementChannel.TreeWalker(Handle, transaction.Handle)));
     }
 
+    /// <summary>
+    ///     Subscribes a callback function for changes performed within the <see cref="XmlElement" /> instance.
+    /// </summary>
+    /// <remarks>
+    ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription Observe(Action<XmlElementEvent> action)
+    {
+        var subscriptionId = XmlElementChannel.Observe(
+            Handle,
+            nint.Zero,
+            (state, eventHandle) => action(new XmlElementEvent(eventHandle)));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
+    ///     performed within <see cref="Array" /> scope.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void Unobserve(EventSubscription subscription)
+    {
+        XmlElementChannel.Unobserve(Handle, subscription.Id);
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
-        return String;
+        return Tag; //String;
     }
 }
