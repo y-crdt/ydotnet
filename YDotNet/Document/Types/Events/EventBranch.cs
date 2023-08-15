@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
+using YDotNet.Document.Types.XmlElements.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -35,6 +36,9 @@ public class EventBranch
             case EventBranchTag.Array:
                 ArrayEvent = new ArrayEvent(handle + offset);
                 break;
+            case EventBranchTag.XmlElement:
+                XmlElementEvent = new XmlElementEvent(handle + offset);
+                break;
             default:
                 throw new NotImplementedException();
         }
@@ -62,6 +66,12 @@ public class EventBranch
     ///     otherwise.
     /// </summary>
     public ArrayEvent? ArrayEvent { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElementEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.XmlElement" />,
+    ///     or <c>null</c> otherwise.
+    /// </summary>
+    public XmlElementEvent? XmlElementEvent { get; }
 
     /// <summary>
     ///     Gets the handle to the native resource.
