@@ -286,6 +286,6 @@ public class XmlElement : Branch
     /// <inheritdoc />
     public override string ToString()
     {
-        return Tag; //String;
+        return String;
     }
 }
