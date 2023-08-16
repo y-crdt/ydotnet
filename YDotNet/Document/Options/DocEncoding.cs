@@ -13,7 +13,7 @@ public enum DocEncoding
     /// <summary>
     ///     Compute editable strings length and offset using UTF-16 chars count.
     /// </summary>
-    Uf16 = 2,
+    Utf16 = 2,
 
     /// <summary>
     ///     Compute editable strings length and offset using UTF-32 (Unicode) code points number.
