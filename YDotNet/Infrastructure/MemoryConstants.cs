@@ -4,5 +4,5 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryConstants
 {
-    public static int PointerSize { get; } = Marshal.SizeOf<nint>();
+    internal static readonly int PointerSize = Marshal.SizeOf<nint>();
 }
