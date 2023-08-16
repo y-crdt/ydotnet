@@ -7,8 +7,7 @@ namespace YDotNet.Tests.Unit.XmlElements;
 public class StringTests
 {
     [Test]
-    [Ignore("Check the Tag implementation for root-level nodes.")]
-    public void RootLevelNodeIsEmptyByDefault()
+    public void RootLevelNodeHasCorrectStringWithoutChildren()
     {
         // Arrange
         var doc = new Doc();
@@ -18,27 +17,32 @@ public class StringTests
         var text = xmlElement.String;
 
         // Assert
-        Assert.That(text, Is.Null);
+        Assert.That(text, Is.EqualTo("<xml-element></xml-element>"));
     }
 
     [Test]
-    [Ignore("Waiting for the implementation of XmlElement.InsertText().")]
-    public void RootLevelNodeHasCorrectStringWithoutChildren()
-    {
-        // TODO [LSViana] Implement this test when XmlElement.InsertText() is available.
-    }
-
-    [Test]
-    [Ignore("Waiting for the implementation of XmlElement.InsertText().")]
     public void RootLevelNodeHasCorrectStringWithChildren()
     {
-        // TODO [LSViana] Implement this test when XmlElement.InsertText() is available.
+        // TODO [LSViana] Implement checks for content and attribute when XmlText.Insert() is available.
+
+        // Arrange
+        var doc = new Doc();
+        var xmlElement = doc.XmlElement("xml-element");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        xmlElement.InsertElement(transaction, index: 0, "color");
+        var text = xmlElement.String;
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("<xml-element><color></color></xml-element>"));
     }
 
     [Test]
     public void NodeNestedOnMapHasCorrectString()
     {
-        // TODO [LSViana] Implement checks for content and attribute when XmlElement.InsertText() is available.
+        // TODO [LSViana] Implement checks for content and attribute when XmlText.Insert() is available.
 
         // Arrange
         var doc = new Doc();
@@ -60,7 +64,7 @@ public class StringTests
     [Test]
     public void NodeNestedOnArrayHasCorrectString()
     {
-        // TODO [LSViana] Implement checks for content and attribute when XmlElement.InsertText() is available.
+        // TODO [LSViana] Implement checks for content and attribute when XmlText.Insert() is available.
 
         // Arrange
         var doc = new Doc();
