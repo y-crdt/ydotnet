@@ -166,7 +166,8 @@ public class Doc : IDisposable
     /// <returns>The <see cref="XmlElement" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
     public XmlElement? XmlElement(string name)
     {
-        return ReferenceAccessor.Access(new XmlElement(DocChannel.Array(Handle, name)));
+        // TODO [LSViana] Wrap the XmlElement with an XmlFragment before returning the value.
+        return ReferenceAccessor.Access(new XmlElement(DocChannel.XmlElement(Handle, name)));
     }
 
     /// <summary>
