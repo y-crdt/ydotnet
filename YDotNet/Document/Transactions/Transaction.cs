@@ -10,9 +10,13 @@ namespace YDotNet.Document.Transactions;
 ///     Represents operations that are executed against a document. This can be reading or writing data.
 /// </summary>
 /// <remarks>
-///     All operations that need to touch or modify the contents of a document need to be executed through a transaction.
+///     <para>
+///         All operations that need to touch or modify the contents of a document need to be executed through a
+///         transaction.
+///     </para>
+///     <para>A <see cref="Transaction" /> is automatically committed during <see cref="Dispose" />.</para>
 /// </remarks>
-public class Transaction
+public class Transaction : IDisposable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Transaction" /> class.
@@ -32,6 +36,13 @@ public class Transaction
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        // TODO [LSViana] Check if this should be unit tested.
+        Commit();
+    }
 
     /// <summary>
     ///     Commit and dispose provided read-write transaction.
