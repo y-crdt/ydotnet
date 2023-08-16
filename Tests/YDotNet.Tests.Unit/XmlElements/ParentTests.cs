@@ -98,24 +98,20 @@ public class ParentTests
         var xmlElement = doc.XmlElement("xml-element");
 
         var transaction = doc.WriteTransaction();
-        xmlElement.InsertElement(transaction, index: 0, "dimensions");
-        var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
+        var childXmlElement = xmlElement.InsertElement(transaction, index: 0, "dimensions");
         childXmlElement.InsertElement(transaction, index: 0, "width");
         childXmlElement.InsertElement(transaction, index: 0, "height");
-        childXmlElement.InsertElement(transaction, index: 0, "depth");
+        var grandChildXmlElement = childXmlElement.InsertElement(transaction, index: 0, "depth");
         transaction.Commit();
 
         // Act
         transaction = doc.ReadTransaction();
-        var grandChildXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
-
-        // TODO [LSViana] Check with the team why this is returning `null`.
         var parentXmlElement = grandChildXmlElement.Parent(transaction);
         var childLength = parentXmlElement.ChildLength(transaction);
         transaction.Commit();
 
         // Assert
         Assert.That(parentXmlElement, Is.Not.Null);
-        Assert.That(childLength, Is.EqualTo(expected: 2));
+        Assert.That(childLength, Is.EqualTo(expected: 3));
     }
 }
