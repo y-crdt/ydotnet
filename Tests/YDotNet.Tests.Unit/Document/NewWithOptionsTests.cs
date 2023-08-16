@@ -15,7 +15,7 @@ public class NewWithOptionsTests
             Id = 2718,
             Guid = "6811c0f5-320a-4a59-805d-ebe857a8b3f4",
             CollectionId = "sample_collection",
-            Encoding = DocEncoding.Uf16,
+            Encoding = DocEncoding.Utf16,
             SkipGarbageCollection = false,
             AutoLoad = false,
             ShouldLoad = false
