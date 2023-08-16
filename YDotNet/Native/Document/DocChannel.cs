@@ -13,9 +13,6 @@ internal static class DocChannel
 
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
-    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
-    public static extern nint New();
-
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new_with_options")]
     public static extern nint NewWithOptions(DocOptionsNative options);
