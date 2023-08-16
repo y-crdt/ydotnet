@@ -17,14 +17,25 @@ public class TagTests
         var tag = xmlElement.Tag;
 
         // Assert
-        Assert.That(tag, Is.Null);
+        Assert.That(tag, Is.EqualTo("xml-element"));
     }
 
     [Test]
     [Ignore("Waiting for the implementation of XmlElement.InsertElement().")]
     public void NodeNestedOnRootNodeHasCorrectTag()
     {
-        // TODO [LSViana] Implement this test when XmlElement.InsertElement() is available.
+        // Arrange
+        var doc = new Doc();
+        var xmlElement = doc.XmlElement("xml-element");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        var childXmlElement = xmlElement.InsertElement(transaction, index: 0, "color");
+        var tag = childXmlElement.Tag;
+        transaction.Commit();
+
+        // Assert
+        Assert.That(tag, Is.EqualTo("color"));
     }
 
     [Test]
