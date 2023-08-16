@@ -22,7 +22,7 @@ public class TextChunk
 
         var offset = Marshal.SizeOf<OutputNative>();
         var attributesLength = (uint) Marshal.ReadInt32(handle + offset);
-        var attributesHandle = Marshal.ReadIntPtr(handle + offset + Marshal.SizeOf<nint>());
+        var attributesHandle = Marshal.ReadIntPtr(handle + offset + MemoryConstants.PointerSize);
 
         Attributes = MemoryReader.TryReadIntPtrArray(
                              attributesHandle, attributesLength, Marshal.SizeOf<MapEntryNative>())

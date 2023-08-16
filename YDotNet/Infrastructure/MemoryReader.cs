@@ -5,8 +5,6 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryReader
 {
-    private static readonly int PointerSize = Marshal.SizeOf<nint>();
-
     internal static unsafe byte[] ReadBytes(nint handle, uint length)
     {
         var data = new byte[length];
@@ -49,6 +47,6 @@ internal static class MemoryReader
 
     internal static (MapEntryNative MapEntryNative, nint OutputHandle) ReadMapEntryAndOutputHandle(nint handle)
     {
-        return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + PointerSize);
+        return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + MemoryConstants.PointerSize);
     }
 }

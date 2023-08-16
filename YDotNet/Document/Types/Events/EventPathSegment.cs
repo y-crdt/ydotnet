@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -16,19 +17,15 @@ public class EventPathSegment
         Handle = handle;
         Tag = (EventPathSegmentTag) Marshal.ReadByte(handle);
 
-        // Offset is the size of an `nint` because the C struct contains two fields. They're 1-byte and 8-byte long
-        // and due to memory alignment, the 8-byte field is put after 7 empty bytes after the first field.
-        var offset = Marshal.SizeOf<nint>();
-
         switch (Tag)
         {
             case EventPathSegmentTag.Key:
-                var pointer = Marshal.ReadIntPtr(handle + offset);
+                var pointer = Marshal.ReadIntPtr(handle + MemoryConstants.PointerSize);
                 Key = Marshal.PtrToStringAnsi(pointer);
                 break;
 
             case EventPathSegmentTag.Index:
-                Index = (uint) Marshal.ReadInt32(handle + offset);
+                Index = (uint) Marshal.ReadInt32(handle + MemoryConstants.PointerSize);
                 break;
         }
     }

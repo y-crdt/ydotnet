@@ -23,15 +23,14 @@ internal static class MemoryWriter
 
     internal static (nint Head, nint[] Pointers) WriteUtf8StringArray(string[] values)
     {
-        var size = Marshal.SizeOf<nint>();
-        var head = Marshal.AllocHGlobal(size * values.Length);
+        var head = Marshal.AllocHGlobal(MemoryConstants.PointerSize * values.Length);
         var pointers = new nint[values.Length];
 
         for (var i = 0; i < values.Length; i++)
         {
             pointers[i] = WriteUtf8String(values[i]);
 
-            Marshal.WriteIntPtr(head + i * size, pointers[i]);
+            Marshal.WriteIntPtr(head + i * MemoryConstants.PointerSize, pointers[i]);
         }
 
         return (head, pointers);

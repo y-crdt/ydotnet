@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -17,11 +18,8 @@ public class XmlAttribute : IDisposable
     {
         Handle = handle;
 
-        // This offset is used to read subsequent pointers of the native resource.
-        var offset = Marshal.SizeOf<nint>();
-
         Name = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(Handle));
-        Value = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(Handle + offset));
+        Value = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(Handle + MemoryConstants.PointerSize));
     }
 
     /// <summary>

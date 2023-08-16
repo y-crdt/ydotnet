@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -16,10 +17,8 @@ public class EventDeltaAttribute
     {
         Handle = handle;
 
-        var offset = Marshal.SizeOf<nint>();
-
         Key = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(handle));
-        Value = new Output(handle + offset);
+        Value = new Output(handle + MemoryConstants.PointerSize);
     }
 
     /// <summary>
