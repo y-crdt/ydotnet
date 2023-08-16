@@ -31,9 +31,13 @@ public class Doc : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
     /// </summary>
+    /// <remarks>
+    ///     The default encoding used for <see cref="Doc" /> instances is see <see cref="DocEncoding.Utf16" />
+    ///     to match default encoding used by C#.
+    /// </remarks>
     public Doc()
+        : this(new DocOptions { Encoding = DocEncoding.Utf16 })
     {
-        Handle = DocChannel.New();
     }
 
     /// <summary>
