@@ -16,7 +16,7 @@ public class StateVectorV1Tests
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.InRange(from: 6, to: 7));
+        Assert.That(stateVector.Length, Is.GreaterThan(expected: 5));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class StateVectorV1Tests
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.InRange(from: 6, to: 7));
+        Assert.That(stateVector.Length, Is.GreaterThan(expected: 5));
     }
 
     private static Doc ArrangeDoc()

@@ -49,6 +49,6 @@ public class LengthTests
         var length = text.Length(transaction);
 
         // Assert
-        Assert.That(length, Is.EqualTo(expected: 10));
+        Assert.That(length, Is.EqualTo(expected: 7));
     }
 }

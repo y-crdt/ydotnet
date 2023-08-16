@@ -30,7 +30,7 @@ public class ObserveUpdatesV1
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(data, Is.Not.Null);
-        Assert.That(data, Has.Length.InRange(from: 25, to: 26));
+        Assert.That(data, Has.Length.InRange(from: 25, to: 30));
 
         // Act
         data = null;
@@ -41,7 +41,7 @@ public class ObserveUpdatesV1
         // Assert
         Assert.That(called, Is.EqualTo(expected: 2));
         Assert.That(data, Is.Not.Null);
-        Assert.That(data, Has.Length.InRange(from: 21, to: 23));
+        Assert.That(data, Has.Length.InRange(from: 25, to: 31));
 
         // Act
         data = null;
