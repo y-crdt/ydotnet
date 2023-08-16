@@ -36,7 +36,7 @@ public class Doc : IDisposable
     ///     to match default encoding used by C#.
     /// </remarks>
     public Doc()
-        : this(new DocOptions { Encoding = DocEncoding.Utf16 })
+        : this(DocOptions.Default)
     {
     }
 

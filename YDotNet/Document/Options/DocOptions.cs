@@ -6,6 +6,16 @@
 public class DocOptions
 {
     /// <summary>
+    ///     Gets the default options value used to initialize <see cref="Doc" /> instances.
+    /// </summary>
+    internal static DocOptions Default => new()
+    {
+        Id = (ulong) Random.Shared.NextInt64(),
+        ShouldLoad = true,
+        Encoding = DocEncoding.Utf16
+    };
+
+    /// <summary>
     ///     Gets the globally unique 53-bit integer assigned to the <see cref="Doc" /> replica as its identifier.
     /// </summary>
     /// <remarks>
