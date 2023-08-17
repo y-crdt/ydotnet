@@ -93,6 +93,11 @@ internal static class MemoryWriter
             return false;
         }
 
+        // This method doesn't throw if called with `nint.Zero` but having a `Try*` version
+        // makes the API more future-friendly and easier to understand for C# developers.
+        //
+        // If they called a `TryWrite*` method, they should call a `TryRelease` method too.
+        // Otherwise, they should call `Release`.
         Release(pointer);
 
         return true;
