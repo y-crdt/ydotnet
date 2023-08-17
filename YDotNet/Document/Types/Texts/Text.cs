@@ -42,7 +42,7 @@ public class Text : Branch
         TextChannel.Insert(Handle, transaction.Handle, index, valueHandle, attributesHandle);
 
         MemoryWriter.TryRelease(attributesHandle);
-        MemoryWriter.TryRelease(valueHandle);
+        MemoryWriter.Release(valueHandle);
     }
 
     /// <summary>
