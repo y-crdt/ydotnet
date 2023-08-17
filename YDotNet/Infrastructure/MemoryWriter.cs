@@ -7,16 +7,17 @@ internal static class MemoryWriter
 {
     internal static unsafe nint WriteUtf8String(string value)
     {
-        var bytes = Encoding.UTF8.GetBytes(value + "\0");
-        var pointer = Marshal.AllocHGlobal(bytes.Length);
+        var utf16Bytes = Encoding.Unicode.GetBytes(value + '\0');
+        var utf8Bytes = Encoding.Convert(Encoding.Unicode, Encoding.UTF8, utf16Bytes);
+        var pointer = Marshal.AllocHGlobal(utf8Bytes.Length);
 
         using var stream = new UnmanagedMemoryStream(
             (byte*) pointer.ToPointer(),
             length: 0,
-            bytes.Length,
+            utf8Bytes.Length,
             FileAccess.Write);
 
-        stream.Write(bytes);
+        stream.Write(utf8Bytes);
 
         return pointer;
     }
