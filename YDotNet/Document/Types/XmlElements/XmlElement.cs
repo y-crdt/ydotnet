@@ -77,8 +77,8 @@ public class XmlElement : Branch
 
         XmlElementChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
 
-        MemoryWriter.TryRelease(nameHandle);
-        MemoryWriter.TryRelease(valueHandle);
+        MemoryWriter.Release(nameHandle);
+        MemoryWriter.Release(valueHandle);
     }
 
     /// <summary>
@@ -88,7 +88,11 @@ public class XmlElement : Branch
     /// <param name="name">The name of the attribute to be removed.</param>
     public void RemoveAttribute(Transaction transaction, string name)
     {
-        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, name);
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+
+        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, nameHandle);
+
+        MemoryWriter.Release(nameHandle);
     }
 
     /// <summary>
@@ -99,8 +103,9 @@ public class XmlElement : Branch
     /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
     public string? GetAttribute(Transaction transaction, string name)
     {
-        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, name);
-        var result = Marshal.PtrToStringAnsi(handle);
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, nameHandle);
+        MemoryReader.TryReadUtf8String(handle, out var result);
         StringChannel.Destroy(handle);
 
         return result;
@@ -155,8 +160,14 @@ public class XmlElement : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
     public XmlElement? InsertElement(Transaction transaction, uint index, string name)
     {
-        return ReferenceAccessor.Access(
-            new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, name)));
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+
+        var result = ReferenceAccessor.Access(
+            new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
     }
 
     /// <summary>

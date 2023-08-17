@@ -18,11 +18,11 @@ internal static class XmlElementChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_remove_attr")]
-    public static extern void RemoveAttribute(nint handle, nint transaction, string name);
+    public static extern void RemoveAttribute(nint handle, nint transaction, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_get_attr")]
-    public static extern nint GetAttribute(nint handle, nint transaction, string name);
+    public static extern nint GetAttribute(nint handle, nint transaction, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_attr_iter")]
@@ -38,7 +38,7 @@ internal static class XmlElementChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_insert_elem")]
-    public static extern nint InsertElement(nint handle, nint transaction, uint index, string name);
+    public static extern nint InsertElement(nint handle, nint transaction, uint index, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_remove_range")]
