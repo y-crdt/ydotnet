@@ -7,7 +7,7 @@ internal static class TextChannel
     public delegate void ObserveCallback(nint state, nint textEvent);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert")]
-    public static extern void Insert(nint text, nint transaction, uint index, string value, nint attributes);
+    public static extern void Insert(nint text, nint transaction, uint index, nint value, nint attributes);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert_embed")]

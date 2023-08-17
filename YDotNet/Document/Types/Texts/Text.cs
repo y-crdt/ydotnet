@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
@@ -37,9 +36,13 @@ public class Text : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
-        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
-        TextChannel.Insert(Handle, transaction.Handle, index, value, attributesPointer);
-        MemoryWriter.TryRelease(attributesPointer);
+        var valueHandle = MemoryWriter.WriteUtf8String(value);
+        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesHandle);
+
+        TextChannel.Insert(Handle, transaction.Handle, index, valueHandle, attributesHandle);
+
+        MemoryWriter.TryRelease(attributesHandle);
+        MemoryWriter.TryRelease(valueHandle);
     }
 
     /// <summary>
@@ -115,11 +118,11 @@ public class Text : Branch
     public string String(Transaction transaction)
     {
         // Get the string pointer and read it into a managed instance.
-        var pointer = TextChannel.String(Handle, transaction.Handle);
-        var result = Marshal.PtrToStringAnsi(pointer);
+        var handle = TextChannel.String(Handle, transaction.Handle);
+        var result = MemoryReader.ReadUtf8String(handle);
 
         // Dispose the resources used by the underlying string.
-        StringChannel.Destroy(pointer);
+        StringChannel.Destroy(handle);
 
         return result;
     }
