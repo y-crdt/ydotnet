@@ -1,13 +1,14 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Types.Events;
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct EventKeyChangeNative
 {
-    public string Key { get; }
+    public nint Key { get; }
 
     public EventKeyChangeTagNative TagNative { get; }
 
@@ -27,7 +28,7 @@ internal struct EventKeyChangeNative
         };
 
         var result = new EventKeyChange(
-            Key,
+            MemoryReader.ReadUtf8String(Key),
             tag,
             OldValue == nint.Zero ? null : new Output(OldValue),
             NewValue == nint.Zero ? null : new Output(NewValue)
