@@ -326,6 +326,24 @@ public class GetTests
     }
 
     [Test]
+    public void GetWithEmojiCharactersOnKeyWorks()
+    {
+        // Arrange
+        var (map, transaction) = ArrangeDoc(
+            ("star-⭐", Input.Long(value: 2469L)),
+            ("moon-🌕", Input.Double(value: 4.20))
+        );
+
+        // Act
+        var value1 = map.Get(transaction, "star-⭐").Long;
+        var value2 = map.Get(transaction, "moon-🌕").Double;
+
+        // Assert
+        Assert.That(value1, Is.EqualTo(expected: 2469L));
+        Assert.That(value2, Is.EqualTo(expected: 4.20));
+    }
+
+    [Test]
     [Ignore("To be implemented.")]
     public void GetNewKeyReturnsNull()
     {
