@@ -68,7 +68,15 @@ public class Doc : IDisposable
     /// </summary>
     // TODO [LSViana] Check if this should be of type `Guid`.
     // There's a complication due to string format losing zero to the left in hexadecimal representation.
-    public string Guid => DocChannel.Guid(Handle);
+    public string Guid
+    {
+        get
+        {
+            MemoryReader.TryReadUtf8String(DocChannel.Guid(Handle), out var result);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
@@ -76,7 +84,15 @@ public class Doc : IDisposable
     /// <remarks>
     ///     If none was defined, a <c>null</c> will be returned.
     /// </remarks>
-    public string CollectionId => DocChannel.CollectionId(Handle);
+    public string? CollectionId
+    {
+        get
+        {
+            MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
@@ -127,7 +143,12 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
     public Text? Text(string name)
     {
-        return ReferenceAccessor.Access(new Text(DocChannel.Text(Handle, name)));
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var result = ReferenceAccessor.Access(new Text(DocChannel.Text(Handle, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
     }
 
     /// <summary>
@@ -140,7 +161,12 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
     public Map? Map(string name)
     {
-        return ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, name)));
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var result = ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
     }
 
     /// <summary>
@@ -153,7 +179,12 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
     public Array? Array(string name)
     {
-        return ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, name)));
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var result = ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
     }
 
     /// <summary>
@@ -167,7 +198,12 @@ public class Doc : IDisposable
     public XmlElement? XmlElement(string name)
     {
         // TODO [LSViana] Wrap the XmlElement with an XmlFragment before returning the value.
-        return ReferenceAccessor.Access(new XmlElement(DocChannel.XmlElement(Handle, name)));
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var result = ReferenceAccessor.Access(new XmlElement(DocChannel.XmlElement(Handle, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
     }
 
     /// <summary>
