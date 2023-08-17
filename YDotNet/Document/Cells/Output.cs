@@ -121,8 +121,9 @@ public class Output : IDisposable
             foreach (var handle in handles)
             {
                 var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
+                var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
 
-                result[mapEntry.Field] = new Output(outputHandle);
+                result[mapEntryKey] = new Output(outputHandle);
             }
 
             return result;
