@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class IdTests
 {
     [Test]
-    public void Id()
+    public void IsGreaterThanZeroByDefault()
     {
         // Arrange
         var doc = new Doc();
