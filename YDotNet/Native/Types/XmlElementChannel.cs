@@ -14,7 +14,7 @@ internal static class XmlElementChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_insert_attr")]
-    public static extern void InsertAttribute(nint handle, nint transaction, string name, string value);
+    public static extern void InsertAttribute(nint handle, nint transaction, nint name, nint value);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_remove_attr")]

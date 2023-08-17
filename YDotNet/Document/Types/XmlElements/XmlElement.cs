@@ -54,7 +54,7 @@ public class XmlElement : Branch
         get
         {
             var handle = XmlElementChannel.String(Handle);
-            var result = Marshal.PtrToStringAnsi(handle);
+            var result = MemoryReader.ReadUtf8String(handle);
             StringChannel.Destroy(handle);
 
             return result;
@@ -72,7 +72,13 @@ public class XmlElement : Branch
     /// <param name="value">The value of the attribute to be added.</param>
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
-        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, name, value);
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var valueHandle = MemoryWriter.WriteUtf8String(value);
+
+        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
+
+        MemoryWriter.TryRelease(nameHandle);
+        MemoryWriter.TryRelease(valueHandle);
     }
 
     /// <summary>
