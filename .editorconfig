@@ -32,5 +32,8 @@ dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be plac
 dotnet_diagnostic.SA1407.severity = suggestion # Arithmetic expressions should declare precedence
 dotnet_diagnostic.SA1413.severity = suggestion # Use trailing comma in multi-line initializers
 
+# Layout rules
+dotnet_diagnostic.SA1500.severity = suggestion # Braces for multi-line statements should not share line
+
 # Documentation rules
 dotnet_diagnostic.SA1633.severity = suggestion # File should have header
