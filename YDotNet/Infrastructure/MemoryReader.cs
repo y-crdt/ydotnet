@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Infrastructure;
@@ -14,8 +15,7 @@ internal static class MemoryReader
         do
         {
             bytesRead = stream.Read(data, offset: 0, data.Length);
-        }
-        while (bytesRead < data.Length);
+        } while (bytesRead < data.Length);
 
         stream.Dispose();
 
@@ -48,5 +48,30 @@ internal static class MemoryReader
     internal static (MapEntryNative MapEntryNative, nint OutputHandle) ReadMapEntryAndOutputHandle(nint handle)
     {
         return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + MemoryConstants.PointerSize);
+    }
+
+    internal static string ReadUtf8String(nint handle)
+    {
+        ReadOnlySpan<byte> readOnlySpan;
+
+        unsafe
+        {
+            var index = 0;
+
+            while (true)
+            {
+                if (Marshal.ReadByte(handle + index++) == 0)
+                {
+                    // Decrease the index to discard the zero byte.
+                    index--;
+
+                    break;
+                }
+            }
+
+            readOnlySpan = new ReadOnlySpan<byte>(handle.ToPointer(), index);
+        }
+
+        return Encoding.UTF8.GetString(readOnlySpan);
     }
 }
