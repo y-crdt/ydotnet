@@ -26,7 +26,7 @@ public class MapEntry : IDisposable
     /// <summary>
     ///     Gets the key of this <see cref="MapEntry" /> that represents the <see cref="Value" />.
     /// </summary>
-    public string Key => MapEntryNative.Field;
+    public string Key => MemoryReader.ReadUtf8String(MapEntryNative.Field);
 
     /// <summary>
     ///     Gets the value of this <see cref="MapEntry" /> that is represented the <see cref="Key" />.
