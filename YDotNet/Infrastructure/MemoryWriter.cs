@@ -22,6 +22,18 @@ internal static class MemoryWriter
         return pointer;
     }
 
+    internal static bool TryWriteUtf8String(string? value, out nint pointer)
+    {
+        if (value != null)
+        {
+            pointer = WriteUtf8String(value);
+            return true;
+        }
+
+        pointer = default;
+        return false;
+    }
+
     internal static (nint Head, nint[] Pointers) WriteUtf8StringArray(string[] values)
     {
         var head = Marshal.AllocHGlobal(MemoryConstants.PointerSize * values.Length);
