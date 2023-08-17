@@ -44,7 +44,15 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
-    public string? String => OutputChannel.String(Handle);
+    public string? String
+    {
+        get
+        {
+            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
