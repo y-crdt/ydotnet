@@ -247,4 +247,24 @@ public class ObserveTests
         Assert.That(add.NewValue.Long, Is.EqualTo(expected: -1337L));
         Assert.That(add.NewValue.Double, Is.Null);
     }
+
+    [Test]
+    public void ObserveHasKeysWithEmojiCharacters()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        IEnumerable<EventKeyChange>? keyChanges = null;
+
+        map.Observe(e => keyChanges = e.Keys.ToArray());
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "moon-🌕", Input.Long(value: 2469L));
+        transaction.Commit();
+
+        // Assert
+        Assert.That(keyChanges.First().Key, Is.EqualTo("moon-🌕"));
+    }
 }
