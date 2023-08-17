@@ -58,6 +58,22 @@ public class IterateTests
         Assert.That(items.ElementAt(index: 1).Value.Long, Is.EqualTo(expected: -420L));
     }
 
+    [Test]
+    public void IteratesOnMapsWithEmojiCharactersAsEntryKeys()
+    {
+        // Arrange
+        var (map, transaction) = Arrange();
+        map.Insert(transaction, "sun-☀️", Input.Boolean(true));
+
+        // Act
+        var iterator = map.Iterate(transaction);
+
+        // Assert
+        var items = iterator.ToArray();
+
+        Assert.That(items.ElementAt(index: 0).Key, Is.EqualTo("sun-☀️"));
+    }
+
     private (Map, Transaction) Arrange()
     {
         var doc = new Doc();
