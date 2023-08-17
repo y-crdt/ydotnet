@@ -43,7 +43,7 @@ public class IterateTests
     {
         // Arrange
         var (map, transaction) = Arrange();
-        map.Insert(transaction, "value-1️⃣", Input.Long(value: 2469L));
+        map.Insert(transaction, "value-1️", Input.Long(value: 2469L));
         map.Insert(transaction, "value-2️⃣", Input.Long(value: -420L));
 
         // Act

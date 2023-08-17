@@ -66,13 +66,18 @@ public class GetTests
     public void GetString()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc(("name", Input.String("Lucas")));
+        var (map, transaction) = ArrangeDoc(
+            ("name", Input.String("Lucas")),
+            ("earth-🌍", Input.String("globe-🌐"))
+        );
 
         // Act
-        var value = map.Get(transaction, "name").String;
+        var value1 = map.Get(transaction, "name").String;
+        var value2 = map.Get(transaction, "earth-🌍").String;
 
         // Assert
-        Assert.That(value, Is.EqualTo("Lucas"));
+        Assert.That(value1, Is.EqualTo("Lucas"));
+        Assert.That(value2, Is.EqualTo("globe-🌐"));
     }
 
     [Test]
