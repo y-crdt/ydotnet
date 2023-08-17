@@ -37,7 +37,7 @@ public class LengthTests
     }
 
     [Test]
-    public void LengthIsCorrectForAlphanumericAndEmojiCharacters()
+    public void LengthIsCorrectForSpecialCharacters()
     {
         // Arrange
         var doc = new Doc();
@@ -45,10 +45,10 @@ public class LengthTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        text.Insert(transaction, index: 0, "Earth 🌎");
+        text.Insert(transaction, index: 0, "Earth 🌎☀️🌕⭐");
         var length = text.Length(transaction);
 
         // Assert
-        Assert.That(length, Is.EqualTo(expected: 8));
+        Assert.That(length, Is.EqualTo(expected: 13));
     }
 }

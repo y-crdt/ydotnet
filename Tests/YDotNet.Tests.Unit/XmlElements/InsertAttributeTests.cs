@@ -78,6 +78,7 @@ public class InsertAttributeTests
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         xmlElement.InsertAttribute(transaction, "rel", "preload");
         xmlElement.InsertAttribute(transaction, "as", "document");
+        xmlElement.InsertAttribute(transaction, "🛫", "🛬");
         transaction.Commit();
 
         // Assert
@@ -85,6 +86,7 @@ public class InsertAttributeTests
         Assert.That(xmlElement.String, Contains.Substring("href=\"https://lsviana.github.io/\""));
         Assert.That(xmlElement.String, Contains.Substring("rel=\"preload\""));
         Assert.That(xmlElement.String, Contains.Substring("as=\"document\""));
+        Assert.That(xmlElement.String, Contains.Substring("🛫=\"🛬\""));
         Assert.That(xmlElement.String, Contains.Substring("></link>"));
     }
 
@@ -109,21 +111,6 @@ public class InsertAttributeTests
 
         // Assert
         Assert.That(xmlElement.String, Is.EqualTo("<link as=\"stylesheet\"></link>"));
-    }
-
-    [Test]
-    public void InsertAttributeWithAlphanumericAndEmojiCharacters()
-    {
-        // Arrange
-        var (doc, xmlElement) = ArrangeDoc();
-
-        // Act
-        var transaction = doc.WriteTransaction();
-        xmlElement.InsertAttribute(transaction, "🛫", "🛬");
-        transaction.Commit();
-
-        // Assert
-        Assert.That(xmlElement.String, Is.EqualTo("<link 🛫=\"🛬\"></link>"));
     }
 
     private static (Doc, XmlElement) ArrangeDoc()
