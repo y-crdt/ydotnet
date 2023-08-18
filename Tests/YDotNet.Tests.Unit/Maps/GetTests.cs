@@ -13,13 +13,13 @@ public class GetTests
     {
         // Arrange
         var (map, transaction) = ArrangeDoc(
-            ("value1", Input.Boolean(value: true)),
-            ("value2", Input.Boolean(value: false))
+            ("star-⭐", Input.Boolean(value: true)),
+            ("moon-🌕", Input.Boolean(value: false))
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Boolean;
-        var value2 = map.Get(transaction, "value2").Boolean;
+        var value1 = map.Get(transaction, "star-⭐").Boolean;
+        var value2 = map.Get(transaction, "moon-🌕").Boolean;
 
         // Assert
         Assert.That(value1, Is.True);
@@ -66,13 +66,18 @@ public class GetTests
     public void GetString()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc(("name", Input.String("Lucas")));
+        var (map, transaction) = ArrangeDoc(
+            ("name", Input.String("Lucas")),
+            ("earth-🌍", Input.String("globe-🌐"))
+        );
 
         // Act
-        var value = map.Get(transaction, "name").String;
+        var value1 = map.Get(transaction, "name").String;
+        var value2 = map.Get(transaction, "earth-🌍").String;
 
         // Assert
-        Assert.That(value, Is.EqualTo("Lucas"));
+        Assert.That(value1, Is.EqualTo("Lucas"));
+        Assert.That(value2, Is.EqualTo("globe-🌐"));
     }
 
     [Test]
@@ -127,8 +132,8 @@ public class GetTests
             ("value1", Input.Object(
                 new Dictionary<string, Input>
                 {
-                    { "value1-1", Input.Long(value: 2469L) },
-                    { "value1-2", Input.Long(value: -420L) }
+                    { "star-⭐", Input.Long(value: 2469L) },
+                    { "moon-🌕", Input.Long(value: -420L) }
                 })),
             ("value2", Input.Boolean(value: true))
         );
@@ -139,8 +144,8 @@ public class GetTests
 
         // Assert
         Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
-        Assert.That(value1["value1-1"].Long, Is.EqualTo(expected: 2469));
-        Assert.That(value1["value1-2"].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value1["star-⭐"].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1["moon-🌕"].Long, Is.EqualTo(expected: -420L));
         Assert.That(value2, Is.Null);
     }
 

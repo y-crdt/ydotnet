@@ -57,8 +57,7 @@ public class ObserveDeepTests
 
         Assert.That(pathSegments.ElementAt(index: 0).Tag, Is.EqualTo(EventPathSegmentTag.Index));
 
-        // TODO [LSViana] Check with the team why this isn't "3", since this is the index the item is being added.
-        Assert.That(pathSegments.ElementAt(index: 0).Index, Is.EqualTo(expected: 1));
+        Assert.That(pathSegments.ElementAt(index: 0).Index, Is.EqualTo(expected: 3));
         Assert.That(pathSegments.ElementAt(index: 0).Key, Is.Null);
 
         Assert.That(pathSegments.ElementAt(index: 1).Tag, Is.EqualTo(EventPathSegmentTag.Key));
@@ -124,13 +123,11 @@ public class ObserveDeepTests
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
 
         Assert.That(pathSegments.ElementAt(index: 0).Tag, Is.EqualTo(EventPathSegmentTag.Index));
-        // TODO [LSViana] Check with the team why this isn't "2", since this is the index the item is being removed.
-        Assert.That(pathSegments.ElementAt(index: 0).Index, Is.EqualTo(expected: 1));
+        Assert.That(pathSegments.ElementAt(index: 0).Index, Is.EqualTo(expected: 2));
         Assert.That(pathSegments.ElementAt(index: 0).Key, Is.Null);
 
         Assert.That(pathSegments.ElementAt(index: 1).Tag, Is.EqualTo(EventPathSegmentTag.Index));
-        // TODO [LSViana] Check with the team why this isn't "3", since this is the index inside "array2".
-        Assert.That(pathSegments.ElementAt(index: 1).Index, Is.EqualTo(expected: 1));
+        Assert.That(pathSegments.ElementAt(index: 1).Index, Is.EqualTo(expected: 3));
         Assert.That(pathSegments.ElementAt(index: 1).Key, Is.Null);
 
         array1.UnobserveDeep(subscription);

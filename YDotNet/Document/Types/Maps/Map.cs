@@ -34,7 +34,11 @@ public class Map : Branch
     /// <param name="input">The <see cref="Input" /> instance to be inserted.</param>
     public void Insert(Transaction transaction, string key, Input input)
     {
-        MapChannel.Insert(Handle, transaction.Handle, key, input.InputNative);
+        var keyHandle = MemoryWriter.WriteUtf8String(key);
+
+        MapChannel.Insert(Handle, transaction.Handle, keyHandle, input.InputNative);
+
+        MemoryWriter.Release(keyHandle);
     }
 
     /// <summary>
@@ -48,7 +52,10 @@ public class Map : Branch
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
     public Output? Get(Transaction transaction, string key)
     {
-        var handle = MapChannel.Get(Handle, transaction.Handle, key);
+        var keyHandle = MemoryWriter.WriteUtf8String(key);
+        var handle = MapChannel.Get(Handle, transaction.Handle, keyHandle);
+
+        MemoryWriter.Release(keyHandle);
 
         return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
@@ -72,7 +79,12 @@ public class Map : Branch
     /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
     public bool Remove(Transaction transaction, string key)
     {
-        return MapChannel.Remove(Handle, transaction.Handle, key) == 1;
+        var keyHandle = MemoryWriter.WriteUtf8String(key);
+        var result = MapChannel.Remove(Handle, transaction.Handle, keyHandle) == 1;
+
+        MemoryWriter.Release(keyHandle);
+
+        return result;
     }
 
     /// <summary>

@@ -13,9 +13,6 @@ internal static class DocChannel
 
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
-    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new")]
-    public static extern nint New();
-
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_new_with_options")]
     public static extern nint NewWithOptions(DocOptionsNative options);
@@ -31,11 +28,11 @@ internal static class DocChannel
     public static extern ulong Id(nint doc);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_guid")]
-    public static extern string Guid(nint doc);
+    public static extern nint Guid(nint doc);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_collection_id")]
-    public static extern string CollectionId(nint doc);
+    public static extern nint CollectionId(nint doc);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_should_load")]
     public static extern bool ShouldLoad(nint doc);
@@ -44,13 +41,16 @@ internal static class DocChannel
     public static extern bool AutoLoad(nint doc);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext")]
-    public static extern nint Text(nint doc, string name);
+    public static extern nint Text(nint doc, nint name);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap")]
-    public static extern nint Map(nint doc, string name);
+    public static extern nint Map(nint doc, nint name);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yarray")]
-    public static extern nint Array(nint doc, string name);
+    public static extern nint Array(nint doc, nint name);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem")]
+    public static extern nint XmlElement(nint doc, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_read_transaction")]

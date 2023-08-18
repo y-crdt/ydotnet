@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Types;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlElements;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
@@ -43,7 +44,15 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
-    public string? String => OutputChannel.String(Handle);
+    public string? String
+    {
+        get
+        {
+            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
@@ -120,8 +129,9 @@ public class Output : IDisposable
             foreach (var handle in handles)
             {
                 var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
+                var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
 
-                result[mapEntry.Field] = new Output(outputHandle);
+                result[mapEntryKey] = new Output(outputHandle);
             }
 
             return result;

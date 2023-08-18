@@ -43,8 +43,8 @@ public class IterateTests
     {
         // Arrange
         var (map, transaction) = Arrange();
-        map.Insert(transaction, "value1", Input.Long(value: 2469L));
-        map.Insert(transaction, "value2", Input.Long(value: -420L));
+        map.Insert(transaction, "value-1️", Input.Long(value: 2469L));
+        map.Insert(transaction, "value-2️⃣", Input.Long(value: -420L));
 
         // Act
         var iterator = map.Iterate(transaction);
@@ -52,9 +52,9 @@ public class IterateTests
         // Assert
         var items = iterator.OrderBy(x => x.Key).ToArray();
         Assert.That(items.Length, Is.EqualTo(expected: 2));
-        Assert.That(items.ElementAt(index: 0).Key, Is.EqualTo("value1"));
+        Assert.That(items.ElementAt(index: 0).Key, Is.EqualTo("value-1️"));
         Assert.That(items.ElementAt(index: 0).Value.Long, Is.EqualTo(expected: 2469L));
-        Assert.That(items.ElementAt(index: 1).Key, Is.EqualTo("value2"));
+        Assert.That(items.ElementAt(index: 1).Key, Is.EqualTo("value-2️⃣"));
         Assert.That(items.ElementAt(index: 1).Value.Long, Is.EqualTo(expected: -420L));
     }
 

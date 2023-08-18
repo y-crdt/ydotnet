@@ -46,7 +46,7 @@ public class ObserveTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        map.Insert(transaction, "value", Input.Long(value: 2469L));
+        map.Insert(transaction, "moon-🌕", Input.Long(value: 2469L));
         transaction.Commit();
 
         // Assert
@@ -56,7 +56,7 @@ public class ObserveTests
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(keyChanges, Is.Not.Null);
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
-        Assert.That(firstKey.Key, Is.EqualTo("value"));
+        Assert.That(firstKey.Key, Is.EqualTo("moon-🌕"));
         Assert.That(firstKey.Tag, Is.EqualTo(EventKeyChangeTag.Add));
         Assert.That(firstKey.OldValue, Is.Null);
         Assert.That(firstKey.NewValue, Is.Not.Null);

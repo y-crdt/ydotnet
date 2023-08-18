@@ -7,7 +7,7 @@ internal static class TextChannel
     public delegate void ObserveCallback(nint state, nint textEvent);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert")]
-    public static extern void Insert(nint text, nint transaction, uint index, string value, nint attributes);
+    public static extern void Insert(nint text, nint transaction, uint index, nint value, nint attributes);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_insert_embed")]
@@ -45,5 +45,5 @@ internal static class TextChannel
     public static extern nint ObserveEventTarget(nint textEvent);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytext_unobserve")]
-    public static extern uint Unobserve(nint text, uint subscriptionId);
+    public static extern void Unobserve(nint text, uint subscriptionId);
 }

@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
+using YDotNet.Document.Types.XmlElements.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -20,20 +22,19 @@ public class EventBranch
         Handle = handle;
         Tag = (EventBranchTag) Marshal.ReadByte(handle);
 
-        // Offset is the size of an `nint` because the C struct contains two fields. They're 1-byte and 8-byte long
-        // and due to memory alignment, the 8-byte field is put after 7 empty bytes after the first field.
-        var offset = Marshal.SizeOf<nint>();
-
         switch (Tag)
         {
             case EventBranchTag.Map:
-                MapEvent = new MapEvent(handle + offset);
+                MapEvent = new MapEvent(handle + MemoryConstants.PointerSize);
                 break;
             case EventBranchTag.Text:
-                TextEvent = new TextEvent(handle + offset);
+                TextEvent = new TextEvent(handle + MemoryConstants.PointerSize);
                 break;
             case EventBranchTag.Array:
-                ArrayEvent = new ArrayEvent(handle + offset);
+                ArrayEvent = new ArrayEvent(handle + MemoryConstants.PointerSize);
+                break;
+            case EventBranchTag.XmlElement:
+                XmlElementEvent = new XmlElementEvent(handle + MemoryConstants.PointerSize);
                 break;
             default:
                 throw new NotImplementedException();
@@ -62,6 +63,12 @@ public class EventBranch
     ///     otherwise.
     /// </summary>
     public ArrayEvent? ArrayEvent { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElementEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.XmlElement" />,
+    ///     or <c>null</c> otherwise.
+    /// </summary>
+    public XmlElementEvent? XmlElementEvent { get; }
 
     /// <summary>
     ///     Gets the handle to the native resource.

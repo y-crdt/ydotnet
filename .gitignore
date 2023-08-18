@@ -38,3 +38,4 @@ msbuild.wrn
 
 # Project-specific files
 *.dll
+*.dylib
