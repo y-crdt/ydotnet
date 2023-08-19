@@ -1,5 +1,7 @@
+using YDotNet.Document.Cells;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlTexts;
@@ -27,5 +29,26 @@ public class XmlText : Branch
     public uint Length(Transaction transaction)
     {
         return XmlTextChannel.Length(Handle, transaction.Handle);
+    }
+
+    /// <summary>
+    ///     Inserts a string in the given <c>index</c>.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
+    /// <param name="value">The text to be inserted.</param>
+    /// <param name="attributes">
+    ///     Optional, the attributes to be added to the inserted text. The value must be the result of a call to
+    ///     <see cref="Input" />.<see cref="Input.Object" />.
+    /// </param>
+    public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
+    {
+        var valueHandle = MemoryWriter.WriteUtf8String(value);
+        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesHandle);
+
+        XmlTextChannel.Insert(Handle, transaction.Handle, index, valueHandle, attributesHandle);
+
+        MemoryWriter.TryRelease(attributesHandle);
+        MemoryWriter.Release(valueHandle);
     }
 }
