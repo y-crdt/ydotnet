@@ -5,6 +5,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
