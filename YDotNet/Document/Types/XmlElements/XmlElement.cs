@@ -12,7 +12,7 @@ using YDotNet.Native.Types;
 namespace YDotNet.Document.Types.XmlElements;
 
 /// <summary>
-///     A shared data type that represents a XML element.
+///     A shared data type that represents an XML element.
 /// </summary>
 public class XmlElement : Branch
 {
