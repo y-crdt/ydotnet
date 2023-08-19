@@ -149,28 +149,32 @@ public class Output : IDisposable
     public bool Undefined => OutputChannel.Undefined(Handle) == 1;
 
     /// <summary>
-    ///     Gets the <see cref="Types.Array" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
     public Array? Array => ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Types.Maps.Map" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="YDotNet.Document.Types.Maps.Map" /> or <c>null</c> if this output cells contains a different
+    ///     type stored.
     /// </summary>
     public Map? Map => ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Texts" /> or <c>null</c> if this output cells contains a different type
+    ///     Gets the <see cref="YDotNet.Document.Types.Texts.Text" /> or <c>null</c> if this output cells contains a different
+    ///     type
     ///     stored.
     /// </summary>
     public Text? Text => ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Types.XmlElement" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> or <c>null</c> if this output cells contains
+    ///     a different type stored.
     /// </summary>
     public XmlElement? XmlElement => ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle)));
 
     /// <summary>
-    ///     Gets the <see cref="Types.XmlText" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> or <c>null</c> if this output cells contains a
+    ///     different type stored.
     /// </summary>
     public XmlText? XmlText => ReferenceAccessor.Access(new XmlText(OutputChannel.XmlText(Handle)));
 
