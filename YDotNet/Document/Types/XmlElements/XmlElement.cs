@@ -45,21 +45,20 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Gets the string representation of the <see cref="XmlElement" /> instance.
+    ///     Returns the string representation of the <see cref="XmlElement" /> instance.
     /// </summary>
     /// <remarks>
     ///     The returned value has no padding or indentation spaces.
     /// </remarks>
-    public string String
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The string representation of the <see cref="XmlElement" /> instance.</returns>
+    public string String(Transaction transaction)
     {
-        get
-        {
-            var handle = XmlElementChannel.String(Handle);
-            var result = MemoryReader.ReadUtf8String(handle);
-            StringChannel.Destroy(handle);
+        var handle = XmlElementChannel.String(Handle, transaction.Handle);
+        var result = MemoryReader.ReadUtf8String(handle);
+        StringChannel.Destroy(handle);
 
-            return result;
-        }
+        return result;
     }
 
     /// <summary>
@@ -301,9 +300,9 @@ public class XmlElement : Branch
         XmlElementChannel.Unobserve(Handle, subscription.Id);
     }
 
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        return String;
-    }
+    // /// <inheritdoc />
+    // public override string ToString()
+    // {
+    //     return String;
+    // }
 }
