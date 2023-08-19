@@ -51,4 +51,18 @@ public class XmlText : Branch
         MemoryWriter.TryRelease(attributesHandle);
         MemoryWriter.Release(valueHandle);
     }
+
+    /// <summary>
+    ///     Returns the string representation of the <see cref="XmlText" /> instance.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The string representation of the <see cref="XmlText" /> instance.</returns>
+    public string String(Transaction transaction)
+    {
+        var handle = XmlTextChannel.String(Handle, transaction.Handle);
+        var result = MemoryReader.ReadUtf8String(handle);
+        StringChannel.Destroy(handle);
+
+        return result;
+    }
 }
