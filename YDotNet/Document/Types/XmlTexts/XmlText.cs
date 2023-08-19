@@ -84,4 +84,18 @@ public class XmlText : Branch
 
         return result;
     }
+
+    /// <summary>
+    ///     Removes a range of characters.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
+    /// <param name="length">
+    ///     The length of the text to be removed, relative to the index and must not go over total
+    ///     <see cref="Length" />.
+    /// </param>
+    public void RemoveRange(Transaction transaction, uint index, uint length)
+    {
+        XmlTextChannel.RemoveRange(Handle, transaction.Handle, index, length);
+    }
 }
