@@ -70,15 +70,7 @@ public class Doc : IDisposable
     /// </summary>
     // TODO [LSViana] Check if this should be of type `Guid`.
     // There's a complication due to string format losing zero to the left in hexadecimal representation.
-    public string Guid
-    {
-        get
-        {
-            MemoryReader.TryReadUtf8String(DocChannel.Guid(Handle), out var result);
-
-            return result;
-        }
-    }
+    public string Guid => MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
