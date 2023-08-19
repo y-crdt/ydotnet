@@ -98,4 +98,24 @@ public class XmlText : Branch
     {
         XmlTextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
+
+    /// <summary>
+    ///     Formats a string in the given range defined by <c>index</c> and <c>length</c>.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this write operation.</param>
+    /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
+    /// <param name="length">
+    ///     The length of the text to be formatted, relative to the index and must not go over total
+    ///     <see cref="Length" />.
+    /// </param>
+    /// <param name="attributes">
+    ///     Optional, the attributes to be added to the inserted text. The value must be the result of a call to
+    ///     <see cref="Input" />.<see cref="Input.Object" />.
+    /// </param>
+    public void Format(Transaction transaction, uint index, uint length, Input attributes)
+    {
+        var attributesPointer = MemoryWriter.WriteStruct(attributes.InputNative);
+        XmlTextChannel.Format(Handle, transaction.Handle, index, length, attributesPointer);
+        MemoryWriter.Release(attributesPointer);
+    }
 }

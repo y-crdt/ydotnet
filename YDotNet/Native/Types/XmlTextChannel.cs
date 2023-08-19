@@ -20,4 +20,7 @@ internal static class XmlTextChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_remove_range")]
     public static extern void RemoveRange(nint handle, nint transaction, uint index, uint length);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_format")]
+    public static extern void Format(nint handle, nint transaction, uint index, uint length, nint attributes);
 }
