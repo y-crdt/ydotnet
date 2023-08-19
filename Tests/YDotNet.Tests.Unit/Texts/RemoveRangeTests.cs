@@ -5,7 +5,7 @@ using YDotNet.Document.Types.Texts;
 
 namespace YDotNet.Tests.Unit.Texts;
 
-public class RemoveTests
+public class RemoveRangeTests
 {
     [Test]
     public void RemoveAtBeginning()
@@ -14,7 +14,7 @@ public class RemoveTests
         var (text, transaction) = ArrangeText();
 
         // Act
-        text.Remove(transaction, index: 0, length: 2);
+        text.RemoveRange(transaction, index: 0, length: 2);
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo("cas"));
@@ -27,7 +27,7 @@ public class RemoveTests
         var (text, transaction) = ArrangeText();
 
         // Act
-        text.Remove(transaction, index: 2, length: 2);
+        text.RemoveRange(transaction, index: 2, length: 2);
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo("Lus"));
@@ -40,7 +40,7 @@ public class RemoveTests
         var (text, transaction) = ArrangeText();
 
         // Act
-        text.Remove(transaction, index: 3, length: 2);
+        text.RemoveRange(transaction, index: 3, length: 2);
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo("Luc"));
@@ -53,7 +53,7 @@ public class RemoveTests
         var (text, transaction) = ArrangeText();
 
         // Act
-        text.Remove(transaction, index: 0, length: 5);
+        text.RemoveRange(transaction, index: 0, length: 5);
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo(string.Empty));
@@ -66,7 +66,7 @@ public class RemoveTests
         var (text, transaction) = ArrangeText();
 
         // Act
-        text.Remove(transaction, index: 0, length: 0);
+        text.RemoveRange(transaction, index: 0, length: 0);
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo("Lucas"));
