@@ -71,7 +71,7 @@ public abstract class Input : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <param name="value">The <see cref="byte" /> array value to be stored in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
@@ -81,7 +81,7 @@ public abstract class Input : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <param name="value">The <see cref="Input" /> array value to be stored in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Collection(Input[] value)
     {
@@ -94,7 +94,7 @@ public abstract class Input : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="value">The <see cref="long" /> value to be stored in the cell.</param>
+    /// <param name="value">The <see cref="Dictionary{TKey,TValue}" /> value to be stored in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Object(IDictionary<string, Input> value)
     {
