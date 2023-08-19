@@ -4,6 +4,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
@@ -210,6 +211,29 @@ public class Doc : IDisposable
         // TODO [LSViana] Wrap the XmlElement with an XmlFragment before returning the value.
         var nameHandle = MemoryWriter.WriteUtf8String(name);
         var result = ReferenceAccessor.Access(new XmlElement(DocChannel.XmlElement(Handle, nameHandle)));
+
+        MemoryWriter.Release(nameHandle);
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> data type instance as a
+    ///     root-level type in this document.
+    /// </summary>
+    /// <remarks>
+    ///     This structure can later be accessed using its <c>name</c>.
+    /// </remarks>
+    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided
+    ///     or <c>null</c> if failed.
+    /// </returns>
+    public XmlText? XmlText(string name)
+    {
+        // TODO [LSViana] Wrap the XmlText with an XmlFragment before returning the value.
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var result = ReferenceAccessor.Access(new XmlText(DocChannel.XmlText(Handle, nameHandle)));
 
         MemoryWriter.Release(nameHandle);
 
