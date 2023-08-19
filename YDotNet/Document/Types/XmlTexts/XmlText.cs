@@ -2,7 +2,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Native.Types;
 
-namespace YDotNet.Document.Types;
+namespace YDotNet.Document.Types.XmlTexts;
 
 /// <summary>
 ///     A shared data type that represents a XML text.
