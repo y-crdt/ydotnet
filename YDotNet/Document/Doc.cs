@@ -17,6 +17,8 @@ namespace YDotNet.Document;
 /// <remarks>
 ///     <para>
 ///         The documents are the most important units of collaborative resources management.
+///     </para>
+///     <para>
 ///         All shared collections live within the scope of their corresponding documents. All updates are
 ///         generated on per document basis (rather than generated per shared type basis). All operations on
 ///         shared collections happen via <see cref="Transaction" />, whose lifetime is also bound to a document.
@@ -134,13 +136,17 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Text" /> data type instance as a root-level type in this document.
+    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Texts.Text" /> data type instance as a root-level
+    ///     type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
-    /// <returns>The <see cref="Text" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Texts.Text" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="YDotNet.Document.Types.Texts.Text" /> instance related to the <c>name</c> provided or
+    ///     <c>null</c> if failed.
+    /// </returns>
     public Text? Text(string name)
     {
         var nameHandle = MemoryWriter.WriteUtf8String(name);
@@ -152,13 +158,17 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Map" /> data type instance as a root-level type in this document.
+    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Maps.Map" /> data type instance as a root-level type
+    ///     in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
-    /// <returns>The <see cref="Map" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Maps.Map" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="YDotNet.Document.Types.Maps.Map" /> instance related to the <c>name</c> provided or <c>null</c>
+    ///     if failed.
+    /// </returns>
     public Map? Map(string name)
     {
         var nameHandle = MemoryWriter.WriteUtf8String(name);
@@ -170,13 +180,17 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Array" /> data type instance as a root-level type in this document.
+    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Arrays.Array" /> data type instance as a root-level
+    ///     type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="Array" /> instance to get.</param>
-    /// <returns>The <see cref="Array" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Arrays.Array" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="YDotNet.Document.Types.Arrays.Array" /> instance related to the <c>name</c> provided or
+    ///     <c>null</c> if failed.
+    /// </returns>
     public Array? Array(string name)
     {
         var nameHandle = MemoryWriter.WriteUtf8String(name);
@@ -188,13 +202,17 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="XmlElement" /> data type instance as a root-level type in this document.
+    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> data type instance as a
+    ///     root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
-    /// <returns>The <see cref="XmlElement" /> instance related to the <c>name</c> provided or <c>null</c> if failed.</returns>
+    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided
+    ///     or <c>null</c> if failed.
+    /// </returns>
     public XmlElement? XmlElement(string name)
     {
         // TODO [LSViana] Wrap the XmlElement with an XmlFragment before returning the value.
