@@ -92,6 +92,20 @@ public class XmlText : Branch
     }
 
     /// <summary>
+    ///     Removes an attribute.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be removed.</param>
+    public void RemoveAttribute(Transaction transaction, string name)
+    {
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+
+        XmlTextChannel.RemoveAttribute(Handle, transaction.Handle, nameHandle);
+
+        MemoryWriter.Release(nameHandle);
+    }
+
+    /// <summary>
     ///     Gets an attribute with the given <see cref="name" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
