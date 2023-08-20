@@ -291,8 +291,8 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Array" /> scope.
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, that
+    ///     was subscribed via <see cref="Observe" />.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void Unobserve(EventSubscription subscription)
