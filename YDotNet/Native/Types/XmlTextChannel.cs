@@ -4,6 +4,8 @@ namespace YDotNet.Native.Types;
 
 internal static class XmlTextChannel
 {
+    public delegate void ObserveCallback(nint state, nint eventHandle);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_len")]
     public static extern uint Length(nint handle, nint transaction);
 
@@ -39,4 +41,11 @@ internal static class XmlTextChannel
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_format")]
     public static extern void Format(nint handle, nint transaction, uint index, uint length, nint attributes);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_observe")]
+    public static extern uint Observe(nint handle, nint state, ObserveCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_event_target")]
+    public static extern nint ObserveEventTarget(nint eventHandle);
 }

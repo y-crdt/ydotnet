@@ -1,7 +1,9 @@
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlTexts.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -211,5 +213,23 @@ public class XmlText : Branch
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
         return handle == nint.Zero ? null : new Output(handle, disposable: true);
+    }
+
+    /// <summary>
+    ///     Subscribes a callback function for changes performed in this instance.
+    /// </summary>
+    /// <remarks>
+    ///     The callbacks are triggered whenever a <see cref="Transaction" /> is committed.
+    /// </remarks>
+    /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription Observe(Action<XmlTextEvent> action)
+    {
+        var subscriptionId = XmlTextChannel.Observe(
+            Handle,
+            nint.Zero,
+            (state, eventHandle) => action(new XmlTextEvent(eventHandle)));
+
+        return new EventSubscription(subscriptionId);
     }
 }
