@@ -114,7 +114,6 @@ public class Output : IDisposable
     {
         get
         {
-            // TODO [LSViana] Refactor this method to extract shared logic with other flows.
             var handles = MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Object(Handle), OutputNative.Length, Marshal.SizeOf<MapEntryNative>());
 
@@ -123,7 +122,6 @@ public class Output : IDisposable
                 return null;
             }
 
-            // This pointer size is used to offset the `MapEntryNative.Field` value (which is a string pointer).
             var result = new Dictionary<string, Output>();
 
             foreach (var handle in handles)
