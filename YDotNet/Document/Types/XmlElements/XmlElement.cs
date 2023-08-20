@@ -299,10 +299,4 @@ public class XmlElement : Branch
     {
         XmlElementChannel.Unobserve(Handle, subscription.Id);
     }
-
-    // /// <inheritdoc />
-    // public override string ToString()
-    // {
-    //     return String;
-    // }
 }
