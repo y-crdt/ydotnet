@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Texts;
 public class UnobserveDeepTests
 {
     [Test]
-    public void TriggersWhenMapChangedUntilUnobserved()
+    public void TriggersWhenChangedUntilUnobserved()
     {
         // Arrange
         var doc = new Doc();
