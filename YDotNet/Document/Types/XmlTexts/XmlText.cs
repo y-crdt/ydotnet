@@ -92,6 +92,22 @@ public class XmlText : Branch
     }
 
     /// <summary>
+    ///     Gets an attribute with the given <see cref="name" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be retrieved.</param>
+    /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
+    public string? GetAttribute(Transaction transaction, string name)
+    {
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var handle = XmlTextChannel.GetAttribute(Handle, transaction.Handle, nameHandle);
+        MemoryReader.TryReadUtf8String(handle, out var result);
+        StringChannel.Destroy(handle);
+
+        return result;
+    }
+
+    /// <summary>
     ///     Returns the string representation of the <see cref="XmlText" /> instance.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
