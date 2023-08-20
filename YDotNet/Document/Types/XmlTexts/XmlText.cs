@@ -180,4 +180,20 @@ public class XmlText : Branch
         XmlTextChannel.Format(Handle, transaction.Handle, index, length, attributesPointer);
         MemoryWriter.Release(attributesPointer);
     }
+
+    /// <summary>
+    ///     Returns the previous sibling which can be either an <see cref="XmlElement" />
+    ///     or an <see cref="XmlText" /> or <c>null</c> if this node is the first child.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The previous sibling of which can be either an <see cref="XmlElement" /> or
+    ///     an <see cref="XmlText" /> or <c>null</c> if this node is the first child.
+    /// </returns>
+    public Output? PreviousSibling(Transaction transaction)
+    {
+        var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
+
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+    }
 }
