@@ -40,7 +40,6 @@ public class Transaction : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        // TODO [LSViana] Check if this should be unit tested.
         Commit();
     }
 
