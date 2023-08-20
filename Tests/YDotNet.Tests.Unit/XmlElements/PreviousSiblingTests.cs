@@ -14,12 +14,12 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var targetXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
-        var siblingElement = targetXmlElement.PreviousSibling(transaction);
+        var target = xmlElement.Get(transaction, index: 0).XmlElement;
+        var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(siblingElement, Is.Null);
+        Assert.That(sibling, Is.Null);
     }
 
     [Test]
@@ -30,13 +30,13 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var targetXmlElement = xmlElement.Get(transaction, index: 2).XmlElement;
-        var siblingElement = targetXmlElement.PreviousSibling(transaction);
+        var target = xmlElement.Get(transaction, index: 2).XmlElement;
+        var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(siblingElement.XmlElement, Is.Null);
-        Assert.That(siblingElement.XmlText, Is.Not.Null);
+        Assert.That(sibling.XmlElement, Is.Null);
+        Assert.That(sibling.XmlText, Is.Not.Null);
     }
 
     [Test]
@@ -47,13 +47,13 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var targetXmlElement = xmlElement.Get(transaction, index: 4).XmlElement;
-        var siblingElement = targetXmlElement.PreviousSibling(transaction);
+        var target = xmlElement.Get(transaction, index: 4).XmlElement;
+        var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(siblingElement.XmlElement, Is.Null);
-        Assert.That(siblingElement.XmlText, Is.Not.Null);
+        Assert.That(sibling.XmlElement, Is.Null);
+        Assert.That(sibling.XmlText, Is.Not.Null);
     }
 
     private (Doc, XmlElement) ArrangeDoc()
