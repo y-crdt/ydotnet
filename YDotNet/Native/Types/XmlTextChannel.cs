@@ -26,6 +26,10 @@ internal static class XmlTextChannel
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_remove_attr")]
     public static extern nint RemoveAttribute(nint handle, nint transaction, nint name);
 
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_attr_iter")]
+    public static extern nint AttributeIterator(nint handle, nint transaction);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_string")]
     public static extern nint String(nint handle, nint transaction);
 
