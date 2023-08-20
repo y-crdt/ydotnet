@@ -38,6 +38,23 @@ public class XmlTextEvent
     }
 
     /// <summary>
+    ///     Gets the attributes that changed and triggered this event.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
+    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
+    /// </remarks>
+    public EventKeys Keys
+    {
+        get
+        {
+            var handle = XmlTextChannel.ObserveEventKeys(Handle, out var length);
+
+            return new EventKeys(handle, length);
+        }
+    }
+
+    /// <summary>
     ///     Gets the <see cref="XmlText" /> instance that is related to this event.
     /// </summary>
     public XmlText? Target => ReferenceAccessor.Access(new XmlText(XmlTextChannel.ObserveEventTarget(Handle)));

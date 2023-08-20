@@ -54,6 +54,10 @@ internal static class XmlTextChannel
     public static extern nint ObserveEventDelta(nint eventHandle, out uint length);
 
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_event_keys")]
+    public static extern nint ObserveEventKeys(nint eventHandle, out uint length);
+
+    [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_unobserve")]
     public static extern void Unobserve(nint handle, uint subscriptionId);
 }
