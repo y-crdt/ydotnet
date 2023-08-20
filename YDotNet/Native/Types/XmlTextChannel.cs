@@ -14,6 +14,10 @@ internal static class XmlTextChannel
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_insert_embed")]
     public static extern void InsertEmbed(nint handle, nint transaction, uint index, nint content, nint attributes);
 
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_insert_attr")]
+    public static extern void InsertAttribute(nint handle, nint transaction, nint name, nint value);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_string")]
     public static extern nint String(nint handle, nint transaction);
 

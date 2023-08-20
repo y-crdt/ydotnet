@@ -72,6 +72,26 @@ public class XmlText : Branch
     }
 
     /// <summary>
+    ///     Inserts an attribute.
+    /// </summary>
+    /// <remarks>
+    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    /// </remarks>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="name">The name of the attribute to be added.</param>
+    /// <param name="value">The value of the attribute to be added.</param>
+    public void InsertAttribute(Transaction transaction, string name, string value)
+    {
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var valueHandle = MemoryWriter.WriteUtf8String(value);
+
+        XmlTextChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
+
+        MemoryWriter.Release(nameHandle);
+        MemoryWriter.Release(valueHandle);
+    }
+
+    /// <summary>
     ///     Returns the string representation of the <see cref="XmlText" /> instance.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
