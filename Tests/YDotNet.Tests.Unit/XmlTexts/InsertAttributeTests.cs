@@ -15,13 +15,11 @@ public class InsertAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, string.Empty, string.Empty);
-        var text = xmlText.String(transaction);
+        var value = xmlText.GetAttribute(transaction, string.Empty);
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(value, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -33,13 +31,11 @@ public class InsertAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, string.Empty, "🔭");
-        var text = xmlText.String(transaction);
+        var value = xmlText.GetAttribute(transaction, string.Empty);
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(value, Is.EqualTo("🔭"));
     }
 
     [Test]
@@ -51,13 +47,11 @@ public class InsertAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "telescope", string.Empty);
-        var text = xmlText.String(transaction);
+        var value = xmlText.GetAttribute(transaction, "telescope");
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(value, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -70,13 +64,13 @@ public class InsertAttributeTests
         var transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "telescope", "🔭");
         xmlText.InsertAttribute(transaction, "mirror", "🪞");
-        var text = xmlText.String(transaction);
+        var telescopeAttribute = xmlText.GetAttribute(transaction, "telescope");
+        var mirrorAttribute = xmlText.GetAttribute(transaction, "mirror");
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(telescopeAttribute, Is.EqualTo("🔭"));
+        Assert.That(mirrorAttribute, Is.EqualTo("🪞"));
     }
 
     [Test]
@@ -88,24 +82,20 @@ public class InsertAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "number", "1️⃣");
-        var text = xmlText.String(transaction);
+        var value = xmlText.GetAttribute(transaction, "number");
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(value, Is.EqualTo("1️⃣"));
 
         // Act
         transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "number", "2️⃣");
-        text = xmlText.String(transaction);
+        value = xmlText.GetAttribute(transaction, "number");
         transaction.Commit();
 
         // Assert
-        Assert.That(text, Is.EqualTo("saturn-🪐"));
-
-        // TODO [LSViana] Replace this assertion with XmlText.GetAttribute() for more reliable verification.
+        Assert.That(value, Is.EqualTo("2️⃣"));
     }
 
     private static (Doc, XmlText) ArrangeDoc()
