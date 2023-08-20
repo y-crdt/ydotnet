@@ -196,4 +196,20 @@ public class XmlText : Branch
 
         return handle == nint.Zero ? null : new Output(handle, disposable: true);
     }
+
+    /// <summary>
+    ///     Returns the next sibling which can be either an <see cref="XmlElement" />
+    ///     or an <see cref="XmlText" /> or <c>null</c> if this node is the last child.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The next sibling which can be either an <see cref="XmlElement" /> or an
+    ///     <see cref="XmlText" /> or <c>null</c> if this node is the last child.
+    /// </returns>
+    public Output? NextSibling(Transaction transaction)
+    {
+        var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
+
+        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+    }
 }
