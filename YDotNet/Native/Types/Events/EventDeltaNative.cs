@@ -37,7 +37,7 @@ internal struct EventDeltaNative
         return new EventDelta(
             tag,
             Length,
-            InsertHandle == nint.Zero ? null : new Output(InsertHandle),
+            ReferenceAccessor.Access(new Output(InsertHandle)),
             attributes
         );
     }

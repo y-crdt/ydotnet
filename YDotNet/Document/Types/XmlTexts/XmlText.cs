@@ -196,7 +196,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+        return ReferenceAccessor.Access(new Output(handle, disposable: true));
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+        return ReferenceAccessor.Access(new Output(handle, disposable: true));
     }
 
     /// <summary>

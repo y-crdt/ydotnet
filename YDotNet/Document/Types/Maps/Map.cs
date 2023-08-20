@@ -57,7 +57,7 @@ public class Map : Branch
 
         MemoryWriter.Release(keyHandle);
 
-        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+        return ReferenceAccessor.Access(new Output(handle, disposable: true));
     }
 
     /// <summary>
