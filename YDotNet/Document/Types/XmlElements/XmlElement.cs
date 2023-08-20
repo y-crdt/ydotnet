@@ -5,13 +5,14 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
 
 /// <summary>
-///     A shared data type that represents a XML element.
+///     A shared data type that represents an XML element.
 /// </summary>
 public class XmlElement : Branch
 {
@@ -44,21 +45,20 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Gets the string representation of the <see cref="XmlElement" /> instance.
+    ///     Returns the string representation of the <see cref="XmlElement" /> instance.
     /// </summary>
     /// <remarks>
     ///     The returned value has no padding or indentation spaces.
     /// </remarks>
-    public string String
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>The string representation of the <see cref="XmlElement" /> instance.</returns>
+    public string String(Transaction transaction)
     {
-        get
-        {
-            var handle = XmlElementChannel.String(Handle);
-            var result = MemoryReader.ReadUtf8String(handle);
-            StringChannel.Destroy(handle);
+        var handle = XmlElementChannel.String(Handle, transaction.Handle);
+        var result = MemoryReader.ReadUtf8String(handle);
+        StringChannel.Destroy(handle);
 
-            return result;
-        }
+        return result;
     }
 
     /// <summary>
@@ -291,18 +291,12 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Array" /> scope.
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, that
+    ///     was subscribed via <see cref="Observe" />.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
     public void Unobserve(EventSubscription subscription)
     {
         XmlElementChannel.Unobserve(Handle, subscription.Id);
-    }
-
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        return String;
     }
 }

@@ -65,7 +65,7 @@ public class Text : Branch
     }
 
     /// <summary>
-    ///     Removes a range of characters from the document.
+    ///     Removes a range of characters.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this write operation.</param>
     /// <param name="index">The index must be between 0 and <see cref="Length" /> or an exception will be thrown.</param>
@@ -73,7 +73,7 @@ public class Text : Branch
     ///     The length of the text to be removed, relative to the index and must not go over total
     ///     <see cref="Length" />.
     /// </param>
-    public void Remove(Transaction transaction, uint index, uint length)
+    public void RemoveRange(Transaction transaction, uint index, uint length)
     {
         TextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }

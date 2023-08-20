@@ -16,10 +16,11 @@ public class RemoveAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlElement.RemoveAttribute(transaction, string.Empty);
+        var text = xmlElement.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlElement.String, Is.EqualTo("<link as=\"stylesheet\"></link>"));
+        Assert.That(text, Is.EqualTo("<link as=\"stylesheet\"></link>"));
     }
 
     [Test]
@@ -31,10 +32,11 @@ public class RemoveAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlElement.RemoveAttribute(transaction, "as");
+        var text = xmlElement.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlElement.String, Is.EqualTo("<link =\"\"></link>"));
+        Assert.That(text, Is.EqualTo("<link =\"\"></link>"));
     }
 
     [Test]
@@ -46,13 +48,14 @@ public class RemoveAttributeTests
         // Act
         var transaction = doc.WriteTransaction();
         xmlElement.RemoveAttribute(transaction, "rel");
+        var text = xmlElement.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlElement.String, Contains.Substring("<link"));
-        Assert.That(xmlElement.String, Contains.Substring("=\"\""));
-        Assert.That(xmlElement.String, Contains.Substring("as=\"stylesheet\""));
-        Assert.That(xmlElement.String, Contains.Substring("></link>"));
+        Assert.That(text, Contains.Substring("<link"));
+        Assert.That(text, Contains.Substring("=\"\""));
+        Assert.That(text, Contains.Substring("as=\"stylesheet\""));
+        Assert.That(text, Contains.Substring("></link>"));
     }
 
     private (Doc, XmlElement) ArrangeDoc()

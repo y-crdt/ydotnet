@@ -7,6 +7,7 @@ using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlElements.Trees;
+using YDotNet.Document.Types.XmlTexts;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Infrastructure;

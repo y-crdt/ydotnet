@@ -1,32 +1,33 @@
 using NUnit.Framework;
 using YDotNet.Document;
 
-namespace YDotNet.Tests.Unit.Texts;
+namespace YDotNet.Tests.Unit.XmlTexts;
 
-public class UnobserveDeepTests
+public class UnobserveTests
 {
     [Test]
-    public void TriggersWhenChangedUntilUnobserved()
+    public void TriggersWhenXmlTextChangedUntilUnobserved()
     {
         // Arrange
         var doc = new Doc();
-        var text = doc.Text("text");
+        var xmlText = doc.XmlText("xml-element");
+
         var called = 0;
-        var subscription = text.ObserveDeep(_ => called++);
+        var subscription = xmlText.Observe(_ => called++);
 
         // Act
         var transaction = doc.WriteTransaction();
-        text.Insert(transaction, index: 0, "World");
+        xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        text.UnobserveDeep(subscription);
+        xmlText.Unobserve(subscription);
 
         transaction = doc.WriteTransaction();
-        text.Insert(transaction, index: 0, "Hello, ");
+        xmlText.Insert(transaction, index: 1, " Viana");
         transaction.Commit();
 
         // Assert

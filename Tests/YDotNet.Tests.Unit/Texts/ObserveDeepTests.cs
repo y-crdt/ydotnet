@@ -37,7 +37,7 @@ public class ObserveDeepTests
 
         // Act
         transaction = doc.WriteTransaction();
-        text.Remove(transaction, index: 5, length: 1);
+        text.RemoveRange(transaction, index: 5, length: 1);
         text.InsertEmbed(
             transaction, index: 5, Input.Collection(
                 new[]

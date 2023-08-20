@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 
-namespace YDotNet.Tests.Unit.Texts;
+namespace YDotNet.Tests.Unit.XmlTexts;
 
 public class UnobserveDeepTests
 {
@@ -10,23 +10,23 @@ public class UnobserveDeepTests
     {
         // Arrange
         var doc = new Doc();
-        var text = doc.Text("text");
+        var xmlText = doc.XmlText("xml-text");
         var called = 0;
-        var subscription = text.ObserveDeep(_ => called++);
+        var subscription = xmlText.ObserveDeep(_ => called++);
 
         // Act
         var transaction = doc.WriteTransaction();
-        text.Insert(transaction, index: 0, "World");
+        xmlText.Insert(transaction, index: 0, "World");
         transaction.Commit();
 
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        text.UnobserveDeep(subscription);
+        xmlText.UnobserveDeep(subscription);
 
         transaction = doc.WriteTransaction();
-        text.Insert(transaction, index: 0, "Hello, ");
+        xmlText.Insert(transaction, index: 0, "Hello, ");
         transaction.Commit();
 
         // Assert

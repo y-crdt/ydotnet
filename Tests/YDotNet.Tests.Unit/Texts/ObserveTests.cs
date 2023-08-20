@@ -65,7 +65,7 @@ public class ObserveTests
 
         // Act
         transaction = doc.WriteTransaction();
-        text.Remove(transaction, index: 0, length: 2);
+        text.RemoveRange(transaction, index: 0, length: 2);
         transaction.Commit();
 
         // Assert
