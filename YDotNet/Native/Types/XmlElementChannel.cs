@@ -76,19 +76,19 @@ internal static class XmlElementChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_target")]
-    public static extern nint ObserveEventTarget(nint arrayEvent);
+    public static extern nint ObserveEventTarget(nint eventHandle);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_path")]
-    public static extern nint ObserveEventPath(nint arrayEvent, out uint length);
+    public static extern nint ObserveEventPath(nint eventHandle, out uint length);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_delta")]
-    public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
+    public static extern nint ObserveEventDelta(nint eventHandle, out uint length);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_event_keys")]
-    public static extern nint ObserveEventKeys(nint arrayEvent, out uint length);
+    public static extern nint ObserveEventKeys(nint eventHandle, out uint length);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmlelem_unobserve")]
