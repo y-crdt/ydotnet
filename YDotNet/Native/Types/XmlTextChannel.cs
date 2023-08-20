@@ -48,4 +48,8 @@ internal static class XmlTextChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_event_target")]
     public static extern nint ObserveEventTarget(nint eventHandle);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yxmltext_event_delta")]
+    public static extern nint ObserveEventDelta(nint eventHandle, out uint length);
 }

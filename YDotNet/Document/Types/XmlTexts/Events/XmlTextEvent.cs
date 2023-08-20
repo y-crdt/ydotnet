@@ -1,3 +1,4 @@
+using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -17,6 +18,23 @@ public class XmlTextEvent
     internal XmlTextEvent(nint handle)
     {
         Handle = handle;
+    }
+
+    /// <summary>
+    ///     Gets the changes that triggered this event.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
+    ///     <para>Check the documentation of <see cref="EventDelta" /> for more information.</para>
+    /// </remarks>
+    public EventDeltas Delta
+    {
+        get
+        {
+            var handle = XmlTextChannel.ObserveEventDelta(Handle, out var length);
+
+            return new EventDeltas(handle, length);
+        }
     }
 
     /// <summary>
