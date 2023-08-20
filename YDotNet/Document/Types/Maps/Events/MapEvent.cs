@@ -4,12 +4,6 @@ using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps.Events;
 
-// TODO [LSViana] Check if this event should have a `*Native` counterpart like `Doc` events have.
-//
-// It wasn't created here because reading values of the event requires function calls instead of
-// being passed through the FFI call as a `struct`. Then, executing all methods for every event may
-// cause performance penalties instead of calling the methods on-demand as clients access it.
-
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Map" /> instance.
 /// </summary>

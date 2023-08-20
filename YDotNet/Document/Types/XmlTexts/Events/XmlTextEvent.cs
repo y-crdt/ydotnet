@@ -4,8 +4,6 @@ using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlTexts.Events;
 
-// TODO [LSViana] Check if this event should have a `*Native` counterpart like `Doc` events have (like MapEvent).
-
 /// <summary>
 ///     Represents the event that's part of an operation within an <see cref="XmlText" /> instance.
 /// </summary>
