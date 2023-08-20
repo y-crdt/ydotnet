@@ -3,6 +3,7 @@ using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Document.Types.XmlElements.Events;
+using YDotNet.Document.Types.XmlTexts.Events;
 using YDotNet.Infrastructure;
 
 namespace YDotNet.Document.Types.Events;
@@ -35,6 +36,9 @@ public class EventBranch
                 break;
             case EventBranchTag.XmlElement:
                 XmlElementEvent = new XmlElementEvent(handle + MemoryConstants.PointerSize);
+                break;
+            case EventBranchTag.XmlText:
+                XmlTextEvent = new XmlTextEvent(handle + MemoryConstants.PointerSize);
                 break;
             default:
                 throw new NotImplementedException();
@@ -69,6 +73,12 @@ public class EventBranch
     ///     or <c>null</c> otherwise.
     /// </summary>
     public XmlElementEvent? XmlElementEvent { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="XmlTextEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.XmlText" />,
+    ///     or <c>null</c> otherwise.
+    /// </summary>
+    public XmlTextEvent? XmlTextEvent { get; }
 
     /// <summary>
     ///     Gets the handle to the native resource.
