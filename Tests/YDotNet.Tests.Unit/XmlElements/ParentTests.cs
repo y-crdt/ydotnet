@@ -80,7 +80,6 @@ public class ParentTests
         transaction = doc.ReadTransaction();
         var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
 
-        // TODO [LSViana] Check with the team why this is returning `null`.
         var parentXmlElement = childXmlElement.Parent(transaction);
         var childLength = parentXmlElement.ChildLength(transaction);
         transaction.Commit();
