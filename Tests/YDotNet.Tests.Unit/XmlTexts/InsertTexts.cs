@@ -16,22 +16,20 @@ public class InsertTexts
         // Act
         var transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
+        var text = xmlText.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlText.Length(transaction), Is.EqualTo(expected: 5));
-
-        // TODO [LSViana] Replace this assertion with XmlText.String() for more reliable verification.
+        Assert.That(text, Is.EqualTo("Lucas"));
 
         // Act
         transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 5, " 💻");
+        text = xmlText.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlText.Length(transaction), Is.EqualTo(expected: 8));
-
-        // TODO [LSViana] Replace this assertion with XmlText.String() for more reliable verification.
+        Assert.That(text, Is.EqualTo("Lucas 💻"));
     }
 
     [Test]
@@ -52,12 +50,11 @@ public class InsertTexts
                 {
                     { "bold", Input.Boolean(value: true) }
                 }));
+        var text = xmlText.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlText.Length(transaction), Is.EqualTo(expected: 5));
-
-        // TODO [LSViana] Replace this assertion with XmlText.String() for more reliable verification.
+        Assert.That(text, Is.EqualTo("<bold>Lucas</bold>"));
 
         // Act
         transaction = doc.WriteTransaction();
@@ -68,13 +65,12 @@ public class InsertTexts
             Input.Object(
                 new Dictionary<string, Input>
                 {
-                    { "bold", Input.Boolean(value: true) }
+                    { "italic", Input.Boolean(value: true) }
                 }));
+        text = xmlText.String(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(xmlText.Length(transaction), Is.EqualTo(expected: 8));
-
-        // TODO [LSViana] Replace this assertion with XmlText.String() for more reliable verification.
+        Assert.That(text, Is.EqualTo("<bold>Lucas</bold><italic> 💻</italic>"));
     }
 }
