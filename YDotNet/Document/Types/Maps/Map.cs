@@ -57,7 +57,7 @@ public class Map : Branch
 
         MemoryWriter.Release(keyHandle);
 
-        return handle == nint.Zero ? null : new Output(handle, disposable: true);
+        return ReferenceAccessor.Access(new Output(handle, disposable: true));
     }
 
     /// <summary>
@@ -65,7 +65,6 @@ public class Map : Branch
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>The number of entries stored in the <see cref="Map" />.</returns>
-    // TODO [LSViana] Check if the `Transaction` parameter is really needed here.
     public uint Length(Transaction transaction)
     {
         return MapChannel.Length(Handle, transaction.Handle);

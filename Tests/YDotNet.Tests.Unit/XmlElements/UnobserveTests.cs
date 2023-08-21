@@ -10,18 +10,13 @@ public class UnobserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         var called = 0;
         var subscription = xmlElement.Observe(_ => called++);
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         transaction.Commit();
 

@@ -30,10 +30,7 @@ public class Output : IDisposable
         this.disposable = disposable;
 
         Handle = handle;
-
-        // TODO [LSViana] Consider skipping this call to make it easier to integrate with `ReferenceAccessor`.
-        // Search for "== nint.Zero ? null : new Output" to see affected places.
-        OutputNative = Marshal.PtrToStructure<OutputNative>(handle);
+        OutputNative = handle == nint.Zero ? null : Marshal.PtrToStructure<OutputNative>(handle);
     }
 
     /// <summary>
@@ -96,14 +93,14 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
-    public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Length);
+    public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Value.Length);
 
     /// <summary>
     ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
     /// </summary>
     public Output[]? Collection =>
         MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Collection(Handle), OutputNative.Length, Marshal.SizeOf<OutputNative>())
+                OutputChannel.Collection(Handle), OutputNative.Value.Length, Marshal.SizeOf<OutputNative>())
             ?.Select(x => new Output(x))
             .ToArray();
 
@@ -114,16 +111,14 @@ public class Output : IDisposable
     {
         get
         {
-            // TODO [LSViana] Refactor this method to extract shared logic with other flows.
             var handles = MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Object(Handle), OutputNative.Length, Marshal.SizeOf<MapEntryNative>());
+                OutputChannel.Object(Handle), OutputNative.Value.Length, Marshal.SizeOf<MapEntryNative>());
 
             if (handles == null)
             {
                 return null;
             }
 
-            // This pointer size is used to offset the `MapEntryNative.Field` value (which is a string pointer).
             var result = new Dictionary<string, Output>();
 
             foreach (var handle in handles)
@@ -186,7 +181,7 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the native output cell represented by this cell.
     /// </summary>
-    private OutputNative OutputNative { get; }
+    private OutputNative? OutputNative { get; }
 
     /// <inheritdoc />
     public void Dispose()

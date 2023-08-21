@@ -12,18 +12,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         XmlElement? target = null;
         xmlElement.Observe(e => target = e.Target);
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         transaction.Commit();
 
@@ -37,18 +32,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         IEnumerable<EventChange>? eventChanges = null;
         xmlElement.Observe(e => eventChanges = e.Delta.ToArray());
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);
@@ -73,18 +63,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         IEnumerable<EventChange>? eventChanges = null;
         xmlElement.Observe(e => eventChanges = e.Delta.ToArray());
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -98,18 +83,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         IEnumerable<EventKeyChange>? keyChanges = null;
         xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         xmlElement.InsertAttribute(transaction, "rel", "preload");
         xmlElement.InsertAttribute(transaction, "as", "document");
@@ -138,11 +118,9 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
+        var xmlElement = doc.XmlElement("xml-element");
 
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
         var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -170,11 +148,9 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
+        var xmlElement = doc.XmlElement("xml-element");
 
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
         var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -201,18 +177,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var parentXmlElement = doc.XmlElement("xml-element");
-
-        // TODO [LSViana] Check with the team why the event can't be generated for root nodes.
-        var transaction = doc.WriteTransaction();
-        var xmlElement = parentXmlElement.InsertElement(transaction, index: 0, "color");
-        transaction.Commit();
+        var xmlElement = doc.XmlElement("xml-element");
 
         IEnumerable<EventKeyChange>? keyChanges = null;
         xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
 
         // Act
-        transaction = doc.WriteTransaction();
+        var transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);

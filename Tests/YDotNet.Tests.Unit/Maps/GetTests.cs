@@ -331,9 +331,19 @@ public class GetTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void GetNewKeyReturnsNull()
     {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        // Act
+        var transaction = doc.ReadTransaction();
+        var value = map.Get(transaction, "new-key");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(value, Is.Null);
     }
 
     private (Map?, Transaction?) ArrangeDoc(params (string Key, Input Value)[] values)

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace YDotNet.Native.Cells.Inputs;
 
-// TODO [LSViana] Check if the `Size` value can be reduced without breaking the features.
+// The size has to be 24 here so that the whole data of the input cell is written/read correctly over the C FFI.
 [StructLayout(LayoutKind.Explicit, Size = 24)]
 internal struct InputNative
 {

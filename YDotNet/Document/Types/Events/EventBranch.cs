@@ -41,7 +41,8 @@ public class EventBranch
                 XmlTextEvent = new XmlTextEvent(handle + MemoryConstants.PointerSize);
                 break;
             default:
-                throw new NotImplementedException();
+                throw new NotSupportedException(
+                    $"The value \"{Tag}\" is not supported by the {nameof(EventBranch)} class.");
         }
     }
 
