@@ -1,4 +1,8 @@
+using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
+using YDotNet.Document.Types.Texts.Events;
+using YDotNet.Document.Types.XmlElements.Events;
+using YDotNet.Document.Types.XmlTexts.Events;
 
 namespace YDotNet.Document.Types.Events;
 
