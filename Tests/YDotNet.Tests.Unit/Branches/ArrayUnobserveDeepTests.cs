@@ -2,32 +2,32 @@ using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
 
-namespace YDotNet.Tests.Unit.Maps;
+namespace YDotNet.Tests.Unit.Branches;
 
-public class UnobserveDeepTests
+public class ArrayUnobserveDeepTests
 {
     [Test]
-    public void TriggersWhenMapChangedUntilUnobserved()
+    public void TriggersWhenArrayChangedUntilUnobserved()
     {
         // Arrange
         var doc = new Doc();
-        var map = doc.Map("map");
+        var array = doc.Array("array");
         var called = 0;
-        var subscription = map.ObserveDeep(_ => called++);
+        var subscription = array.ObserveDeep(_ => called++);
 
         // Act
         var transaction = doc.WriteTransaction();
-        map.Insert(transaction, "value1", Input.Long(value: 2469L));
+        array.InsertRange(transaction, index: 0, new[] { Input.Long(value: 2469L) });
         transaction.Commit();
 
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        map.UnobserveDeep(subscription);
+        array.UnobserveDeep(subscription);
 
         transaction = doc.WriteTransaction();
-        map.Insert(transaction, "value2", Input.Long(value: -420L));
+        array.InsertRange(transaction, index: 0, new[] { Input.Long(value: -420L) });
         transaction.Commit();
 
         // Assert

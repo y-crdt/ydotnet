@@ -3,9 +3,9 @@ using YDotNet.Document;
 using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.XmlElements;
 
-namespace YDotNet.Tests.Unit.XmlElements;
+namespace YDotNet.Tests.Unit.Branches;
 
-public class ObserveDeepTests
+public class XmlElementObserveDeepTests
 {
     [Test]
     public void ObserveDeepHasPathWhenAddedXmlElementsAndTexts()

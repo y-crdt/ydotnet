@@ -3,9 +3,9 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
 
-namespace YDotNet.Tests.Unit.Texts;
+namespace YDotNet.Tests.Unit.Branches;
 
-public class ObserveDeepTests
+public class TextObserveDeepTests
 {
     [Test]
     [Ignore("The feature must be checked before tests are implemented.")]
