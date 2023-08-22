@@ -20,4 +20,10 @@ internal static class BranchChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ybranch_read_transaction")]
     public static extern nint ReadTransaction(nint branch);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ybranch_write_transaction")]
+    public static extern nint WriteTransaction(nint branch);
 }
