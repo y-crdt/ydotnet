@@ -29,7 +29,7 @@ public class GetTests
     }
 
     [Test]
-    public void GetOnDefinedKeyWithReturnsValue()
+    public void GetOnDefinedKeyWithCorrectTypeReturnsValue()
     {
         // Arrange
         var doc = new Doc();
@@ -54,5 +54,33 @@ public class GetTests
         Assert.That(text, Is.Not.Null);
         Assert.That(xmlElement, Is.Not.Null);
         Assert.That(xmlText, Is.Not.Null);
+    }
+
+    [Test]
+    public void GetOnDefinedKeyWithWrongTypeReturnsNull()
+    {
+        // Arrange
+        var doc = new Doc();
+        doc.Array("array");
+        doc.Map("map");
+        doc.Text("text");
+        doc.XmlElement("xml-element");
+        doc.XmlText("xml-text");
+
+        // Act
+        var transaction = doc.ReadTransaction();
+        var array = transaction.GetArray("map");
+        var map = transaction.GetMap("text");
+        var text = transaction.GetText("xml-element");
+        var xmlElement = transaction.GetXmlElement("xml-text");
+        var xmlText = transaction.GetXmlText("array");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(array, Is.Null);
+        Assert.That(map, Is.Null);
+        Assert.That(text, Is.Null);
+        Assert.That(xmlElement, Is.Null);
+        Assert.That(xmlText, Is.Null);
     }
 }
