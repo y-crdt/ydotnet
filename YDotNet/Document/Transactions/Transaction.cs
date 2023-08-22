@@ -7,6 +7,7 @@ using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Transaction;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Branches;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document.Transactions;
@@ -294,7 +295,6 @@ public class Transaction : IDisposable
     ///     Returns the <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
     ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
     /// </summary>
-    /// <remarks>This function will not return <c>null</c> if the entry type is not <see cref="Array" />.</remarks>
     /// <param name="name">The name of the <see cref="Array" /> instance to get.</param>
     /// <returns>
     ///     The <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
@@ -302,14 +302,13 @@ public class Transaction : IDisposable
     /// </returns>
     public Array? GetArray(string name)
     {
-        return ReferenceAccessor.Access(new Array(Get(name)));
+        return ReferenceAccessor.Access(new Array(GetWithKind(name, BranchKind.Array)));
     }
 
     /// <summary>
     ///     Returns the <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
     ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
     /// </summary>
-    /// <remarks>This function will not return <c>null</c> if the entry type is not <see cref="Map" />.</remarks>
     /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
     /// <returns>
     ///     The <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
@@ -317,14 +316,13 @@ public class Transaction : IDisposable
     /// </returns>
     public Map? GetMap(string name)
     {
-        return ReferenceAccessor.Access(new Map(Get(name)));
+        return ReferenceAccessor.Access(new Map(GetWithKind(name, BranchKind.Map)));
     }
 
     /// <summary>
     ///     Returns the <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
     ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
     /// </summary>
-    /// <remarks>This function will not return <c>null</c> if the entry type is not <see cref="Text" />.</remarks>
     /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
     /// <returns>
     ///     The <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
@@ -332,14 +330,13 @@ public class Transaction : IDisposable
     /// </returns>
     public Text? GetText(string name)
     {
-        return ReferenceAccessor.Access(new Text(Get(name)));
+        return ReferenceAccessor.Access(new Text(GetWithKind(name, BranchKind.Text)));
     }
 
     /// <summary>
     ///     Returns the <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
     ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
     /// </summary>
-    /// <remarks>This function will not return <c>null</c> if the entry type is not <see cref="XmlElement" />.</remarks>
     /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
     /// <returns>
     ///     The <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
@@ -347,14 +344,13 @@ public class Transaction : IDisposable
     /// </returns>
     public XmlElement? GetXmlElement(string name)
     {
-        return ReferenceAccessor.Access(new XmlElement(Get(name)));
+        return ReferenceAccessor.Access(new XmlElement(GetWithKind(name, BranchKind.XmlElement)));
     }
 
     /// <summary>
     ///     Returns the <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
     ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
     /// </summary>
-    /// <remarks>This function will not return <c>null</c> if the entry type is not <see cref="XmlText" />.</remarks>
     /// <param name="name">The name of the <see cref="XmlText" /> instance to get.</param>
     /// <returns>
     ///     The <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
@@ -362,16 +358,17 @@ public class Transaction : IDisposable
     /// </returns>
     public XmlText? GetXmlText(string name)
     {
-        return ReferenceAccessor.Access(new XmlText(Get(name)));
+        return ReferenceAccessor.Access(new XmlText(GetWithKind(name, BranchKind.XmlText)));
     }
 
-    private nint Get(string name)
+    private nint GetWithKind(string name, BranchKind branchKind)
     {
         var nameHandle = MemoryWriter.WriteUtf8String(name);
         var handle = TransactionChannel.Get(Handle, nameHandle);
+        var kind = (BranchKind) BranchChannel.Kind(handle);
 
         MemoryWriter.Release(nameHandle);
 
-        return handle;
+        return kind != branchKind ? nint.Zero : handle;
     }
 }
