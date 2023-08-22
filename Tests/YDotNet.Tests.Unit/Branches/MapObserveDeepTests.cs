@@ -4,9 +4,9 @@ using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.Maps;
 
-namespace YDotNet.Tests.Unit.Maps;
+namespace YDotNet.Tests.Unit.Branches;
 
-public class ObserveDeepTests
+public class MapObserveDeepTests
 {
     [Test]
     public void ObserveDeepHasPathWhenAdded()

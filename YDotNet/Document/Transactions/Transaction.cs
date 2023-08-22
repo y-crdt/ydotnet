@@ -1,8 +1,14 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
+using YDotNet.Document.Types.Maps;
+using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Transaction;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Branches;
+using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document.Transactions;
 
@@ -283,5 +289,86 @@ public class Transaction : IDisposable
         BinaryChannel.Destroy(handle, length);
 
         return data;
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </summary>
+    /// <param name="name">The name of the <see cref="Array" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </returns>
+    public Array? GetArray(string name)
+    {
+        return ReferenceAccessor.Access(new Array(GetWithKind(name, BranchKind.Array)));
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </summary>
+    /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </returns>
+    public Map? GetMap(string name)
+    {
+        return ReferenceAccessor.Access(new Map(GetWithKind(name, BranchKind.Map)));
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </summary>
+    /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </returns>
+    public Text? GetText(string name)
+    {
+        return ReferenceAccessor.Access(new Text(GetWithKind(name, BranchKind.Text)));
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </summary>
+    /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </returns>
+    public XmlElement? GetXmlElement(string name)
+    {
+        return ReferenceAccessor.Access(new XmlElement(GetWithKind(name, BranchKind.XmlElement)));
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </summary>
+    /// <param name="name">The name of the <see cref="XmlText" /> instance to get.</param>
+    /// <returns>
+    ///     The <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
+    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    /// </returns>
+    public XmlText? GetXmlText(string name)
+    {
+        return ReferenceAccessor.Access(new XmlText(GetWithKind(name, BranchKind.XmlText)));
+    }
+
+    private nint GetWithKind(string name, BranchKind branchKind)
+    {
+        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var handle = TransactionChannel.Get(Handle, nameHandle);
+        var kind = (BranchKind) BranchChannel.Kind(handle);
+
+        MemoryWriter.Release(nameHandle);
+
+        return kind != branchKind ? nint.Zero : handle;
     }
 }

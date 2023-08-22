@@ -9,7 +9,6 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-// TODO: Implement `ytype_kind`.
 public abstract class Branch
 {
     /// <summary>
@@ -60,5 +59,35 @@ public abstract class Branch
     public void UnobserveDeep(EventSubscription subscription)
     {
         BranchChannel.UnobserveDeep(Handle, subscription.Id);
+    }
+
+    /// <summary>
+    ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
+    /// </summary>
+    /// <returns>
+    ///     <para>The <see cref="Transaction" /> to perform operations in the <see cref="Branch" /> or <c>null</c>.</para>
+    ///     <para>
+    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
+    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
+    ///     </para>
+    /// </returns>
+    public Transaction? ReadTransaction()
+    {
+        return ReferenceAccessor.Access(new Transaction(BranchChannel.ReadTransaction(Handle)));
+    }
+
+    /// <summary>
+    ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
+    /// </summary>
+    /// <returns>
+    ///     <para>The <see cref="Transaction" /> to perform operations in the <see cref="Branch" /> or <c>null</c>.</para>
+    ///     <para>
+    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
+    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
+    ///     </para>
+    /// </returns>
+    public Transaction? WriteTransaction()
+    {
+        return ReferenceAccessor.Access(new Transaction(BranchChannel.WriteTransaction(Handle)));
     }
 }

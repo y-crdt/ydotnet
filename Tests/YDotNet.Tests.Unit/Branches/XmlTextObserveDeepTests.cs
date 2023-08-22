@@ -1,10 +1,10 @@
 using NUnit.Framework;
 
-namespace YDotNet.Tests.Unit.XmlTexts;
+namespace YDotNet.Tests.Unit.Branches;
 
 [TestFixture]
 [Ignore("The feature must be checked before tests are implemented.")]
-public class ObserveDeepTests
+public class XmlTextObserveDeepTests
 {
     [Test]
     public void ObserveDeepHasPathWhenAddedTextsAndEmbeds()

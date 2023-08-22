@@ -79,4 +79,7 @@ internal static class TransactionChannel
         byte[] snapshot,
         uint snapshotLength,
         out uint length);
+
+    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytype_get")]
+    public static extern nint Get(nint transaction, nint name);
 }
