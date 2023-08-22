@@ -61,4 +61,19 @@ public abstract class Branch
     {
         BranchChannel.UnobserveDeep(Handle, subscription.Id);
     }
+
+    /// <summary>
+    ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
+    /// </summary>
+    /// <returns>
+    ///     <para>The <see cref="Transaction" /> to perform operations in the <see cref="Branch" /> or <c>null</c>.</para>
+    ///     <para>
+    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
+    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
+    ///     </para>
+    /// </returns>
+    public Transaction? ReadTransaction()
+    {
+        return ReferenceAccessor.Access(new Transaction(BranchChannel.ReadTransaction(Handle)));
+    }
 }
