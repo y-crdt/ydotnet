@@ -7,7 +7,7 @@ namespace YDotNet.Tests.Unit.Branches;
 public class ReadTransactionTests
 {
     [Test]
-    public void StartReadTransaction()
+    public void StartSingleReadTransaction()
     {
         // Arrange
         var doc = new Doc();
@@ -21,11 +21,27 @@ public class ReadTransactionTests
     }
 
     [Test]
+    public void StartMultipleReadTransaction()
+    {
+        // Arrange
+        var doc = new Doc();
+        Branch branch = doc.Array("branch");
+
+        // Act
+        var transaction1 = branch.ReadTransaction();
+        var transaction2 = branch.ReadTransaction();
+
+        // Assert
+        Assert.That(transaction1, Is.Not.Null);
+        Assert.That(transaction2, Is.Not.Null);
+    }
+
+    [Test]
     public void StartReadTransactionWhileDocumentReadTransactionIsOpen()
     {
         // Arrange
         var doc = new Doc();
-        Branch branch = doc.Text("branch");
+        Branch branch = doc.Map("branch");
 
         // Act
         var documentTransaction = doc.ReadTransaction();
@@ -37,10 +53,19 @@ public class ReadTransactionTests
     }
 
     [Test]
-    [Ignore("Implement this test when Branch.WriteTransaction() is available.")]
     public void StartReadTransactionWhileWriteTransactionIsOpen()
     {
-        // TODO [LSViana] Implement this test when Branch.WriteTransaction() is available.
+        // Arrange
+        var doc = new Doc();
+        Branch branch = doc.XmlElement("branch");
+
+        // Act
+        var writeTransaction = branch.WriteTransaction();
+        var readTransaction = branch.ReadTransaction();
+
+        // Assert
+        Assert.That(writeTransaction, Is.Not.Null);
+        Assert.That(readTransaction, Is.Null);
     }
 
     [Test]
@@ -48,7 +73,7 @@ public class ReadTransactionTests
     {
         // Arrange
         var doc = new Doc();
-        Branch branch = doc.Text("branch");
+        Branch branch = doc.XmlText("branch");
 
         // Act
         var documentTransaction = doc.WriteTransaction();
