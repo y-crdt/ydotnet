@@ -9,7 +9,6 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-// TODO: Implement `ytype_kind`.
 public abstract class Branch
 {
     /// <summary>
