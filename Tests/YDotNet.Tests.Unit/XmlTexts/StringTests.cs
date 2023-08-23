@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 
 namespace YDotNet.Tests.Unit.XmlTexts;
 
@@ -39,20 +40,45 @@ public class StringTests
     }
 
     [Test]
-    [Ignore("Waiting for the necessary methods to be implemented.")]
-    public void StringShowsInsertedAttribute()
+    public void StringDoesNotShowInsertedAttribute()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas Viana");
+        xmlText.InsertAttribute(transaction, "color", "red");
+        var text = xmlText.String(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("Lucas Viana"));
     }
 
     [Test]
-    [Ignore("Waiting for the necessary methods to be implemented.")]
-    public void StringShowsInsertedTextAndAttribute()
+    public void StringShowsInsertedEmbed()
     {
-    }
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
 
-    [Test]
-    [Ignore("Waiting for the necessary methods to be implemented.")]
-    public void StringDoesNotShowInsertedEmbed()
-    {
+        // Act
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas Viana");
+        xmlText.InsertEmbed(transaction, index: 3, Input.Boolean(value: true));
+        xmlText.InsertEmbed(transaction, index: 8, Input.Long(value: 2469L));
+        xmlText.InsertEmbed(
+            transaction, index: 11, Input.Object(
+                new Dictionary<string, Input>
+                {
+                    { "color", Input.Bytes(new byte[] { 255, 79, 113 }) }
+                }));
+        var text = xmlText.String(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("Luctrueas V2469ia{color: 0xff4f71}na"));
     }
 }
