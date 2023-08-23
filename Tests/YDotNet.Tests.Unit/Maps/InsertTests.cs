@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Maps;
 
 namespace YDotNet.Tests.Unit.Maps;
@@ -12,103 +11,101 @@ public class InsertTests
     public void InsertBoolean()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var value1 = true;
         var value2 = false;
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value1", Input.Boolean(value1));
         map.Insert(transaction, "value2", Input.Boolean(value2));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
     }
 
     [Test]
     public void InsertDouble()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var value1 = 24.69;
         var value2 = -4.20;
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value1", Input.Double(value1));
         map.Insert(transaction, "value2", Input.Double(value2));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
     }
 
     [Test]
     public void InsertLong()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var value1 = 2469L;
         var value2 = -420L;
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value1", Input.Long(value1));
         map.Insert(transaction, "value2", Input.Long(value2));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
     }
 
     [Test]
     public void InsertString()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var name = "Lucas";
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "name", Input.String(name));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertBytes()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var value = new byte[] { 2, 4, 6, 9 };
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.Bytes(value));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertCollection()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(
             transaction, "value", Input.Collection(
                 new[]
@@ -116,21 +113,21 @@ public class InsertTests
                     Input.Long(value: 2469L),
                     Input.Long(value: -420L)
                 }));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertObject()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(
             transaction, "value", Input.Object(
                 new Dictionary<string, Input>
@@ -138,69 +135,69 @@ public class InsertTests
                     { "value1", Input.Long(value: 2469L) },
                     { "value2", Input.Long(value: -420L) }
                 }));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertNull()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.Null());
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertUndefined()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.Undefined());
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertText()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.Text("Lucas"));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertArray()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(
             transaction, "value", Input.Array(
                 new[]
@@ -208,21 +205,21 @@ public class InsertTests
                     Input.Long(value: 2469L),
                     Input.Long(value: -420L)
                 }));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertMap()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(
             transaction, "value", Input.Map(
                 new Dictionary<string, Input>
@@ -230,84 +227,113 @@ public class InsertTests
                     { "value1", Input.Long(value: 2469L) },
                     { "value2", Input.Long(value: -420L) }
                 }));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertXmlElement()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.XmlElement("person"));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertXmlText()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
-
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
+        var (doc, map) = ArrangeDoc();
 
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "value", Input.XmlText("Lucas"));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
     public void InsertDoc()
     {
         // Arrange
-        var (map, transaction) = ArrangeDoc();
+        var (doc, map) = ArrangeDoc();
         var subDoc = new Doc();
 
-        // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 0));
-
         // Act
+        var transaction = doc.WriteTransaction();
         map.Insert(transaction, "sub-doc", Input.Doc(subDoc));
+        var length = map.Length(transaction);
+        transaction.Commit();
 
         // Assert
-        Assert.That(map.Length(transaction), Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertEqualTypeOnExistingKey()
     {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+
+        map.Insert(transaction, "value", Input.Long(value: 2469L));
+        map.Insert(transaction, "value", Input.Long(value: 420L));
+
+        var value = map.Get(transaction, "value").Long;
+        var length = map.Length(transaction);
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(value, Is.EqualTo(expected: 420L));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void InsertDifferentTypeOnExistingKey()
     {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+
+        map.Insert(transaction, "value", Input.Long(value: 2469L));
+        map.Insert(transaction, "value", Input.String("Lucas"));
+
+        var longValue = map.Get(transaction, "value").Long;
+        var stringValue = map.Get(transaction, "value").String;
+        var length = map.Length(transaction);
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(longValue, Is.EqualTo(expected: null));
+        Assert.That(stringValue, Is.EqualTo("Lucas"));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
-    [Test]
-    [Ignore("To be implemented.")]
-    public void InsertSameInstanceOnMultipleKeys()
-    {
-    }
-
-    private (Map?, Transaction?) ArrangeDoc()
+    private (Doc, Map) ArrangeDoc()
     {
         var doc = new Doc();
         var map = doc.Map("map");
-        var transaction = doc.WriteTransaction();
 
-        return (map, transaction);
+        return (doc, map);
     }
 }
