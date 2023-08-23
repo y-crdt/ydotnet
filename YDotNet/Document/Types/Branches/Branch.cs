@@ -2,7 +2,7 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Types;
+using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
 

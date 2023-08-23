@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace YDotNet.Native.Types;
+namespace YDotNet.Native.Types.Branches;
 
 internal static class BranchChannel
 {
