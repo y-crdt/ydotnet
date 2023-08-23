@@ -3,7 +3,7 @@ using NUnit.Framework;
 namespace YDotNet.Tests.Unit.Branches;
 
 [TestFixture]
-[Ignore("The feature must be checked before tests are implemented.")]
+[Ignore("The feature under test does not exist on Yrs yet.")]
 public class XmlTextObserveDeepTests
 {
     [Test]
