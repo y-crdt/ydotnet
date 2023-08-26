@@ -59,7 +59,7 @@ public class UndoManager : IDisposable
     ///     registered via <see cref="ObserveAdded" />.
     /// </summary>
     /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveAfterTransaction(EventSubscription subscription)
+    public void UnobserveAdded(EventSubscription subscription)
     {
         UndoManagerChannel.UnobserveAdded(Handle, subscription.Id);
     }
