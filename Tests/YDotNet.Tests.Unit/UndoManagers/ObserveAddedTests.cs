@@ -282,9 +282,106 @@ public class ObserveAddedTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnXmlElement()
     {
+        // Arrange
+        var doc = new Doc(new DocOptions { Id = 8137 });
+        var xmlElement = doc.XmlElement("xml-element");
+        var undoManager = new UndoManager(
+            doc, xmlElement, new UndoManagerOptions
+            {
+                CaptureTimeoutMilliseconds = 0
+            });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObserveAdded(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlElement.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 0, end: 1) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 1, end: 6) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        xmlElement.InsertAttribute(transaction, "italics", "true");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [6, 7] here.
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 6, end: 7) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        var childXmlElement = xmlElement.InsertElement(transaction, index: 1, "color");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [7, 8] here.
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 7, end: 8) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        var childXmlText = childXmlElement.InsertText(transaction, index: 0);
+        childXmlText.Insert(transaction, index: 0, "Viana");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [8, 14] here.
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 8, end: 14) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        xmlElement.RemoveRange(transaction, index: 1, length: 1);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // TODO [LSViana] Check with the team why the indexes are [7, 14] here.
+        AssertDeleteSet(
+            undoEvent.Deletions, (8137, new[] { new IdRange(start: 7, end: 14) }));
     }
 
     private void AssertDeleteSet(DeleteSet deleteSet, params (uint ClientId, IdRange[] IdRanges)[] idRangesPerClientId)
@@ -295,12 +392,15 @@ public class ObserveAddedTests
         {
             var idRanges = deleteSet.Ranges[entry.ClientId];
 
-            Assert.That(idRanges.Length, Is.EqualTo(entry.IdRanges.Length));
+            Assert.That(idRanges.Length, Is.EqualTo(entry.IdRanges.Length), "The amount of IdRanges is different.");
 
             for (var i = 0; i < idRanges.Length; i++)
             {
-                Assert.That(idRanges[i].Start, Is.EqualTo(entry.IdRanges[i].Start));
-                Assert.That(idRanges[i].End, Is.EqualTo(entry.IdRanges[i].End));
+                Assert.That(
+                    idRanges[i].Start, Is.EqualTo(entry.IdRanges[i].Start),
+                    $"The start of the IdRange[{i}] is different.");
+                Assert.That(
+                    idRanges[i].End, Is.EqualTo(entry.IdRanges[i].End), $"The end of the IdRange[{i}] is different.");
             }
         }
     }
