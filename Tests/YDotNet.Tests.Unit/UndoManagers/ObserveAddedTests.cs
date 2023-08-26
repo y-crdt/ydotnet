@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Options;
+using YDotNet.Document.State;
 using YDotNet.Document.UndoManagers;
 using YDotNet.Document.UndoManagers.Events;
 
@@ -37,11 +38,8 @@ public class ObserveAddedTests
         Assert.That(undoEvent, Is.Not.Null);
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
-        Assert.That(undoEvent.Deletions.Ranges, Is.Empty);
-        Assert.That(undoEvent.Insertions.Ranges.Count, Is.EqualTo(expected: 1));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].Length, Is.EqualTo(expected: 1));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].ElementAt(index: 0).Start, Is.EqualTo(expected: 0));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].ElementAt(index: 0).End, Is.EqualTo(expected: 5));
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 0, end: 5) }));
 
         // Act
         transaction = doc.WriteTransaction();
@@ -52,11 +50,8 @@ public class ObserveAddedTests
         Assert.That(undoEvent, Is.Not.Null);
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
-        Assert.That(undoEvent.Deletions.Ranges, Is.Empty);
-        Assert.That(undoEvent.Insertions.Ranges.Count, Is.EqualTo(expected: 1));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].Length, Is.EqualTo(expected: 1));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].ElementAt(index: 0).Start, Is.EqualTo(expected: 5));
-        Assert.That(undoEvent.Insertions.Ranges[key: 1234].ElementAt(index: 0).End, Is.EqualTo(expected: 11));
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 5, end: 11) }));
 
         // Act
         transaction = doc.WriteTransaction();
@@ -67,13 +62,10 @@ public class ObserveAddedTests
         Assert.That(undoEvent, Is.Not.Null);
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
-        Assert.That(undoEvent.Insertions.Ranges, Is.Empty);
-        Assert.That(undoEvent.Deletions.Ranges.Count, Is.EqualTo(expected: 1));
-        Assert.That(undoEvent.Deletions.Ranges[key: 1234].Length, Is.EqualTo(expected: 2));
-        Assert.That(undoEvent.Deletions.Ranges[key: 1234].ElementAt(index: 0).Start, Is.EqualTo(expected: 0));
-        Assert.That(undoEvent.Deletions.Ranges[key: 1234].ElementAt(index: 0).End, Is.EqualTo(expected: 2));
-        Assert.That(undoEvent.Deletions.Ranges[key: 1234].ElementAt(index: 1).Start, Is.EqualTo(expected: 8));
-        Assert.That(undoEvent.Deletions.Ranges[key: 1234].ElementAt(index: 1).End, Is.EqualTo(expected: 11));
+        AssertDeleteSet(
+            undoEvent.Deletions,
+            (1234, new[] { new IdRange(start: 0, end: 2), new IdRange(start: 8, end: 11) }));
+        AssertDeleteSet(undoEvent.Insertions);
     }
 
     [Test]
@@ -98,5 +90,23 @@ public class ObserveAddedTests
     [Ignore("To be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnXmlElement()
     {
+    }
+
+    private void AssertDeleteSet(DeleteSet deleteSet, params (uint ClientId, IdRange[] IdRanges)[] idRangesPerClientId)
+    {
+        Assert.That(deleteSet.Ranges.Count, Is.EqualTo(idRangesPerClientId.Length));
+
+        foreach (var entry in idRangesPerClientId)
+        {
+            var idRanges = deleteSet.Ranges[entry.ClientId];
+
+            Assert.That(idRanges.Length, Is.EqualTo(entry.IdRanges.Length));
+
+            for (var i = 0; i < idRanges.Length; i++)
+            {
+                Assert.That(idRanges[i].Start, Is.EqualTo(entry.IdRanges[i].Start));
+                Assert.That(idRanges[i].End, Is.EqualTo(entry.IdRanges[i].End));
+            }
+        }
     }
 }
