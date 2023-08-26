@@ -7,7 +7,7 @@ namespace YDotNet.Document.UndoManagers;
 /// <summary>
 ///     The <see cref="UndoManager" /> is used to perform undo/redo operations over shared types in a <see cref="Doc" />.
 /// </summary>
-public class UndoManager
+public class UndoManager : IDisposable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
@@ -28,4 +28,10 @@ public class UndoManager
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        UndoManagerChannel.Destroy(Handle);
+    }
 }
