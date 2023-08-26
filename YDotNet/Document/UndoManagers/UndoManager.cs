@@ -1,4 +1,6 @@
+using YDotNet.Document.Events;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.UndoManager;
 
@@ -33,5 +35,32 @@ public class UndoManager : IDisposable
     public void Dispose()
     {
         UndoManagerChannel.Destroy(Handle);
+    }
+
+    /// <summary>
+    ///     Subscribes a callback function to be called every time a new an update happens in a tracked shared type
+    ///     after the capture timeout from the previous update has been reached or <see cref="Reset" /> has been called.
+    ///     has been called.
+    /// </summary>
+    /// <param name="action">The callback to be executed when an update happens, respecting the capture timeout.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObserveAdded(Action<UndoEvent> action)
+    {
+        var subscriptionId = UndoManagerChannel.ObserveAdded(
+            Handle,
+            nint.Zero,
+            (state, undoEvent) => action(undoEvent.ToUndoEvent()));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, previously
+    ///     registered via <see cref="ObserveAdded" />.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobserveAfterTransaction(EventSubscription subscription)
+    {
+        UndoManagerChannel.UnobserveAdded(Handle, subscription.Id);
     }
 }
