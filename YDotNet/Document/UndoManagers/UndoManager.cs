@@ -15,13 +15,13 @@ public class UndoManager : IDisposable
     /// <param name="doc">The <see cref="Doc" /> to operate over.</param>
     /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over.</param>
     /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
-    public UndoManager(Doc doc, Branch branch, UndoManagerOptions options)
+    public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
     {
-        var optionsHandle = MemoryWriter.WriteStruct(UndoManagerOptionsNative.From(options));
+        MemoryWriter.TryToWriteStruct(UndoManagerOptionsNative.From(options), out var optionsHandle);
 
         Handle = UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, optionsHandle);
 
-        MemoryWriter.Release(optionsHandle);
+        MemoryWriter.TryRelease(optionsHandle);
     }
 
     /// <summary>
