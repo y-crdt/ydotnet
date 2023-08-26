@@ -14,13 +14,14 @@ internal struct DeleteSetNative
 
     public DeleteSet ToDeleteSet()
     {
+        var longSize = sizeof(ulong);
+        var idRangeSequenceSize = Marshal.SizeOf<IdRangeSequenceNative>();
         var entries = new Dictionary<ulong, IdRange[]>();
 
         for (var i = 0; i < EntriesCount; i++)
         {
-            var clientId = (ulong) Marshal.ReadInt64(ClientIds, i * sizeof(ulong));
-            var rangeNative =
-                Marshal.PtrToStructure<IdRangeSequenceNative>(Ranges + i * Marshal.SizeOf<IdRangeSequenceNative>());
+            var clientId = (ulong) Marshal.ReadInt64(ClientIds, i * longSize);
+            var rangeNative = Marshal.PtrToStructure<IdRangeSequenceNative>(Ranges + i * idRangeSequenceSize);
 
             var range = rangeNative.ToIdRanges();
 
