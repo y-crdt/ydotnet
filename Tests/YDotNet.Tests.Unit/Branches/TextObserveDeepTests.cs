@@ -8,7 +8,7 @@ namespace YDotNet.Tests.Unit.Branches;
 public class TextObserveDeepTests
 {
     [Test]
-    [Ignore("The feature must be checked before tests are implemented.")]
+    [Ignore("The feature under test does not exist on Yrs yet.")]
     public void ObserveDeepHasPathWhenAdded()
     {
         // Arrange

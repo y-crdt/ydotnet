@@ -7,7 +7,6 @@ namespace YDotNet.Tests.Unit.Transactions;
 public class EncodeStateFromSnapshotV1Tests
 {
     [Test]
-    [Ignore("Checking a possible bug on the Rust library.")]
     public void CreateAndApplySnapshot()
     {
         // Arrange
@@ -20,7 +19,7 @@ public class EncodeStateFromSnapshotV1Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.EqualTo(expected: 17));
+        Assert.That(stateDiff.Length, Is.EqualTo(expected: 18));
 
         // Act
         var targetDoc = new Doc();

@@ -21,7 +21,6 @@ public class TagTests
     }
 
     [Test]
-    [Ignore("Waiting for the implementation of XmlElement.InsertElement().")]
     public void NodeNestedOnRootNodeHasCorrectTag()
     {
         // Arrange
