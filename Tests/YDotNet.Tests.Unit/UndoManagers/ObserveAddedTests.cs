@@ -147,9 +147,64 @@ public class ObserveAddedTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnMap()
     {
+        // Arrange
+        var doc = new Doc(new DocOptions { Id = 9012 });
+        var map = doc.Map("map");
+        var undoManager = new UndoManager(
+            doc, map, new UndoManagerOptions
+            {
+                CaptureTimeoutMilliseconds = 0
+            });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObserveAdded(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "key1", Input.Long(value: 2469L));
+        map.Insert(transaction, "key2", Input.Boolean(value: false));
+        map.Insert(transaction, "key3", Input.String("Lucas"));
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(start: 0, end: 3) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        map.Insert(transaction, "key4", Input.Bytes(new byte[] { 2, 4, 6, 9, 123, 123 }));
+        map.Insert(transaction, "key5", Input.XmlText("Lucas"));
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [0, 3] here.
+        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(start: 3, end: 10) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        map.Remove(transaction, "key2");
+        map.Remove(transaction, "key4");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Insertions);
+        AssertDeleteSet(
+            undoEvent.Deletions, (9012, new[] { new IdRange(start: 1, end: 2), new IdRange(start: 3, end: 4) }));
     }
 
     [Test]
