@@ -26,7 +26,6 @@ public class ObserveAddedTests
             });
 
         UndoEvent? undoEvent = null;
-
         undoManager.ObserveAdded(e => undoEvent = e);
 
         // Act
@@ -42,6 +41,7 @@ public class ObserveAddedTests
         AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 0, end: 5) }));
 
         // Act
+        undoEvent = null;
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, " Viana");
         transaction.Commit();
@@ -54,6 +54,7 @@ public class ObserveAddedTests
         AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 5, end: 11) }));
 
         // Act
+        undoEvent = null;
         transaction = doc.WriteTransaction();
         text.RemoveRange(transaction, index: 3, length: 5);
         transaction.Commit();
