@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Options;
 using YDotNet.Document.State;
 using YDotNet.Document.UndoManagers;
@@ -63,6 +64,8 @@ public class ObserveAddedTests
         Assert.That(undoEvent, Is.Not.Null);
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
+
+        // TODO [LSViana] Check with the team why the indexes are [0, 2] and [8, 11] here.
         AssertDeleteSet(
             undoEvent.Deletions,
             (1234, new[] { new IdRange(start: 0, end: 2), new IdRange(start: 8, end: 11) }));
@@ -70,9 +73,77 @@ public class ObserveAddedTests
     }
 
     [Test]
-    [Ignore("To be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnArray()
     {
+        // Arrange
+        var doc = new Doc(
+            new DocOptions
+            {
+                Id = 5678
+            });
+        var array = doc.Array("array");
+        var undoManager = new UndoManager(
+            doc, array, new UndoManagerOptions
+            {
+                CaptureTimeoutMilliseconds = 0
+            });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObserveAdded(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        array.InsertRange(
+            transaction, index: 0, new[]
+            {
+                Input.Long(value: 2469L),
+                Input.Boolean(value: false),
+                Input.String("Lucas")
+            });
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 0, end: 3) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        array.InsertRange(
+            transaction, index: 2, new[]
+            {
+                Input.Bytes(new byte[] { 2, 4, 6, 9, 123, 123 }),
+                Input.XmlText("Lucas")
+            });
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [3, 10] here.
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 3, end: 10) }));
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        array.RemoveRange(transaction, index: 1, length: 2);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Null);
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // TODO [LSViana] Check with the team why the indexes are [1, 2] and [3, 4] here.
+        AssertDeleteSet(
+            undoEvent.Deletions, (5678, new[] { new IdRange(start: 1, end: 2), new IdRange(start: 3, end: 4) }));
     }
 
     [Test]
