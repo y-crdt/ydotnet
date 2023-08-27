@@ -186,9 +186,52 @@ public class UndoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void UndoAddingAndUpdatingAndRemovingContentOnXmlText()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
+        var undoManager = new UndoManager(doc, xmlText, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas");
+        xmlText.InsertAttribute(transaction, "bold", "true");
+        xmlText.InsertEmbed(transaction, index: 3, Input.Boolean(value: true));
+        transaction.Commit();
+
+        // Act (add text, attribute, and embed and undo)
+        transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 9, " Viana");
+        xmlText.InsertAttribute(transaction, "italics", "false");
+        xmlText.InsertEmbed(transaction, index: 7, Input.Bytes(new byte[] { 2, 4, 6, 9 }));
+        transaction.Commit();
+        var result = undoManager.Undo();
+
+        transaction = doc.ReadTransaction();
+        var text = xmlText.String(transaction);
+        var attribute = xmlText.GetAttribute(transaction, "bold");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("Luctrueas"));
+        Assert.That(attribute, Is.EqualTo("true"));
+        Assert.That(result, Is.True);
+
+        // Act (remove text, attribute, and embed and undo)
+        transaction = doc.WriteTransaction();
+        xmlText.RemoveRange(transaction, index: 0, length: 6);
+        xmlText.RemoveAttribute(transaction, "bold");
+        transaction.Commit();
+        undoManager.Undo();
+
+        transaction = doc.ReadTransaction();
+        text = xmlText.String(transaction);
+        attribute = xmlText.GetAttribute(transaction, "bold");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("Luctrueas"));
+        Assert.That(attribute, Is.EqualTo("true"));
+        Assert.That(result, Is.True);
     }
 
     [Test]
