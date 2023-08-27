@@ -235,8 +235,51 @@ public class UndoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void UndoAddingAndUpdatingAndRemovingContentOnXmlElement()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlElement = doc.XmlElement("xml-element");
+        var undoManager = new UndoManager(doc, xmlElement, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        xmlElement.InsertText(transaction, index: 0);
+        xmlElement.InsertAttribute(transaction, "bold", "true");
+        xmlElement.InsertElement(transaction, index: 1, "color");
+        transaction.Commit();
+
+        // Act (add text, attribute, and element and undo)
+        transaction = doc.WriteTransaction();
+        xmlElement.InsertText(transaction, index: 2);
+        xmlElement.InsertAttribute(transaction, "italics", "false");
+        xmlElement.InsertElement(transaction, index: 3, "size");
+        transaction.Commit();
+        var result = undoManager.Undo();
+
+        transaction = doc.ReadTransaction();
+        var length = xmlElement.ChildLength(transaction);
+        var attribute = xmlElement.GetAttribute(transaction, "bold");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 2));
+        Assert.That(attribute, Is.EqualTo("true"));
+        Assert.That(result, Is.True);
+
+        // Act (remove text, attribute, and element and undo)
+        transaction = doc.WriteTransaction();
+        xmlElement.RemoveRange(transaction, index: 0, length: 2);
+        xmlElement.RemoveAttribute(transaction, "italics");
+        transaction.Commit();
+        result = undoManager.Undo();
+
+        transaction = doc.ReadTransaction();
+        length = xmlElement.ChildLength(transaction);
+        attribute = xmlElement.GetAttribute(transaction, "bold");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 2));
+        Assert.That(attribute, Is.EqualTo("true"));
+        Assert.That(result, Is.True);
     }
 }
