@@ -63,4 +63,17 @@ public class UndoManager : IDisposable
     {
         UndoManagerChannel.UnobserveAdded(Handle, subscription.Id);
     }
+
+    /// <summary>
+    ///     Undoes the last changes tracked by the <see cref="UndoManager" />.
+    /// </summary>
+    /// <remarks>
+    ///     The group of actions to be undone corresponds to the group of actions that happened within
+    ///     the capture timeout or since <see cref="Stop" /> was called.
+    /// </remarks>
+    /// <returns>A boolean flag indicating whether the undo operation performed any changes.</returns>
+    public bool Undo()
+    {
+        return UndoManagerChannel.Undo(Handle) == 1;
+    }
 }
