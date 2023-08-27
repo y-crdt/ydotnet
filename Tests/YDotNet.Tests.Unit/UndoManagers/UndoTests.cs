@@ -82,9 +82,45 @@ public class UndoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void UndoAddingAndUpdatingAndRemovingContentOnArray()
     {
+        // Arrange
+        var doc = new Doc();
+        var array = doc.Array("array");
+        var undoManager = new UndoManager(doc, array, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        array.InsertRange(
+            transaction,
+            index: 0,
+            new[]
+            {
+                Input.Boolean(value: true),
+                Input.Long(value: 2469L),
+                Input.String("Lucas")
+            });
+        transaction.Commit();
+
+        // Act (add and undo)
+        transaction = doc.WriteTransaction();
+        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        transaction.Commit();
+        var result = undoManager.Undo();
+
+        // Assert
+        Assert.That(array.Length, Is.EqualTo(expected: 3));
+        Assert.That(result, Is.True);
+
+        // Act (remove and undo)
+        transaction = doc.WriteTransaction();
+        array.RemoveRange(transaction, index: 1, length: 2);
+        transaction.Commit();
+        result = undoManager.Undo();
+
+        // Assert
+
+        // TODO [LSViana] Check with the team why the amount of items isn't 3.
+        Assert.That(array.Length, Is.EqualTo(expected: 3));
+        Assert.That(result, Is.True);
     }
 
     [Test]
