@@ -129,9 +129,67 @@ public class RedoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void RedoAddingAndUpdatingAndRemovingContentOnMap()
     {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+        var undoManager = new UndoManager(doc, map, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value-1", Input.Long(value: 2469L));
+        map.Insert(transaction, "value-2", Input.String("Lucas"));
+        map.Insert(transaction, "value-3", Input.Boolean(value: true));
+        transaction.Commit();
+
+        // Act (add, undo, and redo)
+        transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value-4", Input.Double(value: 4.20));
+        transaction.Commit();
+        undoManager.Undo();
+        var result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        var length = map.Length(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 4));
+        Assert.That(result, Is.True);
+
+        // Act (replace, undo, and redo)
+        transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value-2", Input.Undefined());
+        transaction.Commit();
+        undoManager.Undo();
+        result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        length = map.Length(transaction);
+        var value2 = map.Get(transaction, "value-2");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 4));
+        Assert.That(value2.Undefined, Is.True);
+        Assert.That(value2.String, Is.Null);
+        Assert.That(result, Is.True);
+
+        // Act (remove, undo, and redo)
+        transaction = doc.WriteTransaction();
+        map.Remove(transaction, "value-1");
+        transaction.Commit();
+        undoManager.Undo();
+        result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        length = map.Length(transaction);
+        var value1 = map.Get(transaction, "value-1");
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 3));
+        Assert.That(value1, Is.Null);
+        Assert.That(result, Is.True);
     }
 
     [Test]
