@@ -76,4 +76,17 @@ public class UndoManager : IDisposable
     {
         return UndoManagerChannel.Undo(Handle) == 1;
     }
+
+    /// <summary>
+    ///     Redoes the last changes tracked by the <see cref="UndoManager" />.
+    /// </summary>
+    /// <remarks>
+    ///     The group of actions to be redone corresponds to the group of actions that happened within
+    ///     the capture timeout or since <see cref="Stop" /> was called.
+    /// </remarks>
+    /// <returns>A boolean flag indicating whether the redo operation performed any changes.</returns>
+    public bool Redo()
+    {
+        return UndoManagerChannel.Redo(Handle) == 1;
+    }
 }
