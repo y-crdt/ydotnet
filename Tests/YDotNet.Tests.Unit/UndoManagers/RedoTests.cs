@@ -193,9 +193,57 @@ public class RedoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void RedoAddingAndUpdatingAndRemovingContentOnXmlText()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
+        var undoManager = new UndoManager(doc, xmlText, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas");
+        xmlText.InsertAttribute(transaction, "bold", "true");
+        xmlText.InsertEmbed(transaction, index: 3, Input.Boolean(value: true));
+        transaction.Commit();
+
+        // Act (add text, attribute, and embed, undo, and redo)
+        transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 9, " Viana");
+        xmlText.InsertAttribute(transaction, "italic", "false");
+        xmlText.InsertEmbed(transaction, index: 7, Input.Bytes(new byte[] { 2, 4, 6, 9 }));
+        transaction.Commit();
+        undoManager.Undo();
+        var result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        var text = xmlText.String(transaction);
+        var attributes = xmlText.Iterate(transaction).ToArray();
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("Luctrueas 0x02040609Viana"));
+        Assert.That(attributes.Length, Is.EqualTo(expected: 2));
+        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
+        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(result, Is.True);
+
+        // Act (remove text, attribute, and embed, undo, and redo)
+        transaction = doc.WriteTransaction();
+        xmlText.RemoveRange(transaction, index: 0, length: 7);
+        xmlText.RemoveAttribute(transaction, "bold");
+        transaction.Commit();
+        undoManager.Undo();
+        result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        text = xmlText.String(transaction);
+        attributes = xmlText.Iterate(transaction).ToArray();
+        transaction.Commit();
+
+        // Assert
+        Assert.That(text, Is.EqualTo("0x02040609Viana"));
+        Assert.That(attributes.Length, Is.EqualTo(expected: 1));
+        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(result, Is.True);
     }
 
     [Test]
