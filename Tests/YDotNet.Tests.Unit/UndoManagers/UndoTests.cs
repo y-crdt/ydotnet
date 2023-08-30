@@ -201,7 +201,7 @@ public class UndoTests
         // Act (add text, attribute, and embed and undo)
         transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 9, " Viana");
-        xmlText.InsertAttribute(transaction, "italics", "false");
+        xmlText.InsertAttribute(transaction, "italic", "false");
         xmlText.InsertEmbed(transaction, index: 7, Input.Bytes(new byte[] { 2, 4, 6, 9 }));
         transaction.Commit();
         var result = undoManager.Undo();
@@ -221,7 +221,7 @@ public class UndoTests
         xmlText.RemoveRange(transaction, index: 0, length: 6);
         xmlText.RemoveAttribute(transaction, "bold");
         transaction.Commit();
-        undoManager.Undo();
+        result = undoManager.Undo();
 
         transaction = doc.ReadTransaction();
         text = xmlText.String(transaction);
@@ -250,7 +250,7 @@ public class UndoTests
         // Act (add text, attribute, and element and undo)
         transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 2);
-        xmlElement.InsertAttribute(transaction, "italics", "false");
+        xmlElement.InsertAttribute(transaction, "italic", "false");
         xmlElement.InsertElement(transaction, index: 3, "size");
         transaction.Commit();
         var result = undoManager.Undo();
@@ -268,7 +268,7 @@ public class UndoTests
         // Act (remove text, attribute, and element and undo)
         transaction = doc.WriteTransaction();
         xmlElement.RemoveRange(transaction, index: 0, length: 2);
-        xmlElement.RemoveAttribute(transaction, "italics");
+        xmlElement.RemoveAttribute(transaction, "italic");
         transaction.Commit();
         result = undoManager.Undo();
 
