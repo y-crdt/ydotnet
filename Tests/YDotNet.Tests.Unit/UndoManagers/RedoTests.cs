@@ -87,9 +87,45 @@ public class RedoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void RedoAddingAndUpdatingAndRemovingContentOnArray()
     {
+        // Arrange
+        var doc = new Doc();
+        var array = doc.Array("array");
+        var undoManager = new UndoManager(doc, array, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        array.InsertRange(
+            transaction,
+            index: 0,
+            new[]
+            {
+                Input.Boolean(value: true),
+                Input.Long(value: 2469L),
+                Input.String("Lucas")
+            });
+        transaction.Commit();
+
+        // Act (add, undo, and redo)
+        transaction = doc.WriteTransaction();
+        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        transaction.Commit();
+        undoManager.Undo();
+        var result = undoManager.Redo();
+
+        // Assert
+        Assert.That(array.Length, Is.EqualTo(expected: 4));
+        Assert.That(result, Is.True);
+
+        // Act (remove, undo, and redo)
+        transaction = doc.WriteTransaction();
+        array.RemoveRange(transaction, index: 1, length: 2);
+        transaction.Commit();
+        undoManager.Undo();
+        result = undoManager.Redo();
+
+        // Assert
+        Assert.That(array.Length, Is.EqualTo(expected: 2));
+        Assert.That(result, Is.True);
     }
 
     [Test]
