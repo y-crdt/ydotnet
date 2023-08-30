@@ -247,8 +247,56 @@ public class RedoTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void RedoAddingAndUpdatingAndRemovingContentOnXmlElement()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlElement = doc.XmlElement("xml-element");
+        var undoManager = new UndoManager(doc, xmlElement, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+        var transaction = doc.WriteTransaction();
+        xmlElement.InsertText(transaction, index: 0);
+        xmlElement.InsertAttribute(transaction, "bold", "true");
+        xmlElement.InsertElement(transaction, index: 1, "color");
+        transaction.Commit();
+
+        // Act (add text, attribute, and element, undo, and redo)
+        transaction = doc.WriteTransaction();
+        xmlElement.InsertText(transaction, index: 2);
+        xmlElement.InsertAttribute(transaction, "italic", "false");
+        xmlElement.InsertElement(transaction, index: 3, "size");
+        transaction.Commit();
+        undoManager.Undo();
+        var result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        var length = xmlElement.ChildLength(transaction);
+        var attributes = xmlElement.Iterate(transaction).ToArray();
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 4));
+        Assert.That(attributes.Length, Is.EqualTo(expected: 2));
+        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
+        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(result, Is.True);
+
+        // Act (remove text, attribute, and element, undo, and redo)
+        transaction = doc.WriteTransaction();
+        xmlElement.RemoveRange(transaction, index: 0, length: 2);
+        xmlElement.RemoveAttribute(transaction, "italic");
+        transaction.Commit();
+        undoManager.Undo();
+        result = undoManager.Redo();
+
+        transaction = doc.ReadTransaction();
+        length = xmlElement.ChildLength(transaction);
+        attributes = xmlElement.Iterate(transaction).ToArray();
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 2));
+        Assert.That(attributes.Length, Is.EqualTo(expected: 1));
+        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
+        Assert.That(result, Is.True);
     }
 }
