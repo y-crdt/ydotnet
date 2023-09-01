@@ -107,4 +107,13 @@ public class UndoManager : IDisposable
     {
         return UndoManagerChannel.CanRedo(Handle) == 1;
     }
+
+    /// <summary>
+    ///     Resets the <see cref="UndoManager" /> and removes history to undo/redo changes.
+    /// </summary>
+    /// <returns><see cref="bool" /> indicating whether the state was reset.</returns>
+    public bool Clear()
+    {
+        return UndoManagerChannel.Clear(Handle) == 1;
+    }
 }
