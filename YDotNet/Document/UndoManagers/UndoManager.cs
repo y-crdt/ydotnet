@@ -98,4 +98,13 @@ public class UndoManager : IDisposable
     {
         return UndoManagerChannel.CanUndo(Handle) == 1;
     }
+
+    /// <summary>
+    ///     Returns a <see cref="bool" /> indicating whether it's possible to redo changes.
+    /// </summary>
+    /// <returns><see cref="bool" /> indicating whether it's possible to redo changes.</returns>
+    public bool CanRedo()
+    {
+        return UndoManagerChannel.CanRedo(Handle) == 1;
+    }
 }
