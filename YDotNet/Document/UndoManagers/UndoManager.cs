@@ -116,4 +116,12 @@ public class UndoManager : IDisposable
     {
         return UndoManagerChannel.Clear(Handle) == 1;
     }
+
+    /// <summary>
+    ///     Stops the current capturing of changes and starts a new capturing group.
+    /// </summary>
+    public void Stop()
+    {
+        UndoManagerChannel.Stop(Handle);
+    }
 }

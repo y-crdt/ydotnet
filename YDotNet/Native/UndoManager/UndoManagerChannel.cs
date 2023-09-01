@@ -45,4 +45,8 @@ internal static class UndoManagerChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yundo_manager_clear")]
     public static extern byte Clear(nint undoManager);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yundo_manager_stop")]
+    public static extern void Stop(nint undoManager);
 }
