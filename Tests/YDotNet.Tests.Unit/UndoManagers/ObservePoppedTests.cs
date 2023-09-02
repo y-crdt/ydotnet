@@ -155,9 +155,68 @@ public class ObservePoppedTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnMap()
     {
+        // Arrange
+        var doc = new Doc(
+            new DocOptions
+            {
+                Id = 9581
+            });
+        var map = doc.Map("map");
+        var undoManager = new UndoManager(doc, map, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObservePopped(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "key1", Input.Boolean(value: false));
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (9581, new[] { new IdRange(start: 0, end: 1) }));
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions, (9581, new[] { new IdRange(start: 0, end: 1) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        map.Remove(transaction, "key1");
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions, (9581, new[] { new IdRange(start: 1, end: 2) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (9581, new[] { new IdRange(start: 2, end: 3) }));
     }
 
     [Test]
