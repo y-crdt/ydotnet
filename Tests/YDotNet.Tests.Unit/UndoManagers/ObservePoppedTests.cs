@@ -220,9 +220,101 @@ public class ObservePoppedTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnXmlText()
     {
+        // Arrange
+        var doc = new Doc(
+            new DocOptions
+            {
+                Id = 7938
+            });
+        var xmlText = doc.XmlText("xml-text");
+        var undoManager = new UndoManager(doc, xmlText, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObservePopped(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas");
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (7938, new[] { new IdRange(start: 0, end: 5) }));
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions, (7938, new[] { new IdRange(start: 0, end: 5) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        xmlText.InsertAttribute(transaction, "bold", "true");
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [10, 11] here.
+        AssertDeleteSet(undoEvent.Insertions, (7938, new[] { new IdRange(start: 10, end: 11) }));
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+
+        // TODO [LSViana] Check with the team why the indexes are [10, 11] here.
+        AssertDeleteSet(undoEvent.Deletions, (7938, new[] { new IdRange(start: 10, end: 11) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        xmlText.RemoveRange(transaction, index: 2, length: 3);
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+
+        // TODO [LSViana] Check with the team why the indexes are [7, 10] here.
+        AssertDeleteSet(undoEvent.Deletions, (7938, new[] { new IdRange(start: 7, end: 10) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [12, 15] here.
+        AssertDeleteSet(undoEvent.Insertions, (7938, new[] { new IdRange(start: 12, end: 15) }));
     }
 
     [Test]
