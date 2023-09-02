@@ -8,7 +8,7 @@ using YDotNet.Document.UndoManagers.Events;
 
 namespace YDotNet.Tests.Unit.UndoManagers;
 
-public class ObservedPoppedTests
+public class ObservePoppedTests
 {
     [Test]
     public void TriggersAfterAddingAndRemovingContentOnText()
