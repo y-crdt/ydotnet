@@ -25,14 +25,14 @@ internal static class UndoManagerChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yundo_manager_observe_popped")]
-    public static extern uint ObservePopped(nint undoManager, nint state, ObservePoppedCallback callback);
+        EntryPoint = "yundo_manager_unobserve_added")]
+    public static extern uint UnobserveAdded(nint undoManager, uint subscriptionId);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yundo_manager_unobserve_added")]
-    public static extern uint UnobserveAdded(nint undoManager, uint subscriptionId);
+        EntryPoint = "yundo_manager_observe_popped")]
+    public static extern uint ObservePopped(nint undoManager, nint state, ObservePoppedCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yundo_manager_undo")]
