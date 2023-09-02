@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.Options;
 using YDotNet.Document.State;
 using YDotNet.Document.UndoManagers;
@@ -79,9 +80,78 @@ public class ObservedPoppedTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void TriggersAfterAddingAndRemovingContentOnArray()
     {
+        // Arrange
+        var doc = new Doc(
+            new DocOptions
+            {
+                Id = 5678
+            });
+        var array = doc.Array("array");
+        var undoManager = new UndoManager(doc, array, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
+
+        UndoEvent? undoEvent = null;
+        undoManager.ObservePopped(e => undoEvent = e);
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        array.InsertRange(
+            transaction, index: 0, new[]
+            {
+                Input.Long(value: 2469L),
+                Input.Boolean(value: false),
+                Input.Undefined()
+            });
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 0, end: 3) }));
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions, (5678, new[] { new IdRange(start: 0, end: 3) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        transaction = doc.WriteTransaction();
+        array.RemoveRange(transaction, index: 1, length: 2);
+        transaction.Commit();
+        undoManager.Undo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Undo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+
+        // TODO [LSViana] Check with the team why the indexes are [1, 4] here.
+        AssertDeleteSet(undoEvent.Deletions, (5678, new[] { new IdRange(start: 4, end: 6) }));
+        AssertDeleteSet(undoEvent.Insertions);
+
+        // Act
+        undoEvent = null;
+        undoManager.Redo();
+
+        // Assert
+        Assert.That(undoEvent, Is.Not.Null);
+        Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
+        Assert.That(undoEvent.Origin, Is.Not.Null);
+        AssertDeleteSet(undoEvent.Deletions);
+
+        // TODO [LSViana] Check with the team why the indexes are [6, 8] here.
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 6, end: 8) }));
     }
 
     [Test]
