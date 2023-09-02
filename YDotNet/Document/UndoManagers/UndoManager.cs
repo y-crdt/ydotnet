@@ -81,6 +81,16 @@ public class UndoManager : IDisposable
     }
 
     /// <summary>
+    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, previously
+    ///     registered via <see cref="ObservePopped" />.
+    /// </summary>
+    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
+    public void UnobservePopped(EventSubscription subscription)
+    {
+        UndoManagerChannel.UnobservePopped(Handle, subscription.Id);
+    }
+
+    /// <summary>
     ///     Undoes the last changes tracked by the <see cref="UndoManager" />.
     /// </summary>
     /// <remarks>
