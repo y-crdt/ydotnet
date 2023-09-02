@@ -150,4 +150,13 @@ public class UndoManager : IDisposable
     {
         UndoManagerChannel.Stop(Handle);
     }
+
+    /// <summary>
+    ///     Includes the <see cref="Branch" /> instance in the list of shared types tracked by this <see cref="UndoManager" />.
+    /// </summary>
+    /// <param name="branch">The <see cref="Branch" /> to be tracked by this <see cref="UndoManager" />.</param>
+    public void AddScope(Branch branch)
+    {
+        UndoManagerChannel.AddScope(Handle, branch.Handle);
+    }
 }
