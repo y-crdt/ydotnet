@@ -65,6 +65,22 @@ public class UndoManager : IDisposable
     }
 
     /// <summary>
+    ///     Subscribes a callback function to be called every time <see cref="Undo" /> or <see cref="Redo" /> is executed
+    ///     and removes items from the history of changes.
+    /// </summary>
+    /// <param name="action">The callback to be executed when <see cref="Undo" /> or <see cref="Redo" /> is executed.</param>
+    /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
+    public EventSubscription ObservePopped(Action<UndoEvent> action)
+    {
+        var subscriptionId = UndoManagerChannel.ObservePopped(
+            Handle,
+            nint.Zero,
+            (state, undoEvent) => action(undoEvent.ToUndoEvent()));
+
+        return new EventSubscription(subscriptionId);
+    }
+
+    /// <summary>
     ///     Undoes the last changes tracked by the <see cref="UndoManager" />.
     /// </summary>
     /// <remarks>

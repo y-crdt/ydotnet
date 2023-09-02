@@ -7,6 +7,8 @@ internal static class UndoManagerChannel
 {
     public delegate void ObserveAddedCallback(nint state, UndoEventNative undoEvent);
 
+    public delegate void ObservePoppedCallback(nint state, UndoEventNative undoEvent);
+
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "yundo_manager")]
     public static extern nint NewWithOptions(nint doc, nint branch, nint options);
 
@@ -19,6 +21,12 @@ internal static class UndoManagerChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yundo_manager_observe_added")]
     public static extern uint ObserveAdded(nint undoManager, nint state, ObserveAddedCallback callback);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "yundo_manager_observe_popped")]
+    public static extern uint ObservePopped(nint undoManager, nint state, ObservePoppedCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
