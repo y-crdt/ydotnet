@@ -40,7 +40,7 @@ public class UndoManager : IDisposable
 
     /// <summary>
     ///     Subscribes a callback function to be called every time a new an update happens in a tracked shared type
-    ///     after the capture timeout from the previous update has been reached or <see cref="Reset" /> has been called.
+    ///     after the capture timeout from the previous update has been reached or <see cref="Stop" /> has been called.
     ///     has been called.
     /// </summary>
     /// <param name="action">The callback to be executed when an update happens, respecting the capture timeout.</param>
