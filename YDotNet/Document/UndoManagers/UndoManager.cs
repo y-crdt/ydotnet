@@ -1,3 +1,4 @@
+using System.Transactions;
 using YDotNet.Document.Events;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.UndoManagers.Events;
@@ -158,5 +159,18 @@ public class UndoManager : IDisposable
     public void AddScope(Branch branch)
     {
         UndoManagerChannel.AddScope(Handle, branch.Handle);
+    }
+
+    /// <summary>
+    ///     Includes this origin in the list of tracked origins for this <see cref="UndoManager" />.
+    /// </summary>
+    /// <remarks>
+    ///     Origin can be assigned to updates executing in a scope of a particular <see cref="Transaction" />
+    ///     via the parameters of <see cref="Doc.WriteTransaction" />.
+    /// </remarks>
+    /// <param name="origin">The origin to be included in this <see cref="UndoManager" />.</param>
+    public void AddOrigin(byte[] origin)
+    {
+        UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
     }
 }
