@@ -73,4 +73,10 @@ internal static class UndoManagerChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yundo_manager_add_origin")]
     public static extern void AddOrigin(nint undoManager, uint originLength, byte[] origin);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "yundo_manager_remove_origin")]
+    public static extern void RemoveOrigin(nint undoManager, uint originLength, byte[] origin);
 }

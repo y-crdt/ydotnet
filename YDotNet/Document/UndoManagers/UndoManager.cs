@@ -173,4 +173,17 @@ public class UndoManager : IDisposable
     {
         UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
     }
+
+    /// <summary>
+    ///     Removes this origin from the list of tracked origins for this <see cref="UndoManager" />.
+    /// </summary>
+    /// <remarks>
+    ///     Origin can be assigned to updates executing in a scope of a particular <see cref="Transaction" />
+    ///     via the parameters of <see cref="Doc.WriteTransaction" />.
+    /// </remarks>
+    /// <param name="origin">The origin to be removed from this <see cref="UndoManager" />.</param>
+    public void RemoveOrigin(byte[] origin)
+    {
+        UndoManagerChannel.RemoveOrigin(Handle, (uint) origin.Length, origin);
+    }
 }
