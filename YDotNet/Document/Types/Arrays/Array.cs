@@ -108,7 +108,7 @@ public class Array : Branch
         var subscriptionId = ArrayChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new ArrayEvent(eventHandle)));
+            (_, eventHandle) => action(new ArrayEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }

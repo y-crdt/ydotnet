@@ -119,7 +119,7 @@ public class Map : Branch
         var subscriptionId = MapChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new MapEvent(eventHandle)));
+            (_, eventHandle) => action(new MapEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }

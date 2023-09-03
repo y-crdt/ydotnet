@@ -285,7 +285,7 @@ public class XmlElement : Branch
         var subscriptionId = XmlElementChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new XmlElementEvent(eventHandle)));
+            (_, eventHandle) => action(new XmlElementEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }

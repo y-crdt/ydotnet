@@ -228,7 +228,7 @@ public class XmlText : Branch
         var subscriptionId = XmlTextChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new XmlTextEvent(eventHandle)));
+            (_, eventHandle) => action(new XmlTextEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }

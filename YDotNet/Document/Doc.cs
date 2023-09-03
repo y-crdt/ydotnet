@@ -307,7 +307,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveClear(
             Handle,
             nint.Zero,
-            (state, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
+            (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -335,7 +335,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -363,7 +363,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV2(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -391,7 +391,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveAfterTransaction(
             Handle,
             nint.Zero,
-            (state, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
+            (_, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -416,7 +416,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
-            (state, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
 
         return new EventSubscription(subscriptionId);
     }

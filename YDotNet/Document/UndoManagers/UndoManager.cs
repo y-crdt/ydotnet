@@ -50,7 +50,7 @@ public class UndoManager : IDisposable
         var subscriptionId = UndoManagerChannel.ObserveAdded(
             Handle,
             nint.Zero,
-            (state, undoEvent) => action(undoEvent.ToUndoEvent()));
+            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -76,7 +76,7 @@ public class UndoManager : IDisposable
         var subscriptionId = UndoManagerChannel.ObservePopped(
             Handle,
             nint.Zero,
-            (state, undoEvent) => action(undoEvent.ToUndoEvent()));
+            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
 
         return new EventSubscription(subscriptionId);
     }
