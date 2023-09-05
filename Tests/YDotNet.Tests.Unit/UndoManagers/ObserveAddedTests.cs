@@ -64,8 +64,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent, Is.Not.Null);
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
-
-        // TODO [LSViana] Check with the team why the indexes are [0, 2] and [8, 11] here.
         AssertDeleteSet(
             undoEvent.Deletions,
             (1234, new[] { new IdRange(start: 0, end: 2), new IdRange(start: 8, end: 11) }));
@@ -115,7 +113,7 @@ public class ObserveAddedTests
         array.InsertRange(
             transaction, index: 2, new[]
             {
-                Input.Bytes(new byte[] { 2, 4, 6, 9, 123, 123 }),
+                Input.Bytes(new byte[] { 2, 4, 6, 9 }),
                 Input.XmlText("Lucas")
             });
         transaction.Commit();
@@ -125,8 +123,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [3, 10] here.
         AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 3, end: 10) }));
 
         // Act
@@ -140,8 +136,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
-
-        // TODO [LSViana] Check with the team why the indexes are [1, 2] and [3, 4] here.
         AssertDeleteSet(
             undoEvent.Deletions, (5678, new[] { new IdRange(start: 1, end: 2), new IdRange(start: 3, end: 4) }));
     }
@@ -187,8 +181,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [0, 3] here.
         AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(start: 3, end: 10) }));
 
         // Act
@@ -245,8 +237,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [5, 6] here.
         AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(start: 5, end: 6) }));
 
         // Act
@@ -260,8 +250,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [6, 7] here.
         AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(start: 6, end: 7) }));
 
         // Act
@@ -275,8 +263,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
-
-        // TODO [LSViana] Check with the team why the indexes are [2, 3] and [6, 7] here.
         AssertDeleteSet(
             undoEvent.Deletions, (7853, new[] { new IdRange(start: 2, end: 3), new IdRange(start: 6, end: 7) }));
     }
@@ -332,8 +318,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [6, 7] here.
         AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 6, end: 7) }));
 
         // Act
@@ -347,8 +331,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [7, 8] here.
         AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 7, end: 8) }));
 
         // Act
@@ -363,8 +345,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-
-        // TODO [LSViana] Check with the team why the indexes are [8, 14] here.
         AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 8, end: 14) }));
 
         // Act
@@ -378,8 +358,6 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
-
-        // TODO [LSViana] Check with the team why the indexes are [7, 14] here.
         AssertDeleteSet(
             undoEvent.Deletions, (8137, new[] { new IdRange(start: 7, end: 14) }));
     }
