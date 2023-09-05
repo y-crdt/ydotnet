@@ -39,7 +39,7 @@ public abstract class Branch
         var subscriptionId = BranchChannel.ObserveDeep(
             Handle,
             nint.Zero,
-            (state, length, eventsHandle) =>
+            (_, length, eventsHandle) =>
             {
                 var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
                     .Select(x => new EventBranch(x))

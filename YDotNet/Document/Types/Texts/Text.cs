@@ -150,7 +150,7 @@ public class Text : Branch
         var subscriptionId = TextChannel.Observe(
             Handle,
             nint.Zero,
-            (state, eventHandle) => action(new TextEvent(eventHandle)));
+            (_, eventHandle) => action(new TextEvent(eventHandle)));
 
         return new EventSubscription(subscriptionId);
     }

@@ -12,11 +12,13 @@ internal struct IdRangeSequenceNative
 
     public IdRange[] ToIdRanges()
     {
+        var idRangeSize = Marshal.SizeOf<IdRangeNative>();
         var sequence = new IdRange[Length];
 
         for (var i = 0; i < Length; i++)
         {
-            sequence[i] = Marshal.PtrToStructure<IdRange>(Sequence + i * Marshal.SizeOf<IdRange>());
+            var idRange = Marshal.PtrToStructure<IdRangeNative>(Sequence + i * idRangeSize);
+            sequence[i] = idRange.ToIdRange();
         }
 
         return sequence;

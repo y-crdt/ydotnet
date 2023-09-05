@@ -5,6 +5,7 @@ using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
+using YDotNet.Document.UndoManagers;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
@@ -241,6 +242,10 @@ public class Doc : IDisposable
     /// <summary>
     ///     Starts a new read-write <see cref="Transaction" /> on this document.
     /// </summary>
+    /// <param name="origin">
+    ///     Optional byte marker to indicate the source of changes to be applied by this transaction.
+    ///     This value is used by <see cref="UndoManager" />.
+    /// </param>
     /// <returns>
     ///     <para>The <see cref="Transaction" /> to perform operations in the document or <c>null</c>.</para>
     ///     <para>
@@ -248,10 +253,12 @@ public class Doc : IDisposable
     ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
     ///     </para>
     /// </returns>
-    public Transaction? WriteTransaction()
+    public Transaction? WriteTransaction(byte[]? origin = null)
     {
+        var length = (uint) (origin?.Length ?? 0);
+
         return ReferenceAccessor.Access(
-            new Transaction(DocChannel.WriteTransaction(Handle, originLength: 0, nint.Zero)));
+            new Transaction(DocChannel.WriteTransaction(Handle, length, origin)));
     }
 
     /// <summary>
@@ -300,7 +307,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveClear(
             Handle,
             nint.Zero,
-            (state, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
+            (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -328,7 +335,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -356,7 +363,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveUpdatesV2(
             Handle,
             nint.Zero,
-            (state, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -384,7 +391,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveAfterTransaction(
             Handle,
             nint.Zero,
-            (state, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
+            (_, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -409,7 +416,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
-            (state, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
 
         return new EventSubscription(subscriptionId);
     }
