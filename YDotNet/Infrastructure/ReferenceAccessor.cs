@@ -1,7 +1,7 @@
 using YDotNet.Document;
 using YDotNet.Document.Cells;
+using YDotNet.Document.StickyIndexes;
 using YDotNet.Document.Transactions;
-using YDotNet.Document.Types;
 using YDotNet.Document.Types.Arrays;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
@@ -70,6 +70,11 @@ internal static class ReferenceAccessor
     }
 
     public static Output? Access(Output instance)
+    {
+        return Access(instance, instance.Handle);
+    }
+
+    public static StickyIndex? Access(StickyIndex instance)
     {
         return Access(instance, instance.Handle);
     }
