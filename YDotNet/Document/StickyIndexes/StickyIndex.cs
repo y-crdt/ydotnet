@@ -24,6 +24,11 @@ public class StickyIndex : IDisposable
     }
 
     /// <summary>
+    ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
+    /// </summary>
+    public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
+
+    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }

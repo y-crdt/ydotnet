@@ -13,4 +13,8 @@ internal static class StickyIndexChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ysticky_index_from_index")]
     public static extern nint FromIndex(nint branch, nint transaction, uint index, sbyte associationType);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ysticky_index_assoc")]
+    public static extern sbyte AssociationType(nint stickyIndex);
 }
