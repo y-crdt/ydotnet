@@ -5,6 +5,10 @@ namespace YDotNet.Native.StickyIndex;
 internal static class StickyIndexChannel
 {
     [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ysticky_index_destroy")]
+    public static extern void Destroy(nint stickyIndex);
+
+    [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ysticky_index_from_index")]

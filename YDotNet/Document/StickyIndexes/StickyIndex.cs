@@ -1,4 +1,5 @@
 using YDotNet.Document.Types.Branches;
+using YDotNet.Native.StickyIndex;
 
 namespace YDotNet.Document.StickyIndexes;
 
@@ -11,7 +12,7 @@ namespace YDotNet.Document.StickyIndexes;
 ///     Also, placing a sticky index at the end of a <see cref="Branch" /> will always point to the end of that
 ///     <see cref="Branch" />.
 /// </remarks>
-public class StickyIndex
+public class StickyIndex : IDisposable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="StickyIndex" /> class.
@@ -26,4 +27,10 @@ public class StickyIndex
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        StickyIndexChannel.Destroy(Handle);
+    }
 }
