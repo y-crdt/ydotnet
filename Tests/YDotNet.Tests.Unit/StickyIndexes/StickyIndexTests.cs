@@ -7,7 +7,7 @@ namespace YDotNet.Tests.Unit.StickyIndexes;
 public class StickyIndexTests
 {
     [Test]
-    public void CreateFromEmptyText()
+    public void CreateFromText()
     {
         // Arrange
         var doc = new Doc();
@@ -27,79 +27,25 @@ public class StickyIndexTests
 
     [Test]
     [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledTextAtBeginning()
+    public void CreateFromArray()
     {
     }
 
     [Test]
     [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledTextAtMiddle()
+    public void CreateFromMap()
     {
     }
 
     [Test]
     [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledTextAtEnding()
+    public void CreateFromdXmlText()
     {
     }
 
     [Test]
     [Ignore("Waiting to be implemented.")]
-    public void CreateFromEmptyArray()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledArrayAtBeginning()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledArrayAtMiddle()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledArrayAtEnding()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromEmptyMap()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledMap()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromEmptyXmlText()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledXmlText()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromEmptyXmlElement()
-    {
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromFilledXmlElement()
+    public void CreateFromXmlElement()
     {
     }
 }
