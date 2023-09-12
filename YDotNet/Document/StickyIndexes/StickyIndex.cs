@@ -1,3 +1,4 @@
+using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Native.StickyIndex;
 
@@ -37,5 +38,20 @@ public class StickyIndex : IDisposable
     public void Dispose()
     {
         StickyIndexChannel.Destroy(Handle);
+    }
+
+    /// <summary>
+    ///     Returns the numeric index in the context of the related <see cref="Branch" /> that created this
+    ///     <see cref="StickyIndex" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The numeric index in the context of the related <see cref="Branch" /> that created this <see cref="StickyIndex" />.
+    /// </returns>
+    public uint Read(Transaction transaction)
+    {
+        StickyIndexChannel.Read(Handle, transaction.Handle, out _, out var index);
+
+        return index;
     }
 }
