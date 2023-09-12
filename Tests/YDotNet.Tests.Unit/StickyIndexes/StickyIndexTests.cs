@@ -64,9 +64,22 @@ public class StickyIndexTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void CreateFromdXmlText()
+    public void CreateFromXmlText()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        var stickyIndexAfter = xmlText.StickyIndex(transaction, index: 0, StickyAssociationType.After);
+        var stickyIndexBefore = xmlText.StickyIndex(transaction, index: 0, StickyAssociationType.Before);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(stickyIndexAfter, Is.Null);
+        Assert.That(stickyIndexBefore, Is.Not.Null);
+        Assert.That(stickyIndexBefore.Handle, Is.GreaterThan(nint.Zero));
     }
 
     [Test]
