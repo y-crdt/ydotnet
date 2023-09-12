@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 using YDotNet.Document.StickyIndexes;
 
 namespace YDotNet.Tests.Unit.StickyIndexes;
@@ -45,9 +46,41 @@ public class ReadTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void ReadIndexFromArray()
     {
+        // Arrange
+        var doc = new Doc();
+        var array = doc.Array("array");
+
+        var transaction = doc.WriteTransaction();
+        array.InsertRange(transaction, index: 0, new[] { Input.Long(2469L), Input.Null(), Input.Boolean(false) });
+        var stickyIndexBefore = array.StickyIndex(transaction, index: 1, StickyAssociationType.Before);
+        var stickyIndexAfter = array.StickyIndex(transaction, index: 1, StickyAssociationType.After);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.ReadTransaction();
+        var beforeIndex = stickyIndexBefore.Read(transaction);
+        var afterIndex = stickyIndexAfter.Read(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(beforeIndex, Is.EqualTo(expected: 1));
+        Assert.That(afterIndex, Is.EqualTo(expected: 1));
+
+        // Act
+        transaction = doc.WriteTransaction();
+        array.InsertRange(transaction, index: 1, new [] { Input.String("(") });
+        array.InsertRange(transaction, index: 3, new [] { Input.String(")") });
+        array.InsertRange(transaction, index: 4, new [] { Input.String(" Viana") });
+        array.InsertRange(transaction, index: 0, new [] { Input.String("Hello, ") });
+        beforeIndex = stickyIndexBefore.Read(transaction);
+        afterIndex = stickyIndexAfter.Read(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(beforeIndex, Is.EqualTo(expected: 2));
+        Assert.That(afterIndex, Is.EqualTo(expected: 3));
     }
 
     [Test]
