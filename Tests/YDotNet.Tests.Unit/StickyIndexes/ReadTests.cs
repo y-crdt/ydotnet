@@ -85,9 +85,43 @@ public class ReadTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void ReadIndexFromXmlText()
     {
+        // Arrange
+        var doc = new Doc();
+        var xmlText = doc.XmlText("xml-text");
+
+        var transaction = doc.WriteTransaction();
+        xmlText.Insert(transaction, index: 0, "Lucas");
+        var stickyIndexBefore = xmlText.StickyIndex(transaction, index: 3, StickyAssociationType.Before);
+        var stickyIndexAfter = xmlText.StickyIndex(transaction, index: 3, StickyAssociationType.After);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.ReadTransaction();
+        var beforeIndex = stickyIndexBefore.Read(transaction);
+        var afterIndex = stickyIndexAfter.Read(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(beforeIndex, Is.EqualTo(expected: 3));
+        Assert.That(afterIndex, Is.EqualTo(expected: 3));
+
+        // Act
+        transaction = doc.WriteTransaction();
+        xmlText.InsertAttribute(transaction, "bold", "true");
+        xmlText.Insert(transaction, index: 3, "(");
+        xmlText.Insert(transaction, index: 5, ")");
+        xmlText.Insert(transaction, index: 7, " Viana");
+        xmlText.Insert(transaction, index: 0, "Hello, ");
+        xmlText.InsertAttribute(transaction, "italics", "false");
+        beforeIndex = stickyIndexBefore.Read(transaction);
+        afterIndex = stickyIndexAfter.Read(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(beforeIndex, Is.EqualTo(expected: 10));
+        Assert.That(afterIndex, Is.EqualTo(expected: 11));
     }
 
     [Test]
