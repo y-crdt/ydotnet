@@ -53,7 +53,8 @@ public class ReadTests
         var array = doc.Array("array");
 
         var transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 0, new[] { Input.Long(2469L), Input.Null(), Input.Boolean(false) });
+        array.InsertRange(
+            transaction, index: 0, new[] { Input.Long(value: 2469L), Input.Null(), Input.Boolean(value: false) });
         var stickyIndexBefore = array.StickyIndex(transaction, index: 1, StickyAssociationType.Before);
         var stickyIndexAfter = array.StickyIndex(transaction, index: 1, StickyAssociationType.After);
         transaction.Commit();
@@ -70,10 +71,10 @@ public class ReadTests
 
         // Act
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 1, new [] { Input.String("(") });
-        array.InsertRange(transaction, index: 3, new [] { Input.String(")") });
-        array.InsertRange(transaction, index: 4, new [] { Input.String(" Viana") });
-        array.InsertRange(transaction, index: 0, new [] { Input.String("Hello, ") });
+        array.InsertRange(transaction, index: 1, new[] { Input.String("(") });
+        array.InsertRange(transaction, index: 3, new[] { Input.String(")") });
+        array.InsertRange(transaction, index: 4, new[] { Input.String(" Viana") });
+        array.InsertRange(transaction, index: 0, new[] { Input.String("Hello, ") });
         beforeIndex = stickyIndexBefore.Read(transaction);
         afterIndex = stickyIndexAfter.Read(transaction);
         transaction.Commit();
@@ -81,12 +82,6 @@ public class ReadTests
         // Assert
         Assert.That(beforeIndex, Is.EqualTo(expected: 2));
         Assert.That(afterIndex, Is.EqualTo(expected: 3));
-    }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void ReadIndexFromMap()
-    {
     }
 
     [Test]
