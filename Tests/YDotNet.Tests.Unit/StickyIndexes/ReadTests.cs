@@ -123,10 +123,4 @@ public class ReadTests
         Assert.That(beforeIndex, Is.EqualTo(expected: 10));
         Assert.That(afterIndex, Is.EqualTo(expected: 11));
     }
-
-    [Test]
-    [Ignore("Waiting to be implemented.")]
-    public void ReadIndexFromXmlElement()
-    {
-    }
 }
