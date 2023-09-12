@@ -45,9 +45,22 @@ public class StickyIndexTests
     }
 
     [Test]
-    [Ignore("Waiting to be implemented.")]
     public void CreateFromMap()
     {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        var stickyIndexAfter = map.StickyIndex(transaction, index: 0, StickyAssociationType.After);
+        var stickyIndexBefore = map.StickyIndex(transaction, index: 0, StickyAssociationType.Before);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(stickyIndexAfter, Is.Null);
+        Assert.That(stickyIndexBefore, Is.Not.Null);
+        Assert.That(stickyIndexBefore.Handle, Is.GreaterThan(nint.Zero));
     }
 
     [Test]
