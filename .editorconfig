@@ -27,6 +27,7 @@ dotnet_diagnostic.SA1101.severity = suggestion # Prefix local calls with this
 
 # Ordering rules
 dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
+dotnet_diagnostic.SA1204.severity = suggestion # Static elements should appear before instance elements
 
 # Maintainability rules
 dotnet_diagnostic.SA1407.severity = suggestion # Arithmetic expressions should declare precedence

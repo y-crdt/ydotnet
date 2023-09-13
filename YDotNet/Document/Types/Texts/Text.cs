@@ -1,9 +1,11 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
+using YDotNet.Document.StickyIndexes;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Texts;
 
@@ -163,5 +165,19 @@ public class Text : Branch
     public void Unobserve(EventSubscription subscription)
     {
         TextChannel.Unobserve(Handle, subscription.Id);
+    }
+
+    /// <summary>
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
+    ///     the <see cref="Branch" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
+    /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
+    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
+    public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
+    {
+        return ReferenceAccessor.Access(
+            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
     }
 }
