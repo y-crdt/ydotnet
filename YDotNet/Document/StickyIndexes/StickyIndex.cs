@@ -1,6 +1,8 @@
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Infrastructure;
 using YDotNet.Native.StickyIndex;
+using YDotNet.Native.Types;
 
 namespace YDotNet.Document.StickyIndexes;
 
@@ -53,5 +55,19 @@ public class StickyIndex : IDisposable
         StickyIndexChannel.Read(Handle, transaction.Handle, out _, out var index);
 
         return index;
+    }
+
+    /// <summary>
+    ///     Serializes the <see cref="StickyIndex" /> into binary representation.
+    /// </summary>
+    /// <returns>The binary representation of the <see cref="StickyIndex" /> index.</returns>
+    public byte[] Encode()
+    {
+        var handle = StickyIndexChannel.Encode(Handle, out var length);
+        var result = MemoryReader.ReadBytes(handle, length);
+
+        BinaryChannel.Destroy(handle, length);
+
+        return result;
     }
 }
