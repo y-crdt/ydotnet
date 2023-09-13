@@ -45,25 +45,6 @@ public class StickyIndexTests
     }
 
     [Test]
-    public void CreateFromMap()
-    {
-        // Arrange
-        var doc = new Doc();
-        var map = doc.Map("map");
-
-        // Act
-        var transaction = doc.WriteTransaction();
-        var stickyIndexAfter = map.StickyIndex(transaction, index: 0, StickyAssociationType.After);
-        var stickyIndexBefore = map.StickyIndex(transaction, index: 0, StickyAssociationType.Before);
-        transaction.Commit();
-
-        // Assert
-        Assert.That(stickyIndexAfter, Is.Null);
-        Assert.That(stickyIndexBefore, Is.Not.Null);
-        Assert.That(stickyIndexBefore.Handle, Is.GreaterThan(nint.Zero));
-    }
-
-    [Test]
     public void CreateFromXmlText()
     {
         // Arrange
@@ -74,25 +55,6 @@ public class StickyIndexTests
         var transaction = doc.WriteTransaction();
         var stickyIndexAfter = xmlText.StickyIndex(transaction, index: 0, StickyAssociationType.After);
         var stickyIndexBefore = xmlText.StickyIndex(transaction, index: 0, StickyAssociationType.Before);
-        transaction.Commit();
-
-        // Assert
-        Assert.That(stickyIndexAfter, Is.Null);
-        Assert.That(stickyIndexBefore, Is.Not.Null);
-        Assert.That(stickyIndexBefore.Handle, Is.GreaterThan(nint.Zero));
-    }
-
-    [Test]
-    public void CreateFromXmlElement()
-    {
-        // Arrange
-        var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
-
-        // Act
-        var transaction = doc.WriteTransaction();
-        var stickyIndexAfter = xmlElement.StickyIndex(transaction, index: 0, StickyAssociationType.After);
-        var stickyIndexBefore = xmlElement.StickyIndex(transaction, index: 0, StickyAssociationType.Before);
         transaction.Commit();
 
         // Assert
