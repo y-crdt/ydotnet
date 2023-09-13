@@ -92,18 +92,4 @@ public abstract class Branch
     {
         return ReferenceAccessor.Access(new Transaction(BranchChannel.WriteTransaction(Handle)));
     }
-
-    /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
-    ///     the <see cref="Branch" />.
-    /// </summary>
-    /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
-    /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
-    public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
-    {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
-    }
 }
