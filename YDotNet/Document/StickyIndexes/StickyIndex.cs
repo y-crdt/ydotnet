@@ -43,6 +43,16 @@ public class StickyIndex : IDisposable
     }
 
     /// <summary>
+    ///     Creates a <see cref="StickyIndex" /> from the result of <see cref="Encode" />.
+    /// </summary>
+    /// <param name="encoded">The <see cref="byte" /> array received from <see cref="Encode" />.</param>
+    /// <returns>The <see cref="StickyIndex" /> represented by the provided <see cref="byte" /> array.</returns>
+    public static StickyIndex? Decode(byte[] encoded)
+    {
+        return ReferenceAccessor.Access(new StickyIndex(StickyIndexChannel.Decode(encoded, (uint) encoded.Length)));
+    }
+
+    /// <summary>
     ///     Returns the numeric index in the context of the related <see cref="Branch" /> that created this
     ///     <see cref="StickyIndex" />.
     /// </summary>

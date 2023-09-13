@@ -25,4 +25,8 @@ internal static class StickyIndexChannel
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ysticky_index_encode")]
     public static extern nint Encode(nint stickyIndex, out uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ysticky_index_decode")]
+    public static extern nint Decode(byte[] encoded, uint length);
 }
