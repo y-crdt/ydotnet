@@ -11,10 +11,11 @@ public class EncodeTests
     public void EncodesOnEmptyValue()
     {
         // Arrange
-        var doc = new Doc(new DocOptions
-        {
-            Id = 91
-        });
+        var doc = new Doc(
+            new DocOptions
+            {
+                Id = 91
+            });
         var text = doc.Text("text");
 
         var transaction = doc.WriteTransaction();
