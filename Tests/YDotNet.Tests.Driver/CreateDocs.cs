@@ -8,7 +8,8 @@ public class CreateDocs
     {
         var count = 0;
 
-        while (true)
+        // Create 1 million documents
+        while (count < 1_000_000)
         {
             // After 1s, stop and show the user the amount of documents
             if (count > 0)
@@ -21,7 +22,7 @@ public class CreateDocs
             // Create many documents
             for (var i = 0; i < 100; i++)
             {
-                new Doc();
+                new Doc().Dispose();
                 count++;
             }
         }
