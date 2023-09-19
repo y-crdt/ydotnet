@@ -2,6 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Docs;
 
-var task = new Create();
-
-task.Run();
+new CreateWithOptions().Run();
