@@ -1,10 +1,11 @@
 using YDotNet.Document;
+using YDotNet.Tests.Driver.Abstractions;
 
-namespace YDotNet.Tests.Driver;
+namespace YDotNet.Tests.Driver.Tasks.Docs;
 
-public class CreateDocs
+public class Create : ITask
 {
-    public void Run()
+    public Task Run()
     {
         var count = 0;
 
@@ -26,5 +27,7 @@ public class CreateDocs
                 count++;
             }
         }
+
+        return Task.CompletedTask;
     }
 }
