@@ -50,7 +50,11 @@ public class Doc : IDisposable
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
     {
-        Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
+        var optionsNative = DocOptionsNative.From(options);
+
+        Handle = DocChannel.NewWithOptions(optionsNative);
+
+        optionsNative.Dispose();
     }
 
     /// <summary>
