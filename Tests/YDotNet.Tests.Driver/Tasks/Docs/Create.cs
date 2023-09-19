@@ -9,7 +9,7 @@ public class Create : ITask
     {
         var count = 0;
 
-        // Create 1 million documents
+        // Create many documents
         while (count < 1_000_000)
         {
             // After 1s, stop and show the user the amount of documents
@@ -18,6 +18,11 @@ public class Create : ITask
                 Console.WriteLine("Status Report");
                 Console.WriteLine($"\tDocuments:\t{count}");
                 Console.WriteLine();
+            }
+
+            if (count % 1_000 == 0)
+            {
+                Thread.Sleep(millisecondsTimeout: 15);
             }
 
             // Create many documents
