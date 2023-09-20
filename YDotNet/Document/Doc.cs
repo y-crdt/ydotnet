@@ -119,6 +119,7 @@ public class Doc : IDisposable
     public void Dispose()
     {
         DocChannel.Destroy(Handle);
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
