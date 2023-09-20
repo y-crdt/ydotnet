@@ -122,6 +122,14 @@ public class Doc : IDisposable
     }
 
     /// <summary>
+    ///     Finalizes an instance of the <see cref="Doc" /> class.
+    /// </summary>
+    ~Doc()
+    {
+        Dispose();
+    }
+
+    /// <summary>
     ///     Creates a copy of the current <see cref="Doc" /> instance.
     /// </summary>
     /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
