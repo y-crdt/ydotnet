@@ -9,6 +9,7 @@ using YDotNet.Document.UndoManagers;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document;
@@ -74,7 +75,18 @@ public class Doc : IDisposable
     /// <summary>
     ///     Gets the unique document identifier of this <see cref="Doc" /> instance.
     /// </summary>
-    public string Guid => MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
+    public string Guid
+    {
+        get
+        {
+            var handle = DocChannel.Guid(Handle);
+            var result = MemoryReader.ReadUtf8String(handle);
+
+            StringChannel.Destroy(handle);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
