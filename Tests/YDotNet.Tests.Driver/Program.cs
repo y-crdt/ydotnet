@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Docs;
 
-new ReadId().Run();
+new ReadGuid().Run();
