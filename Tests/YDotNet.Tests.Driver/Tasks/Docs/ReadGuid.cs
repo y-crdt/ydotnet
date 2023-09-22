@@ -1,4 +1,5 @@
 using YDotNet.Document;
+using YDotNet.Document.Options;
 using YDotNet.Tests.Driver.Abstractions;
 
 namespace YDotNet.Tests.Driver.Tasks.Docs;
@@ -8,7 +9,11 @@ public class ReadGuid : ITask
     public Task Run()
     {
         var count = 0;
-        var doc = new Doc();
+        var doc = new Doc(
+            new DocOptions
+            {
+                Guid = Guid.NewGuid().ToString()
+            });
 
         // Read many times
         while (count < 1_000_000)
