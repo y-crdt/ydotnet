@@ -1,14 +1,19 @@
 using YDotNet.Document;
+using YDotNet.Document.Options;
 using YDotNet.Tests.Driver.Abstractions;
 
 namespace YDotNet.Tests.Driver.Tasks.Docs;
 
-public class ReadGuid : ITask
+public class ReadCollectionId : ITask
 {
     public Task Run()
     {
         var count = 0;
-        var doc = new Doc();
+        var doc = new Doc(
+            new DocOptions
+            {
+                CollectionId = "sample-collection"
+            });
 
         // Read many times
         while (count < 1_000_000)
@@ -29,7 +34,7 @@ public class ReadGuid : ITask
             // Create many documents
             for (var i = 0; i < 100; i++)
             {
-                var _ = doc.Guid;
+                var _ = doc.CollectionId;
                 count++;
             }
         }
