@@ -98,7 +98,10 @@ public class Doc : IDisposable
     {
         get
         {
-            MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
+            var handle = DocChannel.CollectionId(Handle);
+            MemoryReader.TryReadUtf8String(handle, out var result);
+
+            StringChannel.Destroy(handle);
 
             return result;
         }
