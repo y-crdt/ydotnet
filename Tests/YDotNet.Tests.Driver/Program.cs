@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Texts;
 
-new Create().Run();
+new InsertText().Run();
