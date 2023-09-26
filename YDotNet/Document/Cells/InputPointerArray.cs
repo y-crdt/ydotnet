@@ -22,9 +22,18 @@ internal class InputPointerArray : Input
         InputNative = inputNative;
     }
 
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="InputPointerArray" /> class.
+    /// </summary>
+    ~InputPointerArray()
+    {
+        Dispose();
+    }
+
     /// <inheritdoc />
     public override void Dispose()
     {
         MemoryWriter.ReleaseArray(pointers);
+        GC.SuppressFinalize(this);
     }
 }
