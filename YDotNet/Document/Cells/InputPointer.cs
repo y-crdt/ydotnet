@@ -22,9 +22,18 @@ internal class InputPointer : Input
         InputNative = inputNative;
     }
 
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="InputPointer" /> class.
+    /// </summary>
+    ~InputPointer()
+    {
+        Dispose();
+    }
+
     /// <inheritdoc />
     public override void Dispose()
     {
         MemoryWriter.Release(pointer);
+        GC.SuppressFinalize(this);
     }
 }
