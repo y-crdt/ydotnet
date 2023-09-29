@@ -40,6 +40,7 @@ public class TextChunks : IEnumerable<TextChunk>, IDisposable
     public void Dispose()
     {
         ChunksChannel.Destroy(Handle, Length);
+        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc />
@@ -52,5 +53,13 @@ public class TextChunks : IEnumerable<TextChunk>, IDisposable
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="TextChunks" /> class.
+    /// </summary>
+    ~TextChunks()
+    {
+        Dispose();
     }
 }
