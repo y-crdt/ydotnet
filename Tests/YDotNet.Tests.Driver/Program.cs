@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using YDotNet.Tests.Driver.Tasks.Texts;
+using String = YDotNet.Tests.Driver.Tasks.Texts.String;
 
-new Chunks().Run();
+new String().Run();
