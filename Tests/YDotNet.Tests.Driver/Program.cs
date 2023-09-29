@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Texts;
 
-new RemoveText().Run();
+new FormatText().Run();
