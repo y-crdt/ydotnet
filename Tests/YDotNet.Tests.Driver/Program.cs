@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Texts;
 
-new InsertEmbed().Run();
+new RemoveText().Run();
