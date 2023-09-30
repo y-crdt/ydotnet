@@ -40,6 +40,15 @@ public class StickyIndex : IDisposable
     public void Dispose()
     {
         StickyIndexChannel.Destroy(Handle);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="StickyIndex" /> class.
+    /// </summary>
+    ~StickyIndex()
+    {
+        Dispose();
     }
 
     /// <summary>
