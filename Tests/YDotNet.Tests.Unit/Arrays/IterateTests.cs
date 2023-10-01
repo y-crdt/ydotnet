@@ -74,10 +74,7 @@ public class IterateTests
         // Assert
         Assert.That(values.Length, Is.EqualTo(expected: 3));
         Assert.That(values[0].Long, Is.EqualTo(expected: 2469L));
-        Assert.That(values[0].Double, Is.Null);
         Assert.That(values[1].Boolean, Is.False);
-        Assert.That(values[1].Double, Is.Null);
         Assert.That(values[2].Undefined, Is.True);
-        Assert.That(values[2].Double, Is.Null);
     }
 }

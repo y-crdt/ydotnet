@@ -317,15 +317,14 @@ public class InsertTests
         map.Insert(transaction, "value", Input.Long(value: 2469L));
         map.Insert(transaction, "value", Input.String("Lucas"));
 
-        var longValue = map.Get(transaction, "value").Long;
-        var stringValue = map.Get(transaction, "value").String;
+        var value = map.Get(transaction, "value");
         var length = map.Length(transaction);
 
         transaction.Commit();
 
         // Assert
-        Assert.That(longValue, Is.EqualTo(expected: null));
-        Assert.That(stringValue, Is.EqualTo("Lucas"));
+        Assert.That(value.Type, Is.EqualTo(OutputInputType.String));
+        Assert.That(value.String, Is.EqualTo("Lucas"));
         Assert.That(length, Is.EqualTo(expected: 1));
     }
 

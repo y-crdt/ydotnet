@@ -36,8 +36,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Boolean, Is.True);
-        Assert.That(output.Long, Is.Null);
+        Assert.That(output.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -54,7 +53,6 @@ public class GetTests
         // Assert
         Assert.That(output, Is.Not.Null);
         Assert.That(output.Undefined, Is.True);
-        Assert.That(output.Long, Is.Null);
     }
 
     [Test]
@@ -71,7 +69,6 @@ public class GetTests
         // Assert
         Assert.That(output, Is.Not.Null);
         Assert.That(output.String, Is.EqualTo("Lucas"));
-        Assert.That(output.Long, Is.Null);
     }
 
     [Test]
@@ -89,11 +86,9 @@ public class GetTests
         // Assert
         Assert.That(output1, Is.Not.Null);
         Assert.That(output1.Boolean, Is.True);
-        Assert.That(output1.Long, Is.Null);
 
         Assert.That(output2, Is.Not.Null);
         Assert.That(output2.Boolean, Is.True);
-        Assert.That(output2.Long, Is.Null);
     }
 
     [Test]

@@ -8,7 +8,7 @@ internal static class MapChannel
     public delegate void ObserveCallback(nint state, nint eventHandle);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_insert")]
-    public static extern void Insert(nint map, nint transaction, nint key, InputNative inputNative);
+    public static extern void Insert(nint map, nint transaction, nint key, nint value);
 
     [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ymap_get")]
     public static extern nint Get(nint map, nint transaction, nint key);

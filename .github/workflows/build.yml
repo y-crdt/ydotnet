@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - '*'
+  
+jobs:
+  test:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          # Windows
+          - build: win-x64
+            os: windows-latest
+             
+            # Linux
+          - build: linux-x64
+            os: ubuntu-latest
+
+          - build: linux-x64-musl
+            os: ubuntu-latest
+
+          # macOS
+          - build: macos
+            os: macos-latest
+           
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+     
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+
+      - name: Build Test
+        run: |
+          cd T
+          dotnet build
+
+      - name: Copy to Test Folder
+        run: |
+          cp output/${{matrix.build}}/*.* T/bin/Debug/net7.0
+          ls output/${{matrix.build}}
+          ls T/bin/Debug/net7.0
+
+      - name: Test
+        run: |
+          cd T && dotnet run
+        env:
+          RUST_BACKTRACE: 1
+
+  pack-nuget:
+    runs-on: ubuntu-latest
+    needs: test
+           
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+     
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+
+      - name: Nuget pack
+        run: |
+          dotnet pack -c Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            **/*.nupkg

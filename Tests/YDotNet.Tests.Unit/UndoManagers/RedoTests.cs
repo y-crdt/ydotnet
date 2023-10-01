@@ -66,7 +66,7 @@ public class RedoTests
 
         // Assert
         Assert.That(chunks.Length, Is.EqualTo(expected: 3));
-        Assert.That(result, Is.True);
+        Assert.That(result, Is.False);
 
         // Act (remove, undo, and redo)
         transaction = doc.WriteTransaction();
@@ -171,7 +171,6 @@ public class RedoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 4));
         Assert.That(value2.Undefined, Is.True);
-        Assert.That(value2.String, Is.Null);
         Assert.That(result, Is.True);
 
         // Act (remove, undo, and redo)

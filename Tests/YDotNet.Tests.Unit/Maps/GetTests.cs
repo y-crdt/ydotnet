@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
@@ -91,11 +92,11 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Bytes;
-        var value2 = map.Get(transaction, "value2").Bytes;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -114,14 +115,14 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Collection;
-        var value2 = map.Get(transaction, "value2").Collection;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
         Assert.That(value1.Length, Is.EqualTo(expected: 2));
         Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -140,13 +141,13 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Object;
-        var value2 = map.Get(transaction, "value2").Object;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
         Assert.That(value1["star-⭐"].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1["moon-🌕"].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -202,12 +203,12 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Text;
-        var value2 = map.Get(transaction, "value2").Text;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.String(transaction), Is.EqualTo("Lucas"));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -226,12 +227,12 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Array;
-        var value2 = map.Get(transaction, "value2").Array;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Length, Is.EqualTo(expected: 2));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
     }
 
     [Test]
@@ -250,14 +251,14 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Map;
-        var value2 = map.Get(transaction, "value2").Map;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Length(transaction), Is.EqualTo(expected: 2));
         Assert.That(value1.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
         Assert.That(value1.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
     }
 
     [Test]
@@ -271,12 +272,12 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").XmlElement;
-        var value2 = map.Get(transaction, "value2").XmlElement;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Tag, Is.EqualTo("person"));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
     }
 
     [Test]
@@ -290,12 +291,12 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").XmlText;
-        var value2 = map.Get(transaction, "value2").XmlText;
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Length(transaction), Is.EqualTo(expected: 5));
-        Assert.That(value2, Is.Null);
+        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
     }
 
     [Test]
@@ -310,24 +311,6 @@ public class GetTests
 
         // Assert
         Assert.That(subDoc.Id, Is.EqualTo(subDocFromMap.Id));
-    }
-
-    [Test]
-    public void GetWrongTypeOnExistingKeyReturnsNull()
-    {
-        // Arrange
-        var (map, transaction) = ArrangeDoc(
-            ("value1", Input.Long(value: 2469L)),
-            ("value2", Input.Double(value: 4.20))
-        );
-
-        // Act
-        var value1 = map.Get(transaction, "value1").Double;
-        var value2 = map.Get(transaction, "value2").Long;
-
-        // Assert
-        Assert.That(value1, Is.Null);
-        Assert.That(value2, Is.Null);
     }
 
     [Test]
