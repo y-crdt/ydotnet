@@ -1,6 +1,6 @@
-﻿namespace YDotNet.Server
+namespace YDotNet.Server
 {
-    public class Class1
+    public class ServiceExtensions
     {
 
     }

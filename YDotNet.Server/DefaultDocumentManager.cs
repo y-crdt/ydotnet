@@ -1,62 +1,80 @@
 using Microsoft.Extensions.Options;
 using YDotNet.Document;
+using YDotNet.Document.Transactions;
 using YDotNet.Server.Storage;
 
 namespace YDotNet.Server;
 
 public sealed class DefaultDocumentManager : IDocumentManager
 {
-    private readonly IDocumentStorage documentStorage;
-    private readonly DocumentManagerOptions options;
+    private DocumentContextCache contexts;
 
     public DefaultDocumentManager(IDocumentStorage documentStorage,
         IOptions<DocumentManagerOptions> options)
     {
-        this.documentStorage = documentStorage;
-        this.options = options.Value;
+        contexts = new DocumentContextCache(documentStorage, options.Value);
     }
 
-    public ValueTask<Doc?> GetDocAsync(string name,
-        CancellationToken ct = default)
+    public async ValueTask<byte[]> GetMissingChanges(string name, byte[] stateVector)
     {
-        throw new NotImplementedException();
-    }
+        var context = contexts.GetContext(name);
 
-    public async ValueTask<UpdateResult> ApplyUpdateAsync(string name, byte[] stateDiff, object metadata,
-        CancellationToken ct)
-    {
-        var doc = await documentStorage.GetDocAsync(name, ct);
-
-        if (doc == null)
+        return await context.ApplyUpdateReturnAsync(doc =>
         {
-            if (options.AutoCreateDocument)
+            using (var transaction = doc.ReadTransaction())
             {
-                doc = new Doc();
-            }
-            else
-            {
-                return new UpdateResult
+                if (transaction == null)
                 {
-                    IsSkipped = true
-                };
+                    throw new InvalidOperationException("Transaction cannot be created.");
+                }
+
+                return transaction.StateDiffV2(stateVector);
             }
-        }
+        });
+    }
 
-        var result = new UpdateResult();
+    public async ValueTask<UpdateResult> ApplyUpdateAsync(string name, byte[] stateDiff, object metadata)
+    {
+        var context = contexts.GetContext(name);
 
-        using (var transaction = doc.WriteTransaction())
+        return await context.ApplyUpdateReturnAsync(doc =>
         {
-            if (transaction == null)
+            var result = new UpdateResult
             {
-                throw new InvalidOperationException("Transaction cannot be created.");
+                Update = stateDiff
+            };
+
+            using (var transaction = doc.WriteTransaction())
+            {
+                if (transaction == null)
+                {
+                    throw new InvalidOperationException("Transaction cannot be created.");
+                }
+
+                result.TransactionUpdateResult = transaction.ApplyV2(stateDiff);
             }
 
-            result.TransactionUpdateResult = transaction.ApplyV2(stateDiff);
-            transaction.Commit();
+            return result;
+        });
+    }
 
-            result.Update = stateDiff;
-        }
+    public async ValueTask UpdateDocAsync(string name, Action<Doc, Transaction> action)
+    {
+        var context = contexts.GetContext(name);
 
-        return result;
+        await context.ApplyUpdateReturnAsync(doc =>
+        {
+            using (var transaction = doc.WriteTransaction())
+            {
+                if (transaction == null)
+                {
+                    throw new InvalidOperationException("Transaction cannot be created.");
+                }
+
+                action(doc, transaction);
+            }
+
+            return true;
+        });
     }
 }

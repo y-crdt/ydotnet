@@ -1,9 +1,15 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet", "YDotNet\YDotNet.csproj", "{52763429-AB26-4415-9C7B-F17012FE3FDA}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet", "YDotNet\YDotNet.csproj", "{52763429-AB26-4415-9C7B-F17012FE3FDA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{03858045-3849-41E2-ACE9-F10AAA4CCBCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Tests.Unit", "Tests\YDotNet.Tests.Unit\YDotNet.Tests.Unit.csproj", "{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Tests.Unit", "Tests\YDotNet.Tests.Unit\YDotNet.Tests.Unit.csproj", "{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server", "YDotNet.Server\YDotNet.Server.csproj", "{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,8 +25,18 @@ Global
 		{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB} = {03858045-3849-41E2-ACE9-F10AAA4CCBCA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F7865083-8AF3-4562-88F2-95FD43368B57}
 	EndGlobalSection
 EndGlobal

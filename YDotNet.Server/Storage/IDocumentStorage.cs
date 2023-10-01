@@ -4,9 +4,9 @@ namespace YDotNet.Server.Storage;
 
 public interface IDocumentStorage
 {
-    ValueTask<Doc?> GetDocAsync(string name,
+    ValueTask<byte[]?> GetDocAsync(string name,
         CancellationToken ct = default);
 
-    ValueTask StoreDocAsync(string name, Doc doc,
+    ValueTask StoreDocAsync(string name, byte[] doc,
         CancellationToken ct = default);
 }
