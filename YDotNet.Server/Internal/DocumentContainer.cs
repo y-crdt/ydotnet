@@ -1,20 +1,20 @@
 using YDotNet.Document;
 using YDotNet.Server.Storage;
-using YDotNet.Server.Utils;
+using YDotNet.Server.Internal;
 
-namespace YDotNet.Server;
+namespace YDotNet.Server.Internal;
 
-internal sealed class DocumentContext
+internal sealed class DocumentContainer
 {
     private readonly IDocumentStorage documentStorage;
     private readonly DocumentManagerOptions options;
     private readonly string documentName;
     private readonly Task<Doc> loadingTask;
-    private readonly SemaphoreSlim slimLock = new SemaphoreSlim(1);
+    private readonly SemaphoreSlim slimLock = new(1);
     private readonly DelayedWriter writer;
     private Doc? doc;
 
-    public DocumentContext(string documentName, IDocumentStorage documentStorage, DocumentManagerOptions options)
+    public DocumentContainer(string documentName, IDocumentStorage documentStorage, DocumentManagerOptions options)
     {
         this.documentName = documentName;
         this.documentStorage = documentStorage;
@@ -73,9 +73,14 @@ internal sealed class DocumentContext
         }
     }
 
-    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action)
+    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action, Func<Doc, Task>? beforeAction)
     {
         var document = await loadingTask;
+
+        if (beforeAction != null)
+        {
+            await beforeAction(document);
+        }
 
         slimLock.Wait();
         try

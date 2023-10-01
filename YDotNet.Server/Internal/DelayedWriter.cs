@@ -1,4 +1,4 @@
-namespace YDotNet.Server.Utils;
+namespace YDotNet.Server.Internal;
 
 internal sealed class DelayedWriter
 {

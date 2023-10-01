@@ -8,5 +8,5 @@ public sealed class UpdateResult
 
     public bool IsSkipped { get; set; }
 
-    public byte[]? Update { get; set; }
+    public byte[]? Diff { get; set; }
 }

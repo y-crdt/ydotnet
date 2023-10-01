@@ -2,17 +2,17 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using YDotNet.Server.Storage;
 
-namespace YDotNet.Server;
+namespace YDotNet.Server.Internal;
 
-internal sealed class DocumentContextCache : IAsyncDisposable
+internal sealed class DocumentContainerCache : IAsyncDisposable
 {
     private readonly IDocumentStorage documentStorage;
     private readonly DocumentManagerOptions options;
-    private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-    private readonly Dictionary<string, DocumentContext> livingContexts = new Dictionary<string, DocumentContext>();
-    private readonly SemaphoreSlim slimLock = new SemaphoreSlim(1);
+    private readonly MemoryCache memoryCache = new(Options.Create(new MemoryCacheOptions()));
+    private readonly Dictionary<string, DocumentContainer> livingContainers = new();
+    private readonly SemaphoreSlim slimLock = new(1);
 
-    public DocumentContextCache(IDocumentStorage documentStorage, DocumentManagerOptions options)
+    public DocumentContainerCache(IDocumentStorage documentStorage, DocumentManagerOptions options)
     {
         this.documentStorage = documentStorage;
         this.options = options;
@@ -23,9 +23,9 @@ internal sealed class DocumentContextCache : IAsyncDisposable
         await slimLock.WaitAsync();
         try
         {
-            foreach (var (_, context) in livingContexts)
+            foreach (var (_, container) in livingContainers)
             {
-                await context.FlushAsync();
+                await container.FlushAsync();
             }
         }
         finally
@@ -39,7 +39,7 @@ internal sealed class DocumentContextCache : IAsyncDisposable
         memoryCache.Remove(true);
     }
 
-    public DocumentContext GetContext(string name)
+    public DocumentContainer GetContext(string name)
     {
         // The memory cache does nto guarantees that the callback is called in parallel. Therefore we need the lock here.
         slimLock.Wait();
@@ -48,13 +48,13 @@ internal sealed class DocumentContextCache : IAsyncDisposable
             return memoryCache.GetOrCreate(name, entry =>
             {
                 // Check if there are any pending flushes. If the flush is still running we reuse the context.
-                if (livingContexts.TryGetValue(name, out var context))
+                if (livingContainers.TryGetValue(name, out var container))
                 {
-                    livingContexts.Remove(name);
+                    livingContainers.Remove(name);
                 }
                 else
                 {
-                    context = new DocumentContext(name, documentStorage, options);
+                    container = new DocumentContainer(name, documentStorage, options);
                 }
 
                 // For each access we extend the lifetime of the cache entry.
@@ -62,11 +62,11 @@ internal sealed class DocumentContextCache : IAsyncDisposable
                 entry.RegisterPostEvictionCallback((_, _, _, _) =>
                 {
                     // There is no background thread for eviction. It is just done from 
-                    _ = CleanupAsync(name, context);
+                    _ = CleanupAsync(name, container);
                 });
 
-                livingContexts.Add(name, context);
-                return context;
+                livingContainers.Add(name, container);
+                return container;
             })!;
         }
         finally
@@ -75,7 +75,7 @@ internal sealed class DocumentContextCache : IAsyncDisposable
         }
     }
 
-    private async Task CleanupAsync(string name, DocumentContext context)
+    private async Task CleanupAsync(string name, DocumentContainer context)
     {
         // Flush all pending changes to the storage and then remove the context from the list of living entries.
         await context.FlushAsync();
@@ -83,7 +83,7 @@ internal sealed class DocumentContextCache : IAsyncDisposable
         slimLock.Wait();
         try
         {
-            livingContexts.Remove(name);
+            livingContainers.Remove(name);
         }
         finally
         {
