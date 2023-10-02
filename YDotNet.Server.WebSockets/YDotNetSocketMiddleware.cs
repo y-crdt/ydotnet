@@ -14,9 +14,9 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         return default;
     }
 
-    public async ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
+    public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
     {
-        await Task.Run(async () =>
+        Task.Run(async () =>
         {
             var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
 
@@ -30,11 +30,13 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 }, default);
             }
         });
+
+        return default;
     }
 
-    public async ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
+    public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
-        await Task.Run(async () =>
+        Task.Run(async () =>
         {
             var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
 
@@ -53,6 +55,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 }, default);
             }
         });
+
+        return default;
     }
 
     public async Task InvokeAsync(HttpContext httpContext)

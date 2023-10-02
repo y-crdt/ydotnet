@@ -13,6 +13,7 @@
     "bootstrap": "^4.6.0",
     "lib0": "0.2.35",
     "monaco-editor": "0.22.3",
+    "prosemirror-example-setup": "^1.2.2",
     "prosemirror-keymap": "^1.1.4",
     "prosemirror-schema-basic": "^1.1.2",
     "prosemirror-view": "^1.17.5",

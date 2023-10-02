@@ -3,6 +3,7 @@ import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { keymap } from 'prosemirror-keymap';
+import { exampleSetup } from 'prosemirror-example-setup';
 import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
 import { useYjs } from '../hooks/useYjs';
 
@@ -24,7 +25,7 @@ export const YjsProseMirror = () => {
           'Mod-y': redo,
           'Mod-Shift-z': redo
         })
-      ]
+      ].concat(exampleSetup({ schema }))
     });
 
     const editor = new EditorView(viewHost.current, { state });

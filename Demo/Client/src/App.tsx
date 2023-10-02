@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import { YjsMonacoEditor } from './components/YjsMonacoEditor'
 import { YjsProseMirror } from './components/YjsProseMirror';
+import './App.css';
 
 function App() {
   return (

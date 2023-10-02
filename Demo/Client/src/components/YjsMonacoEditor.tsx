@@ -21,10 +21,7 @@ export const YjsMonacoEditor = () => {
 
   return (
     <div>
-      <MonacoEditor width='100%' height='600px' theme='vs'
-        options={{
-          automaticLayout: true
-        }}
+      <MonacoEditor
         editorDidMount={(e) => _onEditorDidMount(e)}
       />
     </div>
