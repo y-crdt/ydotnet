@@ -5,9 +5,9 @@ internal sealed class DelayedWriter
     private readonly TimeSpan delay;
     private readonly TimeSpan delayMax;
     private readonly Func<Task> action;
+    private readonly Timer writeTimer;
     private int pendingWrites = 0;
     private DateTime lastWrite;
-    private Timer? writeTimer;
     private Task? writeTask;
 
     public Func<DateTime> Clock = () => DateTime.UtcNow;
@@ -17,11 +17,13 @@ internal sealed class DelayedWriter
         this.delay = delay;
         this.delayMax = delayMax;
         this.action = action;
+
+        writeTimer = new Timer(_ => Write(), null, Timeout.Infinite, Timeout.Infinite);
     }
 
     public async Task FlushAsync()
     {
-        writeTimer?.Dispose();
+        writeTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
         if (writeTask != null)
         {
@@ -53,12 +55,13 @@ internal sealed class DelayedWriter
         var timeSinceLastPing = now - lastWrite;
         if (timeSinceLastPing > delayMax)
         {
-            Write();
+            // Trigger the write operation immediately, but use no in the current thread to avoid blocking.
+            writeTimer.Change(0, Timeout.Infinite);
         }
         else
         {
-            writeTimer?.Dispose();
-            writeTimer = new Timer(_ => Write(), null, (int)delay.TotalMilliseconds, 0);
+            // Reset the timer with every change.
+            writeTimer.Change((int)delay.TotalMilliseconds, Timeout.Infinite);
         }
     }
 
@@ -90,8 +93,9 @@ internal sealed class DelayedWriter
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Interlocked.CompareExchange(ref writeTask, null, task);
-            Interlocked.Add(ref pendingWrites, -localPendingWrites);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+            Interlocked.Add(ref pendingWrites, -localPendingWrites);
         }
     }
 }

@@ -1,6 +1,7 @@
 using YDotNet.Document;
 using YDotNet.Server.Storage;
 using YDotNet.Server.Internal;
+using System.Reflection.Metadata;
 
 namespace YDotNet.Server.Internal;
 
@@ -14,7 +15,11 @@ internal sealed class DocumentContainer
     private readonly DelayedWriter writer;
     private Doc? doc;
 
-    public DocumentContainer(string documentName, IDocumentStorage documentStorage, DocumentManagerOptions options)
+    public DocumentContainer(string documentName, 
+        IDocumentStorage documentStorage,
+        IDocumentCallback documentCallback,
+        IDocumentManager documentManager,
+        DocumentManagerOptions options)
     {
         this.documentName = documentName;
         this.documentStorage = documentStorage;
@@ -22,7 +27,7 @@ internal sealed class DocumentContainer
 
         writer = new DelayedWriter(options.DelayWriting, options.MaxWriteTimeInterval, WriteAsync);
 
-        loadingTask = LoadInternalAsync();
+        loadingTask = LoadInternalAsync(documentCallback, documentManager);
     }
 
     public Task FlushAsync()
@@ -30,11 +35,18 @@ internal sealed class DocumentContainer
         return writer.FlushAsync();
     }
 
-    private async Task<Doc> LoadInternalAsync()
+    private async Task<Doc> LoadInternalAsync(IDocumentCallback documentCallback, IDocumentManager documentManager)
     {
         doc = await LoadCoreAsync();
 
-        doc.ObserveUpdatesV2(e =>
+        await documentCallback.OnDocumentLoadedAsync(new DocumentLoadEvent
+        {
+            Document = doc,
+            Context = new DocumentContext { ClientId = 0, DocumentName = documentName },
+            Source = documentManager,
+        });
+
+        doc.ObserveUpdatesV1(e =>
         {
             writer.Ping();
         });
@@ -48,9 +60,9 @@ internal sealed class DocumentContainer
 
         if (documentData != null)
         {
-            var doc = new Doc();
+            var document = new Doc();
 
-            using (var transaction = doc.WriteTransaction())
+            using (var transaction = document.WriteTransaction())
             {
                 if (transaction == null)
                 {
@@ -60,7 +72,7 @@ internal sealed class DocumentContainer
                 transaction.ApplyV2(documentData);
             }
 
-            return doc;
+            return document;
         }
 
         if (options.AutoCreateDocument)

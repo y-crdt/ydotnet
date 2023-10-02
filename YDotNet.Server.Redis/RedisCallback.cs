@@ -108,10 +108,10 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId,
             Pinged = new PingMessage
             {
-                ClientId = @event.DocumentContext.ClientId,
+                ClientId = @event.Context.ClientId,
                 ClientClock = @event.ClientClock,
                 ClientState = @event.ClientState,
-                DocumentName = @event.DocumentContext.DocumentName,
+                DocumentName = @event.Context.DocumentName,
             },
         };
 
@@ -132,10 +132,10 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId,
             ClientDisconnected = events.Select(x => new PingMessage
             {
-                ClientId = x.DocumentContext.ClientId,
+                ClientId = x.Context.ClientId,
                 ClientState = null,
                 ClientClock = 0,
-                DocumentName = x.DocumentContext.DocumentName,
+                DocumentName = x.Context.DocumentName,
             }).ToArray()
         };
 
@@ -156,8 +156,8 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId,
             DocumentChanged = new DocumentChangeMessage
             {
-                ClientId = @event.DocumentContext.ClientId,
-                DocumentName = @event.DocumentContext.DocumentName,
+                ClientId = @event.Context.ClientId,
+                DocumentName = @event.Context.DocumentName,
                 DocumentDiff = @event.Diff
             },
         };

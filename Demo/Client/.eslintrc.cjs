@@ -14,5 +14,10 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-  },
+    '@typescript-eslint/semi': 'error',
+    '@typescript-eslint/indent': [
+      'warn',
+      4
+    ]
+  }
 }

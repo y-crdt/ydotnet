@@ -1,10 +1,10 @@
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YDotNet.Document;
 using YDotNet.Document.Transactions;
 using YDotNet.Server.Internal;
 using YDotNet.Server.Storage;
+using IDocumentCallbacks = System.Collections.Generic.IEnumerable<YDotNet.Server.IDocumentCallback>;
 
 #pragma warning disable IDE0063 // Use simple 'using' statement
 
@@ -15,21 +15,24 @@ public sealed class DefaultDocumentManager : IDocumentManager
     private readonly ConnectedUsers users = new();
     private readonly DocumentManagerOptions options;
     private readonly DocumentContainerCache containers;
-    private readonly CallbackInvoker callbacks;
+    private readonly CallbackInvoker callback;
 
-    public DefaultDocumentManager(IDocumentStorage documentStorage, IEnumerable<IDocumentCallback> callbacks,
-        IOptions<DocumentManagerOptions> options, ILogger<DefaultDocumentManager> logger)
+    public DefaultDocumentManager(
+        IDocumentStorage documentStorage,
+        IDocumentCallbacks callbacks,
+        IOptions<DocumentManagerOptions> options,
+        ILogger<DefaultDocumentManager> logger)
     {
         this.options = options.Value;
-        this.callbacks = new CallbackInvoker(callbacks, logger);
+        this.callback = new CallbackInvoker(callbacks, logger);
 
-        containers = new DocumentContainerCache(documentStorage, options.Value);
+        containers = new DocumentContainerCache(documentStorage, this.callback, this, options.Value);
     }
 
     public async Task StartAsync(
         CancellationToken cancellationToken)
     {
-        await callbacks.OnInitializedAsync(this);
+        await callback.OnInitializedAsync(this);
     }
 
     public async Task StopAsync(
@@ -92,22 +95,22 @@ public sealed class DefaultDocumentManager : IDocumentManager
             return (result, doc);
         }, async doc =>
         {
-            await callbacks.OnDocumentChangingAsync(new DocumentChangeEvent
+            await callback.OnDocumentChangingAsync(new DocumentChangeEvent
             {
-                DocumentContext = context,
+                Context = context,
                 Document = doc,
-                DocumentManager = this,
+                Source = this,
             });
         });
 
         if (result.Diff != null)
         {
-            await callbacks.OnDocumentChangedAsync(new DocumentChangedEvent
+            await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
+                Context = context,
                 Diff = result.Diff,
                 Document = doc,
-                DocumentContext = context,
-                DocumentManager = this,
+                Source = this,
             });
         }
 
@@ -141,22 +144,22 @@ public sealed class DefaultDocumentManager : IDocumentManager
             return (diff, doc);
         }, async doc =>
         {
-            await callbacks.OnDocumentChangingAsync(new DocumentChangeEvent
+            await callback.OnDocumentChangingAsync(new DocumentChangeEvent
             {
+                Context = context,
                 Document = doc,
-                DocumentContext = context,
-                DocumentManager = this,
+                Source = this,
             });
         });
 
         if (diff != null)
         {
-            await callbacks.OnDocumentChangedAsync(new DocumentChangedEvent
+            await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
+                Context = context,
                 Diff = diff,
                 Document = doc,
-                DocumentContext = context,
-                DocumentManager = this,
+                Source = this,
             });
         }
     }
@@ -166,12 +169,12 @@ public sealed class DefaultDocumentManager : IDocumentManager
     {
         if (users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state, out var newState))
         {
-            await callbacks.OnAwarenessUpdatedAsync(new ClientAwarenessEvent
+            await callback.OnAwarenessUpdatedAsync(new ClientAwarenessEvent
             {
-                DocumentContext = context,
-                DocumentManager = this,
+                Context = context,
                 ClientClock = clock,
-                ClientState = newState
+                ClientState = newState,
+                Source = this,
             });
         }
     }
@@ -181,12 +184,12 @@ public sealed class DefaultDocumentManager : IDocumentManager
     {
         if (users.Remove(context.DocumentName, context.ClientId))
         {
-            await callbacks.OnClientDisconnectedAsync(new[] 
+            await callback.OnClientDisconnectedAsync(new[] 
             { 
                 new ClientDisconnectedEvent
                 {
-                    DocumentContext = context,
-                    DocumentManager = this,
+                    Context = context,
+                    Source = this,
                 }
             });
         }
@@ -199,12 +202,12 @@ public sealed class DefaultDocumentManager : IDocumentManager
 
         if (removedUsers.Count > 0)
         {
-            await callbacks.OnClientDisconnectedAsync(removedUsers.Select(x =>
+            await callback.OnClientDisconnectedAsync(removedUsers.Select(x =>
             {
                 return new ClientDisconnectedEvent
                 {
-                    DocumentContext = new DocumentContext { ClientId = x.ClientId, DocumentName = x.DocumentName },
-                    DocumentManager = this,
+                    Context = new DocumentContext { ClientId = x.ClientId, DocumentName = x.DocumentName },
+                    Source = this,
                 };
             }).ToArray());
         }

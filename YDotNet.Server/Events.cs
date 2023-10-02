@@ -4,12 +4,17 @@ namespace YDotNet.Server;
 
 public abstract class DocumentEvent
 {
-    required public IDocumentManager DocumentManager { get; init; }
+    required public IDocumentManager Source { get; init; }
 
-    required public DocumentContext DocumentContext { get; init; }
+    required public DocumentContext Context { get; init; }
 }
 
 public class DocumentChangeEvent : DocumentEvent
+{
+    required public Doc Document { get; init; }
+}
+
+public class DocumentLoadEvent : DocumentEvent
 {
     required public Doc Document { get; init; }
 }

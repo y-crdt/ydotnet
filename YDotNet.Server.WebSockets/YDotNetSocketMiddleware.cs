@@ -1,12 +1,19 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace YDotNet.Server.WebSockets;
 
 public sealed class YDotNetSocketMiddleware : IDocumentCallback
 {
-    private readonly ConcurrentDictionary<string, List<ClientState>> statesPerDocumentName = new ConcurrentDictionary<string, List<ClientState>>();
+    private readonly ConcurrentDictionary<string, List<ClientState>> statesPerDocumentName = new();
+    private readonly ILogger<YDotNetSocketMiddleware> logger;
     private IDocumentManager? documentManager;
+
+    public YDotNetSocketMiddleware(ILogger<YDotNetSocketMiddleware> logger)
+    {
+        this.logger = logger;
+    }
 
     public ValueTask OnInitializedAsync(IDocumentManager manager)
     {
@@ -18,7 +25,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
     {
         Task.Run(async () =>
         {
-            var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
+            var documentStates = GetOtherClients(@event.Context.DocumentName, @event.Context.ClientId);
 
             foreach (var state in documentStates)
             {
@@ -26,7 +33,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 {
                     await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
                     await encoder.WriteVarUintAsync(1, ct);
-                    await encoder.WriteAwarenessAsync(@event.DocumentContext.ClientId, @event.ClientClock, @event.ClientState, ct);
+                    await encoder.WriteAwarenessAsync(@event.Context.ClientId, @event.ClientClock, @event.ClientState, ct);
                 }, default);
             }
         });
@@ -38,7 +45,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
     {
         Task.Run(async () =>
         {
-            var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
+            var documentStates = GetOtherClients(@event.Context.DocumentName, @event.Context.ClientId);
 
             foreach (var state in documentStates)
             {
@@ -69,6 +76,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
         var documentName = httpContext.Request.Path;
         var documentStates = statesPerDocumentName.GetOrAdd(documentName, _ => new List<ClientState>());
+
+        logger.LogDebug("Websocket connection to {document} established.", documentName);
 
         var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
 
@@ -108,6 +117,9 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 }
             }
         }
+        catch (OperationCanceledException)
+        {
+        }
         finally
         {
             // Usually we should have relatively few clients per document, therefore we use a simple lock.
@@ -121,6 +133,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 await documentManager.DisconnectAsync(state.DocumentContext, default);
             }
         }
+
+        logger.LogDebug("Websocket connection to {document} closed.", documentName);
     }
 
     private async Task HandleSyncAsync(ClientState state,
@@ -148,23 +162,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                     await encoder.WriteSyncStep2Async(update, ct);
                     await encoder.WriteSyncStep1Async(serverState, ct);
 
-                    while (state.PendingUpdates.TryDequeue(out var pendingDiff))
-                    {
-                        await encoder.WriteSyncUpdateAsync(pendingDiff, ct);
-                    }
-
-                    var users = await documentManager.GetAwarenessAsync(state.DocumentName, ct);
-
-                    if (users.Count != 0)
-                    {
-                        await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
-                        await encoder.WriteVarUintAsync(users.Count, ct);
-
-                        foreach (var (clientId, user) in await documentManager.GetAwarenessAsync(state.DocumentName, ct))
-                        {
-                            await encoder.WriteAwarenessAsync(clientId, user.ClientClock, user.ClientState, ct);
-                        }
-                    }
+                    await SendPendingUpdatesAsync(encoder, state, ct);
+                    await SendAwarenessAsync(encoder, state, ct);
 
                     // Sync state has been completed, therefore the client will receive normal updates now.
                     state.IsSynced = true;
@@ -183,6 +182,32 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         }, ct);
     }
 
+    private static async Task SendPendingUpdatesAsync(WebSocketEncoder encoder, ClientState state, CancellationToken ct)
+    {
+        while (state.PendingUpdates.TryDequeue(out var pendingDiff))
+        {
+            await encoder.WriteSyncUpdateAsync(pendingDiff, ct);
+        }
+    }
+
+    private async Task SendAwarenessAsync(WebSocketEncoder encoder, ClientState state, CancellationToken ct)
+    {
+        var users = await documentManager!.GetAwarenessAsync(state.DocumentName, ct);
+
+        if (users.Count == 0)
+        {
+            return;
+        }
+
+        await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
+        await encoder.WriteVarUintAsync(users.Count, ct);
+
+        foreach (var (clientId, user) in await documentManager.GetAwarenessAsync(state.DocumentName, ct))
+        {
+            await encoder.WriteAwarenessAsync(clientId, user.ClientClock, user.ClientState, ct);
+        }
+    }
+
     private async Task HandleAwarenessAsync(ClientState state,
         CancellationToken ct)
     {
@@ -191,18 +216,25 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
         var clientCount = await state.Decoder.ReadVarUintAsync(ct);
 
-        if (clientCount != 1)
+        for (var i = 0; i < clientCount; i++)
         {
-            throw new InvalidOperationException($"Protocol error. Expected client count to be 1, got {clientCount}.");
+            var clientId = await state.Decoder.ReadVarUintAsync(ct);
+            var clientClock = await state.Decoder.ReadVarUintAsync(ct);
+            var clientState = await state.Decoder.ReadVarStringAsync(ct);
+
+            if (state.DocumentContext.ClientId == 0 && clientCount == 1)
+            {
+                state.DocumentContext.ClientId = clientId;
+
+                logger.LogDebug("Websocket connection to {document} enhanced with client Id {clientId}.",
+                    state.DocumentContext.DocumentName,
+                    state.DocumentContext.ClientId);
+            }
+
+            var context = new DocumentContext { ClientId = clientId, DocumentName = state.DocumentName };
+
+            await documentManager!.PingAsync(context, clientClock, clientState, ct);
         }
-
-        var clientId = await state.Decoder.ReadVarUintAsync(ct);
-        var clientClock = await state.Decoder.ReadVarUintAsync(ct);
-        var clientState = await state.Decoder.ReadVarStringAsync(ct);
-        
-        state.DocumentContext.ClientId = clientId;
-
-        await documentManager!.PingAsync(state.DocumentContext, clientClock, clientState, ct);
     }
 
     private List<ClientState> GetOtherClients(string documentName, long clientId)

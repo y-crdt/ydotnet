@@ -7,14 +7,22 @@ namespace YDotNet.Server.Internal;
 internal sealed class DocumentContainerCache : IAsyncDisposable
 {
     private readonly IDocumentStorage documentStorage;
+    private readonly IDocumentCallback documentCallback;
+    private readonly IDocumentManager documentManager;
     private readonly DocumentManagerOptions options;
     private readonly MemoryCache memoryCache = new(Options.Create(new MemoryCacheOptions()));
     private readonly Dictionary<string, DocumentContainer> livingContainers = new();
     private readonly SemaphoreSlim slimLock = new(1);
 
-    public DocumentContainerCache(IDocumentStorage documentStorage, DocumentManagerOptions options)
+    public DocumentContainerCache(
+        IDocumentStorage documentStorage,
+        IDocumentCallback documentCallback,
+        IDocumentManager documentManager,
+        DocumentManagerOptions options)
     {
         this.documentStorage = documentStorage;
+        this.documentCallback = documentCallback;
+        this.documentManager = documentManager;
         this.options = options;
     }
 
@@ -54,7 +62,12 @@ internal sealed class DocumentContainerCache : IAsyncDisposable
                 }
                 else
                 {
-                    container = new DocumentContainer(name, documentStorage, options);
+                    container = new DocumentContainer(
+                        name, 
+                        documentStorage, 
+                        documentCallback,
+                        documentManager,
+                        options);
                 }
 
                 // For each access we extend the lifetime of the cache entry.

@@ -4,7 +4,7 @@ namespace YDotNet.Server.WebSockets;
 
 public sealed class ClientState : IDisposable
 {
-    private readonly SemaphoreSlim slimLock = new SemaphoreSlim(1);
+    private readonly SemaphoreSlim slimLock = new(1);
 
     required public WebSocket WebSocket { get; set; }
 
