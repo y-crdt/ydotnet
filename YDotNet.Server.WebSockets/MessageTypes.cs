@@ -11,7 +11,7 @@ public static class MessageTypes
     public const int TypeQueryAwareness = 3;
 
     // Read: https://github.com/yjs/y-protocols/blob/master/sync.js
-    public const int SyncStep1 = 1;
-    public const int SyncStep2 = 2;
+    public const int SyncStep1 = 0;
+    public const int SyncStep2 = 1;
     public const int SyncUpdate = 2;
 }

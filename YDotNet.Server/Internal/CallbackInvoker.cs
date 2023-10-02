@@ -2,12 +2,12 @@ using Microsoft.Extensions.Logging;
 
 namespace YDotNet.Server.Internal;
 
-public sealed class CallbackManager : IDocumentCallback
+public sealed class CallbackInvoker : IDocumentCallback
 {
     private readonly List<IDocumentCallback> callbacks;
     private readonly ILogger logger;
 
-    public CallbackManager(IEnumerable<IDocumentCallback> callbacks, ILogger logger)
+    public CallbackInvoker(IEnumerable<IDocumentCallback> callbacks, ILogger logger)
     {
         this.callbacks = callbacks.ToList();
         this.logger = logger;

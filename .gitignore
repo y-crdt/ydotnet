@@ -39,3 +39,10 @@ msbuild.wrn
 # Project-specific files
 *.dll
 *.dylib
+
+# Node
+node_modules
+
+apSettings.Development.json
+
+launchSettings.json

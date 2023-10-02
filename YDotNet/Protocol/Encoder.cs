@@ -17,13 +17,20 @@ public abstract class Encoder
     public async ValueTask WriteVarUintAsync(long value,
         CancellationToken ct = default)
     {
-        while (value > BITS7)
+        do
         {
-            await WriteByteAsync((byte)(BITS8 | (BITS7 & value)), ct);
-            value >>= 7;
-        }
+            byte lower7bits = (byte)(value & 0x7f);
 
-        await WriteByteAsync((byte)(BITS7 & value), ct);
+            value >>= 7;
+
+            if (value > 0)
+            {
+                lower7bits |= 128;
+            }
+
+            await WriteByteAsync(lower7bits, ct);
+        }
+        while (value > 0);
     }
 
     public async ValueTask WriteVarUint8Array(byte[] value,
@@ -62,12 +69,9 @@ public abstract class Encoder
         }
     }
 
-    public abstract ValueTask EndMessageAsync(
-        CancellationToken ct = default);
-
-    protected abstract ValueTask WriteByteAsync(byte value,
+    public abstract ValueTask WriteByteAsync(byte value,
         CancellationToken ct);
 
-    protected abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
+    public abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
         CancellationToken ct);
 }

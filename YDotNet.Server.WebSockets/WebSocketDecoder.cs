@@ -10,6 +10,13 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
     private readonly byte[] buffer = ArrayPool<byte>.Shared.Rent(1024 * 4);
     private int bufferLength;
     private int bufferIndex;
+    private long previousBuffers;
+
+    public override long Position => previousBuffers + bufferIndex;
+
+    public bool CanRead { get; set; } = true;
+
+    public bool HasMore => bufferIndex < bufferLength;
 
     public WebSocketDecoder(WebSocket webSocket)
     {
@@ -56,6 +63,14 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
         {
             var received = await webSocket.ReceiveAsync(buffer, ct);
 
+            if (received.CloseStatus != null)
+            {
+                CanRead = false;
+                throw new InvalidOperationException("Socket is already closed.");
+            }
+
+            previousBuffers += bufferLength;
+
             bufferLength = received.Count;
             bufferIndex = 0;
         }
@@ -63,7 +78,7 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
 
     private void EnsureSocketIsOpen()
     {
-        if (webSocket.State != WebSocketState.Open)
+        if (webSocket.State != WebSocketState.Open && CanRead)
         {
             throw new InvalidOperationException("Socket is already closed.");
         }

@@ -15,13 +15,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
     private readonly ConnectedUsers users = new();
     private readonly DocumentManagerOptions options;
     private readonly DocumentContainerCache containers;
-    private readonly CallbackManager callbacks;
+    private readonly CallbackInvoker callbacks;
 
     public DefaultDocumentManager(IDocumentStorage documentStorage, IEnumerable<IDocumentCallback> callbacks,
         IOptions<DocumentManagerOptions> options, ILogger<DefaultDocumentManager> logger)
     {
         this.options = options.Value;
-        this.callbacks = new CallbackManager(callbacks, logger);
+        this.callbacks = new CallbackInvoker(callbacks, logger);
 
         containers = new DocumentContainerCache(documentStorage, options.Value);
     }
@@ -52,7 +52,17 @@ public sealed class DefaultDocumentManager : IDocumentManager
                     throw new InvalidOperationException("Transaction cannot be created.");
                 }
 
-                return (transaction.StateDiffV2(stateVector), transaction.StateVectorV1());
+                byte[] update;
+                if (stateVector.Length == 0)
+                {
+                    update = stateVector;
+                }
+                else
+                {
+                    update = transaction.StateDiffV2(stateVector);
+                }
+
+                return (update, transaction.StateVectorV1());
             }
         }, null);
     }

@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Net.WebSockets;
 
 namespace YDotNet.Server.WebSockets;
@@ -19,7 +18,7 @@ public sealed class ClientState : IDisposable
 
     public bool IsSynced { get; set; }
 
-    public ConcurrentQueue<byte[]> PendingUpdates { get; } = new ConcurrentQueue<byte[]>();
+    public Queue<byte[]> PendingUpdates { get; } = new Queue<byte[]>();
 
     public async Task WriteLockedAsync<T>(T state, Func<WebSocketEncoder, T, ClientState, CancellationToken, Task> action, CancellationToken ct)
     {

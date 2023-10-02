@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceExtensions
 {
-    public static YDotnetRegistration AddYDotNet(IServiceCollection services)
+    public static YDotnetRegistration AddYDotNet(this IServiceCollection services)
     {
         services.AddOptions<DocumentManagerOptions>();
         services.TryAddSingleton<IDocumentManager, DefaultDocumentManager>();

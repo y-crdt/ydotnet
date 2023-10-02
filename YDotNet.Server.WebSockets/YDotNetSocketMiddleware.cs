@@ -79,20 +79,23 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
         try
         {
-            var messageType = await state.Decoder.ReadVarUintAsync(httpContext.RequestAborted);
-
-            switch (messageType)
+            while (state.Decoder.CanRead)
             {
-                case MessageTypes.TypeSync:
-                    await HandleSyncAsync(state, httpContext.RequestAborted);
-                    break;
+                var messageType = await state.Decoder.ReadVarUintAsync(httpContext.RequestAborted);
 
-                case MessageTypes.TypeAwareness:
-                    await HandleAwarenessAsync(state, httpContext.RequestAborted);
-                    break;
+                switch (messageType)
+                {
+                    case MessageTypes.TypeSync:
+                        await HandleSyncAsync(state, httpContext.RequestAborted);
+                        break;
 
-                default:
-                    throw new InvalidOperationException("Protocol error.");
+                    case MessageTypes.TypeAwareness:
+                        await HandleAwarenessAsync(state, httpContext.RequestAborted);
+                        break;
+
+                    default:
+                        throw new InvalidOperationException("Protocol error.");
+                }
             }
         }
         finally
@@ -113,27 +116,31 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
     private async Task HandleSyncAsync(ClientState state,
         CancellationToken ct)
     {
-        var syncType = await state.Decoder.ReadVarUintAsync(ct);
-
-        switch (syncType)
+        await state.WriteLockedAsync(true, async (encoder, context, state, ct) =>
         {
-            case MessageTypes.SyncStep1:
-                var stateVector = await state.Decoder.ReadVarUint8ArrayAsync(ct);
+            if (!state.Decoder.HasMore)
+            {
+                return;
+            }
 
-                var (update, serverState) = await documentManager!.GetMissingChangesAsync(state.DocumentContext, stateVector, ct);
+            var syncType = await state.Decoder.ReadVarUintAsync(ct);
 
-                await state.WriteLockedAsync((update, serverState), async (encoder, context, state, ct) =>
-                {
+            switch (syncType)
+            {
+                case MessageTypes.SyncStep1:
+                    var stateVector = await state.Decoder.ReadVarUint8ArrayAsync(ct);
+
+                    var (update, serverState) = await documentManager!.GetMissingChangesAsync(state.DocumentContext, stateVector, ct);
+
+                    // We mark the sync state as false again to handle multiple sync steps.
                     state.IsSynced = false;
-
-                    var (update, serverState) = context;
 
                     await encoder.WriteSyncStep2Async(update, ct);
                     await encoder.WriteSyncStep1Async(serverState, ct);
 
-                    while (state.PendingUpdates.TryDequeue(out var diff))
+                    while (state.PendingUpdates.TryDequeue(out var pendingDiff))
                     {
-                        await encoder.WriteSyncUpdateAsync(diff, ct);
+                        await encoder.WriteSyncUpdateAsync(pendingDiff, ct);
                     }
 
                     var users = await documentManager.GetAwarenessAsync(state.DocumentName, ct);
@@ -149,25 +156,36 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                         }
                     }
 
+                    // Sync state has been completed, therefore the client will receive normal updates now.
                     state.IsSynced = true;
-                }, ct);
+                    break;
 
-                break;
+                case MessageTypes.SyncStep2:
+                case MessageTypes.SyncUpdate:
+                    var diff = await state.Decoder.ReadVarUint8ArrayAsync(ct);
 
-            case MessageTypes.SyncUpdate:
-                var stateDiff = await state.Decoder.ReadVarUint8ArrayAsync(ct);
+                    try
+                    {
+                        await documentManager!.ApplyUpdateAsync(state.DocumentContext, diff, ct);
+                    }
+                    catch
+                    {
 
-                await documentManager!.ApplyUpdateAsync(state.DocumentContext, stateDiff, ct);
-                break;
+                    }
+                    break;
 
-            default:
-                throw new InvalidOperationException("Protocol error.");
-        }
+                default:
+                    throw new InvalidOperationException("Protocol error.");
+            }
+        }, ct);
     }
 
     private async Task HandleAwarenessAsync(ClientState state,
         CancellationToken ct)
     {
+        // This is the length of the awareness message (for whatever reason).
+        await state.Decoder.ReadVarUintAsync(ct);
+
         var clientCount = await state.Decoder.ReadVarUintAsync(ct);
 
         if (clientCount != 1)
