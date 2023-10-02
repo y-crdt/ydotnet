@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YDotNet.Document;
@@ -9,7 +10,7 @@ using YDotNet.Server.Storage;
 
 namespace YDotNet.Server;
 
-public sealed class DefaultDocumentManager : IDocumentManager
+public sealed class DefaultDocumentManager : IDocumentManager, IHostedService
 {
     private readonly ConnectedUsers users = new();
     private readonly DocumentManagerOptions options;
@@ -25,7 +26,19 @@ public sealed class DefaultDocumentManager : IDocumentManager
         containers = new DocumentContainerCache(documentStorage, options.Value);
     }
 
-    public async ValueTask<byte[]> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
+    public async Task StartAsync(
+        CancellationToken cancellationToken)
+    {
+        await callbacks.OnInitializedAsync(this);
+    }
+
+    public async Task StopAsync(
+        CancellationToken cancellationToken)
+    {
+        await containers.DisposeAsync();
+    }
+
+    public async ValueTask<(byte[] Update, byte[] StateVector)> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
         CancellationToken ct = default)
     {
         var container = containers.GetContext(context.DocumentName);
@@ -39,7 +52,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                     throw new InvalidOperationException("Transaction cannot be created.");
                 }
 
-                return transaction.StateDiffV2(stateVector);
+                return (transaction.StateDiffV2(stateVector), transaction.StateVectorV1());
             }
         }, null);
     }
@@ -138,31 +151,17 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }
     }
 
-    public async ValueTask PingAsync(DocumentContext context,
+    public async ValueTask PingAsync(DocumentContext context, long clock, string? state = null,
         CancellationToken ct = default)
     {
-        if (users.Add(context.DocumentName, context.ClientId))
-        {
-            await callbacks.OnClientConnectedAsync(new ClientConnectedEvent
-            {
-                DocumentContext = context,
-                DocumentManager = this,
-            });
-        }
-    }
-
-    public async ValueTask UpdateAwarenessAsync(DocumentContext context, string key, object value,
-        CancellationToken ct = default)
-    {
-        var user = users.SetAwareness(context.DocumentName, context.ClientId, key, value);
-
-        if (user != null)
+        if (users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state, out var newState))
         {
             await callbacks.OnAwarenessUpdatedAsync(new ClientAwarenessEvent
             {
                 DocumentContext = context,
                 DocumentManager = this,
-                LocalState = null!,
+                ClientClock = clock,
+                ClientState  = newState
             });
         }
     }

@@ -10,8 +10,12 @@ public sealed class CallbackManager : IDocumentCallback
     public CallbackManager(IEnumerable<IDocumentCallback> callbacks, ILogger logger)
     {
         this.callbacks = callbacks.ToList();
-
         this.logger = logger;
+    }
+
+    public ValueTask OnInitializedAsync(IDocumentManager manager)
+    {
+        return InvokeCallbackAsync(manager, (c, m) => c.OnInitializedAsync(m));
     }
 
     public ValueTask OnDocumentChangingAsync(DocumentChangeEvent @event)
@@ -22,11 +26,6 @@ public sealed class CallbackManager : IDocumentCallback
     public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
         return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentChangedAsync(e));
-    }
-
-    public ValueTask OnClientConnectedAsync(ClientConnectedEvent @event)
-    {
-        return InvokeCallbackAsync(@event, (c, e) => c.OnClientConnectedAsync(e));
     }
 
     public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent[] events)

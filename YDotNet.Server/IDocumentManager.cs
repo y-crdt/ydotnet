@@ -5,16 +5,13 @@ namespace YDotNet.Server;
 
 public interface IDocumentManager
 {
-    ValueTask PingAsync(DocumentContext context,
+    ValueTask PingAsync(DocumentContext context, long clock, string? clientState = null,
         CancellationToken ct = default);
 
     ValueTask DisconnectAsync(DocumentContext context,
         CancellationToken ct = default);
 
-    ValueTask UpdateAwarenessAsync(DocumentContext context, string key, object value,
-        CancellationToken ct = default);
-
-    ValueTask<byte[]> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
+    ValueTask<(byte[] Update, byte[] StateVector)> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
         CancellationToken ct = default);
 
     ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(string roomName,

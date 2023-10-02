@@ -14,60 +14,42 @@ public sealed class ConnectedUsers
 
         lock (documentUsers)
         {
-            return documentUsers.ToDictionary(
-                x => x.Key,
-                x => new ConnectedUser
-                {
-                    State = new Dictionary<string, object>(x.Value.State)
-                });
+            return new Dictionary<long, ConnectedUser>(documentUsers);
         }
     }
 
-    public bool Add(string documentName, long clientId)
+    public bool AddOrUpdate(string documentName, long clientId, long clock, string? state, out string? existingState)
     {
         var documentUsers = users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
 
         lock (documentUsers)
         {
-            if (documentUsers.ContainsKey(clientId))
+            if (documentUsers.TryGetValue(clientId, out var user))
             {
-                return false;
+                var isChanged = false;
+
+                if (clock > user.ClientClock)
+                {
+                    user.ClientClock = clock;
+                    user.ClientState = state;
+                }
+
+                existingState = user.ClientState;
+
+                user.LastActivity = Clock();
+                return isChanged;
             }
 
             documentUsers.Add(clientId, new ConnectedUser
             {
+                ClientClock = clock,
+                ClientState = state,
                 LastActivity = Clock(),
             });
 
+            existingState = state;
             return true;
         }
-    }
-
-    public ConnectedUser SetAwareness(string documentName, long clientId, string key, object value)
-    {
-        var documentUsers = users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
-
-        ConnectedUser user;
-
-        lock (documentUsers)
-        {
-            if (!documentUsers.TryGetValue(clientId, out user!))
-            {
-                user = new ConnectedUser
-                {
-                    LastActivity = Clock(),
-                };
-
-                documentUsers.Add(clientId, user);
-            }
-        }
-
-        lock (user)
-        {
-            user.State[key] = value;
-        }
-
-        return user;
     }
 
     public bool Remove(string documentName, long clientId)

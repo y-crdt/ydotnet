@@ -2,7 +2,9 @@ namespace YDotNet.Server;
 
 public sealed class ConnectedUser
 {
-    public Dictionary<string, object> State { get; set; } = new Dictionary<string, object>();
+    required public string? ClientState { get; set; }
+
+    required public long ClientClock { get; set; }
 
     public DateTime LastActivity { get; set; }
 }

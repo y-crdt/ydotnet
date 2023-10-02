@@ -9,7 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{03858045
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Tests.Unit", "Tests\YDotNet.Tests.Unit\YDotNet.Tests.Unit.csproj", "{F85C9334-87AF-4FFC-A301-3A9F57ECD4AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server", "YDotNet.Server\YDotNet.Server.csproj", "{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Server", "YDotNet.Server\YDotNet.Server.csproj", "{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server.Redis", "YDotNet.Server.Redis\YDotNet.Server.Redis.csproj", "{99705343-FB53-47F5-8601-FC89BA565F94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server.WebSockets", "YDotNet.Server.WebSockets\YDotNet.Server.WebSockets.csproj", "{273EF3C8-55E5-46EC-A985-ED677F41133D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,14 @@ Global
 		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99705343-FB53-47F5-8601-FC89BA565F94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99705343-FB53-47F5-8601-FC89BA565F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99705343-FB53-47F5-8601-FC89BA565F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99705343-FB53-47F5-8601-FC89BA565F94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{273EF3C8-55E5-46EC-A985-ED677F41133D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{273EF3C8-55E5-46EC-A985-ED677F41133D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{273EF3C8-55E5-46EC-A985-ED677F41133D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{273EF3C8-55E5-46EC-A985-ED677F41133D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

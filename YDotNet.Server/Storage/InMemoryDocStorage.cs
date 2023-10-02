@@ -3,7 +3,7 @@ using YDotNet.Document;
 
 namespace YDotNet.Server.Storage;
 
-public sealed class InMemoryDocStorage : IDocumentStorage
+public sealed class InMemoryDocumentStorage : IDocumentStorage
 {
     private readonly ConcurrentDictionary<string, byte[]> docs = new();
 
