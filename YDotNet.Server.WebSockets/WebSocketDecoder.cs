@@ -10,9 +10,6 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
     private readonly byte[] buffer = ArrayPool<byte>.Shared.Rent(1024 * 4);
     private int bufferLength;
     private int bufferIndex;
-    private long previousBuffers;
-
-    public override long Position => previousBuffers + bufferIndex;
 
     public bool CanRead { get; set; } = true;
 
@@ -68,8 +65,6 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
                 CanRead = false;
                 throw new InvalidOperationException("Socket is already closed.");
             }
-
-            previousBuffers += bufferLength;
 
             bufferLength = received.Count;
             bufferIndex = 0;

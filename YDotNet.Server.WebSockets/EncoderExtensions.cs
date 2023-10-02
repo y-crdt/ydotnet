@@ -9,7 +9,7 @@ public static class EncoderExtensions
     {
         await encoder.WriteVarUintAsync(MessageTypes.TypeSync, ct);
         await encoder.WriteVarUintAsync(MessageTypes.SyncStep1, ct);
-        await encoder.WriteBytesAsync(stateVector, ct);
+        await encoder.WriteVarUint8Array(stateVector, ct);
         await encoder.EndMessageAsync(ct);
     }
 
@@ -18,7 +18,7 @@ public static class EncoderExtensions
     {
         await encoder.WriteVarUintAsync(MessageTypes.TypeSync, ct);
         await encoder.WriteVarUintAsync(MessageTypes.SyncStep2, ct);
-        await encoder.WriteBytesAsync(update, ct);
+        await encoder.WriteVarUint8Array(update, ct);
         await encoder.EndMessageAsync(ct);
     }
 
@@ -27,7 +27,7 @@ public static class EncoderExtensions
     {
         await encoder.WriteVarUintAsync(MessageTypes.TypeSync, ct);
         await encoder.WriteVarUintAsync(MessageTypes.SyncUpdate, ct);
-        await encoder.WriteBytesAsync(update, ct);
+        await encoder.WriteVarUint8Array(update, ct);
         await encoder.EndMessageAsync(ct);
     }
 

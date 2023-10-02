@@ -8,8 +8,6 @@ public abstract class Decoder
 {
     private readonly byte[] stringBuffer = new byte[128];
 
-    public abstract long Position { get; }
-
     public async ValueTask<long> ReadVarUintAsync(
         CancellationToken ct = default)
     {
@@ -39,43 +37,6 @@ public abstract class Decoder
         var arrayBuffer = new byte[arrayLength];
 
         await ReadBytesAsync(arrayBuffer, ct);
-
-        return arrayBuffer;
-    }
-
-    public async ValueTask<byte[]> ReadVarUint8ArrayWithLengthAsync(
-        CancellationToken ct)
-    {
-        var positionBeforeLength = Position;
-
-        // Reserve enough place for the array that we have just read and the total array.
-        var arrayLength = await ReadVarUintAsync(ct);
-        var arrayPrefix = (int)(Position - positionBeforeLength);
-        var arrayBuffer = new byte[arrayLength + arrayPrefix];
-
-        // We cannot read backwards, therefore we have to write the number to the array again.
-        WriteWithVariableEncoding(arrayLength, arrayBuffer);
-
-        await ReadBytesAsync(arrayBuffer.AsMemory().Slice(arrayPrefix), ct);
-
-        static void WriteWithVariableEncoding(long value, byte[] target)
-        {
-            var index = 0;
-            do
-            {
-                byte lower7bits = (byte)(value & 0x7f);
-
-                value >>= 7;
-
-                if (value > 0)
-                {
-                    lower7bits |= 128;
-                }
-
-                target[index++] = lower7bits;
-            }
-            while (value > 0);
-        }
 
         return arrayBuffer;
     }

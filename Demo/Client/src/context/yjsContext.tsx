@@ -7,7 +7,7 @@ export interface IYjsContext {
   readonly yjsConnector: WebsocketProvider;
 }
 
-export interface IOptions extends React.PropsWithChildren<{}> {
+export interface IOptions extends React.PropsWithChildren<object> {
   readonly baseUrl: string;
 }
 

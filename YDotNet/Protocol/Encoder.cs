@@ -69,9 +69,9 @@ public abstract class Encoder
         }
     }
 
-    public abstract ValueTask WriteByteAsync(byte value,
+    protected abstract ValueTask WriteByteAsync(byte value,
         CancellationToken ct);
 
-    public abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
+    protected abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
         CancellationToken ct);
 }

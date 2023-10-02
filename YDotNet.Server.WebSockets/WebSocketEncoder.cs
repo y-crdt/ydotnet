@@ -17,7 +17,7 @@ public sealed class WebSocketEncoder : Encoder, IDisposable
     {
     }
 
-    public override ValueTask WriteByteAsync(byte value,
+    protected override ValueTask WriteByteAsync(byte value,
         CancellationToken ct)
     {
         buffer[0] = value;
@@ -25,7 +25,7 @@ public sealed class WebSocketEncoder : Encoder, IDisposable
         return new ValueTask(webSocket.SendAsync(buffer, WebSocketMessageType.Binary, false, ct));
     }
 
-    public override ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
+    protected override ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
         CancellationToken ct)
     {
         return new ValueTask(webSocket.SendAsync(bytes, WebSocketMessageType.Binary, false, ct));

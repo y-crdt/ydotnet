@@ -86,7 +86,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                     throw new InvalidOperationException("Transaction cannot be created.");
                 }
 
-                result.TransactionUpdateResult = transaction.ApplyV2(stateDiff);
+                result.TransactionUpdateResult = transaction.ApplyV1(stateDiff);
             }
 
             return (result, doc);

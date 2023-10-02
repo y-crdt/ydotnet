@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
@@ -8,9 +8,9 @@ import { useYjs } from '../hooks/useYjs';
 
 export const YjsProseMirror = () => {
   const { yjsDocument, yjsConnector } = useYjs();
-  const yText = yjsDocument.getText('prosemirror');
+  const yText = yjsDocument.getXmlFragment('prosemirror');
   const viewHost = React.useRef(null);
-  const viewRef = React.useRef(null);
+  const viewRef = React.useRef<EditorView | null>(null);
 
   React.useEffect(() => {
     const state = EditorState.create({
@@ -27,10 +27,12 @@ export const YjsProseMirror = () => {
       ]
     });
 
-    viewRef.current = new EditorView(viewHost.current, { state });
+    const editor = new EditorView(viewHost.current, { state });
+
+    viewRef.current = editor;
 
     return () => {
-      (viewRef.current as any)?.destroy();
+      editor.destroy();
     };
   }, [yText, yjsConnector.awareness]);
 

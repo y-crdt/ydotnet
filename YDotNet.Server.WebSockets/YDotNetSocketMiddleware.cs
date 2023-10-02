@@ -16,37 +16,43 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
     public async ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
     {
-        var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
-
-        foreach (var state in documentStates)
+        await Task.Run(async () =>
         {
-            await state.WriteLockedAsync(@event, async (encoder, @event, _, ct) =>
+            var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
+
+            foreach (var state in documentStates)
             {
-                await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
-                await encoder.WriteVarUintAsync(1, ct);
-                await encoder.WriteAwarenessAsync(@event.DocumentContext.ClientId, @event.ClientClock, @event.ClientState, ct);
-            }, default);
-        }
+                await state.WriteLockedAsync(@event, async (encoder, @event, _, ct) =>
+                {
+                    await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
+                    await encoder.WriteVarUintAsync(1, ct);
+                    await encoder.WriteAwarenessAsync(@event.DocumentContext.ClientId, @event.ClientClock, @event.ClientState, ct);
+                }, default);
+            }
+        });
     }
 
     public async ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
-        var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
-
-        foreach (var state in documentStates)
+        await Task.Run(async () =>
         {
-            await state.WriteLockedAsync(@event.Diff, async (encoder, diff, _, ct) =>
+            var documentStates = GetOtherClients(@event.DocumentContext.DocumentName, @event.DocumentContext.ClientId);
+
+            foreach (var state in documentStates)
             {
-                if (state.IsSynced)
+                await state.WriteLockedAsync(@event.Diff, async (encoder, diff, _, ct) =>
                 {
-                    await encoder.WriteSyncUpdateAsync(diff, ct);
-                }
-                else
-                {
-                    state.PendingUpdates.Enqueue(@event.Diff);
-                }
-            }, default);
-        }
+                    if (state.IsSynced)
+                    {
+                        await encoder.WriteSyncUpdateAsync(diff, ct);
+                    }
+                    else
+                    {
+                        state.PendingUpdates.Enqueue(@event.Diff);
+                    }
+                }, default);
+            }
+        });
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
@@ -163,15 +169,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 case MessageTypes.SyncStep2:
                 case MessageTypes.SyncUpdate:
                     var diff = await state.Decoder.ReadVarUint8ArrayAsync(ct);
-
-                    try
-                    {
-                        await documentManager!.ApplyUpdateAsync(state.DocumentContext, diff, ct);
-                    }
-                    catch
-                    {
-
-                    }
+                    
+                    await documentManager!.ApplyUpdateAsync(state.DocumentContext, diff, ct);
                     break;
 
                 default:
