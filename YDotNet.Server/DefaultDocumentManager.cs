@@ -10,7 +10,7 @@ using YDotNet.Server.Storage;
 
 namespace YDotNet.Server;
 
-public sealed class DefaultDocumentManager : IDocumentManager, IHostedService
+public sealed class DefaultDocumentManager : IDocumentManager
 {
     private readonly ConnectedUsers users = new();
     private readonly DocumentManagerOptions options;
@@ -161,7 +161,7 @@ public sealed class DefaultDocumentManager : IDocumentManager, IHostedService
                 DocumentContext = context,
                 DocumentManager = this,
                 ClientClock = clock,
-                ClientState  = newState
+                ClientState = newState
             });
         }
     }

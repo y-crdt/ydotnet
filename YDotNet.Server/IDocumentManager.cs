@@ -1,11 +1,12 @@
+using Microsoft.Extensions.Hosting;
 using YDotNet.Document;
 using YDotNet.Document.Transactions;
 
 namespace YDotNet.Server;
 
-public interface IDocumentManager
+public interface IDocumentManager : IHostedService
 {
-    ValueTask PingAsync(DocumentContext context, long clock, string? clientState = null,
+    ValueTask PingAsync(DocumentContext context, long clock, string? state = null,
         CancellationToken ct = default);
 
     ValueTask DisconnectAsync(DocumentContext context,

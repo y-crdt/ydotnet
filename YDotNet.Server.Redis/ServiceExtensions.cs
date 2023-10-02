@@ -1,13 +1,18 @@
-using YDotNet.Server;
+using Microsoft.Extensions.Hosting;
 using YDotNet.Server.Redis;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceExtensions
 {
-    public static void AddYDotNetRedisClustering(IServiceCollection services, Action<RedisClusteringOptions> configure)
+    public static YDotnetRegistration AddRedisClustering(this YDotnetRegistration registration, Action<RedisClusteringOptions> configure)
     {
-        services.Configure(configure);
-        services.AddSingleton<IDocumentCallback, RedisCallback>();
+        registration.Services.Configure(configure);
+        registration.Services.AddSingleton<RedisCallback>();
+
+        registration.Services.AddSingleton<IHostedService>(x =>
+            x.GetRequiredService<RedisCallback>());
+
+        return registration;
     }
 }
