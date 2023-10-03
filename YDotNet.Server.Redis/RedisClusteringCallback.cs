@@ -1,62 +1,55 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProtoBuf;
 using StackExchange.Redis;
-using System.Text.Json;
 using YDotNet.Server.Redis.Internal;
 
 namespace YDotNet.Server.Redis;
 
-public sealed class RedisCallback : IDocumentCallback, IHostedService
+public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
 {
     private readonly Guid senderId = Guid.NewGuid();
-    private readonly RedisClusteringOptions options;
-    private readonly ILogger<RedisCallback> logger;
-    private readonly PublishQueue<Message> queue;
+    private readonly RedisClusteringOptions redisOptions;
+    private readonly PublishQueue<Message> subscriberQueue;
     private ISubscriber? subscriber;
     private IDocumentManager? documentManager;
 
-    public RedisCallback(IOptions<RedisClusteringOptions> options, ILogger<RedisCallback> logger)
+    public RedisClusteringCallback(IOptions<RedisClusteringOptions> redisOptions, RedisConnection redisConnection)
     {
-        this.options = options.Value;
+        this.redisOptions = redisOptions.Value;
 
-        queue = new PublishQueue<Message>(
-            this.options.MaxBatchCount,
-            this.options.MaxBatchSize,
-            (int)this.options.DebounceTime.TotalMilliseconds,
+        subscriberQueue = new PublishQueue<Message>(
+            this.redisOptions.MaxBatchCount,
+            this.redisOptions.MaxBatchSize,
+            (int)this.redisOptions.DebounceTime.TotalMilliseconds,
             PublishBatchAsync);
 
-        this.logger = logger;
+        _ = InitializeAsync(redisConnection);
     }
 
-    public async Task StartAsync(
-        CancellationToken cancellationToken)
+    public async Task InitializeAsync(RedisConnection redisConnection)
     {
-        var connection = await options.ConnectAsync(new LoggerTextWriter(logger));
+        // Use a single task, so that the ordering of registrations does not matter.
+        var connection = await redisConnection.Instance;
 
-        // Is only needed for topics, but it has only minor costs.
         subscriber = connection.GetSubscriber();
-        subscriber.Subscribe(options.Channel, async (_, value) =>
+        subscriber.Subscribe(redisOptions.Channel, async (_, value) =>
         {
             await HandleMessage(value);
         });
     }
 
+    public void Dispose()
+    {
+        subscriberQueue.Dispose();
+        subscriber?.UnsubscribeAll();
+    }
+
     public ValueTask OnInitializedAsync(
         IDocumentManager manager)
     {
+        // The initialize method is used to prevent circular dependencies between managers and hooks.
         documentManager = manager;
         return default;
-    }
-
-    public Task StopAsync(
-        CancellationToken cancellationToken)
-    {
-        queue.Dispose();
-
-        subscriber?.UnsubscribeAll();
-        return Task.CompletedTask;
     }
 
     private async Task HandleMessage(RedisValue value)
@@ -116,7 +109,7 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId,
         };
 
-        return queue.EnqueueAsync(message, default);
+        return subscriberQueue.EnqueueAsync(message, default);
     }
 
     public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
@@ -129,7 +122,7 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId,
         };
 
-        return queue.EnqueueAsync(message, default);
+        return subscriberQueue.EnqueueAsync(message, default);
     }
 
     public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
@@ -145,7 +138,7 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             SenderId = senderId
         };
 
-        return queue.EnqueueAsync(message, default);
+        return subscriberQueue.EnqueueAsync(message, default);
     }
 
     private async Task PublishBatchAsync(List<Message> batch, CancellationToken ct)
@@ -159,6 +152,6 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
 
         Serializer.Serialize(stream, batch);
 
-        await subscriber.PublishAsync(options.Channel, stream.ToArray());
+        await subscriber.PublishAsync(redisOptions.Channel, stream.ToArray());
     }
 }

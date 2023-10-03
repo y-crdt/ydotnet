@@ -11,13 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Tests.Unit", "Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Server", "YDotNet.Server\YDotNet.Server.csproj", "{F24C69F2-E08A-4C93-A173-3F24FD4A0E7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server.Redis", "YDotNet.Server.Redis\YDotNet.Server.Redis.csproj", "{99705343-FB53-47F5-8601-FC89BA565F94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Server.Redis", "YDotNet.Server.Redis\YDotNet.Server.Redis.csproj", "{99705343-FB53-47F5-8601-FC89BA565F94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server.WebSockets", "YDotNet.Server.WebSockets\YDotNet.Server.WebSockets.csproj", "{273EF3C8-55E5-46EC-A985-ED677F41133D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Server.WebSockets", "YDotNet.Server.WebSockets\YDotNet.Server.WebSockets.csproj", "{273EF3C8-55E5-46EC-A985-ED677F41133D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{12A368ED-DC07-4A33-85AB-6330C11476ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{13D76453-95FC-441D-9AC7-E41848C882C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "Demo\Demo.csproj", "{13D76453-95FC-441D-9AC7-E41848C882C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
