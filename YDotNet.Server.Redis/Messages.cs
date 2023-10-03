@@ -1,7 +1,20 @@
 using ProtoBuf;
 using YDotNet.Server.Redis.Internal;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
 namespace YDotNet.Server.Redis;
+
+[ProtoContract]
+public enum MessageType
+{
+    ClientPinged,
+    ClientDisconnected,
+    AwarenessRequested,
+    Update,
+    SyncStep1,
+    SyncStep2,
+}
 
 [ProtoContract]
 public sealed class Message : ICanEstimateSize
@@ -9,60 +22,35 @@ public sealed class Message : ICanEstimateSize
     private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
     [ProtoMember(1)]
-    required public Guid SenderId { get; init; }
+    public MessageType Type { get; set; }
+
+    [ProtoMember(1)]
+    public Guid SenderId { get; set; }
 
     [ProtoMember(2)]
-    required public string DocumentName { get; init; }
+    public string DocumentName { get; set; }
 
     [ProtoMember(3)]
-    required public long ClientId { get; init; }
+    public long ClientId { get; set; }
 
     [ProtoMember(4)]
-    public ClientPingMessage? ClientPinged { get; set; }
+    public long ClientClock { get; set; }
 
     [ProtoMember(5)]
-    public ClientDisconnectMessage? ClientDisconnected { get; set; }
+    public string? ClientState { get; set; }
 
     [ProtoMember(6)]
-    public DocumentChangeMessage? DocumentChanged { get; set; }
+    public byte[]? Data { get; set; }
 
     public int EstimateSize()
     {
         var size =
             GuidLength +
             sizeof(long) +
+            sizeof(long) +
             DocumentName.Length +
-            ClientPinged?.EstimatedSize() ?? 0 +
-            ClientDisconnected?.EstimatedSize() ?? 0 +
-            DocumentChanged?.EstimatedSize() ?? 0;
+            Data?.Length ?? 0;
 
         return size;
     }
-}
-
-[ProtoContract]
-public sealed class ClientDisconnectMessage
-{
-    public int EstimatedSize() => 0;
-}
-
-[ProtoContract]
-public sealed class DocumentChangeMessage
-{
-    [ProtoMember(1)]
-    required public byte[] DocumentDiff { get; init; }
-
-    public int EstimatedSize() => sizeof(long) + DocumentDiff?.Length ?? 0;
-}
-
-[ProtoContract]
-public sealed class ClientPingMessage
-{
-    [ProtoMember(1)]
-    required public long ClientClock { get; init; }
-
-    [ProtoMember(2)]
-    required public string? ClientState { get; init; }
-
-    public int EstimatedSize() => sizeof(long) + ClientState?.Length ?? 0;
 }

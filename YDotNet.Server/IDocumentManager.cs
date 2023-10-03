@@ -12,10 +12,13 @@ public interface IDocumentManager : IHostedService
     ValueTask DisconnectAsync(DocumentContext context,
         CancellationToken ct = default);
 
-    ValueTask<(byte[] Update, byte[] StateVector)> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
+    ValueTask<byte[]> GetStateAsUpdateAsync(DocumentContext context, byte[] stateVector,
         CancellationToken ct = default);
 
-    ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(string roomName,
+    ValueTask<byte[]> GetStateAsync(DocumentContext context,
+        CancellationToken ct = default);
+
+    ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
         CancellationToken ct = default);
 
     ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,

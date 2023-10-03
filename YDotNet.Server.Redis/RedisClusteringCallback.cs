@@ -78,65 +78,97 @@ public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
                 Metadata = senderId
             };
 
-            if (message.DocumentChanged is DocumentChangeMessage changed)
+            switch (message.Type)
             {
-                await documentManager.ApplyUpdateAsync(context, changed.DocumentDiff);
-            }
+                case MessageType.ClientPinged:
+                    await documentManager.PingAsync(context, message.ClientClock, message.ClientState);
+                    break;
+                case MessageType.ClientDisconnected:
+                    await documentManager.DisconnectAsync(context);
+                    break;
+                case MessageType.Update when message.Data != null:
+                    await documentManager.ApplyUpdateAsync(context, message.Data);
+                    break;
+                case MessageType.SyncStep2 when message.Data != null:
+                    await documentManager.ApplyUpdateAsync(context, message.Data);
+                    break;
+                case MessageType.SyncStep1 when message.Data != null:
+                    await SendSync2Async(context, message.Data);
+                    break;
+                case MessageType.AwarenessRequested:
+                    foreach (var (id, user) in await documentManager.GetAwarenessAsync(context))
+                    {
+                        var userContext = context with { ClientId = id };
 
-            if (message.ClientPinged is ClientPingMessage pinged)
-            {
-                await documentManager.PingAsync(context, pinged.ClientClock, pinged.ClientState);
+                        await SendAwarenessAsync(userContext, user.ClientState, user.ClientClock);
+                    }
+                    break;
             }
-
-            if (message.ClientDisconnected is not null)
-            {
-                await documentManager.DisconnectAsync(context);
-            }
-        }       
+        }
     }
 
-    public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
+    public async ValueTask OnDocumentLoadedAsync(DocumentLoadEvent @event)
     {
-        var message = new Message
-        {
-            ClientId = @event.Context.ClientId,
-            ClientPinged = new ClientPingMessage
-            {
-                ClientClock = @event.ClientClock,
-                ClientState = @event.ClientState,
-            },
-            DocumentName = @event.Context.DocumentName,
-            SenderId = senderId,
-        };
+        await SendAwarenessRequest(@event.Context);
+        await SendSync1Async(@event.Context);
+    }
 
-        return subscriberQueue.EnqueueAsync(message, default);
+    public async ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
+    {
+        await SendAwarenessAsync(@event.Context, @event.ClientState, @event.ClientClock);
     }
 
     public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
     {
-        var message = new Message
-        {
-            ClientId = @event.Context.ClientId,
-            ClientDisconnected = new ClientDisconnectMessage(),
-            DocumentName = @event.Context.DocumentName,
-            SenderId = senderId,
-        };
+        var m = new Message { Type = MessageType.ClientDisconnected };
 
-        return subscriberQueue.EnqueueAsync(message, default);
+        return EnqueueAsync(m, @event.Context);
     }
 
     public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
-        var message = new Message
-        {
-            ClientId = @event.Context.ClientId,
-            DocumentName = @event.Context.DocumentName,
-            DocumentChanged = new DocumentChangeMessage
-            {
-                DocumentDiff = @event.Diff
-            },
-            SenderId = senderId
-        };
+        var m = new Message { Type = MessageType.Update, Data = @event.Diff };
+
+        return EnqueueAsync(m, @event.Context);
+    }
+
+    private ValueTask SendAwarenessAsync(DocumentContext context, string? state, long clock)
+    {
+        var m = new Message { Type = MessageType.ClientPinged, ClientState = state, ClientClock = clock };
+
+        return EnqueueAsync(m, context);
+    }
+
+    private async ValueTask SendSync1Async(DocumentContext context)
+    {
+        var state = await documentManager!.GetStateAsync(context);
+
+        var m = new Message { Type = MessageType.SyncStep1, Data = state };
+
+        await EnqueueAsync(m, context);
+    }
+
+    private async ValueTask SendSync2Async(DocumentContext context, byte[] stateVector)
+    {
+        var state = await documentManager!.GetStateAsUpdateAsync(context, stateVector);
+
+        var m = new Message { Type = MessageType.SyncStep2, Data = state };
+
+        await EnqueueAsync(m, context);
+    }
+
+    private ValueTask SendAwarenessRequest(DocumentContext context)
+    {
+        var m = new Message { Type = MessageType.AwarenessRequested };
+
+        return EnqueueAsync(m, context);
+    }
+
+    private ValueTask EnqueueAsync(Message message, DocumentContext context)
+    {
+        message.ClientId = context.ClientId;
+        message.DocumentName = context.DocumentName;
+        message.SenderId = senderId;
 
         return subscriberQueue.EnqueueAsync(message, default);
     }

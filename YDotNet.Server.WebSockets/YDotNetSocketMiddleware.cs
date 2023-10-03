@@ -181,14 +181,15 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
             switch (syncType)
             {
                 case MessageTypes.SyncStep1:
-                    var stateVector = await state.Decoder.ReadVarUint8ArrayAsync(ct);
+                    var clientState = await state.Decoder.ReadVarUint8ArrayAsync(ct);
 
-                    var (update, serverState) = await documentManager!.GetMissingChangesAsync(state.DocumentContext, stateVector, ct);
+                    var serverState = await documentManager!.GetStateAsync(state.DocumentContext, ct);
+                    var serverUpdate = await documentManager!.GetStateAsUpdateAsync(state.DocumentContext, clientState, ct);
 
                     // We mark the sync state as false again to handle multiple sync steps.
                     state.IsSynced = false;
 
-                    await encoder.WriteSyncStep2Async(update, ct);
+                    await encoder.WriteSyncStep2Async(serverUpdate, ct);
                     await encoder.WriteSyncStep1Async(serverState, ct);
 
                     await SendPendingUpdatesAsync(encoder, state, ct);
@@ -221,7 +222,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
     private async Task SendAwarenessAsync(WebSocketEncoder encoder, ClientState state, CancellationToken ct)
     {
-        var users = await documentManager!.GetAwarenessAsync(state.DocumentName, ct);
+        var users = await documentManager!.GetAwarenessAsync(state.DocumentContext, ct);
 
         if (users.Count == 0)
         {
@@ -231,7 +232,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
         await encoder.WriteVarUintAsync(users.Count, ct);
 
-        foreach (var (clientId, user) in await documentManager.GetAwarenessAsync(state.DocumentName, ct))
+        foreach (var (clientId, user) in users)
         {
             await encoder.WriteAwarenessAsync(clientId, user.ClientClock, user.ClientState, ct);
         }

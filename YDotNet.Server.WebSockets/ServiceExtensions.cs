@@ -9,6 +9,7 @@ public static class ServiceExtensions
 {
     public static YDotnetRegistration AddWebSockets(this YDotnetRegistration registration, Action<YDotNetWebSocketOptions>? configure = null)
     {
+        registration.Services.Configure(configure ?? (x => { }));
         registration.Services.AddSingleton<YDotNetSocketMiddleware>();
 
         registration.Services.AddSingleton<IDocumentCallback>(x =>

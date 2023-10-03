@@ -75,7 +75,7 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
     {
         if (webSocket.State != WebSocketState.Open && CanRead)
         {
-            throw new InvalidOperationException("Socket is already closed.");
+            throw new WebSocketException("Socket is already closed.");
         }
     }
 }

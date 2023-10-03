@@ -41,7 +41,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         await containers.DisposeAsync();
     }
 
-    public async ValueTask<(byte[] Update, byte[] StateVector)> GetMissingChangesAsync(DocumentContext context, byte[] stateVector,
+    public async ValueTask<byte[]> GetStateAsync(DocumentContext context,
         CancellationToken ct = default)
     {
         var container = containers.GetContext(context.DocumentName);
@@ -55,17 +55,21 @@ public sealed class DefaultDocumentManager : IDocumentManager
                     throw new InvalidOperationException("Transaction cannot be created.");
                 }
 
-                byte[] update;
-                if (stateVector.Length == 0)
-                {
-                    update = stateVector;
-                }
-                else
-                {
-                    update = transaction.StateDiffV2(stateVector);
-                }
+                return transaction.StateVectorV1();
+            }
+        }, null);
+    }
 
-                return (update, transaction.StateVectorV1());
+    public async ValueTask<byte[]> GetStateAsUpdateAsync(DocumentContext context, byte[] stateVector,
+        CancellationToken ct = default)
+    {
+        var container = containers.GetContext(context.DocumentName);
+
+        return await container.ApplyUpdateReturnAsync(doc =>
+        {
+            using (var transaction = doc.ReadTransactionOrThrow())
+            {
+                return transaction.StateDiffV1(stateVector);
             }
         }, null);
     }
@@ -82,13 +86,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 Diff = stateDiff
             };
 
-            using (var transaction = doc.WriteTransaction())
+            using (var transaction = doc.WriteTransactionOrThrow())
             {
-                if (transaction == null)
-                {
-                    throw new InvalidOperationException("Transaction cannot be created.");
-                }
-
                 result.TransactionUpdateResult = transaction.ApplyV1(stateDiff);
             }
 
@@ -130,13 +129,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 diff = @event.Update;
             });
 
-            using (var transaction = doc.WriteTransaction())
+            using (var transaction = doc.WriteTransactionOrThrow())
             {
-                if (transaction == null)
-                {
-                    throw new InvalidOperationException("Transaction cannot be created.");
-                }
-
                 action(doc, transaction);
             }
 
@@ -195,11 +189,11 @@ public sealed class DefaultDocumentManager : IDocumentManager
     public async ValueTask CleanupAsync(
         CancellationToken ct = default)
     {
-        foreach (var removedUser in users.Cleanup(options.MaxPingTime))
+        foreach (var (clientId, documentName) in users.Cleanup(options.MaxPingTime))
         {
             await callback.OnClientDisconnectedAsync(new ClientDisconnectedEvent
             {
-                Context = new DocumentContext(removedUser.DocumentName, removedUser.ClientId),
+                Context = new DocumentContext(documentName, clientId),
                 Source = this,
             });
         }
@@ -207,9 +201,9 @@ public sealed class DefaultDocumentManager : IDocumentManager
         containers.RemoveEvictedItems();
     }
 
-    public ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(string roomName,
+    public ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
         CancellationToken ct = default)
     {
-        return new ValueTask<IReadOnlyDictionary<long, ConnectedUser>>(users.GetUsers(roomName));
+        return new ValueTask<IReadOnlyDictionary<long, ConnectedUser>>(users.GetUsers(context.DocumentName));
     }
 }
