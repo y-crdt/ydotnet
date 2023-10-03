@@ -8,7 +8,7 @@ public class Program
 
         builder.Services.AddRazorPages();
         builder.Services.AddYDotNet()
-            .AddCallback<Listener>()
+            .AddCallback<Callback>()
             .AddWebSockets();
 
         var app = builder.Build();

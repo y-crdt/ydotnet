@@ -42,7 +42,7 @@ internal sealed class DocumentContainer
         await documentCallback.OnDocumentLoadedAsync(new DocumentLoadEvent
         {
             Document = doc,
-            Context = new DocumentContext { ClientId = 0, DocumentName = documentName },
+            Context = new DocumentContext(documentName, 0),
             Source = documentManager,
         });
 

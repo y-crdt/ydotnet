@@ -184,13 +184,10 @@ public sealed class DefaultDocumentManager : IDocumentManager
     {
         if (users.Remove(context.DocumentName, context.ClientId))
         {
-            await callback.OnClientDisconnectedAsync(new[] 
-            { 
-                new ClientDisconnectedEvent
-                {
-                    Context = context,
-                    Source = this,
-                }
+            await callback.OnClientDisconnectedAsync(new ClientDisconnectedEvent
+            {
+                Context = context,
+                Source = this,
             });
         }
     }
@@ -198,18 +195,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
     public async ValueTask CleanupAsync(
         CancellationToken ct = default)
     {
-        var removedUsers = users.Cleanup(options.MaxPingTime).ToList();
-
-        if (removedUsers.Count > 0)
+        foreach (var removedUser in users.Cleanup(options.MaxPingTime))
         {
-            await callback.OnClientDisconnectedAsync(removedUsers.Select(x =>
+            await callback.OnClientDisconnectedAsync(new ClientDisconnectedEvent
             {
-                return new ClientDisconnectedEvent
-                {
-                    Context = new DocumentContext { ClientId = x.ClientId, DocumentName = x.DocumentName },
-                    Source = this,
-                };
-            }).ToArray());
+                Context = new DocumentContext(removedUser.DocumentName, removedUser.ClientId),
+                Source = this,
+            });
         }
 
         containers.RemoveEvictedItems();

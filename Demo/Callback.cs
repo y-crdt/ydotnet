@@ -3,11 +3,11 @@ using YDotNet.Server;
 
 namespace Demo;
 
-public sealed class Listener : IDocumentCallback
+public sealed class Callback : IDocumentCallback
 {
-    private readonly ILogger<Listener> log;
+    private readonly ILogger<Callback> log;
 
-    public Listener(ILogger<Listener> log)
+    public Callback(ILogger<Callback> log)
     {
         this.log = log;
     }

@@ -1,45 +1,68 @@
-using System.Text.Json.Serialization;
+using ProtoBuf;
+using YDotNet.Server.Redis.Internal;
 
 namespace YDotNet.Server.Redis;
 
-public sealed class Message
+[ProtoContract]
+public sealed class Message : ICanEstimateSize
 {
-    [JsonPropertyName("s")]
+    private static readonly int GuidLength = Guid.Empty.ToString().Length;
+
+    [ProtoMember(1)]
     required public Guid SenderId { get; init; }
 
-    [JsonPropertyName("c")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public PingMessage? Pinged { get; set; }
-
-    [JsonPropertyName("d")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public PingMessage[]? ClientDisconnected { get; set; }
-
-    [JsonPropertyName("u")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public DocumentChangeMessage? DocumentChanged { get; set; }
-}
-
-public abstract class ClientMessage
-{
-    [JsonPropertyName("d")]
+    [ProtoMember(2)]
     required public string DocumentName { get; init; }
 
-    [JsonPropertyName("c")]
+    [ProtoMember(3)]
     required public long ClientId { get; init; }
+
+    [ProtoMember(4)]
+    public ClientPingMessage? ClientPinged { get; set; }
+
+    [ProtoMember(5)]
+    public ClientDisconnectMessage? ClientDisconnected { get; set; }
+
+    [ProtoMember(6)]
+    public DocumentChangeMessage? DocumentChanged { get; set; }
+
+    public int EstimateSize()
+    {
+        var size =
+            GuidLength +
+            sizeof(long) +
+            DocumentName.Length +
+            ClientPinged?.EstimatedSize() ?? 0 +
+            ClientDisconnected?.EstimatedSize() ?? 0 +
+            DocumentChanged?.EstimatedSize() ?? 0;
+
+        return size;
+    }
 }
 
-public sealed class DocumentChangeMessage : ClientMessage
+[ProtoContract]
+public sealed class ClientDisconnectMessage
 {
-    [JsonPropertyName("u")]
+    public int EstimatedSize() => 0;
+}
+
+[ProtoContract]
+public sealed class DocumentChangeMessage
+{
+    [ProtoMember(1)]
     required public byte[] DocumentDiff { get; init; }
+
+    public int EstimatedSize() => sizeof(long) + DocumentDiff?.Length ?? 0;
 }
 
-public sealed class PingMessage : ClientMessage
+[ProtoContract]
+public sealed class ClientPingMessage
 {
-    [JsonPropertyName("c")]
+    [ProtoMember(1)]
     required public long ClientClock { get; init; }
 
-    [JsonPropertyName("s")]
+    [ProtoMember(2)]
     required public string? ClientState { get; init; }
+
+    public int EstimatedSize() => sizeof(long) + ClientState?.Length ?? 0;
 }

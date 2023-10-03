@@ -84,7 +84,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         using var state = new ClientState
         {
             Decoder = new WebSocketDecoder(webSocket),
-            DocumentContext = new DocumentContext { ClientId = 0, DocumentName = documentName },
+            DocumentContext = new DocumentContext(documentName, 0),
             DocumentName = documentName,
             Encoder = new WebSocketEncoder(webSocket),
             WebSocket = webSocket
@@ -224,14 +224,14 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
             if (state.DocumentContext.ClientId == 0 && clientCount == 1)
             {
-                state.DocumentContext.ClientId = clientId;
+                state.DocumentContext = state.DocumentContext with { ClientId = clientId };
 
                 logger.LogDebug("Websocket connection to {document} enhanced with client Id {clientId}.",
                     state.DocumentContext.DocumentName,
                     state.DocumentContext.ClientId);
             }
 
-            var context = new DocumentContext { ClientId = clientId, DocumentName = state.DocumentName };
+            var context = new DocumentContext(state.DocumentName, clientId);
 
             await documentManager!.PingAsync(context, clientClock, clientState, ct);
         }

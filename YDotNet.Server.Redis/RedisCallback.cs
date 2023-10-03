@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ProtoBuf;
 using StackExchange.Redis;
 using System.Text.Json;
 using YDotNet.Server.Redis.Internal;
@@ -12,12 +13,20 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
     private readonly Guid senderId = Guid.NewGuid();
     private readonly RedisClusteringOptions options;
     private readonly ILogger<RedisCallback> logger;
+    private readonly PublishQueue<Message> queue;
     private ISubscriber? subscriber;
     private IDocumentManager? documentManager;
 
     public RedisCallback(IOptions<RedisClusteringOptions> options, ILogger<RedisCallback> logger)
     {
         this.options = options.Value;
+
+        queue = new PublishQueue<Message>(
+            this.options.MaxBatchCount,
+            this.options.MaxBatchSize,
+            (int)this.options.DebounceTime.TotalMilliseconds,
+            PublishBatchAsync);
+
         this.logger = logger;
     }
 
@@ -44,6 +53,8 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
     public Task StopAsync(
         CancellationToken cancellationToken)
     {
+        queue.Dispose();
+
         subscriber?.UnsubscribeAll();
         return Task.CompletedTask;
     }
@@ -55,116 +66,99 @@ public sealed class RedisCallback : IDocumentCallback, IHostedService
             return;
         }
 
-        var message = JsonSerializer.Deserialize<Message>(value.ToString());
+        var batch = Serializer.Deserialize<Message[]>(value);
 
-        if (message == null || message.SenderId == senderId)
+        if (batch == null)
         {
             return;
         }
 
-        if (message.DocumentChanged is DocumentChangeMessage changed)
+        foreach (var message in batch)
         {
-            await documentManager.ApplyUpdateAsync(new DocumentContext
+            if (message.SenderId == senderId)
             {
-                ClientId = changed.ClientId,
-                DocumentName = changed.DocumentName,
-                Metadata = senderId
-            }, changed.DocumentDiff);
-        }
-
-        if (message.Pinged is PingMessage pinged)
-        {
-            await documentManager.PingAsync(new DocumentContext
-            {
-                ClientId = pinged.ClientId,
-                DocumentName = pinged.DocumentName,
-                Metadata = senderId
-            }, pinged.ClientClock, pinged.ClientState);
-        }
-
-        if (message.ClientDisconnected is PingMessage[] disconnected)
-        {
-            foreach (var client in disconnected)
-            {
-                await documentManager.DisconnectAsync(new DocumentContext
-                {
-                    ClientId = client.ClientId,
-                    DocumentName = client.DocumentName,
-                    Metadata = senderId
-                });
+                continue;
             }
-        }
+
+            var context = new DocumentContext(message.DocumentName, message.ClientId)
+            {
+                Metadata = senderId
+            };
+
+            if (message.DocumentChanged is DocumentChangeMessage changed)
+            {
+                await documentManager.ApplyUpdateAsync(context, changed.DocumentDiff);
+            }
+
+            if (message.ClientPinged is ClientPingMessage pinged)
+            {
+                await documentManager.PingAsync(context, pinged.ClientClock, pinged.ClientState);
+            }
+
+            if (message.ClientDisconnected is not null)
+            {
+                await documentManager.DisconnectAsync(context);
+            }
+        }       
     }
 
-    public async ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
+    public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
     {
-        if (subscriber == null)
-        {
-            return;
-        }
-
         var message = new Message
         {
-            SenderId = senderId,
-            Pinged = new PingMessage
+            ClientId = @event.Context.ClientId,
+            ClientPinged = new ClientPingMessage
             {
-                ClientId = @event.Context.ClientId,
                 ClientClock = @event.ClientClock,
                 ClientState = @event.ClientState,
-                DocumentName = @event.Context.DocumentName,
             },
+            DocumentName = @event.Context.DocumentName,
+            SenderId = senderId,
         };
 
-        var json = JsonSerializer.Serialize(message);
-
-        await subscriber.PublishAsync(options.Channel, json);
+        return queue.EnqueueAsync(message, default);
     }
 
-    public async ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent[] events)
+    public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
     {
-        if (subscriber == null)
-        {
-            return;
-        }
-
         var message = new Message
         {
+            ClientId = @event.Context.ClientId,
+            ClientDisconnected = new ClientDisconnectMessage(),
+            DocumentName = @event.Context.DocumentName,
             SenderId = senderId,
-            ClientDisconnected = events.Select(x => new PingMessage
-            {
-                ClientId = x.Context.ClientId,
-                ClientState = null,
-                ClientClock = 0,
-                DocumentName = x.Context.DocumentName,
-            }).ToArray()
         };
 
-        var json = JsonSerializer.Serialize(message);
-
-        await subscriber.PublishAsync(options.Channel, json);
+        return queue.EnqueueAsync(message, default);
     }
 
-    public async ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
+    public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
-        if (subscriber == null)
-        {
-            return;
-        }
-
         var message = new Message
         {
-            SenderId = senderId,
+            ClientId = @event.Context.ClientId,
+            DocumentName = @event.Context.DocumentName,
             DocumentChanged = new DocumentChangeMessage
             {
-                ClientId = @event.Context.ClientId,
-                DocumentName = @event.Context.DocumentName,
                 DocumentDiff = @event.Diff
             },
+            SenderId = senderId
         };
 
-        var json = JsonSerializer.Serialize(message);
+        return queue.EnqueueAsync(message, default);
+    }
 
-        await subscriber.PublishAsync(options.Channel, json);
+    private async Task PublishBatchAsync(List<Message> batch, CancellationToken ct)
+    {
+        if (subscriber == null)
+        {
+            return;
+        }
 
+        using var stream = new MemoryStream();
+
+        Serializer.Serialize(stream, batch);
+
+        await subscriber.PublishAsync(options.Channel, stream.ToArray());
     }
 }

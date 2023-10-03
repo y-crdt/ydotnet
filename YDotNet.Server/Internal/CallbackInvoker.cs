@@ -33,9 +33,9 @@ public sealed class CallbackInvoker : IDocumentCallback
         return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentChangedAsync(e));
     }
 
-    public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent[] events)
+    public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
     {
-        return InvokeCallbackAsync(@events, (c, e) => c.OnClientDisconnectedAsync(e));
+        return InvokeCallbackAsync(@event, (c, e) => c.OnClientDisconnectedAsync(e));
     }
 
     public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)

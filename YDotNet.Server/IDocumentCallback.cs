@@ -22,7 +22,7 @@ public interface IDocumentCallback
         return default;
     }
 
-    ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent[] events)
+    ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
     {
         return default;
     }

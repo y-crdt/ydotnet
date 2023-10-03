@@ -1,10 +1,6 @@
 namespace YDotNet.Server;
 
-public sealed class DocumentContext
+public sealed record DocumentContext(string DocumentName, long ClientId)
 {
-    required public string DocumentName { get; set; }
-
-    required public long ClientId { get; set; }
-
     public object? Metadata { get; set; }
 }
