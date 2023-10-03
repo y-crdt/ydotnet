@@ -1,5 +1,3 @@
-using YDotNet.Document;
-
 namespace YDotNet.Server.Storage;
 
 public interface IDocumentStorage

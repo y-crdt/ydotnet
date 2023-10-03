@@ -1,5 +1,3 @@
-using YDotNet.Protocol;
-
 namespace YDotNet.Server.WebSockets;
 
 public static class EncoderExtensions

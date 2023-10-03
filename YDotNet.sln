@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{12A368ED-D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "Demo\Demo.csproj", "{13D76453-95FC-441D-9AC7-E41848C882C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.MongoDB", "YDotNet.MongoDB\YDotNet.MongoDB.csproj", "{DAA60ED8-B8E3-4D84-85D4-F07DF597281C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{13D76453-95FC-441D-9AC7-E41848C882C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13D76453-95FC-441D-9AC7-E41848C882C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13D76453-95FC-441D-9AC7-E41848C882C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAA60ED8-B8E3-4D84-85D4-F07DF597281C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAA60ED8-B8E3-4D84-85D4-F07DF597281C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAA60ED8-B8E3-4D84-85D4-F07DF597281C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAA60ED8-B8E3-4D84-85D4-F07DF597281C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
