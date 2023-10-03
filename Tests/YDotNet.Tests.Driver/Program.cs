@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using YDotNet.Tests.Driver.Tasks.Branches;
+using YDotNet.Tests.Driver.Tasks.Texts;
 
-new StickyIndex().Run();
+new Observe().Run();
