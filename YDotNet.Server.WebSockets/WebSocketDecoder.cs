@@ -48,7 +48,7 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
             var bytesToCopy = Math.Min(memory.Length, bytesLeft);
 
             buffer.AsMemory(bufferIndex, bytesToCopy).CopyTo(memory);
-            memory = memory.Slice(bytesToCopy);
+            memory = memory[bytesToCopy..];
 
             bufferIndex += bytesToCopy;
         }

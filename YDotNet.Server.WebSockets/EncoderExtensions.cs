@@ -37,4 +37,13 @@ public static class EncoderExtensions
         await encoder.WriteVarStringAsync(state ?? string.Empty, ct);
         await encoder.EndMessageAsync(ct);
     }
+
+    public static async Task WriteAuthErrorAsync(this WebSocketEncoder encoder, string reason,
+        CancellationToken ct)
+    {
+        await encoder.WriteVarUintAsync(MessageTypes.TypeAuth, ct);
+        await encoder.WriteVarUintAsync(0, ct);
+        await encoder.WriteVarStringAsync(reason, ct);
+        await encoder.EndMessageAsync(ct);
+    }
 }

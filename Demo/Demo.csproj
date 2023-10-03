@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\YDotNet.Server.MongoDB\YDotNet.Server.MongoDB.csproj" />
+    <ProjectReference Include="..\YDotNet.Server.Redis\YDotNet.Server.Redis.csproj" />
     <ProjectReference Include="..\YDotNet.Server.WebSockets\YDotNet.Server.WebSockets.csproj" />
+    <ProjectReference Include="..\YDotNet.Server\YDotNet.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>

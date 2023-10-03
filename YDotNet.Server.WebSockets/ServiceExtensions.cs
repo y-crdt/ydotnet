@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceExtensions
 {
-    public static YDotnetRegistration AddWebSockets(this YDotnetRegistration registration)
+    public static YDotnetRegistration AddWebSockets(this YDotnetRegistration registration, Action<YDotNetWebSocketOptions>? configure = null)
     {
         registration.Services.AddSingleton<YDotNetSocketMiddleware>();
 

@@ -1,17 +1,21 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Net.WebSockets;
 
 namespace YDotNet.Server.WebSockets;
 
 public sealed class YDotNetSocketMiddleware : IDocumentCallback
 {
     private readonly ConcurrentDictionary<string, List<ClientState>> statesPerDocumentName = new();
+    private readonly YDotNetWebSocketOptions options;
     private readonly ILogger<YDotNetSocketMiddleware> logger;
     private IDocumentManager? documentManager;
 
-    public YDotNetSocketMiddleware(ILogger<YDotNetSocketMiddleware> logger)
+    public YDotNetSocketMiddleware(IOptions<YDotNetWebSocketOptions> options, ILogger<YDotNetSocketMiddleware> logger)
     {
+        this.options = options.Value;
         this.logger = logger;
     }
 
@@ -96,6 +100,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
             documentStates.Add(state);
         }
 
+        await AuthenticateAsync(httpContext, state);
+
         try
         {
             while (state.Decoder.CanRead)
@@ -119,6 +125,11 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         }
         catch (OperationCanceledException)
         {
+            // Usually throw when the client stops the connection.
+        }
+        catch (WebSocketException)
+        {
+            // Usually throw when the client stops the connection.
         }
         finally
         {
@@ -135,6 +146,24 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         }
 
         logger.LogDebug("Websocket connection to {document} closed.", documentName);
+    }
+
+    private async Task AuthenticateAsync(HttpContext httpContext, ClientState state)
+    {
+        if (options.OnAuthenticateAsync == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await options.OnAuthenticateAsync(httpContext, state.DocumentContext);
+        }
+        catch (Exception ex)
+        {
+            await state.Encoder.WriteAuthErrorAsync(ex.Message, httpContext.RequestAborted);
+            throw;
+        }
     }
 
     private async Task HandleSyncAsync(ClientState state,
