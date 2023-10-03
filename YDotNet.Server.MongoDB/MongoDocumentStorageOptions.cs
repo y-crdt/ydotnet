@@ -1,4 +1,4 @@
-namespace YDotNet.MongoDB;
+namespace YDotNet.Server.MongoDB;
 
 public sealed class MongoDocumentStorageOptions
 {

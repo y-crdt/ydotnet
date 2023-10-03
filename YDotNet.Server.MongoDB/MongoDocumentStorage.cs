@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using YDotNet.Server.Storage;
 
-namespace YDotNet.MongoDB;
+namespace YDotNet.Server.MongoDB;
 
 public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
 {
