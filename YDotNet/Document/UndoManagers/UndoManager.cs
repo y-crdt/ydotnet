@@ -47,12 +47,11 @@ public class UndoManager : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAdded(Action<UndoEvent> action)
     {
-        var subscriptionId = UndoManagerChannel.ObserveAdded(
-            Handle,
-            nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
+        UndoManagerChannel.ObserveAddedCallback callback = (_, undoEvent) => action(undoEvent.ToUndoEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -73,12 +72,11 @@ public class UndoManager : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObservePopped(Action<UndoEvent> action)
     {
-        var subscriptionId = UndoManagerChannel.ObservePopped(
-            Handle,
-            nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
+        UndoManagerChannel.ObservePoppedCallback callback = (_, undoEvent) => action(undoEvent.ToUndoEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

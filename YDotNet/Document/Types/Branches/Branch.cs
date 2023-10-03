@@ -1,9 +1,7 @@
 using YDotNet.Document.Events;
-using YDotNet.Document.StickyIndexes;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
-using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
@@ -38,19 +36,18 @@ public abstract class Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveDeep(Action<IEnumerable<EventBranch>> action)
     {
-        var subscriptionId = BranchChannel.ObserveDeep(
-            Handle,
-            nint.Zero,
-            (_, length, eventsHandle) =>
-            {
-                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
-                    .Select(x => new EventBranch(x))
-                    .ToArray();
+        BranchChannel.ObserveCallback callback = (_, length, eventsHandle) =>
+        {
+            var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
+                .Select(x => new EventBranch(x))
+                .ToArray();
 
-                action(events);
-            });
+            action(events);
+        };
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = BranchChannel.ObserveDeep(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

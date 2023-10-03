@@ -282,12 +282,11 @@ public class XmlElement : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription Observe(Action<XmlElementEvent> action)
     {
-        var subscriptionId = XmlElementChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new XmlElementEvent(eventHandle)));
+        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle));
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = XmlElementChannel.Observe(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

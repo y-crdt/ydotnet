@@ -107,12 +107,11 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription Observe(Action<ArrayEvent> action)
     {
-        var subscriptionId = ArrayChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new ArrayEvent(eventHandle)));
+        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle));
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = ArrayChannel.Observe(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

@@ -332,12 +332,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveClear(Action<ClearEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveClear(
-            Handle,
-            nint.Zero,
-            (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
+        DocChannel.ObserveClearCallback callback = (_, doc) =>
+            action(ClearEventNative.From(new Doc(doc)).ToClearEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveClear(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -360,12 +360,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveUpdatesV1(
-            Handle,
-            nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) =>
+            action(UpdateEventNative.From(length, data).ToUpdateEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveUpdatesV1(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -388,12 +388,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV2(Action<UpdateEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveUpdatesV2(
-            Handle,
-            nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) =>
+            action(UpdateEventNative.From(length, data).ToUpdateEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveUpdatesV2(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -416,12 +416,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveAfterTransaction(
-            Handle,
-            nint.Zero,
-            (_, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
+        DocChannel.ObserveAfterTransactionCallback callback = (_, afterTransactionEvent) =>
+            action(afterTransactionEvent.ToAfterTransactionEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveAfterTransaction(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -441,12 +441,11 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveSubDocs(
-            Handle,
-            nint.Zero,
-            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+        DocChannel.ObserveSubdocsCallback callback = (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveSubDocs(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

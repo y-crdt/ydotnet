@@ -149,12 +149,11 @@ public class Text : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription Observe(Action<TextEvent> action)
     {
-        var subscriptionId = TextChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new TextEvent(eventHandle)));
+        TextChannel.ObserveCallback callback = (_, eventHandle) => action(new TextEvent(eventHandle));
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = TextChannel.Observe(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
