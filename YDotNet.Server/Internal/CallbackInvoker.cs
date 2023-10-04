@@ -23,11 +23,6 @@ public sealed class CallbackInvoker : IDocumentCallback
         return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentLoadedAsync(e));
     }
 
-    public ValueTask OnDocumentChangingAsync(DocumentChangeEvent @event)
-    {
-        return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentChangingAsync(e));
-    }
-
     public ValueTask OnDocumentChangedAsync(DocumentChangedEvent @event)
     {
         return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentChangedAsync(e));

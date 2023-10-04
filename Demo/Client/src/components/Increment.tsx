@@ -12,6 +12,7 @@ export const Increment = () => {
             setState(map.get('value') || 0);
         };
 
+        handler();
         map.observeDeep(handler);
 
         return () => {
@@ -22,7 +23,7 @@ export const Increment = () => {
     React.useEffect(() => {
         yjsDocument.transact(() => {
             map.set('value', state);
-        }, 'Incrementer');
+        });
     }, [map, state, yjsDocument]);
 
     const _increment = () => {

@@ -20,11 +20,12 @@ public sealed class ConnectedUsers
 
     public bool AddOrUpdate(string documentName, long clientId, long clock, string? state, out string? existingState)
     {
-        var documentUsers = users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
+        var users = this.users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
 
-        lock (documentUsers)
+        // We expect to have relatively few users per document, therefore we use normal lock here.
+        lock (users)
         {
-            if (documentUsers.TryGetValue(clientId, out var user))
+            if (users.TryGetValue(clientId, out var user))
             {
                 var isChanged = false;
 
@@ -32,15 +33,18 @@ public sealed class ConnectedUsers
                 {
                     user.ClientClock = clock;
                     user.ClientState = state;
+                    isChanged = true;
                 }
 
                 existingState = user.ClientState;
 
+                // Always update the timestamp, because every call is an activity.
                 user.LastActivity = Clock();
+
                 return isChanged;
             }
 
-            documentUsers.Add(clientId, new ConnectedUser
+            users.Add(clientId, new ConnectedUser
             {
                 ClientClock = clock,
                 ClientState = state,
@@ -71,10 +75,12 @@ public sealed class ConnectedUsers
 
         foreach (var (documentName, users) in users)
         {
-            List<long>? usersToRemove = null;
-
+            // We expect to have relatively few users per document, therefore we use normal lock here.
             lock (users)
             {
+                // Usually there should be nothing to remove, therefore we save a few allocations for the fast path.
+                List<long>? usersToRemove = null;
+
                 foreach (var (clientId, user) in users)
                 {
                     if (user.LastActivity < olderThan)
@@ -85,13 +91,13 @@ public sealed class ConnectedUsers
                         yield return (clientId, documentName);
                     }
                 }
-            }
 
-            if (usersToRemove != null)
-            {
-                foreach (var user in usersToRemove)
+                if (usersToRemove != null)
                 {
-                    users.Remove(user);
+                    foreach (var user in usersToRemove)
+                    {
+                        users.Remove(user);
+                    }
                 }
             }
         }

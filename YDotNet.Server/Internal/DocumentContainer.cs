@@ -23,7 +23,7 @@ internal sealed class DocumentContainer
         this.documentStorage = documentStorage;
         this.options = options;
 
-        writer = new DelayedWriter(options.DelayWriting, options.MaxWriteTimeInterval, WriteAsync);
+        writer = new DelayedWriter(options.StoreDebounce, options.MaxWriteTimeInterval, WriteAsync);
 
         loadingTask = LoadInternalAsync(documentCallback, documentManager);
     }
@@ -67,7 +67,7 @@ internal sealed class DocumentContainer
                     throw new InvalidOperationException("Transaction cannot be acquired.");
                 }
 
-                transaction.ApplyV2(documentData);
+                transaction.ApplyV1(documentData);
             }
 
             return document;
@@ -83,14 +83,9 @@ internal sealed class DocumentContainer
         }
     }
 
-    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action, Func<Doc, Task>? beforeAction)
+    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action)
     {
         var document = await loadingTask;
-
-        if (beforeAction != null)
-        {
-            await beforeAction(document);
-        }
 
         slimLock.Wait();
         try
@@ -112,25 +107,22 @@ internal sealed class DocumentContainer
             return;
         }
 
-        byte[] snapshot;
+        byte[] state;
 
         slimLock.Wait();
         try
         {
-            using var transaction = doc.ReadTransaction();
+            using var transaction = doc.ReadTransactionOrThrow();
 
-            if (transaction == null)
-            {
-                throw new InvalidOperationException("Transaction cannot be acquired.");
-            }
+            var snapshot = transaction!.Snapshot()!;
 
-            snapshot = transaction!.Snapshot();
+            state = transaction.StateDiffV1(snapshot)!;
         }
         finally
         {
             slimLock.Release();
         }
 
-        await documentStorage.StoreDocAsync(documentName, snapshot);
+        await documentStorage.StoreDocAsync(documentName, state);
     }
 }

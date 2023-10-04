@@ -183,8 +183,8 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
                 case MessageTypes.SyncStep1:
                     var clientState = await state.Decoder.ReadVarUint8ArrayAsync(ct);
 
-                    var serverState = await documentManager!.GetStateAsync(state.DocumentContext, ct);
-                    var serverUpdate = await documentManager!.GetStateAsUpdateAsync(state.DocumentContext, clientState, ct);
+                    var serverState = await documentManager!.GetStateVectorAsync(state.DocumentContext, ct);
+                    var serverUpdate = await documentManager!.GetUpdateAsync(state.DocumentContext, clientState, ct);
 
                     // We mark the sync state as false again to handle multiple sync steps.
                     state.IsSynced = false;

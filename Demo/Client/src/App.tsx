@@ -10,40 +10,40 @@ function App() {
     return (
         <>
             <Container>
-                <Row className='mt-4'>
+                <Row className='mt-5'>
                     <Col>
                         <h2>Monaco Editor</h2>
 
                         <YjsMonacoEditor />
                     </Col>
                 </Row>
-                <Row className='mt-4'>
+                <Row className='mt-5'>
                     <Col>
                         <h2>Prose Mirror</h2>
 
                         <YjsProseMirror />
                     </Col>
                 </Row>
-                <Row className='mt-4'>
+                <Row className='mt-5'>
                     <Col>
                         <h2>Increment</h2>
 
                         <Increment />
                     </Col>
                 </Row>
-                <Row className='mt-4'>
+                <Row className='mt-5 pb-5'>
                     <Col>
                         <Row>
                             <Col><h2>Chat</h2></Col>
                         </Row>
                         <Row>
                             <Col>
-                                <h3>Chat</h3>
+                                <h5>Chat</h5>
 
                                 <Chat isReadonly={false} />
                             </Col>
                             <Col>
-                                <h3>Notifications</h3>
+                                <h5>Notifications</h5>
 
                                 <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration'} roomName='notifications'>
                                     <Chat isReadonly />

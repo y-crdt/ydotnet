@@ -48,7 +48,7 @@ public abstract class Decoder
     /// The decoded byte array.
     /// </returns>
     public async ValueTask<byte[]> ReadVarUint8ArrayAsync(
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
         var arrayLength = await this.ReadVarUintAsync(ct);
         var arrayBuffer = new byte[arrayLength];

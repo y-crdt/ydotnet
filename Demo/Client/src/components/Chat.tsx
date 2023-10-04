@@ -11,12 +11,14 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
     const array = yjsDocument.getArray<Comment>('stream');
     const [state, setState] = React.useState<Comment[]>([]);
     const [text, setText] = React.useState('');
+    const container = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         const handler = () => {
             setState(array.toJSON());
         };
 
+        handler();
         array.observeDeep(handler);
 
         return () => {
@@ -24,7 +26,21 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
         };
     }, [array]);
 
+    React.useEffect(() => {
+        setTimeout(() => {
+            const div = container.current;
+
+            if (div) {
+                div.scrollTop = div.scrollHeight;
+            }
+        });
+    }, [state]);
+
     const _comment = () => {
+        if (!text) {
+            return;
+        }
+    
         yjsDocument.transact(() => {
             array.push([{ text }]);
         });
@@ -38,7 +54,7 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
 
     return (
         <>
-            <div className='chat'>
+            <div className='chat' ref={container}>
                 {state.map((row, i) =>
                     <div key={i}>
                         {row.text}

@@ -14,7 +14,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
 {
     private readonly ConnectedUsers users = new();
     private readonly DocumentManagerOptions options;
-    private readonly DocumentContainerCache containers;
+    private readonly DocumentCache cache;
     private readonly CallbackInvoker callback;
 
     public DefaultDocumentManager(
@@ -26,7 +26,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         this.options = options.Value;
         this.callback = new CallbackInvoker(callbacks, logger);
 
-        containers = new DocumentContainerCache(documentStorage, this.callback, this, options.Value);
+        cache = new DocumentCache(documentStorage, this.callback, this, options.Value);
     }
 
     public async Task StartAsync(
@@ -38,13 +38,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
     public async Task StopAsync(
         CancellationToken cancellationToken)
     {
-        await containers.DisposeAsync();
+        await cache.DisposeAsync();
     }
 
-    public async ValueTask<byte[]> GetStateAsync(DocumentContext context,
+    public async ValueTask<byte[]> GetStateVectorAsync(DocumentContext context,
         CancellationToken ct = default)
     {
-        var container = containers.GetContext(context.DocumentName);
+        var container = cache.GetContext(context.DocumentName);
 
         return await container.ApplyUpdateReturnAsync(doc =>
         {
@@ -52,13 +52,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 return transaction.StateVectorV1();
             }
-        }, null);
+        });
     }
 
-    public async ValueTask<byte[]> GetStateAsUpdateAsync(DocumentContext context, byte[] stateVector,
+    public async ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector,
         CancellationToken ct = default)
     {
-        var container = containers.GetContext(context.DocumentName);
+        var container = cache.GetContext(context.DocumentName);
 
         return await container.ApplyUpdateReturnAsync(doc =>
         {
@@ -66,13 +66,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 return transaction.StateDiffV1(stateVector);
             }
-        }, null);
+        });
     }
 
     public async ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,
         CancellationToken ct = default)
     {
-        var container = containers.GetContext(context.DocumentName);
+        var container = cache.GetContext(context.DocumentName);
 
         var (result, doc) = await container.ApplyUpdateReturnAsync(doc =>
         {
@@ -87,18 +87,11 @@ public sealed class DefaultDocumentManager : IDocumentManager
             }
 
             return (result, doc);
-        }, async doc =>
-        {
-            await callback.OnDocumentChangingAsync(new DocumentChangeEvent
-            {
-                Context = context,
-                Document = doc,
-                Source = this,
-            });
         });
 
         if (result.Diff != null)
         {
+            // The diff is just the plain byte array from the client.
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
@@ -114,36 +107,24 @@ public sealed class DefaultDocumentManager : IDocumentManager
     public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action,
         CancellationToken ct = default)
     {
-        var container = containers.GetContext(context.DocumentName);
+        var container = cache.GetContext(context.DocumentName);
 
         var (diff, doc) = await container.ApplyUpdateReturnAsync(doc =>
         {
-            byte[]? diff = null;
-            var subscription = doc.ObserveUpdatesV1(@event =>
-            {
-                diff = @event.Update;
-            });
+            using var subscribeOnce = new SubscribeToUpdatesV1Once(doc);
 
             action(doc);
 
-            doc.UnobserveUpdatesV2(subscription);
-            return (diff, doc);
-        }, async doc =>
-        {
-            await callback.OnDocumentChangingAsync(new DocumentChangeEvent
-            {
-                Context = context,
-                Document = doc,
-                Source = this,
-            });
+            return (subscribeOnce.Update, doc);
         });
 
         if (diff != null)
         {
+            // The result from the library already contains all the headers and is therefore not protocol agnostic.
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
-                Diff = diff,
+                Diff = await diff.GetUpdateArray(),
                 Document = doc,
                 Source = this,
             });
@@ -190,7 +171,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             });
         }
 
-        containers.RemoveEvictedItems();
+        cache.RemoveEvictedItems();
     }
 
     public ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(DocumentContext context,

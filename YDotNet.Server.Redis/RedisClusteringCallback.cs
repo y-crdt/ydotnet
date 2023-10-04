@@ -147,7 +147,7 @@ public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
 
     private async ValueTask SendSync1Async(DocumentContext context)
     {
-        var state = await documentManager!.GetStateAsync(context);
+        var state = await documentManager!.GetStateVectorAsync(context);
 
         var m = new Message { Type = MessageType.SyncStep1, Data = state };
 
@@ -156,7 +156,7 @@ public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
 
     private async ValueTask SendSync2Async(DocumentContext context, byte[] stateVector)
     {
-        var state = await documentManager!.GetStateAsUpdateAsync(context, stateVector);
+        var state = await documentManager!.GetUpdateAsync(context, stateVector);
 
         var m = new Message { Type = MessageType.SyncStep2, Data = state };
 

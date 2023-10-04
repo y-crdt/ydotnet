@@ -47,7 +47,7 @@ public sealed class Callback : IDocumentCallback
 
         var chat = @event.Document.Array("stream");
 
-        chat?.ObserveDeep(changes =>
+        chat?.ObserveDeep(async changes =>
         {
             var newNotificationsRaw =
                 changes
@@ -67,24 +67,18 @@ public sealed class Callback : IDocumentCallback
                 notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList()!;
             }
 
-            Task.Run(async () =>
+            var notificationCtx = new DocumentContext("notifications", 0);
+
+            await @event.Source.UpdateDocAsync(notificationCtx, (doc) =>
             {
-                var notificationCtx = new DocumentContext("Notifications", 0);
+                var array = doc.Array("stream");
 
-                await @event.Source.UpdateDocAsync(notificationCtx, (doc) =>
+                // notifications = notifications.Select(x => new Notification { Text = $"You got the follow message: {x.Text}" }).ToList();
+
+                using (var transaction = doc.WriteTransaction() ?? throw new InvalidOperationException("Failed to open transaction."))
                 {
-                    var array = doc.Array("stream");
-
-                    notifications = notifications.Select(x => new Notification
-                    {
-                        Text = $"You got the follow message: {x.Text}"
-                    }).ToList();
-
-                    using (var transaction = doc.WriteTransaction() ?? throw new InvalidOperationException("Failed to open transaction."))
-                    {
-                        array!.InsertRange(transaction, array.Length, notifications.Select(x => x.ToInput()).ToArray());
-                    }
-                });
+                    array!.InsertRange(transaction, array.Length, notifications.Select(x => x.ToInput()).ToArray());
+                }
             });
         });
        

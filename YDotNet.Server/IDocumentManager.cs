@@ -12,10 +12,10 @@ public interface IDocumentManager : IHostedService
     ValueTask DisconnectAsync(DocumentContext context,
         CancellationToken ct = default);
 
-    ValueTask<byte[]> GetStateAsUpdateAsync(DocumentContext context, byte[] stateVector,
+    ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector,
         CancellationToken ct = default);
 
-    ValueTask<byte[]> GetStateAsync(DocumentContext context,
+    ValueTask<byte[]> GetStateVectorAsync(DocumentContext context,
         CancellationToken ct = default);
 
     ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
