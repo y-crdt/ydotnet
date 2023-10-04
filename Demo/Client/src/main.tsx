@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(    
-    <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration'}>
+    <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration'} roomName='app'>
         <App />
     </YjsContextProvider>,
 );

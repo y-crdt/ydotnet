@@ -9,17 +9,18 @@ export interface IYjsContext {
 
 export interface IOptions extends React.PropsWithChildren<object> {
     readonly baseUrl: string;
+    readonly roomName: string;
 }
 
 export const YjsContextProvider: React.FunctionComponent<IOptions> = (props: IOptions) => {
-    const { baseUrl } = props;
+    const { baseUrl, roomName } = props;
 
     const contextProps: IYjsContext = React.useMemo(() => {
         const yjsDocument = new Y.Doc();
-        const yjsConnector = new WebsocketProvider(baseUrl, 'test', yjsDocument);
+        const yjsConnector = new WebsocketProvider(baseUrl, roomName, yjsDocument);
 
         return { yjsDocument, yjsConnector };
-    }, [baseUrl]);
+    }, [baseUrl, roomName]);
 
     return <YjsContext.Provider value={contextProps}>{props.children}</YjsContext.Provider>;
 };

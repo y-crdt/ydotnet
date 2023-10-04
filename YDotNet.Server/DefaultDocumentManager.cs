@@ -48,13 +48,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
 
         return await container.ApplyUpdateReturnAsync(doc =>
         {
-            using (var transaction = doc.ReadTransaction())
+            using (var transaction = doc.ReadTransactionOrThrow())
             {
-                if (transaction == null)
-                {
-                    throw new InvalidOperationException("Transaction cannot be created.");
-                }
-
                 return transaction.StateVectorV1();
             }
         }, null);
@@ -116,7 +111,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         return result;
     }
 
-    public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc, Transaction> action,
+    public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action,
         CancellationToken ct = default)
     {
         var container = containers.GetContext(context.DocumentName);
@@ -129,10 +124,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 diff = @event.Update;
             });
 
-            using (var transaction = doc.WriteTransactionOrThrow())
-            {
-                action(doc, transaction);
-            }
+            action(doc);
 
             doc.UnobserveUpdatesV2(subscription);
             return (diff, doc);

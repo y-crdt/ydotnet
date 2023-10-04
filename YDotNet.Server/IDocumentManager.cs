@@ -24,7 +24,7 @@ public interface IDocumentManager : IHostedService
     ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,
         CancellationToken ct = default);
 
-    ValueTask UpdateDocAsync(DocumentContext context, Action<Doc, Transaction> action,
+    ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action,
         CancellationToken ct = default);
 
     ValueTask CleanupAsync(

@@ -136,12 +136,12 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
-    public bool Null => OutputChannel.Null(Handle) == 1;
+    public bool Null => OutputNative?.Tag == -1;
 
     /// <summary>
     ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
     /// </summary>
-    public bool Undefined => OutputChannel.Undefined(Handle) == 1;
+    public bool Undefined => OutputNative?.Tag == 0;
 
     /// <summary>
     ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.

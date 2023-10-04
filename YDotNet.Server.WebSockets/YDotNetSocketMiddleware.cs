@@ -78,7 +78,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
             return;
         }
 
-        var documentName = httpContext.Request.Path;
+        var documentName = httpContext.Request.Path.ToString().Substring(1);
         var documentStates = statesPerDocumentName.GetOrAdd(documentName, _ => new List<ClientState>());
 
         logger.LogDebug("Websocket connection to {document} established.", documentName);

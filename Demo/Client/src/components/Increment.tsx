@@ -34,11 +34,11 @@ export const Increment = () => {
     };
 
     return (
-        <Row>
+        <Row noGutters>
             <Col xs='auto'>
                 <Button onClick={_decrement}>-1</Button>
             </Col>
-            <Col xs={5}>
+            <Col xs={5} className='pl-2 pr-2'>
                 <Input readOnly value={state}></Input>
             </Col>
             <Col xs='auto'>

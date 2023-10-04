@@ -107,10 +107,16 @@ public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
         }
     }
 
-    public async ValueTask OnDocumentLoadedAsync(DocumentLoadEvent @event)
+    public ValueTask OnDocumentLoadedAsync(DocumentLoadEvent @event)
     {
-        await SendAwarenessRequest(@event.Context);
-        await SendSync1Async(@event.Context);
+        // Run these callbacks in another thread because it could cause deadlocks if it would interact with the same document.
+        _ = Task.Run(async () =>
+        {
+            await SendAwarenessRequest(@event.Context);
+            await SendSync1Async(@event.Context);
+        });
+
+        return default;
     }
 
     public async ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
