@@ -65,7 +65,7 @@ public static class YDotNetExtensions
 
         WriteValue(output, jsonWriter, transaction);
 
-        static void WriteMap(IDictionary<string, Output> obj, Utf8JsonWriter jsonWriter, Transaction transaction)
+        static void WriteObject(IDictionary<string, Output> obj, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
             jsonWriter.WriteStartObject();
 
@@ -75,6 +75,30 @@ public static class YDotNetExtensions
             }
 
             jsonWriter.WriteEndObject();
+        }
+
+        static void WriteCollection(Output[] array, Utf8JsonWriter jsonWriter, Transaction transaction)
+        {
+            jsonWriter.WriteStartArray();
+
+            foreach (var item in array)
+            {
+                WriteValue(item, jsonWriter, transaction);
+            }
+
+            jsonWriter.WriteEndArray();
+        }
+
+        static void WriteMap(Map map, Utf8JsonWriter jsonWriter, Transaction transaction)
+        {
+            jsonWriter.WriteStartArray();
+
+            foreach (var property in map.Iterate(transaction) ?? throw new InvalidOperationException("Failed to iterate array."))
+            {
+                WriteProperty(property.Key, property.Value, jsonWriter, transaction);
+            }
+
+            jsonWriter.WriteEndArray();
         }
 
         static void WriteArray(Array array, Utf8JsonWriter jsonWriter, Transaction transaction)
@@ -114,7 +138,15 @@ public static class YDotNetExtensions
             {
                 jsonWriter.WriteNullValue();
             }
-            else if (output.Object is IDictionary<string, Output> map)
+            else if (output.Object is IDictionary<string, Output> obj)
+            {
+                WriteObject(obj, jsonWriter, transaction);
+            }
+            else if (output.Collection is Output[] collection)
+            {
+                WriteCollection(collection, jsonWriter, transaction);
+            }
+            else if (output.Map is Map map)
             {
                 WriteMap(map, jsonWriter, transaction);
             }
