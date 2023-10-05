@@ -4,7 +4,7 @@ using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
 
-internal sealed class DocumentContainerCache : IAsyncDisposable
+internal sealed class DocumentCache : IAsyncDisposable
 {
     private readonly IDocumentStorage documentStorage;
     private readonly IDocumentCallback documentCallback;
@@ -14,7 +14,7 @@ internal sealed class DocumentContainerCache : IAsyncDisposable
     private readonly Dictionary<string, DocumentContainer> livingContainers = new();
     private readonly SemaphoreSlim slimLock = new(1);
 
-    public DocumentContainerCache(
+    public DocumentCache(
         IDocumentStorage documentStorage,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,

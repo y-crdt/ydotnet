@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YDotNet.Document;
-using YDotNet.Document.Transactions;
 using YDotNet.Server.Internal;
 using YDotNet.Server.Storage;
 using IDocumentCallbacks = System.Collections.Generic.IEnumerable<YDotNet.Server.IDocumentCallback>;
@@ -91,7 +90,6 @@ public sealed class DefaultDocumentManager : IDocumentManager
 
         if (result.Diff != null)
         {
-            // The diff is just the plain byte array from the client.
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
@@ -120,11 +118,10 @@ public sealed class DefaultDocumentManager : IDocumentManager
 
         if (diff != null)
         {
-            // The result from the library already contains all the headers and is therefore not protocol agnostic.
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
-                Diff = await diff.GetUpdateArray(),
+                Diff = diff,
                 Document = doc,
                 Source = this,
             });
