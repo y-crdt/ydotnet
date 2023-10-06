@@ -114,11 +114,6 @@ jobs:
         run: |
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
-
-      - name: Patch yffi/Cargo.toml
-        run: |
-          patch yrs/yffi/Cargo.toml resources/patch/yffi/Cargo.toml.patch
-        shell: bash
         
       - name: Build (cargo)
         if: "!matrix.cross"
