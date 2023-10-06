@@ -11,9 +11,9 @@ jobs:
     strategy:
       matrix:
         include:
-          # Windows
-          - build: win-x64
-            os: windows-latest
+          # Linux
+          - build: linux-x64
+            os: ubuntu-latest
            
     steps:
       - name: Checkout repository
