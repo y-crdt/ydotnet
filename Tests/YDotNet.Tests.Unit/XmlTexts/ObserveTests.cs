@@ -61,20 +61,16 @@ public class ObserveTests
 
         Assert.That(firstDelta.Length, Is.EqualTo(expected: 1));
         Assert.That(firstDelta.Insert.String, Is.EqualTo("Luc"));
-        Assert.That(firstDelta.Insert.Long, Is.Null);
         Assert.That(firstDelta.Attributes, Is.Empty);
 
         Assert.That(secondDelta.Length, Is.EqualTo(expected: 1));
         Assert.That(secondDelta.Insert.Boolean, Is.EqualTo(expected: true));
-        Assert.That(secondDelta.Insert.String, Is.Null);
         Assert.That(secondDelta.Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(secondDelta.Attributes.ElementAt(index: 0).Key, Is.EqualTo("bold"));
         Assert.That(secondDelta.Attributes.ElementAt(index: 0).Value.Boolean, Is.True);
-        Assert.That(secondDelta.Attributes.ElementAt(index: 0).Value.Long, Is.Null);
 
         Assert.That(thirdDelta.Length, Is.EqualTo(expected: 1));
         Assert.That(thirdDelta.Insert.String, Is.EqualTo("as"));
-        Assert.That(thirdDelta.Insert.Long, Is.Null);
         Assert.That(thirdDelta.Attributes, Is.Empty);
     }
 

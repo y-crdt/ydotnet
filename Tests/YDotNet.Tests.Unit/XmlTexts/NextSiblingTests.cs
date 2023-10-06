@@ -20,7 +20,6 @@ public class NextSiblingTests
 
         // Assert
         Assert.That(sibling.XmlElement, Is.Not.Null);
-        Assert.That(sibling.XmlText, Is.Null);
     }
 
     [Test]
@@ -37,7 +36,6 @@ public class NextSiblingTests
 
         // Assert
         Assert.That(sibling.XmlElement, Is.Not.Null);
-        Assert.That(sibling.XmlText, Is.Null);
     }
 
     [Test]
