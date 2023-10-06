@@ -56,7 +56,7 @@ jobs:
 
       - name: Copy to Test Folder
         run: |
-          copy output/${{matrix.build}}/*.* Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
+          cp output/${{matrix.build}}/*.* Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
 
       - name: Test
         run: |
