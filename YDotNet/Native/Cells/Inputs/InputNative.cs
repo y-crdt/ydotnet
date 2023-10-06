@@ -6,9 +6,9 @@ namespace YDotNet.Native.Cells.Inputs;
 [StructLayout(LayoutKind.Explicit, Size = 24)]
 internal struct InputNative
 {
-    [FieldOffset(offset: 0)]
-    public sbyte Tag;
+    [field: FieldOffset(offset: 0)]
+    public sbyte Tag { get; }
 
-    [FieldOffset(offset: 1)]
-    public uint Length;
+    [field: FieldOffset(offset: 4)]
+    public uint Length { get; }
 }

@@ -7,9 +7,9 @@ internal struct OutputNative
 {
     internal const int Size = 16;
 
-    [FieldOffset(offset: 0)]
-    public sbyte Tag;
+    [field: FieldOffset(offset: 0)]
+    public sbyte Tag { get; }
 
-    [FieldOffset(offset: 1)]
-    public uint Length;
+    [field: FieldOffset(offset: 4)]
+    public uint Length { get; }
 }
