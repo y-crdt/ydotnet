@@ -6,6 +6,62 @@ on:
       - '*'
   
 jobs:
+  test:
+  runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        include:
+          # Windows
+          - build: win-x64
+            os: windows-latest
+            
+          # Linux
+          - build: linux-x64
+            os: ubuntu-latest
+
+          - build: linux-x64-musl
+            os: ubuntu-latest
+
+          - build: linux-armv7
+            os: ubuntu-latest
+
+          - build: linux-armv7-musl
+            os: ubuntu-latest
+
+          - build: linux-arm64
+            os: ubuntu-latest
+
+          - build: linux-arm64-musl
+            os: ubuntu-latest
+
+          # macOS
+          - build: macos
+            os: macos-latest
+           
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+     
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+
+      - name: Build Test
+        run: |
+          cd Tests
+          dotnet build
+
+      - name: Copy to Test Folder
+        run: |
+          copy output/${{matrix.build}}/*.* Tests/bin/Debug/net7.0
+
+      - name: Test
+        run: |
+          dotnet test
+
   pack-nuget:
     runs-on: ubuntu-latest
            
