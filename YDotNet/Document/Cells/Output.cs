@@ -220,7 +220,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.Map);
+            EnsureType(OutputInputType.YMap);
 
             return ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
