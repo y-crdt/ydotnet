@@ -290,7 +290,7 @@ public class Output : IDisposable
 
     private void EnsureType(OutputInputType expectedType)
     {
-        if (Type == expectedType)
+        if (Type != expectedType)
         {
             throw new InvalidOperationException($"Expected {expectedType}, got {Type}.");
         }
