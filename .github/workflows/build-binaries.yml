@@ -5,7 +5,7 @@ on:
     tags: 
       - 'binaries[0-9]'
 env:
-  YRS_REPO: https://github.com/LSViana/y-crdt
+  YRS_REPO: https://github.com/SebastianStehle/y-crdt
   YRS_BRANCH: main
   CARGO_TERM_COLOR: always
   
