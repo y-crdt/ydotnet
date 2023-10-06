@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\output\macos\libyrs.so" Pack="True" Link="runtimes\osx\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\macos\libyrs.so" Pack="True" PackagePath="runtimes\osx\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

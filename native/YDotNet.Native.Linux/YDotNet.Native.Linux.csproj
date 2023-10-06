@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\output\linux-arm64-musl\libyrs.so" Pack="True" Link="runtimes\linux-musl-x64/\native\%(Filename)%(Extension)" />
-    <None Include="..\..\output\linux-arm64\libyrs.so" Pack="True" Link="runtimes\linux-arm64\native\%(Filename)%(Extension)" />
-    <None Include="..\..\output\linux-armv7-musl\libyrs.so" Pack="True" Link="runtimes\linux-musl-arm\native\%(Filename)%(Extension)" />
-    <None Include="..\..\output\linux-armv7\libyrs.so" Pack="True" Link="runtimes\linux-arm\native\%(Filename)%(Extension)" />
-    <None Include="..\..\output\linux-x64-musl\libyrs.so" Pack="True" Link="runtimes\linux-x64-musl\native\%(Filename)%(Extension)" />
-    <None Include="..\..\output\linux-x64\libyrs.so" Pack="True" Link="runtimes\linux-x64\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-arm64-musl\libyrs.so" Pack="True" PackagePath="runtimes\linux-musl-x64/\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-arm64\libyrs.so" Pack="True" PackagePath="runtimes\linux-arm64\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-armv7-musl\libyrs.so" Pack="True" PackagePath="runtimes\linux-musl-arm\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-armv7\libyrs.so" Pack="True" PackagePath="runtimes\linux-arm\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-x64-musl\libyrs.so" Pack="True" PackagePath="runtimes\linux-x64-musl\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\linux-x64\libyrs.so" Pack="True" PackagePath="runtimes\linux-x64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
