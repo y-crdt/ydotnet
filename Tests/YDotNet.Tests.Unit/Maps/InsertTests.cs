@@ -210,6 +210,24 @@ public class InsertTests
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 1));
+        Assert.That(map.Get(transaction, "value").Type, Is.EqualTo(OutputInputType.Array));
+    }
+
+    [Test]
+    public void InsertEmptyArray()
+    {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value", Input.Array(Array.Empty<Input>()));
+        var length = map.Length(transaction);
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 1));
+        Assert.That(map.Get(transaction, "value").Type, Is.EqualTo(OutputInputType.Array));
     }
 
     [Test]
