@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageFile Include="..\..\output\win-x64\yrs.dll" PackagePath="runtimes\win-x64\native\%(Filename)%(Extension)" />
+    <None Include="..\..\output\win-x64\yrs.dll" Pack="True" Link="runtimes\win-x64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
