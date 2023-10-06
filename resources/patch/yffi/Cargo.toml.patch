@@ -1,0 +1,9 @@
+--- yrs/yffi/Cargo.toml	2023-08-06 21:09:32.704256700 -0400
++++ yrs/yffi/Cargo.toml	2023-08-06 21:12:42.317515700 -0400
+@@ -17,5 +17,5 @@
+ rand = "0.7.0"
+ 
+ [lib]
+-crate-type = ["staticlib"]
++crate-type = ["staticlib", "cdylib"]
+ name = "yrs"

@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - '*'
+  
+jobs:
+  pack-nuget:
+    runs-on: ubuntu-latest
+           
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            NativeAssets
+     
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+
+      - name: Nuget pack
+        run: |
+          dotnet pack -c Release

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageFile Include="..\..\output\linux-arm64-musl\libyrs.so" PackagePath="runtimes\linux-musl-x64/\native\%(Filename)%(Extension)" />
+    <PackageFile Include="..\..\output\linux-arm64\libyrs.so" PackagePath="runtimes\linux-arm64\native\%(Filename)%(Extension)" />
+    <PackageFile Include="..\..\output\linux-armv7-musl\libyrs.so" PackagePath="runtimes\linux-musl-arm\native\%(Filename)%(Extension)" />
+    <PackageFile Include="..\..\output\linux-armv7\libyrs.so" PackagePath="runtimes\linux-arm\native\%(Filename)%(Extension)" />
+    <PackageFile Include="..\..\output\linux-x64-musl\libyrs.so" PackagePath="runtimes\linux-x64-musl\native\%(Filename)%(Extension)" />
+    <PackageFile Include="..\..\output\linux-x64\libyrs.so" PackagePath="runtimes\linux-x64\native\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageFile Include="..\..\output\macos\libyrs.so" PackagePath="runtimes\osx\native\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
