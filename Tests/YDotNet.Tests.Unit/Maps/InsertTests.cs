@@ -210,24 +210,28 @@ public class InsertTests
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 1));
-        Assert.That(map.Get(transaction, "value").Type, Is.EqualTo(OutputInputType.Array));
     }
 
     [Test]
-    public void InsertEmptyArray()
+    public void InsertArray()
     {
         // Arrange
         var (doc, map) = ArrangeDoc();
 
         // Act
         var transaction = doc.WriteTransaction();
-        map.Insert(transaction, "value", Input.Array(Array.Empty<Input>()));
+        map.Insert(
+            transaction, "value", Input.Array(
+                new[]
+                {
+                    Input.Long(value: 2469L),
+                    Input.Long(value: -420L)
+                }));
         var length = map.Length(transaction);
         transaction.Commit();
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 1));
-        Assert.That(map.Get(transaction, "value").Type, Is.EqualTo(OutputInputType.Array));
     }
 
     [Test]

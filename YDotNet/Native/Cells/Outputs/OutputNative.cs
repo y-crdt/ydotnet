@@ -10,6 +10,6 @@ internal struct OutputNative
     [field: FieldOffset(offset: 0)]
     public sbyte Tag { get; }
 
-    [field: FieldOffset(offset: 4)]
+    [field: FieldOffset(offset: 1)]
     public uint Length { get; }
 }
