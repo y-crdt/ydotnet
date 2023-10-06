@@ -137,6 +137,5 @@ public class ObserveTests
         Assert.That(eventDeltas.First().Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Attributes.First().Key, Is.EqualTo("bold"));
         Assert.That(eventDeltas.First().Attributes.First().Value.Boolean, Is.True);
-        Assert.That(eventDeltas.First().Attributes.First().Value.Long, Is.Null);
     }
 }

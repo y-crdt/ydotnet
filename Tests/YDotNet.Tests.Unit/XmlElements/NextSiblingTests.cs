@@ -19,7 +19,6 @@ public class NextSiblingTests
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.XmlElement, Is.Null);
         Assert.That(sibling.XmlText, Is.Not.Null);
     }
 
@@ -36,7 +35,6 @@ public class NextSiblingTests
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.XmlElement, Is.Null);
         Assert.That(sibling.XmlText, Is.Not.Null);
     }
 

@@ -182,7 +182,6 @@ public class UndoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(value1.Long, Is.EqualTo(expected: 2469L));
-        Assert.That(value1.String, Is.Null);
         Assert.That(result, Is.True);
     }
 

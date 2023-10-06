@@ -47,7 +47,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonString);
+            EnsureType(OutputInputType.String);
 
             MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
 
@@ -62,7 +62,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonBool);
+            EnsureType(OutputInputType.Bool);
 
             var value = OutputChannel.Boolean(Handle);
 
@@ -82,7 +82,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonNumber);
+            EnsureType(OutputInputType.Double);
 
             var value = OutputChannel.Double(Handle);
 
@@ -102,7 +102,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonInteger);
+            EnsureType(OutputInputType.Long);
 
             var value = OutputChannel.Long(Handle);
 
@@ -122,7 +122,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonBuffer);
+            EnsureType(OutputInputType.Bytes);
 
             var result = MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Value.Length) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -143,7 +143,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonArray);
+            EnsureType(OutputInputType.Collection);
 
             var handles = MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Collection(Handle), OutputNative!.Value.Length, Marshal.SizeOf<OutputNative>());
@@ -164,7 +164,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.JsonMap);
+            EnsureType(OutputInputType.Object);
 
             var handles = MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Object(Handle), OutputNative!.Value.Length, Marshal.SizeOf<MapEntryNative>());
@@ -191,12 +191,12 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
-    public bool Null => Type == OutputInputType.JsonNull;
+    public bool Null => Type == OutputInputType.Null;
 
     /// <summary>
     ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
     /// </summary>
-    public bool Undefined => Type == OutputInputType.JsonUndefined;
+    public bool Undefined => Type == OutputInputType.Undefined;
 
     /// <summary>
     ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
@@ -205,7 +205,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.YArray);
+            EnsureType(OutputInputType.Array);
 
             return ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -220,7 +220,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.YMap);
+            EnsureType(OutputInputType.Map);
 
             return ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -236,7 +236,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.YText);
+            EnsureType(OutputInputType.Text);
 
             return ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -251,7 +251,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.YXmlElement);
+            EnsureType(OutputInputType.XmlElement);
 
             return ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -266,7 +266,7 @@ public class Output : IDisposable
     {
         get
         {
-            EnsureType(OutputInputType.YXmlText);
+            EnsureType(OutputInputType.XmlText);
 
             return ReferenceAccessor.Access(new XmlText(OutputChannel.XmlText(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
