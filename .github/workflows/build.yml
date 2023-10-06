@@ -51,12 +51,12 @@ jobs:
 
       - name: Build Test
         run: |
-          cd Tests
+          cd Tests/YDotNet.Tests.Unit
           dotnet build
 
       - name: Copy to Test Folder
         run: |
-          copy output/${{matrix.build}}/*.* Tests/bin/Debug/net7.0
+          copy output/${{matrix.build}}/*.* Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
 
       - name: Test
         run: |
@@ -64,6 +64,7 @@ jobs:
 
   pack-nuget:
     runs-on: ubuntu-latest
+    needs: test
            
     steps:
       - name: Checkout repository
