@@ -14,29 +14,6 @@ jobs:
           # Windows
           - build: win-x64
             os: windows-latest
-            
-          # Linux
-          - build: linux-x64
-            os: ubuntu-latest
-
-          - build: linux-x64-musl
-            os: ubuntu-latest
-
-          - build: linux-armv7
-            os: ubuntu-latest
-
-          - build: linux-armv7-musl
-            os: ubuntu-latest
-
-          - build: linux-arm64
-            os: ubuntu-latest
-
-          - build: linux-arm64-musl
-            os: ubuntu-latest
-
-          # macOS
-          - build: macos
-            os: macos-latest
            
     steps:
       - name: Checkout repository
@@ -56,8 +33,9 @@ jobs:
 
       - name: Copy to Test Folder
         run: |
-          ls output/${{matrix.build}}
           cp output/${{matrix.build}}/*.* Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
+          ls output/${{matrix.build}}
+          ls Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
 
       - name: Test
         run: |
