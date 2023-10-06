@@ -12,8 +12,8 @@ jobs:
       matrix:
         include:
           # Linux
-          - build: linux-x64
-            os: ubuntu-latest
+          - build: macos
+            os: macos-latest
            
     steps:
       - name: Checkout repository
