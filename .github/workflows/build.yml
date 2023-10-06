@@ -9,9 +9,34 @@ jobs:
   test:
     runs-on: ${{matrix.os}}
     strategy:
+      fail-fast: false
+      
       matrix:
         include:
-          # Linux
+          # Windows
+          - build: win-x64
+            os: windows-latest
+             
+            # Linux
+          - build: linux-x64
+            os: ubuntu-latest
+
+          - build: linux-x64-musl
+            os: ubuntu-latest
+
+          - build: linux-armv7
+            os: ubuntu-latest
+
+          - build: linux-armv7-musl
+            os: ubuntu-latest
+
+          - build: linux-arm64
+            os: ubuntu-latest
+
+          - build: linux-arm64-musl
+            os: ubuntu-latest
+
+          # macOS
           - build: macos
             os: macos-latest
            
