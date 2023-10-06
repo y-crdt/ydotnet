@@ -23,3 +23,9 @@ jobs:
       - name: Nuget pack
         run: |
           dotnet pack -c Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            **/*.nupkg
