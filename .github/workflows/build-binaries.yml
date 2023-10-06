@@ -12,7 +12,6 @@ env:
 jobs:
   # Based on https://www.rohanjain.in/cargo-cross/
   build-native-binaries:
-    name: Build native libraries
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
