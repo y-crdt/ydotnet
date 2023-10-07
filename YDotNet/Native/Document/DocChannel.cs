@@ -5,11 +5,11 @@ namespace YDotNet.Native.Document;
 
 internal static class DocChannel
 {
-    public delegate void ObserveAfterTransactionCallback(nint state, nint afterTransactionEvent);
+    public delegate void ObserveAfterTransactionCallback(nint state, nint eventHandle);
 
     public delegate void ObserveClearCallback(nint state, nint doc);
 
-    public delegate void ObserveSubdocsCallback(nint state, SubDocsEventNative subDocsEvent);
+    public delegate void ObserveSubdocsCallback(nint state, int eventHandle);
 
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
