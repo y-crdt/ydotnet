@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ObjectLayoutInspector" Version="0.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\YDotNet\YDotNet.csproj" />
   </ItemGroup>
 

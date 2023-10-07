@@ -391,7 +391,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveAfterTransaction(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(MemoryReader.ReadStruct<AfterTransactionEventNative>(eventHandle).ToAfterTransactionEvent()));
+            (_, eventHandler) => action(MemoryReader.ReadStruct<AfterTransactionEventNative>(eventHandler).ToAfterTransactionEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -416,7 +416,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent()));
+            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
 
         return new EventSubscription(subscriptionId);
     }

@@ -9,7 +9,7 @@ internal static class DocChannel
 
     public delegate void ObserveClearCallback(nint state, nint doc);
 
-    public delegate void ObserveSubdocsCallback(nint state, int eventHandle);
+    public delegate void ObserveSubdocsCallback(nint state, SubDocsEventNative subDocsEvent);
 
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 
