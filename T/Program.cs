@@ -1,5 +1,6 @@
 using YDotNet.Document;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Events;
 
 namespace T
 {
@@ -7,29 +8,37 @@ namespace T
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(sizeof(uint));
-            Console.WriteLine(sizeof(ulong));
-
             // Arrange
             var doc = new Doc();
-            var array1 = doc.Array("array-1");
 
-            var transaction = doc.WriteTransaction();
-            array1.InsertRange(
-                transaction, index: 0, new[]
+            AfterTransactionEvent? afterTransactionEvent = null;
+            var called = 0;
+
+            var text = doc.Text("country");
+            var subscription = doc.ObserveAfterTransaction(
+                e =>
                 {
-                Input.Long(value: 2469L),
-                Input.Null(),
-                Input.Boolean(value: false),
-                Input.Map(new Dictionary<string, Input>())
+                    called++;
+                    afterTransactionEvent = e;
                 });
 
-            var map2 = array1.Get(transaction, index: 3).Map;
-            var i = Input.Array(Array.Empty<Input>());
-            Console.WriteLine(i.InputNative.Tag);
-            Console.Out.Flush();
-            Thread.Sleep(10000);
-            map2.Insert(transaction, "array-3", i);
+            // Act
+            var transaction = doc.WriteTransaction();
+            text.Insert(transaction, index: 0, "Brazil");
+            transaction.Commit();
+            // Act
+            afterTransactionEvent = null;
+            transaction = doc.WriteTransaction();
+            text.Insert(transaction, index: 0, "Great ");
+            transaction.Commit();
+
+            // Act
+            afterTransactionEvent = null;
+            doc.UnobserveAfterTransaction(subscription);
+
+            transaction = doc.WriteTransaction();
+            text.Insert(transaction, index: 0, "The ");
+            transaction.Commit();
         }
     }
 }
