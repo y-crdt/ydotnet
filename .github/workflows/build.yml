@@ -52,7 +52,7 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test
+          dotnet test -v n -m:1
         env:
           RUST_BACKTRACE: 1
 
