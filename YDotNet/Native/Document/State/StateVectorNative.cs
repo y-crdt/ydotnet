@@ -3,13 +3,16 @@ using YDotNet.Document.State;
 
 namespace YDotNet.Native.Document.State;
 
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = 24)]
 internal struct StateVectorNative
 {
+    [field: FieldOffset(0)]
     public uint EntriesCount { get; }
 
+    [field: FieldOffset(8)]
     public nint ClientIds { get; }
 
+    [field: FieldOffset(16)]
     public nint Clocks { get; }
 
     public StateVector ToStateVector()
