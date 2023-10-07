@@ -22,7 +22,11 @@ namespace T
                 });
 
             var map2 = array1.Get(transaction, index: 3).Map;
-            map2.Insert(transaction, "array-3", Input.Array(Array.Empty<Input>()));
+            var i = Input.Array(Array.Empty<Input>());
+            Console.WriteLine(i.InputNative.Tag);
+            Console.Out.Flush();
+            Thread.Sleep(10000);
+            map2.Insert(transaction, "array-3", i);
         }
     }
 }

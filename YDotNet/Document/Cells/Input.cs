@@ -11,7 +11,7 @@ public abstract class Input : IDisposable
     /// <summary>
     ///     Gets or sets the native input cell represented by this cell.
     /// </summary>
-    internal InputNative InputNative { get; set; }
+    public InputNative InputNative { get; set; }
 
     /// <inheritdoc />
     public abstract void Dispose();
