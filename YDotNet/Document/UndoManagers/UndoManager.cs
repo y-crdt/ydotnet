@@ -4,6 +4,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.UndoManager;
+using YDotNet.Native.UndoManager.Events;
 
 namespace YDotNet.Document.UndoManagers;
 
@@ -50,7 +51,7 @@ public class UndoManager : IDisposable
         var subscriptionId = UndoManagerChannel.ObserveAdded(
             Handle,
             nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
+            (_, eventHandle) => action(MemoryReader.ReadStruct<UndoEventNative>(eventHandle).ToUndoEvent()));
 
         return new EventSubscription(subscriptionId);
     }
@@ -76,7 +77,7 @@ public class UndoManager : IDisposable
         var subscriptionId = UndoManagerChannel.ObservePopped(
             Handle,
             nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
+            (_, eventHandle) => action(MemoryReader.ReadStruct<UndoEventNative>(eventHandle).ToUndoEvent()));
 
         return new EventSubscription(subscriptionId);
     }

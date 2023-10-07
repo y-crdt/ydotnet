@@ -41,18 +41,18 @@ jobs:
 
       - name: Build Test
         run: |
-          cd T
+          cd Tests/YDotNet.Tests.Unit
           dotnet build
 
       - name: Copy to Test Folder
         run: |
-          cp output/${{matrix.build}}/*.* T/bin/Debug/net7.0
+          cp output/${{matrix.build}}/*.* Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
           ls output/${{matrix.build}}
-          ls T/bin/Debug/net7.0
+          ls Tests/YDotNet.Tests.Unit/bin/Debug/net7.0
 
       - name: Test
         run: |
-          cd T && dotnet run
+          dotnet test -v n -m:1
         env:
           RUST_BACKTRACE: 1
 
