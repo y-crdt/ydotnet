@@ -13,8 +13,6 @@ internal struct StateVectorNative
 
     public StateVector ToStateVector()
     {
-        Console.WriteLine("Entries {0}", EntriesCount);
-
         var entries = new Dictionary<ulong, uint>();
 
         for (var i = 0; i < EntriesCount; i++)
