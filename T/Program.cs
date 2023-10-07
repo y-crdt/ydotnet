@@ -7,6 +7,9 @@ namespace T
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(sizeof(uint));
+            Console.WriteLine(sizeof(ulong));
+
             // Arrange
             var doc = new Doc();
             var array1 = doc.Array("array-1");
