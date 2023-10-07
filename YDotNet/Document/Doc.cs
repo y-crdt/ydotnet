@@ -416,7 +416,7 @@ public class Doc : IDisposable
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
-            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+            (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent()));
 
         return new EventSubscription(subscriptionId);
     }
