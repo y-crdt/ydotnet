@@ -35,10 +35,12 @@ public class Map : Branch
     public void Insert(Transaction transaction, string key, Input input)
     {
         var keyHandle = MemoryWriter.WriteUtf8String(key);
+        var valuePointer = MemoryWriter.WriteStruct(input.InputNative);
 
-        MapChannel.Insert(Handle, transaction.Handle, keyHandle, input.InputNative);
+        MapChannel.Insert(Handle, transaction.Handle, keyHandle, valuePointer);
 
         MemoryWriter.Release(keyHandle);
+        MemoryWriter.Release(valuePointer);
     }
 
     /// <summary>
