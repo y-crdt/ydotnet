@@ -22,6 +22,12 @@ internal static class MemoryReader
         return data;
     }
 
+    internal static T ReadStruct<T>(nint handle)
+        where T : struct
+    {
+        return Marshal.PtrToStructure<T>(handle);
+    }
+
     internal static byte[]? TryReadBytes(nint handle, uint length)
     {
         return handle == nint.Zero ? null : ReadBytes(handle, length);
