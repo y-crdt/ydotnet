@@ -116,7 +116,7 @@ public class ObserveTests
 
         Assert.That(eventChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.ElementAt(index: 0).Length, Is.EqualTo(expected: 1));
-        Assert.That(eventChanges.ElementAt(index: 0).Values.First().Undefined, Is.True);
+        Assert.That(eventChanges.ElementAt(index: 0).Values.First().Type, Is.EqualTo(OutputInputType.Undefined));
 
         Assert.That(eventChanges.ElementAt(index: 1).Tag, Is.EqualTo(EventChangeTag.Retain));
         Assert.That(eventChanges.ElementAt(index: 1).Length, Is.EqualTo(expected: 2));

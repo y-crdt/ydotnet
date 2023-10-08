@@ -165,7 +165,6 @@ public class UndoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(value2.String, Is.EqualTo("Lucas"));
-        Assert.That(value2.Undefined, Is.False);
         Assert.That(result, Is.True);
 
         // Act (remove and undo)

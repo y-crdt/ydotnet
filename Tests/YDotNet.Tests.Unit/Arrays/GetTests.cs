@@ -52,7 +52,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Undefined, Is.True);
+        Assert.That(output.Type, Is.EqualTo(OutputInputType.Undefined));
     }
 
     [Test]

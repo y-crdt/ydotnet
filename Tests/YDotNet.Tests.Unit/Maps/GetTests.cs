@@ -161,14 +161,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Null;
-        var value2 = map.Get(transaction, "value2").Null;
-        var value3 = map.Get(transaction, "value3").Null;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value3 = map.Get(transaction, "value3");
 
         // Assert
-        Assert.That(value1, Is.True);
-        Assert.That(value2, Is.False);
-        Assert.That(value3, Is.False);
+        Assert.That(value1.Type, Is.EqualTo(OutputInputType.Null));
+        Assert.That(value2.Type, Is.Not.EqualTo(OutputInputType.Null));
+        Assert.That(value3.Type, Is.Not.EqualTo(OutputInputType.Null));
     }
 
     [Test]
@@ -182,14 +182,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Undefined;
-        var value2 = map.Get(transaction, "value2").Undefined;
-        var value3 = map.Get(transaction, "value3").Undefined;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value3 = map.Get(transaction, "value3");
 
         // Assert
-        Assert.That(value1, Is.True);
-        Assert.That(value2, Is.False);
-        Assert.That(value3, Is.False);
+        Assert.That(value1.Type, Is.EqualTo(OutputInputType.Undefined));
+        Assert.That(value2.Type, Is.Not.EqualTo(OutputInputType.Undefined));
+        Assert.That(value3.Type, Is.Not.EqualTo(OutputInputType.Undefined));
     }
 
     [Test]

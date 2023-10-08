@@ -170,7 +170,7 @@ public class RedoTests
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 4));
-        Assert.That(value2.Undefined, Is.True);
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Undefined));
         Assert.That(result, Is.True);
 
         // Act (remove, undo, and redo)

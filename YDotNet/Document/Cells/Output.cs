@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
@@ -29,14 +28,14 @@ public class Output
     {
         if (handle == nint.Zero)
         {
-            value = new Lazy<object?>((object?)null);
-            return;
+            throw new ArgumentException("Handle cannot be zero.", nameof(handle));
         }
 
         var native = Marshal.PtrToStructure<OutputNative>(handle);
 
-        Type = (OutputInputType)native.Tag;
+        Type = (OutputType)native.Tag;
 
+        // We use lazy because some types like Doc and Map need to be disposed and therefore they should not be allocated, if not needed.
         value = BuildValue(handle, native.Length, Type);
 
         if (shouldDispose)
@@ -46,91 +45,89 @@ public class Output
     }
 
     /// <summary>
-    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="Doc" /> value.
     /// </summary>
-    public Doc Doc => GetValue<Doc>(OutputInputType.Doc);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Doc" />.</exception>
+    public Doc Doc => GetValue<Doc>(OutputType.Doc);
 
     /// <summary>
-    ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="string" /> value.
     /// </summary>
-    public string String => GetValue<string>(OutputInputType.String);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="string" />.</exception>
+    public string String => GetValue<string>(OutputType.String);
 
     /// <summary>
-    ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="bool" /> value.
     /// </summary>
-    public bool Boolean => GetValue<bool>(OutputInputType.Bool);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="string" />.</exception>
+    public bool Boolean => GetValue<bool>(OutputType.Bool);
 
     /// <summary>
-    ///     Gets the <see cref="double" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="double" /> value.
     /// </summary>
-    public double Double => GetValue<double>(OutputInputType.Double);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="double" />.</exception>
+    public double Double => GetValue<double>(OutputType.Double);
 
     /// <summary>
-    ///     Gets the <see cref="long" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="long" /> value.
     /// </summary>
-    public long Long => GetValue<long>(OutputInputType.Long);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="long" />.</exception>
+    public long Long => GetValue<long>(OutputType.Long);
 
     /// <summary>
-    ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="byte" /> array value.
     /// </summary>
-    public byte[] Bytes => GetValue<byte[]>(OutputInputType.Bytes);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="byte" /> array.</exception>
+    public byte[] Bytes => GetValue<byte[]>(OutputType.Bytes);
 
     /// <summary>
-    ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Output" /> collection.
     /// </summary>
-    public Output[] Collection => GetValue<Output[]>(OutputInputType.Collection);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Output" /> collection.</exception>
+    public Output[] Collection => GetValue<Output[]>(OutputType.Collection);
 
     /// <summary>
-    ///     Gets the <see cref="Input" /> dictionary or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the value as json object.
     /// </summary>
-    public IDictionary<string, Output>? Object => GetValue<IDictionary<string, Output>>(OutputInputType.Object);
+    /// <exception cref="InvalidOperationException">Value is not a json object.</exception>
+    public IDictionary<string, Output>? Object => GetValue<IDictionary<string, Output>>(OutputType.Object);
 
     /// <summary>
-    ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
+    ///     Gets the <see cref="Array" /> value.
     /// </summary>
-    public bool Null => Type == OutputInputType.Null;
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Array" />.</exception>
+    public Array Array => GetValue<Array>(OutputType.Array);
 
     /// <summary>
-    ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
+    ///     Gets the <see cref="Map" /> value.
     /// </summary>
-    public bool Undefined => Type == OutputInputType.Undefined;
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Map" />.</exception>
+    public Map Map => GetValue<Map>(OutputType.Map);
 
     /// <summary>
-    ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Map" /> value.
     /// </summary>
-    public Array Array => GetValue<Array>(OutputInputType.Array);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Map" />.</exception>
+    public Text Text => GetValue<Text>(OutputType.Text);
 
     /// <summary>
-    ///     Gets the <see cref="Types.Maps.Map" /> or <c>null</c> if this output cells contains a different
-    ///     type stored.
+    ///     Gets the <see cref="XmlElement" /> value.
     /// </summary>
-    public Map Map => GetValue<Map>(OutputInputType.Map);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlElement" />.</exception>
+    public XmlElement XmlElement => GetValue<XmlElement>(OutputType.XmlElement);
 
     /// <summary>
-    ///     Gets the <see cref="Types.Texts.Text" /> or <c>null</c> if this output cells contains a different
-    ///     type
-    ///     stored.
+    ///     Gets the <see cref="XmlText" /> value.
     /// </summary>
-    public Text Text => GetValue<Text>(OutputInputType.Text);
-
-    /// <summary>
-    ///     Gets the <see cref="Types.XmlElements.XmlElement" /> or <c>null</c> if this output cells contains
-    ///     a different type stored.
-    /// </summary>
-    public XmlElement XmlElement => GetValue<XmlElement>(OutputInputType.XmlElement);
-
-    /// <summary>
-    ///     Gets the <see cref="Types.XmlTexts.XmlText" /> or <c>null</c> if this output cells contains a
-    ///     different type stored.
-    /// </summary>
-    public XmlText? XmlText => GetValue<XmlText>(OutputInputType.XmlText);
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlText" />.</exception>
+    public XmlText XmlText => GetValue<XmlText>(OutputType.XmlText);
 
     /// <summary>
     ///     Gets the type of the output.
     /// </summary>
-    public OutputInputType Type { get; private set; }
+    public OutputType Type { get; private set; }
 
-    private static Lazy<object?> BuildValue(nint handle, uint length, OutputInputType type)
+    private static Lazy<object?> BuildValue(nint handle, uint length, OutputType type)
     {
         static nint GuardHandle(nint handle)
         {
@@ -144,35 +141,35 @@ public class Output
 
         switch (type)
         {
-            case OutputInputType.Bool:
+            case OutputType.Bool:
                 {
                     var value = GuardHandle(OutputChannel.Boolean(handle));
 
                     return new Lazy<object?>((object?)(Marshal.PtrToStructure<byte>(value) == 1));
                 }
 
-            case OutputInputType.Double:
+            case OutputType.Double:
                 {
                     var value = GuardHandle(OutputChannel.Double(handle));
 
                     return new Lazy<object?>(Marshal.PtrToStructure<double>(value));
                 }
 
-            case OutputInputType.Long:
+            case OutputType.Long:
                 {
                     var value = GuardHandle(OutputChannel.Long(handle));
 
                     return new Lazy<object?>(Marshal.PtrToStructure<long>(value));
                 }
 
-            case OutputInputType.String:
+            case OutputType.String:
                 {
                     MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
 
                     return new Lazy<object?>(result);
                 }
 
-            case OutputInputType.Bytes:
+            case OutputType.Bytes:
                 {
                     var pointer = GuardHandle(OutputChannel.Bytes(handle));
 
@@ -188,7 +185,7 @@ public class Output
                     return new Lazy<object?>(result);
                 }
 
-            case OutputInputType.Collection:
+            case OutputType.Collection:
                 {
                     var pointer = GuardHandle(OutputChannel.Collection(handle));
 
@@ -201,7 +198,7 @@ public class Output
                     return new Lazy<object?>(result);
                 }
 
-            case OutputInputType.Object:
+            case OutputType.Object:
                 {
                     var pointer = GuardHandle(OutputChannel.Object(handle));
 
@@ -222,22 +219,22 @@ public class Output
                     return new Lazy<object?>(result);
                 }
 
-            case OutputInputType.Array:
+            case OutputType.Array:
                 return new Lazy<object?>(() => new Array(GuardHandle(OutputChannel.Array(handle))));
 
-            case OutputInputType.Map:
+            case OutputType.Map:
                 return new Lazy<object?>(() => new Map(GuardHandle(OutputChannel.Map(handle))));
 
-            case OutputInputType.Text:
+            case OutputType.Text:
                 return new Lazy<object?>(() => new Text(GuardHandle(OutputChannel.Text(handle))));
 
-            case OutputInputType.XmlElement:
+            case OutputType.XmlElement:
                 return new Lazy<object?>(() => new XmlElement(GuardHandle(OutputChannel.XmlElement(handle))));
 
-            case OutputInputType.XmlText:
+            case OutputType.XmlText:
                 return new Lazy<object?>(() => new XmlText(GuardHandle(OutputChannel.XmlText(handle))));
 
-            case OutputInputType.Doc:
+            case OutputType.Doc:
                 return new Lazy<object?>(() => new Doc(GuardHandle(OutputChannel.Doc(handle))));
 
             default:
@@ -245,7 +242,7 @@ public class Output
         }
     }
 
-    private T GetValue<T>(OutputInputType expectedType)
+    private T GetValue<T>(OutputType expectedType)
     {
         var resolvedValue = value.Value;
 
