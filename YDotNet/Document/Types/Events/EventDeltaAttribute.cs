@@ -19,7 +19,7 @@ public class EventDeltaAttribute
     {
         Handle = handle;
 
-        Key = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(handle));
+        Key = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(handle)) ?? throw new InvalidOperationException("Failed to read key");
 
         value = new Lazy<Output>(() =>
         {

@@ -29,6 +29,7 @@ public class Output
     {
         if (handle == nint.Zero)
         {
+            value = new Lazy<object?>((object?)null);
             return;
         }
 

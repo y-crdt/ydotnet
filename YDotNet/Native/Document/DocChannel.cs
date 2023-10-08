@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Native.Document;
 
