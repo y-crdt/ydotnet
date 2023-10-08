@@ -96,7 +96,7 @@ public class GetTests
 
         // Assert
         Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class GetTests
         Assert.That(value1.Length, Is.EqualTo(expected: 2));
         Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
     }
 
     [Test]
@@ -147,7 +147,7 @@ public class GetTests
         Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
         Assert.That(value1["star-⭐"].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1["moon-🌕"].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
     }
 
     [Test]
@@ -208,7 +208,7 @@ public class GetTests
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.String(transaction), Is.EqualTo("Lucas"));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
     }
 
     [Test]
@@ -232,7 +232,7 @@ public class GetTests
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Length, Is.EqualTo(expected: 2));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]
@@ -258,7 +258,7 @@ public class GetTests
         Assert.That(value1.Length(transaction), Is.EqualTo(expected: 2));
         Assert.That(value1.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
         Assert.That(value1.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Bool));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
     }
 
     [Test]
@@ -277,7 +277,7 @@ public class GetTests
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Tag, Is.EqualTo("person"));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]
@@ -296,7 +296,7 @@ public class GetTests
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.Length(transaction), Is.EqualTo(expected: 5));
-        Assert.That(value2.Type, Is.EqualTo(OutputInputType.Null));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]

@@ -3,7 +3,7 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 /// The type of an output.
 /// </summary>
-public enum OutputInputType
+public enum OutputType
 {
     /// <summary>
     /// No defined.

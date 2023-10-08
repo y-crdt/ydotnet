@@ -36,33 +36,45 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="Doc" /> value.
     /// </summary>
-    public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public string? String
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Doc" />.</exception>
+    public Doc Doc
     {
         get
         {
-            EnsureType(OutputInputType.String);
+            EnsureType(OutputType.Doc);
 
-            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
-
-            return result;
+            return ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle))) ??
+                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
         }
     }
 
     /// <summary>
-    ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="string" /> value.
     /// </summary>
-    public bool? Boolean
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="string" />.</exception>
+    public string String
     {
         get
         {
-            EnsureType(OutputInputType.Bool);
+            EnsureType(OutputType.String);
+
+            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
+
+            return result ?? throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+        }
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="bool" /> value.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="bool" />.</exception>
+    public bool Boolean
+    {
+        get
+        {
+            EnsureType(OutputType.Bool);
 
             var value = OutputChannel.Boolean(Handle);
 
@@ -76,13 +88,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="double" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="double" /> value.
     /// </summary>
-    public double? Double
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="double" />.</exception>
+    public double Double
     {
         get
         {
-            EnsureType(OutputInputType.Double);
+            EnsureType(OutputType.Double);
 
             var value = OutputChannel.Double(Handle);
 
@@ -96,13 +109,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="long" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="long" /> value.
     /// </summary>
-    public long? Long
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="long" />.</exception>
+    public long Long
     {
         get
         {
-            EnsureType(OutputInputType.Long);
+            EnsureType(OutputType.Long);
 
             var value = OutputChannel.Long(Handle);
 
@@ -116,13 +130,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="byte[]" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="byte[]" />.</exception>
     public byte[] Bytes
     {
         get
         {
-            EnsureType(OutputInputType.Bytes);
+            EnsureType(OutputType.Bytes);
 
             var result = MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Value.Length) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -137,13 +152,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Output[]" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Output[]" />.</exception>
     public Output[] Collection
     {
         get
         {
-            EnsureType(OutputInputType.Collection);
+            EnsureType(OutputType.Collection);
 
             var handles = MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Collection(Handle), OutputNative!.Value.Length, Marshal.SizeOf<OutputNative>());
@@ -158,13 +174,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="Input" /> dictionary or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the JsonObject value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a JsonObject.</exception>
     public IDictionary<string, Output>? Object
     {
         get
         {
-            EnsureType(OutputInputType.Object);
+            EnsureType(OutputType.Object);
 
             var handles = MemoryReader.TryReadIntPtrArray(
                 OutputChannel.Object(Handle), OutputNative!.Value.Length, Marshal.SizeOf<MapEntryNative>());
@@ -191,21 +208,22 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
     /// </summary>
-    public bool Null => Type == OutputInputType.Null;
+    public bool Null => Type == OutputType.Null;
 
     /// <summary>
     ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
     /// </summary>
-    public bool Undefined => Type == OutputInputType.Undefined;
+    public bool Undefined => Type == OutputType.Undefined;
 
     /// <summary>
-    ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
+    ///     Gets the <see cref="Array" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Array" />.</exception>
     public Array Array
     {
         get
         {
-            EnsureType(OutputInputType.Array);
+            EnsureType(OutputType.Array);
 
             return ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -213,14 +231,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Maps.Map" /> or <c>null</c> if this output cells contains a different
-    ///     type stored.
+    ///     Gets the <see cref="Map" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Map" />.</exception>
     public Map Map
     {
         get
         {
-            EnsureType(OutputInputType.Map);
+            EnsureType(OutputType.Map);
 
             return ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -228,15 +246,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Texts.Text" /> or <c>null</c> if this output cells contains a different
-    ///     type
-    ///     stored.
+    ///     Gets the <see cref="Text" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="Text" />.</exception>
     public Text Text
     {
         get
         {
-            EnsureType(OutputInputType.Text);
+            EnsureType(OutputType.Text);
 
             return ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -244,14 +261,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> or <c>null</c> if this output cells contains
-    ///     a different type stored.
+    ///     Gets the <see cref="XmlElement" /> value.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlElement" />.</exception>
     public XmlElement XmlElement
     {
         get
         {
-            EnsureType(OutputInputType.XmlElement);
+            EnsureType(OutputType.XmlElement);
 
             return ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -259,14 +276,14 @@ public class Output : IDisposable
     }
 
     /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> or <c>null</c> if this output cells contains a
-    ///     different type stored.
+    ///     Gets the <see cref="XmlText" /> value.
     /// </summary>
-    public XmlText? XmlText
+    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlText" />.</exception>
+    public XmlText XmlText
     {
         get
         {
-            EnsureType(OutputInputType.XmlText);
+            EnsureType(OutputType.XmlText);
 
             return ReferenceAccessor.Access(new XmlText(OutputChannel.XmlText(Handle))) ??
                 throw new InvalidOperationException("Internal type mismatch, native library returns null.");
@@ -276,7 +293,7 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the type of the output.
     /// </summary>
-    public OutputInputType Type => (OutputInputType)(OutputNative?.Tag ?? -99);
+    public OutputType Type => (OutputType)(OutputNative?.Tag ?? -99);
 
     /// <summary>
     ///     Gets the handle to the native resource.
@@ -288,7 +305,7 @@ public class Output : IDisposable
     /// </summary>
     private OutputNative? OutputNative { get; }
 
-    private void EnsureType(OutputInputType expectedType)
+    private void EnsureType(OutputType expectedType)
     {
         if (Type != expectedType)
         {
