@@ -26,10 +26,14 @@ internal struct EventChangeNative
                 $"The value \"{TagNative}\" for {nameof(EventChangeTagNative)} is not supported.")
         };
 
-        var attributes = MemoryReader.TryReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>())
-                             ?.Select(x => new Output(x))
-                             .ToArray() ??
-                         Enumerable.Empty<Output>();
+        var localValues = Values;
+        var localLength = Length;
+
+        var attributes = new Lazy<List<Output>>(() =>
+        {
+            return MemoryReader.TryReadIntPtrArray(localValues, localLength, Marshal.SizeOf<OutputNative>())?
+                .Select(x => new Output(x, false)).ToList() ?? new List<Output>();
+        });
 
         return new EventChange(
             tag,

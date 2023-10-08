@@ -30,8 +30,8 @@ internal struct EventKeyChangeNative
         var result = new EventKeyChange(
             MemoryReader.ReadUtf8String(Key),
             tag,
-            ReferenceAccessor.Access(new Output(OldValue)),
-            ReferenceAccessor.Access(new Output(NewValue))
+            ReferenceAccessor.Output(OldValue, false),
+            ReferenceAccessor.Output(NewValue, false)
         );
 
         return result;

@@ -18,7 +18,7 @@ public class TextChunk
     /// <param name="handle">The handle to the native resource.</param>
     internal TextChunk(nint handle)
     {
-        Data = new Output(handle);
+        Data = new Output(handle, false);
 
         var offset = Marshal.SizeOf<OutputNative>();
         var attributesLength = (uint) Marshal.ReadInt32(handle + offset);

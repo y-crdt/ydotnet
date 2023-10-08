@@ -69,7 +69,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, true);
     }
 
     /// <summary>

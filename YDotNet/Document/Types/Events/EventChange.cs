@@ -7,6 +7,8 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventChange
 {
+    private readonly Lazy<List<Output>> values;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventChange" /> class.
     /// </summary>
@@ -16,11 +18,11 @@ public class EventChange
     ///     Optional, the values affected by the current change if <see cref="Tag" /> is
     ///     <see cref="EventChangeTag.Add" />.
     /// </param>
-    public EventChange(EventChangeTag tag, uint length, IEnumerable<Output>? values)
+    public EventChange(EventChangeTag tag, uint length, Lazy<List<Output>> values)
     {
         Tag = tag;
         Length = length;
-        Values = values;
+        this.values = values;
     }
 
     /// <summary>
@@ -36,5 +38,5 @@ public class EventChange
     /// <summary>
     ///     Gets the values that were affected by this change.
     /// </summary>
-    public IEnumerable<Output>? Values { get; }
+    public List<Output> Values => values.Value;
 }

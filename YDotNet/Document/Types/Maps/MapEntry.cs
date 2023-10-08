@@ -20,7 +20,7 @@ public class MapEntry : IDisposable
         var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
 
         MapEntryNative = mapEntry;
-        Value = new Output(outputHandle);
+        Value = new Output(outputHandle, false);
     }
 
     /// <summary>

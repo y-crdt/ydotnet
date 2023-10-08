@@ -23,7 +23,7 @@ dotnet_diagnostic.SA1008.severity = suggestion # Opening parenthesis should be s
 dotnet_diagnostic.SA1009.severity = suggestion # Closing parenthesis should be spaced correctly
 
 # Readability rules
-dotnet_diagnostic.SA1101.severity = suggestion # Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none       # Prefix local calls with this
 
 # Ordering rules
 dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
@@ -37,4 +37,6 @@ dotnet_diagnostic.SA1413.severity = suggestion # Use trailing comma in multi-lin
 dotnet_diagnostic.SA1500.severity = suggestion # Braces for multi-line statements should not share line
 
 # Documentation rules
-dotnet_diagnostic.SA1633.severity = suggestion # File should have header
+dotnet_diagnostic.SA1600.severity = none       # SA1600: Elements should be documented
+dotnet_diagnostic.SA1633.severity = none       # File should have header
+

@@ -192,7 +192,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, true);
     }
 
     /// <summary>
@@ -209,7 +209,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, true);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, true);
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, true);
     }
 
     /// <summary>

@@ -40,7 +40,7 @@ internal class ArrayEnumerator : IEnumerator<Output>
     {
         var handle = ArrayChannel.IteratorNext(Iterator.Handle);
 
-        Current = handle != nint.Zero ? new Output(handle) : null;
+        Current = handle != nint.Zero ? new Output(handle, false) : null;
 
         return Current != null;
     }

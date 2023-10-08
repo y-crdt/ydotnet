@@ -59,7 +59,7 @@ public class Map : Branch
 
         MemoryWriter.Release(keyHandle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return ReferenceAccessor.Output(handle, false);
     }
 
     /// <summary>

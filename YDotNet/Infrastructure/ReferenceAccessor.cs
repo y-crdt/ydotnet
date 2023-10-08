@@ -69,9 +69,9 @@ internal static class ReferenceAccessor
         return Access(instance, instance.Handle);
     }
 
-    public static Output? Access(Output instance)
+    public static Output? Output(nint handle, bool shouldDispose)
     {
-        return Access(instance, instance.Handle);
+        return handle == nint.Zero ? null : new Output(handle, shouldDispose);
     }
 
     public static StickyIndex? Access(StickyIndex instance)
