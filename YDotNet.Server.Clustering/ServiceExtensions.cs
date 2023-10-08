@@ -1,5 +1,5 @@
 using YDotNet.Server;
-using YDotNet.Server.Redis;
+using YDotNet.Server.Clustering;
 using YDotNet.Server.Storage;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -14,10 +14,10 @@ public static class ServiceExtensions
         return registration;
     }
 
-    public static YDotnetRegistration AddRedisClustering(this YDotnetRegistration registration, Action<RedisClusteringOptions>? configure = null)
+    public static YDotnetRegistration AddRedisClustering(this YDotnetRegistration registration, Action<ClusteringOptions>? configure = null)
     {
         registration.Services.Configure(configure ?? (x => { }));
-        registration.AddPubSub<RedisPubSub>();
+        registration.Services.AddSingleton<IDocumentCallback, ClusteringCallback>();
 
         return registration;
     }

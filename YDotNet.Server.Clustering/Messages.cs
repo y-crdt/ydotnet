@@ -1,9 +1,9 @@
 using ProtoBuf;
-using YDotNet.Server.Redis.Internal;
+using YDotNet.Server.Clustering.Internal;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-namespace YDotNet.Server.Redis;
+namespace YDotNet.Server.Clustering;
 
 [ProtoContract]
 public enum MessageType

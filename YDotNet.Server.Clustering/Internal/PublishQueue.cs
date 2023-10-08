@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace YDotNet.Server.Redis.Internal;
+namespace YDotNet.Server.Clustering.Internal;
 
 public interface ICanEstimateSize
 {

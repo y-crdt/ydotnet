@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using ProtoBuf;
 using StackExchange.Redis;
-using YDotNet.Server.Redis.Internal;
+using YDotNet.Server.Clustering.Internal;
 
-namespace YDotNet.Server.Redis;
+namespace YDotNet.Server.Clustering;
 
 public sealed class RedisClusteringCallback : IDocumentCallback, IDisposable
 {
