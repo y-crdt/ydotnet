@@ -75,6 +75,10 @@ jobs:
         run: |
           dotnet pack -c Release
 
+      - name: Nuget publish
+        run: |
+          dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }}
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
