@@ -1,9 +1,7 @@
 using YDotNet.Document.Events;
-using YDotNet.Document.StickyIndexes;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
-using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
@@ -64,32 +62,38 @@ public abstract class Branch
     }
 
     /// <summary>
-    ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
+    ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
-    /// <returns>
-    ///     <para>The <see cref="Transaction" /> to perform operations in the <see cref="Branch" /> or <c>null</c>.</para>
-    ///     <para>
-    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
-    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
-    ///     </para>
-    /// </returns>
-    public Transaction? ReadTransaction()
+    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
+    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    public Transaction WriteTransaction()
     {
-        return ReferenceAccessor.Access(new Transaction(BranchChannel.ReadTransaction(Handle)));
+        var handle = BranchChannel.WriteTransaction(Handle);
+
+        if (handle == nint.Zero)
+        {
+            ThrowHelper.PendingTransaction();
+            return default!;
+        }
+
+        return new Transaction(handle);
     }
 
     /// <summary>
-    ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
+    ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
-    /// <returns>
-    ///     <para>The <see cref="Transaction" /> to perform operations in the <see cref="Branch" /> or <c>null</c>.</para>
-    ///     <para>
-    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
-    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
-    ///     </para>
-    /// </returns>
-    public Transaction? WriteTransaction()
+    /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
+    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    public Transaction ReadTransaction()
     {
-        return ReferenceAccessor.Access(new Transaction(BranchChannel.WriteTransaction(Handle)));
+        var handle = BranchChannel.ReadTransaction(Handle);
+
+        if (handle == nint.Zero)
+        {
+            ThrowHelper.PendingTransaction();
+            return default!;
+        }
+
+        return new Transaction(handle);
     }
 }

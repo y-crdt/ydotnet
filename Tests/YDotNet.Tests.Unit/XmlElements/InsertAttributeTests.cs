@@ -127,7 +127,7 @@ public class InsertAttributeTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("link") });
-        var xmlElement = array.Get(transaction, index: 0).XmlElement;
+        var xmlElement = array.Get(transaction, index: 0).ResolveXmlElement();
         transaction.Commit();
 
         return (doc, xmlElement);

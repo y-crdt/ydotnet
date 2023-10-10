@@ -10,6 +10,8 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 internal class ArrayEnumerator : IEnumerator<Output>
 {
+    private Output? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ArrayEnumerator" /> class.
     /// </summary>
@@ -20,27 +22,25 @@ internal class ArrayEnumerator : IEnumerator<Output>
     internal ArrayEnumerator(ArrayIterator iterator)
     {
         Iterator = iterator;
-        Current = null;
     }
 
+    /// <inheritdoc />
+    public Output Current => current!;
+
+    /// <inheritdoc />
+    object? IEnumerator.Current => current!;
+
     /// <summary>
-    ///     Gets the <see cref="Iterator" /> instance that holds the
-    ///     <see cref="ArrayIterator.Handle" /> used by this enumerator.
+    ///     Gets the <see cref="Iterator" /> instance that holds the <see cref="ArrayIterator.Handle" /> used by this enumerator.
     /// </summary>
     private ArrayIterator Iterator { get; }
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => Current;
-
-    /// <inheritdoc />
-    public Output? Current { get; private set; }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
         var handle = ArrayChannel.IteratorNext(Iterator.Handle);
 
-        Current = handle != nint.Zero ? new Output(handle, false) : null;
+        current = handle != nint.Zero ? new Output(handle, false) : null;
 
         return Current != null;
     }

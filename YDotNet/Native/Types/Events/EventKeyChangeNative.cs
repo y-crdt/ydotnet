@@ -6,7 +6,7 @@ using YDotNet.Infrastructure;
 namespace YDotNet.Native.Types.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct EventKeyChangeNative
+internal readonly struct EventKeyChangeNative
 {
     public nint Key { get; }
 
@@ -23,16 +23,14 @@ internal struct EventKeyChangeNative
             EventKeyChangeTagNative.Add => EventKeyChangeTag.Add,
             EventKeyChangeTagNative.Remove => EventKeyChangeTag.Remove,
             EventKeyChangeTagNative.Update => EventKeyChangeTag.Update,
-            _ => throw new NotSupportedException(
-                $"The value \"{TagNative}\" for {nameof(EventKeyChangeTagNative)} is not supported.")
+            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventKeyChangeTagNative)} is not supported."),
         };
 
         var result = new EventKeyChange(
             MemoryReader.ReadUtf8String(Key),
             tag,
-            ReferenceAccessor.Output(OldValue, false),
-            ReferenceAccessor.Output(NewValue, false)
-        );
+            OldValue != nint.Zero ? new Output(OldValue, false) : null,
+            NewValue != nint.Zero ? new Output(NewValue, false) : null);
 
         return result;
     }

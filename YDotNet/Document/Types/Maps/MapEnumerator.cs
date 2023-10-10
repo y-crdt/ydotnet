@@ -9,6 +9,8 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 internal class MapEnumerator : IEnumerator<MapEntry>
 {
+    private MapEntry? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MapEnumerator" /> class.
     /// </summary>
@@ -19,29 +21,27 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     internal MapEnumerator(MapIterator mapIterator)
     {
         MapIterator = mapIterator;
-        Current = null;
     }
 
+    /// <inheritdoc />
+    public MapEntry Current => current!;
+
+    /// <inheritdoc />
+    object? IEnumerator.Current => current!;
+
     /// <summary>
-    ///     Gets the <see cref="MapIterator" /> instance that holds the
-    ///     <see cref="Types.MapIterator.Handle" /> used by this enumerator.
+    ///     Gets the <see cref="MapIterator" /> instance that holds the <see cref="Types.MapIterator.Handle" /> used by this enumerator.
     /// </summary>
     private MapIterator MapIterator { get; }
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => Current;
-
-    /// <inheritdoc />
-    public MapEntry? Current { get; private set; }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
         var handle = MapChannel.IteratorNext(MapIterator.Handle);
 
-        Current = handle != nint.Zero ? new MapEntry(handle) : null;
+        current = handle != nint.Zero ? new MapEntry(handle, true) : null;
 
-        return Current != null;
+        return current != null;
     }
 
     /// <inheritdoc />

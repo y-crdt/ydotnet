@@ -127,7 +127,7 @@ public class Transaction : IDisposable
     /// </returns>
     public byte[] StateDiffV1(byte[] stateVector)
     {
-        var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) (stateVector != null ? stateVector.Length : 0), out var length);
+        var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint)(stateVector != null ? stateVector.Length : 0), out var length);
         var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
@@ -160,7 +160,7 @@ public class Transaction : IDisposable
     /// </returns>
     public byte[] StateDiffV2(byte[] stateVector)
     {
-        var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVector.Length, out var length);
+        var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint)stateVector.Length, out var length);
         var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
@@ -178,7 +178,7 @@ public class Transaction : IDisposable
     /// <returns>The result of the update operation.</returns>
     public TransactionUpdateResult ApplyV1(byte[] stateDiff)
     {
-        return (TransactionUpdateResult) TransactionChannel.ApplyV1(Handle, stateDiff, (uint) stateDiff.Length);
+        return (TransactionUpdateResult)TransactionChannel.ApplyV1(Handle, stateDiff, (uint)stateDiff.Length);
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ public class Transaction : IDisposable
     /// <returns>The result of the update operation.</returns>
     public TransactionUpdateResult ApplyV2(byte[] stateDiff)
     {
-        return (TransactionUpdateResult) TransactionChannel.ApplyV2(Handle, stateDiff, (uint) stateDiff.Length);
+        return (TransactionUpdateResult)TransactionChannel.ApplyV2(Handle, stateDiff, (uint)stateDiff.Length);
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public class Transaction : IDisposable
         var handle = TransactionChannel.EncodeStateFromSnapshotV1(
             Handle,
             snapshot,
-            (uint) snapshot.Length,
+            (uint)snapshot.Length,
             out var length);
         var data = MemoryReader.TryReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
@@ -283,7 +283,7 @@ public class Transaction : IDisposable
         var handle = TransactionChannel.EncodeStateFromSnapshotV2(
             Handle,
             snapshot,
-            (uint) snapshot.Length,
+            (uint)snapshot.Length,
             out var length);
         var data = MemoryReader.TryReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
@@ -302,7 +302,9 @@ public class Transaction : IDisposable
     /// </returns>
     public Array? GetArray(string name)
     {
-        return ReferenceAccessor.Access(new Array(GetWithKind(name, BranchKind.Array)));
+        var handle = GetWithKind(name, BranchKind.Array);
+
+        return handle != nint.Zero ? new Array(handle) : null;
     }
 
     /// <summary>
@@ -316,7 +318,9 @@ public class Transaction : IDisposable
     /// </returns>
     public Map? GetMap(string name)
     {
-        return ReferenceAccessor.Access(new Map(GetWithKind(name, BranchKind.Map)));
+        var handle = GetWithKind(name, BranchKind.Map);
+
+        return handle != nint.Zero ? new Map(handle) : null;
     }
 
     /// <summary>
@@ -330,7 +334,9 @@ public class Transaction : IDisposable
     /// </returns>
     public Text? GetText(string name)
     {
-        return ReferenceAccessor.Access(new Text(GetWithKind(name, BranchKind.Text)));
+        var handle = GetWithKind(name, BranchKind.Text);
+
+        return handle != nint.Zero ? new Text(handle) : null;
     }
 
     /// <summary>
@@ -344,7 +350,9 @@ public class Transaction : IDisposable
     /// </returns>
     public XmlElement? GetXmlElement(string name)
     {
-        return ReferenceAccessor.Access(new XmlElement(GetWithKind(name, BranchKind.XmlElement)));
+        var handle = GetWithKind(name, BranchKind.XmlElement);
+
+        return handle != nint.Zero ? new XmlElement(handle) : null;
     }
 
     /// <summary>
@@ -358,15 +366,16 @@ public class Transaction : IDisposable
     /// </returns>
     public XmlText? GetXmlText(string name)
     {
-        return ReferenceAccessor.Access(new XmlText(GetWithKind(name, BranchKind.XmlText)));
+        var handle = GetWithKind(name, BranchKind.XmlText);
+
+        return handle != nint.Zero ? new XmlText(handle) : null;
     }
 
     private nint GetWithKind(string name, BranchKind branchKind)
     {
         var nameHandle = MemoryWriter.WriteUtf8String(name);
         var handle = TransactionChannel.Get(Handle, nameHandle);
-        var kind = (BranchKind) BranchChannel.Kind(handle);
-
+        var kind = (BranchKind)BranchChannel.Kind(handle);
         MemoryWriter.Release(nameHandle);
 
         return kind != branchKind ? nint.Zero : handle;

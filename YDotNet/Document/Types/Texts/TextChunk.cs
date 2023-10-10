@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Maps;
@@ -21,14 +22,21 @@ public class TextChunk
         Data = new Output(handle, false);
 
         var offset = Marshal.SizeOf<OutputNative>();
-        var attributesLength = (uint) Marshal.ReadInt32(handle + offset);
+
+        var attributesLength = (uint)Marshal.ReadInt32(handle + offset);
         var attributesHandle = Marshal.ReadIntPtr(handle + offset + MemoryConstants.PointerSize);
 
-        Attributes = MemoryReader.TryReadIntPtrArray(
-                             attributesHandle, attributesLength, Marshal.SizeOf<MapEntryNative>())
-                         ?.Select(x => new MapEntry(x))
-                         .ToArray() ??
-                     Enumerable.Empty<MapEntry>();
+        if (attributesHandle == nint.Zero)
+        {
+            Attributes = new List<MapEntry>();
+            return;
+        }
+
+        Attributes = MemoryReader.ReadIntPtrArray(
+            attributesHandle,
+            attributesLength,
+            Marshal.SizeOf<MapEntryNative>())
+            .Select(x => new MapEntry(x, false)).ToList();
     }
 
     /// <summary>
@@ -40,5 +48,5 @@ public class TextChunk
     /// <summary>
     ///     Gets the formatting attributes applied to the <see cref="Data" />.
     /// </summary>
-    public IEnumerable<MapEntry> Attributes { get; }
+    public IReadOnlyList<MapEntry> Attributes { get; }
 }

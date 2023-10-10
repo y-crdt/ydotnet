@@ -75,7 +75,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
-        return new InputEmpty(InputChannel.Bytes(value, (uint) value.Length));
+        return new InputEmpty(InputChannel.Bytes(value, (uint)value.Length));
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public abstract class Input : IDisposable
         var inputs = value.Select(x => x.InputNative).ToArray();
         var pointer = MemoryWriter.WriteStructArray(inputs);
 
-        return new InputPointer(InputChannel.Collection(pointer, (uint) value.Length), pointer);
+        return new InputPointer(InputChannel.Collection(pointer, (uint)value.Length), pointer);
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public abstract class Input : IDisposable
         var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
         return new InputPointerArray(
-            InputChannel.Object(keys.Head, values, (uint) value.Count),
+            InputChannel.Object(keys.Head, values, (uint)value.Count),
             keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
     }
 
@@ -134,7 +134,7 @@ public abstract class Input : IDisposable
         var inputs = value.Select(x => x.InputNative).ToArray();
         var pointer = MemoryWriter.WriteStructArray(inputs);
 
-        return new InputPointer(InputChannel.Array(pointer, (uint) value.Length), pointer);
+        return new InputPointer(InputChannel.Array(pointer, (uint)value.Length), pointer);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public abstract class Input : IDisposable
         var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
         return new InputPointerArray(
-            InputChannel.Map(keys.Head, values, (uint) value.Count),
+            InputChannel.Map(keys.Head, values, (uint)value.Count),
             keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
     }
 

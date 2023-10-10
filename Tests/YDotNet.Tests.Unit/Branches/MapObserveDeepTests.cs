@@ -200,10 +200,10 @@ public class MapObserveDeepTests
         var transaction = doc.WriteTransaction();
         map1.Insert(transaction, "map-2", Input.Map(new Dictionary<string, Input>()));
 
-        var map2 = map1.Get(transaction, "map-2").Map;
+        var map2 = map1.Get(transaction, "map-2").ResolveMap();
         map2.Insert(transaction, "map-3", Input.Map(new Dictionary<string, Input>()));
 
-        var map3 = map2.Get(transaction, "map-3").Map;
+        var map3 = map2.Get(transaction, "map-3").ResolveMap();
         transaction.Commit();
 
         return (doc, map1, map2, map3);

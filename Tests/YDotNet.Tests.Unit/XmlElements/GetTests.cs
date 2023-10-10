@@ -34,7 +34,7 @@ public class GetTests
         transaction.Commit();
 
         // Assert
-        Assert.That(output.XmlText, Is.Not.Null);
+        Assert.That(output.ResolveXmlText(), Is.Not.Null);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class GetTests
         transaction.Commit();
 
         // Assert
-        Assert.That(output.XmlElement, Is.Not.Null);
+        Assert.That(output.ResolveXmlElement(), Is.Not.Null);
     }
 
     private (Doc, XmlElement) ArrangeDoc()

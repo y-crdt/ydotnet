@@ -26,12 +26,7 @@ public class Output
     /// <param name="shouldDispose">Indicates if the memory has been allocated and needs to be disposed.</param>
     internal Output(nint handle, bool shouldDispose)
     {
-        if (handle == nint.Zero)
-        {
-            throw new ArgumentException("Handle cannot be zero.", nameof(handle));
-        }
-
-        var native = Marshal.PtrToStructure<OutputNative>(handle);
+        var native = Marshal.PtrToStructure<OutputNative>(handle.Checked());
 
         Type = (OutputType)native.Tag;
 
@@ -45,119 +40,119 @@ public class Output
     }
 
     /// <summary>
+    ///     Gets the type of the output.
+    /// </summary>
+    public OutputType Type { get; private set; }
+
+    /// <summary>
     ///     Gets the <see cref="Doc" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="Doc" />.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
     public Doc Doc => GetValue<Doc>(OutputType.Doc);
 
     /// <summary>
     ///     Gets the <see cref="string" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="string" />.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
     public string String => GetValue<string>(OutputType.String);
 
     /// <summary>
     ///     Gets the <see cref="bool" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="string" />.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
     public bool Boolean => GetValue<bool>(OutputType.Bool);
 
     /// <summary>
     ///     Gets the <see cref="double" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="double" />.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="double" />.</exception>
     public double Double => GetValue<double>(OutputType.Double);
 
     /// <summary>
     ///     Gets the <see cref="long" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="long" />.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="long" />.</exception>
     public long Long => GetValue<long>(OutputType.Long);
 
     /// <summary>
     ///     Gets the <see cref="byte" /> array value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="byte" /> array.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="byte" /> array.</exception>
     public byte[] Bytes => GetValue<byte[]>(OutputType.Bytes);
 
     /// <summary>
     ///     Gets the <see cref="Output" /> collection.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="Output" /> collection.</exception>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
     public Output[] Collection => GetValue<Output[]>(OutputType.Collection);
 
     /// <summary>
     ///     Gets the value as json object.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a json object.</exception>
+    /// <exception cref="YDotNetException">Value is not a json object.</exception>
     public IDictionary<string, Output>? Object => GetValue<IDictionary<string, Output>>(OutputType.Object);
 
     /// <summary>
     ///     Gets the <see cref="Array" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="Array" />.</exception>
-    public Array Array => GetValue<Array>(OutputType.Array);
+    /// <returns>The resolved array.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
+    /// <remarks>You are responsible to dispose the array, if you use this property.</remarks>
+    public Array ResolveArray() => GetValue<Array>(OutputType.Array);
 
     /// <summary>
     ///     Gets the <see cref="Map" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="Map" />.</exception>
-    public Map Map => GetValue<Map>(OutputType.Map);
+    /// <returns>The resolved map.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    /// <remarks>You are responsible to dispose the map, if you use this property.</remarks>
+    public Map ResolveMap() => GetValue<Map>(OutputType.Map);
 
     /// <summary>
     ///     Gets the <see cref="Map" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="Map" />.</exception>
-    public Text Text => GetValue<Text>(OutputType.Text);
+    /// <returns>The resolved text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    /// <remarks>You are responsible to dispose the text, if you use this property.</remarks>
+    public Text ResolveText() => GetValue<Text>(OutputType.Text);
 
     /// <summary>
     ///     Gets the <see cref="XmlElement" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlElement" />.</exception>
-    public XmlElement XmlElement => GetValue<XmlElement>(OutputType.XmlElement);
+    /// <returns>The resolved xml element.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
+    /// <remarks>You are responsible to dispose the xml element, if you use this property.</remarks>
+    public XmlElement ResolveXmlElement() => GetValue<XmlElement>(OutputType.XmlElement);
 
     /// <summary>
     ///     Gets the <see cref="XmlText" /> value.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Value is not a <see cref="XmlText" />.</exception>
-    public XmlText XmlText => GetValue<XmlText>(OutputType.XmlText);
-
-    /// <summary>
-    ///     Gets the type of the output.
-    /// </summary>
-    public OutputType Type { get; private set; }
+    /// <returns>The resolved xml text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
+    /// <remarks>You are responsible to dispose the xml text, if you use this property.</remarks>
+    public XmlText ResolveXmlText() => GetValue<XmlText>(OutputType.XmlText);
 
     private static Lazy<object?> BuildValue(nint handle, uint length, OutputType type)
     {
-        static nint GuardHandle(nint handle)
-        {
-            if (handle == nint.Zero)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
-
-            return handle;
-        }
-
         switch (type)
         {
             case OutputType.Bool:
                 {
-                    var value = GuardHandle(OutputChannel.Boolean(handle));
+                    var value = OutputChannel.Boolean(handle).Checked();
 
                     return new Lazy<object?>((object?)(Marshal.PtrToStructure<byte>(value) == 1));
                 }
 
             case OutputType.Double:
                 {
-                    var value = GuardHandle(OutputChannel.Double(handle));
+                    var value = OutputChannel.Double(handle).Checked();
 
                     return new Lazy<object?>(Marshal.PtrToStructure<double>(value));
                 }
 
             case OutputType.Long:
                 {
-                    var value = GuardHandle(OutputChannel.Long(handle));
+                    var value = OutputChannel.Long(handle).Checked();
 
                     return new Lazy<object?>(Marshal.PtrToStructure<long>(value));
                 }
@@ -171,14 +166,14 @@ public class Output
 
             case OutputType.Bytes:
                 {
-                    var pointer = GuardHandle(OutputChannel.Bytes(handle));
+                    var pointer = OutputChannel.Bytes(handle).Checked();
 
                     var result = MemoryReader.TryReadBytes(OutputChannel.Bytes(handle), length) ??
-                        throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+                        throw new YDotNetException("Internal type mismatch, native library returns null.");
 
                     if (result == null)
                     {
-                        throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+                        throw new YDotNetException("Internal type mismatch, native library returns null.");
                     }
 
                     OutputChannel.Destroy(pointer);
@@ -187,10 +182,10 @@ public class Output
 
             case OutputType.Collection:
                 {
-                    var pointer = GuardHandle(OutputChannel.Collection(handle));
+                    var pointer = OutputChannel.Collection(handle).Checked();
 
                     var handles = MemoryReader.TryReadIntPtrArray(pointer, length, Marshal.SizeOf<OutputNative>())
-                        ?? throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+                        ?? throw new YDotNetException("Internal type mismatch, native library returns null.");
 
                     var result = handles.Select(x => new Output(x, false)).ToArray();
 
@@ -200,10 +195,10 @@ public class Output
 
             case OutputType.Object:
                 {
-                    var pointer = GuardHandle(OutputChannel.Object(handle));
+                    var pointer = OutputChannel.Object(handle).Checked();
 
                     var handlesArray = MemoryReader.TryReadIntPtrArray(pointer, length, Marshal.SizeOf<MapEntryNative>())
-                        ?? throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+                        ?? throw new YDotNetException("Internal type mismatch, native library returns null.");
 
                     var result = new Dictionary<string, Output>();
 
@@ -220,22 +215,22 @@ public class Output
                 }
 
             case OutputType.Array:
-                return new Lazy<object?>(() => new Array(GuardHandle(OutputChannel.Array(handle))));
+                return new Lazy<object?>(() => new Array(OutputChannel.Array(handle).Checked()));
 
             case OutputType.Map:
-                return new Lazy<object?>(() => new Map(GuardHandle(OutputChannel.Map(handle))));
+                return new Lazy<object?>(() => new Map(OutputChannel.Map(handle).Checked()));
 
             case OutputType.Text:
-                return new Lazy<object?>(() => new Text(GuardHandle(OutputChannel.Text(handle))));
+                return new Lazy<object?>(() => new Text(OutputChannel.Text(handle).Checked()));
 
             case OutputType.XmlElement:
-                return new Lazy<object?>(() => new XmlElement(GuardHandle(OutputChannel.XmlElement(handle))));
+                return new Lazy<object?>(() => new XmlElement(OutputChannel.XmlElement(handle).Checked()));
 
             case OutputType.XmlText:
-                return new Lazy<object?>(() => new XmlText(GuardHandle(OutputChannel.XmlText(handle))));
+                return new Lazy<object?>(() => new XmlText(OutputChannel.XmlText(handle).Checked()));
 
             case OutputType.Doc:
-                return new Lazy<object?>(() => new Doc(GuardHandle(OutputChannel.Doc(handle))));
+                return new Lazy<object?>(() => new Doc(OutputChannel.Doc(handle).Checked()));
 
             default:
                 return new Lazy<object?>((object?)null);
@@ -248,7 +243,7 @@ public class Output
 
         if (resolvedValue is not T typed)
         {
-            throw new InvalidOperationException($"Expected {expectedType}, got {Type}.");
+            throw new YDotNetException($"Expected {expectedType}, got {Type}.");
         }
 
         return typed;

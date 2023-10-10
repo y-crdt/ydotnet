@@ -171,7 +171,7 @@ public class UndoManager : IDisposable
     /// <param name="origin">The origin to be included in this <see cref="UndoManager" />.</param>
     public void AddOrigin(byte[] origin)
     {
-        UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.AddOrigin(Handle, (uint)origin.Length, origin);
     }
 
     /// <summary>
@@ -184,6 +184,6 @@ public class UndoManager : IDisposable
     /// <param name="origin">The origin to be removed from this <see cref="UndoManager" />.</param>
     public void RemoveOrigin(byte[] origin)
     {
-        UndoManagerChannel.RemoveOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.RemoveOrigin(Handle, (uint)origin.Length, origin);
     }
 }

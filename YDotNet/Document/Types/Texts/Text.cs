@@ -60,7 +60,7 @@ public class Text : Branch
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
         MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
-        MemoryWriter.TryToWriteStruct(content.InputNative, out var contentPointer);
+        var contentPointer = MemoryWriter.WriteStruct(content.InputNative);
         TextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
         MemoryWriter.TryRelease(attributesPointer);
         MemoryWriter.TryRelease(contentPointer);
@@ -95,9 +95,10 @@ public class Text : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
-        var attributesPointer = MemoryWriter.WriteStruct(attributes.InputNative);
-        TextChannel.Format(Handle, transaction.Handle, index, length, attributesPointer);
-        MemoryWriter.Release(attributesPointer);
+        var attributesHnadle = MemoryWriter.WriteStruct(attributes.InputNative);
+        TextChannel.Format(Handle, transaction.Handle, index, length, attributesHnadle);
+
+        MemoryWriter.Release(attributesHnadle);
     }
 
     /// <summary>
@@ -107,7 +108,7 @@ public class Text : Branch
     /// <returns>The <see cref="TextChunks" /> that compose this <see cref="Text" />.</returns>
     public TextChunks Chunks(Transaction transaction)
     {
-        var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length);
+        var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length).Checked();
 
         return new TextChunks(handle, length);
     }
@@ -177,7 +178,8 @@ public class Text : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+
+        return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
 }

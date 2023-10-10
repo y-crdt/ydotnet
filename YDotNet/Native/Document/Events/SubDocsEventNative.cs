@@ -5,7 +5,7 @@ using YDotNet.Document.Events;
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct SubDocsEventNative
+internal readonly struct SubDocsEventNative
 {
     public uint AddedLength { get; }
 

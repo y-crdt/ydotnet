@@ -29,7 +29,7 @@ public class StickyIndex : IDisposable
     /// <summary>
     ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
     /// </summary>
-    public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
+    public StickyAssociationType AssociationType => (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
 
     /// <summary>
     ///     Gets the handle to the native resource.
@@ -47,9 +47,11 @@ public class StickyIndex : IDisposable
     /// </summary>
     /// <param name="encoded">The <see cref="byte" /> array received from <see cref="Encode" />.</param>
     /// <returns>The <see cref="StickyIndex" /> represented by the provided <see cref="byte" /> array.</returns>
-    public static StickyIndex? Decode(byte[] encoded)
+    public static StickyIndex Decode(byte[] encoded)
     {
-        return ReferenceAccessor.Access(new StickyIndex(StickyIndexChannel.Decode(encoded, (uint) encoded.Length)));
+        var handle = StickyIndexChannel.Decode(encoded, (uint)encoded.Length);
+
+        return new StickyIndex(handle.Checked());
     }
 
     /// <summary>

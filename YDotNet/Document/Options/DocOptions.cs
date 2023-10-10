@@ -8,9 +8,9 @@ public class DocOptions
     /// <summary>
     ///     Gets the default options value used to initialize <see cref="Doc" /> instances.
     /// </summary>
-    internal static DocOptions Default => new()
+    public static DocOptions Default => new()
     {
-        Id = (ulong) Random.Shared.Next(),
+        Id = (ulong)Random.Shared.Next(),
         ShouldLoad = true,
         Encoding = DocEncoding.Utf16
     };

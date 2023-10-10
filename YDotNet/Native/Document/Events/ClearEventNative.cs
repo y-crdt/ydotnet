@@ -5,7 +5,7 @@ using YDotNet.Document.Events;
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct ClearEventNative
+internal readonly struct ClearEventNative
 {
     public Doc Doc { get; init; }
 

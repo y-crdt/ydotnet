@@ -11,7 +11,7 @@ internal static class MemoryWriter
         var pointer = Marshal.AllocHGlobal(bytes.Length);
 
         using var stream = new UnmanagedMemoryStream(
-            (byte*) pointer.ToPointer(),
+            (byte*)pointer.ToPointer(),
             length: 0,
             bytes.Length,
             FileAccess.Write);
@@ -63,14 +63,17 @@ internal static class MemoryWriter
     }
 
     internal static nint WriteStruct<T>(T value)
+        where T : struct
     {
         var handle = Marshal.AllocHGlobal(Marshal.SizeOf(value));
+
         Marshal.StructureToPtr(value, handle, fDeleteOld: false);
 
         return handle;
     }
 
     internal static bool TryToWriteStruct<T>(T? value, out nint handle)
+        where T : struct
     {
         if (value == null)
         {
@@ -79,7 +82,7 @@ internal static class MemoryWriter
             return false;
         }
 
-        handle = WriteStruct<T>(value);
+        handle = WriteStruct<T>(value.Value);
 
         return true;
     }

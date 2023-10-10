@@ -15,7 +15,7 @@ public class ObserveTests
         var doc = new Doc();
         var text = doc.Text("value");
         Text? target = null;
-        text.Observe(e => target = e.Target);
+        text.Observe(e => target = e.ResolveTarget());
 
         // Act
         var transaction = doc.WriteTransaction();
@@ -43,7 +43,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Add));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Insert.String, Is.EqualTo("Lucas"));
@@ -70,7 +70,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Remove));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 2));
         Assert.That(eventDeltas.First().Insert, Is.Null);
@@ -102,7 +102,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Retain));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 2));
         Assert.That(eventDeltas.First().Insert, Is.Null);
@@ -130,7 +130,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Add));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Insert.String, Is.EqualTo("Lucas"));

@@ -70,7 +70,7 @@ public class XmlText : Branch
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
         MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
-        MemoryWriter.TryToWriteStruct(content.InputNative, out var contentPointer);
+        var contentPointer = MemoryWriter.WriteStruct(content.InputNative);
         XmlTextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
         MemoryWriter.TryRelease(attributesPointer);
         MemoryWriter.TryRelease(contentPointer);
@@ -130,11 +130,12 @@ public class XmlText : Branch
     ///     Returns a <see cref="XmlAttributeIterator" />, which can be used to traverse over all attributes.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
-    public XmlAttributeIterator? Iterate(Transaction transaction)
+    /// <returns>The <see cref="XmlAttributeIterator" /> instance.</returns>
+    public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(
-            new XmlAttributeIterator(XmlTextChannel.AttributeIterator(Handle, transaction.Handle)));
+        var handle = XmlTextChannel.AttributeIterator(Handle, transaction.Handle).Checked();
+
+        return new XmlAttributeIterator(handle);
     }
 
     /// <summary>
@@ -198,7 +199,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -214,7 +215,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -255,7 +256,8 @@ public class XmlText : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+
+        return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
 }

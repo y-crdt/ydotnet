@@ -15,7 +15,7 @@ public class ObserveTests
         var doc = new Doc();
         var map = doc.Map("map");
         Map? target = null;
-        map.Observe(e => target = e.Target);
+        map.Observe(e => target = e.ResolveTarget());
 
         // Act
         var transaction = doc.WriteTransaction();

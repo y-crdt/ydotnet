@@ -7,26 +7,33 @@ namespace YDotNet.Document.Types.Maps;
 /// <summary>
 ///     Represents an entry of a <see cref="Map" />. It contains a <see cref="Key" /> and <see cref="Value" />.
 /// </summary>
-public class MapEntry : IDisposable
+public sealed class MapEntry
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="MapEntry" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
-    internal MapEntry(nint handle)
+    internal MapEntry(nint handle, bool shouldDispose)
     {
         Handle = handle;
 
         var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
+        Key = MemoryReader.ReadUtf8String(mapEntry.Field);
 
-        MapEntryNative = mapEntry;
+        // The output memory is part of the entry memory. Therefore we don't release it.
         Value = new Output(outputHandle, false);
+
+        if (shouldDispose)
+        {
+            // We are done reading and can release the memory.
+            MapChannel.EntryDestroy(handle);
+        }
     }
 
     /// <summary>
     ///     Gets the key of this <see cref="MapEntry" /> that represents the <see cref="Value" />.
     /// </summary>
-    public string Key => MemoryReader.ReadUtf8String(MapEntryNative.Field);
+    public string Key { get; }
 
     /// <summary>
     ///     Gets the value of this <see cref="MapEntry" /> that is represented the <see cref="Key" />.
@@ -34,18 +41,7 @@ public class MapEntry : IDisposable
     public Output Value { get; }
 
     /// <summary>
-    ///     Gets the native resource that provides data for this <see cref="MapEntry" /> instance.
-    /// </summary>
-    internal MapEntryNative MapEntryNative { get; }
-
-    /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        MapChannel.EntryDestroy(Handle);
-    }
 }

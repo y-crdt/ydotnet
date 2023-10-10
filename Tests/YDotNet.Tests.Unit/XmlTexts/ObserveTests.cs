@@ -16,7 +16,7 @@ public class ObserveTests
         var xmlText = doc.XmlText("xml-text");
 
         XmlText? target = null;
-        var subscription = xmlText.Observe(e => target = e.Target);
+        var subscription = xmlText.Observe(e => target = e.ResolveTarget());
 
         // Act
         var transaction = doc.WriteTransaction();

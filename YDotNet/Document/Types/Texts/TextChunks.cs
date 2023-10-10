@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -7,23 +7,17 @@ namespace YDotNet.Document.Types.Texts;
 /// <summary>
 ///     Represents a collection of <see cref="TextChunk" /> instances.
 /// </summary>
-public class TextChunks : IEnumerable<TextChunk>, IDisposable
+public class TextChunks : ReadOnlyCollection<TextChunk>
 {
-    private readonly IEnumerable<TextChunk> collection;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextChunks" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     /// <param name="length">The length of <see cref="TextChunk" /> instances to be read from <see cref="Handle" />.</param>
     internal TextChunks(nint handle, uint length)
+        : base(ReadItems(handle, length))
     {
         Handle = handle;
-        Length = length;
-
-        collection = MemoryReader.TryReadIntPtrArray(Handle, Length, size: 32)
-            .Select(x => new TextChunk(x))
-            .ToArray();
     }
 
     /// <summary>
@@ -31,26 +25,13 @@ public class TextChunks : IEnumerable<TextChunk>, IDisposable
     /// </summary>
     internal nint Handle { get; }
 
-    /// <summary>
-    ///     Gets the length of the native resource.
-    /// </summary>
-    internal uint Length { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private static IList<TextChunk> ReadItems(nint handle, uint length)
     {
-        ChunksChannel.Destroy(Handle, Length);
-    }
+        var result = MemoryReader.ReadIntPtrArray(handle, length, size: 32).Select(x => new TextChunk(x)).ToList();
 
-    /// <inheritdoc />
-    public IEnumerator<TextChunk> GetEnumerator()
-    {
-        return collection.GetEnumerator();
-    }
+        // We are done reading and can release the memory.
+        // ChunksChannel.Destroy(handle, length);
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
+        return result;
     }
 }

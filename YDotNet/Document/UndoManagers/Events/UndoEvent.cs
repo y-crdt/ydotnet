@@ -14,7 +14,7 @@ public class UndoEvent
     /// <param name="origin">The origin of the event.</param>
     /// <param name="insertions">The <see cref="DeleteSet" /> entries for inserted content.</param>
     /// <param name="deletions">The <see cref="DeleteSet" /> entries for deleted content.</param>
-    internal UndoEvent(UndoEventKind kind, byte[] origin, DeleteSet insertions, DeleteSet deletions)
+    internal UndoEvent(UndoEventKind kind, byte[]? origin, DeleteSet insertions, DeleteSet deletions)
     {
         Kind = kind;
         Origin = origin;
@@ -33,7 +33,7 @@ public class UndoEvent
     /// <remarks>
     ///     The <see cref="Origin" /> is a binary marker.
     /// </remarks>
-    public byte[] Origin { get; }
+    public byte[]? Origin { get; }
 
     /// <summary>
     ///     Gets the <see cref="DeleteSet" /> entries for inserted content.

@@ -3,7 +3,7 @@ using YDotNet.Document.State;
 
 namespace YDotNet.Native.Document.State;
 
-internal struct StateVectorNative
+internal readonly struct StateVectorNative
 {
     public uint EntriesCount { get; }
 
@@ -17,8 +17,8 @@ internal struct StateVectorNative
 
         for (var i = 0; i < EntriesCount; i++)
         {
-            var clientId = (ulong) Marshal.ReadInt64(ClientIds, i * sizeof(ulong));
-            var clock = (uint) Marshal.ReadInt32(Clocks, i * sizeof(uint));
+            var clientId = (ulong)Marshal.ReadInt64(ClientIds, i * sizeof(ulong));
+            var clock = (uint)Marshal.ReadInt32(Clocks, i * sizeof(uint));
 
             entries.Add(clientId, clock);
         }

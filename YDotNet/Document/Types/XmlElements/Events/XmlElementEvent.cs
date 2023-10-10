@@ -9,6 +9,11 @@ namespace YDotNet.Document.Types.XmlElements.Events;
 /// </summary>
 public class XmlElementEvent
 {
+    private readonly Lazy<EventPath> path;
+    private readonly Lazy<EventChanges> delta;
+    private readonly Lazy<EventKeys> keys;
+    private readonly Lazy<XmlElement> target;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlElementEvent" /> class.
     /// </summary>
@@ -16,66 +21,59 @@ public class XmlElementEvent
     internal XmlElementEvent(nint handle)
     {
         Handle = handle;
+
+        path = new Lazy<EventPath>(() =>
+        {
+            var pathHandle = XmlElementChannel.ObserveEventPath(handle, out var length).Checked();
+            return new EventPath(pathHandle, length);
+        });
+
+        delta = new Lazy<EventChanges>(() =>
+        {
+            var deltaHandle = XmlElementChannel.ObserveEventDelta(handle, out var length).Checked();
+            return new EventChanges(deltaHandle, length);
+        });
+
+        keys = new Lazy<EventKeys>(() =>
+        {
+            var keysHandle = XmlElementChannel.ObserveEventKeys(handle, out var length).Checked();
+            return new EventKeys(keysHandle, length);
+        });
+
+        target = new Lazy<XmlElement>(() =>
+        {
+            var targetHandle = XmlElementChannel.ObserveEventTarget(handle).Checked();
+            return new XmlElement(targetHandle);
+        });
     }
 
     /// <summary>
     ///     Gets the changes within the <see cref="XmlElement" /> instance and triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventChange" /> for more information.</para>
-    /// </remarks>
-    public EventChanges Delta
-    {
-        get
-        {
-            var handle = XmlElementChannel.ObserveEventDelta(Handle, out var length);
-
-            return new EventChanges(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventChanges Delta => delta.Value;
 
     /// <summary>
     ///     Gets the path from the observed instanced down to the current <see cref="XmlElement" /> instance.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventPath" /> for more information.</para>
-    /// </remarks>
-    public EventPath Path
-    {
-        get
-        {
-            var handle = XmlElementChannel.ObserveEventPath(Handle, out var length);
-
-            return new EventPath(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventPath Path => path.Value;
 
     /// <summary>
     ///     Gets the attributes that changed within the <see cref="XmlElement" /> instance and triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
-    /// </remarks>
-    public EventKeys Keys
-    {
-        get
-        {
-            var handle = XmlElementChannel.ObserveEventKeys(Handle, out var length);
-
-            return new EventKeys(handle, length);
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="XmlElement" /> instance that is related to this <see cref="XmlElementEvent" /> instance.
-    /// </summary>
-    public XmlElement? Target => ReferenceAccessor.Access(new XmlElement(XmlElementChannel.ObserveEventTarget(Handle)));
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventKeys Keys => keys.Value;
 
     /// <summary>
     ///     Gets the handle to the native resource.
     /// </summary>
     internal nint Handle { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElement" /> instance that is related to this <see cref="XmlElementEvent" /> instance.
+    /// </summary>
+    /// <returns>The target of the event.</returns>
+    /// <remarks>You are responsible to dispose the text, if you use this property.</remarks>
+    public XmlElement ResolveTarget() => target.Value;
 }

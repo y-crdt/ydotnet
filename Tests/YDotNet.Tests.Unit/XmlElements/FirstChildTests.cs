@@ -40,7 +40,7 @@ public class FirstChildTests
         transaction.Commit();
 
         // Assert
-        Assert.That(childXmlElement.XmlText, Is.Not.Null);
+        Assert.That(childXmlElement.ResolveXmlText(), Is.Not.Null);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class FirstChildTests
 
         var transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
-        var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
+        var childXmlElement = xmlElement.Get(transaction, index: 0).ResolveXmlElement();
         transaction.Commit();
 
         // Act
@@ -73,7 +73,7 @@ public class FirstChildTests
 
         var transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
-        var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
+        var childXmlElement = xmlElement.Get(transaction, index: 0).ResolveXmlElement();
         childXmlElement.InsertElement(transaction, index: 0, "alpha");
         childXmlElement.InsertElement(transaction, index: 0, "hex");
         transaction.Commit();
@@ -84,6 +84,6 @@ public class FirstChildTests
         transaction.Commit();
 
         // Assert
-        Assert.That(grandChildXmlElement.XmlElement, Is.Not.Null);
+        Assert.That(grandChildXmlElement.ResolveXmlElement(), Is.Not.Null);
     }
 }

@@ -22,8 +22,7 @@ internal struct UndoEventNative
         {
             UndoEventKindNative.Undo => UndoEventKind.Undo,
             UndoEventKindNative.Redo => UndoEventKind.Redo,
-            _ => throw new NotSupportedException(
-                $"The value \"{KindNative}\" for {nameof(UndoEventKindNative)} is not supported.")
+            _ => throw new NotSupportedException($"The value \"{KindNative}\" for {nameof(UndoEventKindNative)} is not supported."),
         };
 
         var origin = MemoryReader.TryReadBytes(Origin, OriginLength);

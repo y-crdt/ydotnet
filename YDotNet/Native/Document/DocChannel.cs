@@ -60,7 +60,7 @@ internal static class DocChannel
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_write_transaction")]
-    public static extern nint WriteTransaction(nint doc, uint originLength, byte[] origin);
+    public static extern nint WriteTransaction(nint doc, uint originLength, byte[]? origin);
 
     [DllImport(
         ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ydoc_clear")]

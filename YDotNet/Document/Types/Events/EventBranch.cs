@@ -21,7 +21,7 @@ public class EventBranch
     public EventBranch(nint handle)
     {
         Handle = handle;
-        Tag = (EventBranchTag) Marshal.ReadByte(handle);
+        Tag = (EventBranchTag)Marshal.ReadByte(handle);
 
         switch (Tag)
         {

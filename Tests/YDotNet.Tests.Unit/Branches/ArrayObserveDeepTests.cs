@@ -24,10 +24,10 @@ public class ArrayObserveDeepTests
                 Input.Map(new Dictionary<string, Input>())
             });
 
-        var map2 = array1.Get(transaction, index: 3).Map;
+        var map2 = array1.Get(transaction, index: 3).ResolveMap();
         map2.Insert(transaction, "array-3", Input.Array(Array.Empty<Input>()));
 
-        var array3 = map2.Get(transaction, "array-3").Array;
+        var array3 = map2.Get(transaction, "array-3").ResolveArray();
         array3.InsertRange(
             transaction, index: 0, new[]
             {
@@ -84,7 +84,7 @@ public class ArrayObserveDeepTests
                 Input.Boolean(value: false)
             });
 
-        var array2 = array1.Get(transaction, index: 2).Array;
+        var array2 = array1.Get(transaction, index: 2).ResolveArray();
         array2.InsertRange(
             transaction, index: 0, new[]
             {
@@ -94,7 +94,7 @@ public class ArrayObserveDeepTests
                 Input.Array(Array.Empty<Input>())
             });
 
-        var array3 = array2.Get(transaction, index: 3).Array;
+        var array3 = array2.Get(transaction, index: 3).ResolveArray();
         array3.InsertRange(
             transaction, index: 0, new[]
             {

@@ -117,10 +117,11 @@ public class XmlElement : Branch
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
-    public XmlAttributeIterator? Iterate(Transaction transaction)
+    public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(
-            new XmlAttributeIterator(XmlElementChannel.AttributeIterator(Handle, transaction.Handle)));
+        var handle = XmlElementChannel.AttributeIterator(Handle, transaction.Handle);
+
+        return new XmlAttributeIterator(handle.Checked());
     }
 
     /// <summary>
@@ -144,10 +145,11 @@ public class XmlElement : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
-    public XmlText? InsertText(Transaction transaction, uint index)
+    public XmlText InsertText(Transaction transaction, uint index)
     {
-        return ReferenceAccessor.Access(
-            new XmlText(XmlElementChannel.InsertText(Handle, transaction.Handle, index)));
+        var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
+
+        return new XmlText(handle.Checked());
     }
 
     /// <summary>
@@ -158,16 +160,13 @@ public class XmlElement : Branch
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <param name="name">The name (or tag) of the <see cref="XmlElement" /> that will be inserted.</param>
     /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
-    public XmlElement? InsertElement(Transaction transaction, uint index, string name)
+    public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        var elementName = MemoryWriter.WriteUtf8String(name);
+        var elementHandle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, elementName);
+        MemoryWriter.Release(elementName);
 
-        var result = ReferenceAccessor.Access(
-            new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, nameHandle)));
-
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new XmlElement(elementHandle.Checked());
     }
 
     /// <summary>
@@ -192,7 +191,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -209,7 +208,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -226,7 +225,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -240,7 +239,9 @@ public class XmlElement : Branch
     /// </returns>
     public XmlElement? Parent(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new XmlElement(XmlElementChannel.Parent(Handle, transaction.Handle)));
+        var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
+
+        return handle != nint.Zero ? new XmlElement(handle) : null;
     }
 
     /// <summary>
@@ -256,7 +257,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -267,9 +268,11 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlElement" />.</returns>
-    public XmlTreeWalker? TreeWalker(Transaction transaction)
+    public XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new XmlTreeWalker(XmlElementChannel.TreeWalker(Handle, transaction.Handle)));
+        var handle = XmlElementChannel.TreeWalker(Handle, transaction.Handle);
+
+        return new XmlTreeWalker(handle.Checked());
     }
 
     /// <summary>

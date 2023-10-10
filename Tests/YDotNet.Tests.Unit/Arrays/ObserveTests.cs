@@ -15,7 +15,7 @@ public class ObserveTests
         var doc = new Doc();
         var array = doc.Array("array");
         Array? target = null;
-        array.Observe(e => target = e.Target);
+        array.Observe(e => target = e.ResolveTarget());
 
         // Act
         var transaction = doc.WriteTransaction();
@@ -44,7 +44,7 @@ public class ObserveTests
         // Assert
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
-        Assert.That(eventChanges.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventChanges.Count, Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.First().Length, Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Values.First().Long, Is.EqualTo(expected: 2469L));
@@ -78,7 +78,7 @@ public class ObserveTests
         // Assert
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
-        Assert.That(eventChanges.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventChanges.Count, Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Remove));
         Assert.That(eventChanges.First().Length, Is.EqualTo(expected: 2));
         Assert.That(eventChanges.First().Values, Is.Empty);
@@ -112,11 +112,11 @@ public class ObserveTests
         // Assert
         Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
-        Assert.That(eventChanges.Length, Is.EqualTo(expected: 3));
+        Assert.That(eventChanges.Count, Is.EqualTo(expected: 3));
 
         Assert.That(eventChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.ElementAt(index: 0).Length, Is.EqualTo(expected: 1));
-        Assert.That(eventChanges.ElementAt(index: 0).Values.First().Type, Is.EqualTo(OutputInputType.Undefined));
+        Assert.That(eventChanges.ElementAt(index: 0).Values.First().Type, Is.EqualTo(OutputType.Undefined));
 
         Assert.That(eventChanges.ElementAt(index: 1).Tag, Is.EqualTo(EventChangeTag.Retain));
         Assert.That(eventChanges.ElementAt(index: 1).Length, Is.EqualTo(expected: 2));

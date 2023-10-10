@@ -2,7 +2,7 @@ using YDotNet.Document.State;
 
 namespace YDotNet.Native.Document.State;
 
-internal struct IdRangeNative
+internal readonly struct IdRangeNative
 {
     public uint Start { get; }
 

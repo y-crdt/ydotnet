@@ -4,7 +4,7 @@ using YDotNet.Document.State;
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct DeleteSetNative
+internal readonly struct DeleteSetNative
 {
     public uint EntriesCount { get; }
 
@@ -20,7 +20,7 @@ internal struct DeleteSetNative
 
         for (var i = 0; i < EntriesCount; i++)
         {
-            var clientId = (ulong) Marshal.ReadInt64(ClientIds, i * longSize);
+            var clientId = (ulong)Marshal.ReadInt64(ClientIds, i * longSize);
             var rangeNative = Marshal.PtrToStructure<IdRangeSequenceNative>(Ranges + i * idRangeSequenceSize);
 
             var range = rangeNative.ToIdRanges();

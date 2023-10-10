@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
@@ -9,24 +9,17 @@ namespace YDotNet.Document.Types.Events;
 /// <summary>
 ///     Represents a collection of <see cref="EventChange" /> instances.
 /// </summary>
-public class EventChanges : IEnumerable<EventChange>, IDisposable
+public class EventChanges : ReadOnlyCollection<EventChange>
 {
-    private readonly IEnumerable<EventChange> collection;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="EventChanges" /> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     /// <param name="length">The length of the array of <see cref="EventChange" /> to read from <see cref="Handle" />.</param>
     public EventChanges(nint handle, uint length)
+        : base(ReadItems(handle, length))
     {
         Handle = handle;
-        Length = length;
-
-        collection = MemoryReader.TryReadIntPtrArray(Handle, Length, Marshal.SizeOf<EventChangeNative>())!
-            .Select(Marshal.PtrToStructure<EventChangeNative>)
-            .Select(x => x.ToEventChange())
-            .ToArray();
     }
 
     /// <summary>
@@ -34,26 +27,15 @@ public class EventChanges : IEnumerable<EventChange>, IDisposable
     /// </summary>
     internal nint Handle { get; }
 
-    /// <summary>
-    ///     Gets the length of the native resource.
-    /// </summary>
-    internal uint Length { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private static IList<EventChange> ReadItems(nint handle, uint length)
     {
-        EventChannel.DeltaDestroy(Handle, Length);
-    }
+        var result = MemoryReader.TryReadIntPtrArray(handle, length, Marshal.SizeOf<EventChangeNative>())!
+            .Select(Marshal.PtrToStructure<EventChangeNative>)
+            .Select(x => x.ToEventChange())
+            .ToList();
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    /// <inheritdoc />
-    public IEnumerator<EventChange> GetEnumerator()
-    {
-        return collection.GetEnumerator();
+        // We are done reading and can release the memory.
+        PathChannel.Destroy(handle, length);
+        return result;
     }
 }

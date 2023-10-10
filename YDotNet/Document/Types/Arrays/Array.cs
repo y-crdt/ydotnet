@@ -41,7 +41,7 @@ public class Array : Branch
         var inputsArray = inputs.Select(x => x.InputNative).ToArray();
         var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
 
-        ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint)inputsArray.Length);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Output(handle, true);
+        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -91,10 +91,12 @@ public class Array : Branch
     ///     over all values of this <see cref="Array" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>The <see cref="ArrayIterator" /> instance or <c>null</c> if failed.</returns>
-    public ArrayIterator? Iterate(Transaction transaction)
+    /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
+    public ArrayIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new ArrayIterator(ArrayChannel.Iterator(Handle, transaction.Handle)));
+        var handle = ArrayChannel.Iterator(Handle, transaction.Handle);
+
+        return new ArrayIterator(handle.Checked());
     }
 
     /// <summary>
@@ -135,7 +137,8 @@ public class Array : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+
+        return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
 }

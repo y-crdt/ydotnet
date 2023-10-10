@@ -6,7 +6,7 @@ using YDotNet.Infrastructure;
 namespace YDotNet.Native.Types.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct EventDeltaNative
+internal readonly struct EventDeltaNative
 {
     public EventDeltaTagNative TagNative { get; }
 
@@ -25,20 +25,17 @@ internal struct EventDeltaNative
             EventDeltaTagNative.Add => EventDeltaTag.Add,
             EventDeltaTagNative.Remove => EventDeltaTag.Remove,
             EventDeltaTagNative.Retain => EventDeltaTag.Retain,
-            _ => throw new NotSupportedException(
-                $"The value \"{TagNative}\" for {nameof(EventDeltaTagNative)} is not supported.")
+            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventDeltaTagNative)} is not supported."),
         };
 
-        var attributes = MemoryReader.TryReadIntPtrArray(Attributes, AttributesLength, size: 16)
-                             ?.Select(x => new EventDeltaAttribute(x))
-                             .ToArray() ??
-                         Enumerable.Empty<EventDeltaAttribute>();
+        var attributes =
+            MemoryReader.ReadIntPtrArray(Attributes, AttributesLength, size: 16)
+                .Select(x => new EventDeltaAttribute(x)).ToArray();
 
         return new EventDelta(
             tag,
             Length,
-            ReferenceAccessor.Output(InsertHandle, false),
-            attributes
-        );
+            InsertHandle != nint.Zero ? new Output(InsertHandle, false) : null,
+            attributes);
     }
 }

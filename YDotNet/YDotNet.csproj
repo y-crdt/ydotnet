@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests.Unit" />
   </ItemGroup>
 
@@ -17,19 +21,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="yrs.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="libyrs.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <!-- https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022 -->
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <DefineConstants>WINDOWS</DefineConstants>
-  </PropertyGroup>
 
 </Project>

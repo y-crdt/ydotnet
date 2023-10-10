@@ -4,7 +4,7 @@ using YDotNet.Document.Events;
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct UpdateEventNative
+internal readonly struct UpdateEventNative
 {
     public uint Length { get; init; }
 
@@ -22,7 +22,7 @@ internal struct UpdateEventNative
     public UpdateEvent ToUpdateEvent()
     {
         var result = new byte[Length];
-        Marshal.Copy(Data, result, startIndex: 0, (int) Length);
+        Marshal.Copy(Data, result, startIndex: 0, (int)Length);
 
         return new UpdateEvent(result);
     }

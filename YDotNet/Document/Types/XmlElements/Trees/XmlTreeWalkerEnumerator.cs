@@ -10,6 +10,8 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </summary>
 internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
 {
+    private Output? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
     /// </summary>
@@ -20,8 +22,13 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     public XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker)
     {
         TreeWalker = treeWalker;
-        Current = null;
     }
+
+    /// <inheritdoc />
+    public Output Current => current!;
+
+    /// <inheritdoc />
+    object? IEnumerator.Current => current!;
 
     /// <summary>
     ///     Gets the <see cref="TreeWalker" /> instance that holds the
@@ -30,17 +37,11 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     private XmlTreeWalker TreeWalker { get; }
 
     /// <inheritdoc />
-    public Output? Current { get; private set; }
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => Current;
-
-    /// <inheritdoc />
     public bool MoveNext()
     {
         var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
 
-        Current = handle != nint.Zero ? new Output(handle, false) : null;
+        current = handle != nint.Zero ? new Output(handle, false) : null;
 
         return Current != null;
     }

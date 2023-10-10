@@ -5,7 +5,6 @@ using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
-using YDotNet.Document.UndoManagers;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
@@ -114,6 +113,7 @@ public class Doc : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         DocChannel.Destroy(Handle);
     }
 
@@ -122,158 +122,138 @@ public class Doc : IDisposable
     /// </summary>
     /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
     /// <returns>A new <see cref="Doc" /> instance that controls the same document.</returns>
-    public Doc? Clone()
+    public Doc Clone()
     {
-        return ReferenceAccessor.Access(new Doc(DocChannel.Clone(Handle)));
+        var handle = DocChannel.Clone(Handle).Checked();
+
+        return new Doc(handle);
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Texts.Text" /> data type instance as a root-level
+    ///     Gets or creates a new shared <see cref="Types.Texts.Text" /> data type instance as a root-level
     ///     type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Texts.Text" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="YDotNet.Document.Types.Texts.Text" /> instance related to the <c>name</c> provided or
-    ///     <c>null</c> if failed.
-    /// </returns>
-    public Text? Text(string name)
+    /// <param name="name">The name of the <see cref="Types.Texts.Text" /> instance to get.</param>
+    /// <returns>The <see cref="Types.Texts.Text" /> instance related to the <c>name</c> provided.</returns>
+    public Text Text(string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var result = ReferenceAccessor.Access(new Text(DocChannel.Text(Handle, nameHandle)));
+        var textName = MemoryWriter.WriteUtf8String(name);
+        var textHandle = DocChannel.Text(Handle, textName);
+        MemoryWriter.Release(textName);
 
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new Text(textHandle.Checked());
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Maps.Map" /> data type instance as a root-level type
+    ///     Gets or creates a new shared <see cref="Types.Maps.Map" /> data type instance as a root-level type
     ///     in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Maps.Map" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="YDotNet.Document.Types.Maps.Map" /> instance related to the <c>name</c> provided or <c>null</c>
-    ///     if failed.
-    /// </returns>
-    public Map? Map(string name)
+    /// <param name="name">The name of the <see cref="Types.Maps.Map" /> instance to get.</param>
+    /// <returns>The <see cref="Types.Maps.Map" /> instance related to the <c>name</c> provided.</returns>
+    public Map Map(string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var result = ReferenceAccessor.Access(new Map(DocChannel.Map(Handle, nameHandle)));
+        var mapName = MemoryWriter.WriteUtf8String(name);
+        var mapHandle = DocChannel.Map(Handle, mapName);
+        MemoryWriter.Release(mapName);
 
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new Map(mapHandle.Checked());
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.Arrays.Array" /> data type instance as a root-level
+    ///     Gets or creates a new shared <see cref="Types.Arrays.Array" /> data type instance as a root-level
     ///     type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.Arrays.Array" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="YDotNet.Document.Types.Arrays.Array" /> instance related to the <c>name</c> provided or
-    ///     <c>null</c> if failed.
-    /// </returns>
-    public Array? Array(string name)
+    /// <param name="name">The name of the <see cref="Types.Arrays.Array" /> instance to get.</param>
+    /// <returns>The <see cref="Types.Arrays.Array" /> instance related to the <c>name</c> provided.</returns>
+    public Array Array(string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var result = ReferenceAccessor.Access(new Array(DocChannel.Array(Handle, nameHandle)));
+        var arrayName = MemoryWriter.WriteUtf8String(name);
+        var arrayHandle = DocChannel.Array(Handle, arrayName);
+        MemoryWriter.Release(arrayName);
 
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new Array(arrayHandle.Checked());
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> data type instance as a
+    ///     Gets or creates a new shared <see cref="Types.XmlElements.XmlElement" /> data type instance as a
     ///     root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided
-    ///     or <c>null</c> if failed.
-    /// </returns>
-    public XmlElement? XmlElement(string name)
+    /// <param name="name">The name of the <see cref="Types.XmlElements.XmlElement" /> instance to get.</param>
+    /// <returns>The <see cref="Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided.</returns>
+    public XmlElement XmlElement(string name)
     {
-        // TODO [LSViana] Wrap the XmlElement with an XmlFragment before returning the value.
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var result = ReferenceAccessor.Access(new XmlElement(DocChannel.XmlElement(Handle, nameHandle)));
+        var xmlElementName = MemoryWriter.WriteUtf8String(name);
+        var xmlElementHandle = DocChannel.XmlElement(Handle, xmlElementName);
+        MemoryWriter.Release(xmlElementName);
 
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new XmlElement(xmlElementHandle.Checked());
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> data type instance as a
+    ///     Gets or creates a new shared <see cref="Types.XmlTexts.XmlText" /> data type instance as a
     ///     root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided
-    ///     or <c>null</c> if failed.
-    /// </returns>
-    public XmlText? XmlText(string name)
+    /// <param name="name">The name of the <see cref="Types.XmlTexts.XmlText" /> instance to get.</param>
+    /// <returns>The <see cref="Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided.</returns>
+    public XmlText XmlText(string name)
     {
-        // TODO [LSViana] Wrap the XmlText with an XmlFragment before returning the value.
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var result = ReferenceAccessor.Access(new XmlText(DocChannel.XmlText(Handle, nameHandle)));
+        var xmlTextName = MemoryWriter.WriteUtf8String(name);
+        var xmlTextHandle = DocChannel.XmlText(Handle, xmlTextName);
+        MemoryWriter.Release(xmlTextName);
 
-        MemoryWriter.Release(nameHandle);
-
-        return result;
+        return new XmlText(xmlTextHandle.Checked());
     }
 
     /// <summary>
     ///     Starts a new read-write <see cref="Transaction" /> on this document.
     /// </summary>
-    /// <param name="origin">
-    ///     Optional byte marker to indicate the source of changes to be applied by this transaction.
-    ///     This value is used by <see cref="UndoManager" />.
-    /// </param>
-    /// <returns>
-    ///     <para>The <see cref="Transaction" /> to perform operations in the document or <c>null</c>.</para>
-    ///     <para>
-    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
-    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
-    ///     </para>
-    /// </returns>
-    public Transaction? WriteTransaction(byte[]? origin = null)
+    /// <param name="origin">Optional byte marker to indicate the source of changes to be applied by this transaction.</param>
+    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
+    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    public Transaction WriteTransaction(byte[]? origin = null)
     {
-        var length = (uint) (origin?.Length ?? 0);
+        var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
 
-        return ReferenceAccessor.Access(
-            new Transaction(DocChannel.WriteTransaction(Handle, length, origin)));
+        if (handle == nint.Zero)
+        {
+            ThrowHelper.PendingTransaction();
+            return default!;
+        }
+
+        return new Transaction(handle);
     }
 
     /// <summary>
     ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
-    /// <returns>
-    ///     <para>The <see cref="Transaction" /> to perform operations in the document or <c>null</c>.</para>
-    ///     <para>
-    ///         Returns <c>null</c> if the <see cref="Transaction" /> could not be created because, for example, another
-    ///         read-write <see cref="Transaction" /> already exists and was not committed yet.
-    ///     </para>
-    /// </returns>
-    public Transaction? ReadTransaction()
+    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</para>
+    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    public Transaction ReadTransaction()
     {
-        return ReferenceAccessor.Access(new Transaction(DocChannel.ReadTransaction(Handle)));
+        var handle = DocChannel.ReadTransaction(Handle);
+
+        if (handle == nint.Zero)
+        {
+            ThrowHelper.PendingTransaction();
+            return default!;
+        }
+
+        return new Transaction(handle);
     }
 
     /// <summary>

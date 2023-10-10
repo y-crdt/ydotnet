@@ -14,7 +14,7 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 0).XmlElement;
+        var target = xmlElement.Get(transaction, index: 0).ResolveXmlElement();
         var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
@@ -30,12 +30,12 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 2).XmlElement;
+        var target = xmlElement.Get(transaction, index: 2).ResolveXmlElement();
         var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.XmlText, Is.Not.Null);
+        Assert.That(sibling.ResolveXmlText(), Is.Not.Null);
     }
 
     [Test]
@@ -46,12 +46,12 @@ public class PreviousSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 4).XmlElement;
+        var target = xmlElement.Get(transaction, index: 4).ResolveXmlElement();
         var sibling = target.PreviousSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.XmlText, Is.Not.Null);
+        Assert.That(sibling.ResolveXmlText(), Is.Not.Null);
     }
 
     private (Doc, XmlElement) ArrangeDoc()

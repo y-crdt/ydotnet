@@ -5,7 +5,7 @@ using YDotNet.Infrastructure;
 namespace YDotNet.Native.Document;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct DocOptionsNative : IDisposable
+internal readonly struct DocOptionsNative : IDisposable
 {
     public ulong Id { get; init; }
 
@@ -31,10 +31,10 @@ internal struct DocOptionsNative : IDisposable
             Id = options.Id ?? 0,
             Guid = guidHandle,
             CollectionId = collectionIdHandle,
-            Encoding = (byte) (options.Encoding ?? DocEncoding.Utf8),
-            SkipGc = (byte) (options.SkipGarbageCollection ?? false ? 1 : 0),
-            AutoLoad = (byte) (options.AutoLoad ?? false ? 1 : 0),
-            ShouldLoad = (byte) (options.ShouldLoad ?? false ? 1 : 0)
+            Encoding = (byte)(options.Encoding ?? DocEncoding.Utf8),
+            SkipGc = (byte)(options.SkipGarbageCollection ?? false ? 1 : 0),
+            AutoLoad = (byte)(options.AutoLoad ?? false ? 1 : 0),
+            ShouldLoad = (byte)(options.ShouldLoad ?? false ? 1 : 0)
         };
     }
 

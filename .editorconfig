@@ -10,7 +10,11 @@ tab_width = 4
 
 # New line preferences
 end_of_line = lf
+
 insert_final_newline = true
+
+csharp_style_namespace_declarations = file_scoped
+
 
 # StyleCop rules (https://dotnetanalyzers.github.io/StyleCopAnalyzers/)
 

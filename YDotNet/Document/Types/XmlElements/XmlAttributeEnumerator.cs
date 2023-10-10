@@ -9,6 +9,8 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
 {
+    private XmlAttribute? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlAttributeEnumerator" /> class.
     /// </summary>
@@ -21,6 +23,12 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
         Iterator = iterator;
     }
 
+    /// <inheritdoc />
+    public XmlAttribute Current => current!;
+
+    /// <inheritdoc />
+    object? IEnumerator.Current => current!;
+
     /// <summary>
     ///     Gets the <see cref="Iterator" /> instance that holds the
     ///     <see cref="XmlAttributeIterator.Handle" /> used by this enumerator.
@@ -28,19 +36,13 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     private XmlAttributeIterator Iterator { get; }
 
     /// <inheritdoc />
-    public XmlAttribute? Current { get; private set; }
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => Current;
-
-    /// <inheritdoc />
     public bool MoveNext()
     {
         var handle = XmlAttributeChannel.IteratorNext(Iterator.Handle);
 
-        Current = handle != nint.Zero ? new XmlAttribute(handle) : null;
+        current = handle != nint.Zero ? new XmlAttribute(handle) : null;
 
-        return Current != null;
+        return current != null;
     }
 
     /// <inheritdoc />

@@ -29,11 +29,10 @@ public class WriteTransactionTests
 
         // Act
         var transaction1 = branch.WriteTransaction();
-        var transaction2 = branch.WriteTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.WriteTransaction());
         Assert.That(transaction1, Is.Not.Null);
-        Assert.That(transaction2, Is.Null);
     }
 
     [Test]
@@ -45,11 +44,10 @@ public class WriteTransactionTests
 
         // Act
         var readTransaction = branch.ReadTransaction();
-        var writeTransaction = branch.WriteTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.WriteTransaction());
         Assert.That(readTransaction, Is.Not.Null);
-        Assert.That(writeTransaction, Is.Null);
     }
 
     [Test]
@@ -61,11 +59,10 @@ public class WriteTransactionTests
 
         // Act
         var readTransaction = doc.ReadTransaction();
-        var writeTransaction = branch.WriteTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.WriteTransaction());
         Assert.That(readTransaction, Is.Not.Null);
-        Assert.That(writeTransaction, Is.Null);
     }
 
     [Test]
@@ -77,10 +74,9 @@ public class WriteTransactionTests
 
         // Act
         var transaction1 = doc.WriteTransaction();
-        var transaction2 = branch.WriteTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.WriteTransaction());
         Assert.That(transaction1, Is.Not.Null);
-        Assert.That(transaction2, Is.Null);
     }
 }

@@ -15,7 +15,7 @@ public class EventPathSegment
     public EventPathSegment(nint handle)
     {
         Handle = handle;
-        Tag = (EventPathSegmentTag) Marshal.ReadByte(handle);
+        Tag = (EventPathSegmentTag)Marshal.ReadByte(handle);
 
         switch (Tag)
         {
@@ -25,15 +25,10 @@ public class EventPathSegment
                 break;
 
             case EventPathSegmentTag.Index:
-                Index = (uint) Marshal.ReadInt32(handle + MemoryConstants.PointerSize);
+                Index = (uint)Marshal.ReadInt32(handle + MemoryConstants.PointerSize);
                 break;
         }
     }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 
     /// <summary>
     ///     Gets the value that indicates the kind of data held by this <see cref="EventPathSegment" /> instance.
@@ -51,4 +46,9 @@ public class EventPathSegment
     ///     <c>null</c> otherwise.
     /// </summary>
     public uint? Index { get; }
+
+    /// <summary>
+    ///     Gets the handle to the native resource.
+    /// </summary>
+    internal nint Handle { get; }
 }

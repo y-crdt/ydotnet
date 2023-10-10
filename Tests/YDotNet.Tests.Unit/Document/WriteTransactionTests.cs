@@ -26,6 +26,6 @@ public class WriteTransactionTests
 
         // Assert
         Assert.That(doc.WriteTransaction(), Is.Not.Null);
-        Assert.That(doc.WriteTransaction(), Is.Null);
+        Assert.Throws<YDotNetException>(() => doc.WriteTransaction());
     }
 }

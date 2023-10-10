@@ -4,7 +4,7 @@ using YDotNet.Document.State;
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct IdRangeSequenceNative
+internal readonly struct IdRangeSequenceNative
 {
     public uint Length { get; }
 

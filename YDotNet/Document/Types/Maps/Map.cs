@@ -54,12 +54,11 @@ public class Map : Branch
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
     public Output? Get(Transaction transaction, string key)
     {
-        var keyHandle = MemoryWriter.WriteUtf8String(key);
-        var handle = MapChannel.Get(Handle, transaction.Handle, keyHandle);
+        var outputName = MemoryWriter.WriteUtf8String(key);
+        var outputHandle = MapChannel.Get(Handle, transaction.Handle, outputName);
+        MemoryWriter.Release(outputName);
 
-        MemoryWriter.Release(keyHandle);
-
-        return ReferenceAccessor.Output(handle, false);
+        return outputHandle != nint.Zero ? new Output(outputHandle, false) : null;
     }
 
     /// <summary>
@@ -102,10 +101,12 @@ public class Map : Branch
     ///     <see cref="Map" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>The <see cref="MapIterator" /> instance or <c>null</c> if failed.</returns>
-    public MapIterator? Iterate(Transaction transaction)
+    /// <returns>The <see cref="MapIterator" /> instance.</returns>
+    public MapIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new MapIterator(MapChannel.Iterator(Handle, transaction.Handle)));
+        var handle = MapChannel.Iterator(Handle, transaction.Handle).Checked();
+
+        return new MapIterator(handle);
     }
 
     /// <summary>

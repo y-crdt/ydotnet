@@ -9,7 +9,7 @@ internal static class MemoryReader
     internal static unsafe byte[] ReadBytes(nint handle, uint length)
     {
         var data = new byte[length];
-        var stream = new UnmanagedMemoryStream((byte*) handle.ToPointer(), length);
+        var stream = new UnmanagedMemoryStream((byte*)handle.ToPointer(), length);
         int bytesRead;
 
         do
@@ -86,7 +86,6 @@ internal static class MemoryReader
         if (handle == nint.Zero)
         {
             result = null;
-
             return false;
         }
 

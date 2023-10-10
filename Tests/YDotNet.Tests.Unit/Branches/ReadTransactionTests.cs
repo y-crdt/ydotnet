@@ -61,11 +61,10 @@ public class ReadTransactionTests
 
         // Act
         var writeTransaction = branch.WriteTransaction();
-        var readTransaction = branch.ReadTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.ReadTransaction());
         Assert.That(writeTransaction, Is.Not.Null);
-        Assert.That(readTransaction, Is.Null);
     }
 
     [Test]
@@ -77,10 +76,9 @@ public class ReadTransactionTests
 
         // Act
         var documentTransaction = doc.WriteTransaction();
-        var branchTransaction = branch.ReadTransaction();
 
         // Assert
+        Assert.Throws<YDotNetException>(() => branch.ReadTransaction());
         Assert.That(documentTransaction, Is.Not.Null);
-        Assert.That(branchTransaction, Is.Null);
     }
 }
