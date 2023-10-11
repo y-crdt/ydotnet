@@ -28,7 +28,7 @@ internal static class TransactionChannel
         EntryPoint = "ytransaction_state_diff_v1")]
     public static extern nint StateDiffV1(
         nint transaction,
-        byte[] stateVector,
+        byte[]? stateVector,
         uint stateVectorLength,
         out uint length);
 
