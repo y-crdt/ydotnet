@@ -25,12 +25,16 @@ public class EventKeys : UnmanagedCollectionResource<EventKeyChange>
         this.length = length;
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="EventKeys"/> class.
+    /// </summary>
     ~EventKeys()
     {
         Dispose(true);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         EventChannel.KeysDestroy(Handle, length);
     }

@@ -15,7 +15,7 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 public class Array : Branch
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     internal Array(nint handle)
         : base(handle)
@@ -23,12 +23,12 @@ public class Array : Branch
     }
 
     /// <summary>
-    ///     Gets the number of elements stored within current instance of <see cref="Types.Array" />.
+    ///     Gets the number of elements stored within current instance of <see cref="YDotNet.Document.Types.Arrays.Array" />.
     /// </summary>
     public uint Length => ArrayChannel.Length(Handle);
 
     /// <summary>
-    ///     Inserts a range of <see cref="inputs" /> into the current instance of <see cref="Array" />.
+    ///     Inserts a range of <paramref name="inputs" /> into the current instance of <see cref="Array" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The starting index to insert the items.</param>
@@ -52,13 +52,13 @@ public class Array : Branch
     }
 
     /// <summary>
-    ///     Gets the <see cref="Output" /> value at the given <see cref="index" /> or
-    ///     <c>null</c> if <see cref="index" /> is outside the bounds.
+    ///     Gets the <see cref="Output" /> value at the given <paramref name="index" /> or
+    ///     <c>null</c> if <paramref name="index" /> is outside the bounds.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to get the item.</param>
     /// <returns>
-    ///     The <see cref="Output" /> value at the given <see cref="index" /> or <c>null</c> if <see cref="index" /> is
+    ///     The <see cref="Output" /> value at the given <paramref name="index" /> or <c>null</c> if <paramref name="index" /> is
     ///     outside the bounds.
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
@@ -69,7 +69,7 @@ public class Array : Branch
     }
 
     /// <summary>
-    ///     Moves the element at <see cref="sourceIndex" /> to the <see cref="targetIndex" />.
+    ///     Moves the element at <paramref name="sourceIndex" /> to the <paramref name="targetIndex" />.
     /// </summary>
     /// <remarks>
     ///     Both indexes must be lower than the <see cref="Length" />.
@@ -119,13 +119,13 @@ public class Array : Branch
     }
 
     /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
+    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);

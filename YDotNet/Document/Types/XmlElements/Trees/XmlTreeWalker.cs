@@ -1,5 +1,6 @@
 using System.Collections;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -19,12 +20,16 @@ public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
     {
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="XmlTreeWalker"/> class.
+    /// </summary>
     ~XmlTreeWalker()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         XmlElementChannel.TreeWalkerDestroy(Handle);
     }

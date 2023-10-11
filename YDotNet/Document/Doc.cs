@@ -31,7 +31,7 @@ namespace YDotNet.Document;
 /// </remarks>
 public class Doc
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
@@ -237,7 +237,7 @@ public class Doc
     /// <summary>
     ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
-    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</para>
+    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
     /// <exception cref="YDotNetException">Another exception is pending.</exception>
     public Transaction ReadTransaction()
     {

@@ -41,7 +41,7 @@ public class EventPathSegment
     public string? Key { get; }
 
     /// <summary>
-    ///     Gets the <see cref="int" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or
+    ///     Gets the <see ref="uint" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or
     ///     <c>null</c> otherwise.
     /// </summary>
     public uint? Index { get; }

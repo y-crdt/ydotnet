@@ -1,3 +1,5 @@
+using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Inputs;
 
@@ -17,7 +19,8 @@ public sealed class Input : Resource
         InputNative = native;
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
     {
         foreach (var memory in allocatedMemory)
         {
@@ -175,7 +178,7 @@ public sealed class Input : Resource
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="name">The <see cref="string" /> value to name the <see cref="Types.XmlElement" /> in the cell.</param>
+    /// <param name="name">The <see cref="string" /> value to name the <see cref="XmlElement" /> in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlElement(string name)
     {
@@ -187,7 +190,7 @@ public sealed class Input : Resource
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
-    /// <param name="value">The <see cref="value" /> value to fill the <see cref="Types.XmlText" /> in the cell.</param>
+    /// <param name="value">The <see cref="string" /> value to fill the <see cref="XmlText" /> in the cell.</param>
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlText(string value)
     {

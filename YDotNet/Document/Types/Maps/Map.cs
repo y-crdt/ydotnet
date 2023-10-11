@@ -13,7 +13,7 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 public class Map : Branch
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     internal Map(nint handle)
         : base(handle)

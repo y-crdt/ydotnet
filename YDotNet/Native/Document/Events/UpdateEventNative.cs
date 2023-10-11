@@ -1,5 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using YDotNet.Document.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.Events;
 
@@ -12,17 +14,12 @@ internal readonly struct UpdateEventNative
 
     public static UpdateEventNative From(uint length, nint data)
     {
-        return new UpdateEventNative
-        {
-            Length = length,
-            Data = data
-        };
+        return new UpdateEventNative { Length = length, Data = data };
     }
 
     public UpdateEvent ToUpdateEvent()
     {
-        var result = new byte[Length];
-        Marshal.Copy(Data, result, startIndex: 0, (int)Length);
+        var result = MemoryReader.ReadBytes(Data, Length);
 
         return new UpdateEvent(result);
     }

@@ -34,10 +34,6 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
 
-    /// <summary>
-    ///     Gets the <see cref="Iterator" /> instance that holds the
-    ///     <see cref="XmlAttributeIterator.Handle" /> used by this enumerator.
-    /// </summary>
     private XmlAttributeIterator Iterator { get; }
 
     /// <inheritdoc />

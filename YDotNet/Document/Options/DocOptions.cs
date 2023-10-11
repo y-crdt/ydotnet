@@ -1,3 +1,6 @@
+using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlTexts;
+
 namespace YDotNet.Document.Options;
 
 /// <summary>

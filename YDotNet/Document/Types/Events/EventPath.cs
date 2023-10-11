@@ -22,7 +22,8 @@ public sealed class EventPath : UnmanagedCollectionResource<EventPathSegment>
         PathChannel.Destroy(Handle, length);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         // We have read everything in the constructor, therefore there is no unmanaged memory to be released.
     }

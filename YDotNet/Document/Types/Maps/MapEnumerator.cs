@@ -26,9 +26,6 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
 
-    /// <summary>
-    ///     Gets the <see cref="Iterator" /> instance that holds the <see cref="Types.MapIterator.Handle" /> used by this enumerator.
-    /// </summary>
     private MapIterator Iterator { get; }
 
     /// <inheritdoc />

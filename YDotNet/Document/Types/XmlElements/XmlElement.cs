@@ -15,7 +15,7 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlElement : Branch
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     internal XmlElement(nint handle)
         : base(handle)
@@ -57,7 +57,7 @@ public class XmlElement : Branch
     ///     Inserts an attribute in this <see cref="XmlElement" /> instance.
     /// </summary>
     /// <remarks>
-    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    ///     If another attribute with the same <paramref name="name" /> already exists, it will be replaced.
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be added.</param>
@@ -83,7 +83,7 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Gets an attribute with the given <see cref="name" /> from this <see cref="XmlElement" /> instance.
+    ///     Gets an attribute with the given <paramref name="name" /> from this <see cref="XmlElement" /> instance.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be retrieved.</param>
@@ -126,11 +126,11 @@ public class XmlElement : Branch
 
     /// <summary>
     ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
-    ///     <see cref="index" />.
+    ///     <paramref name="index" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
-    /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
+    /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlText InsertText(Transaction transaction, uint index)
     {
         var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
@@ -140,12 +140,12 @@ public class XmlElement : Branch
 
     /// <summary>
     ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
-    ///     <see cref="index" />.
+    ///     <paramref name="index" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <param name="name">The name (or tag) of the <see cref="XmlElement" /> that will be inserted.</param>
-    /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
+    /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
@@ -156,23 +156,23 @@ public class XmlElement : Branch
     }
 
     /// <summary>
-    ///     Removes a consecutive range of direct child nodes starting at the <see cref="index" /> through the
-    ///     <see cref="length" />.
+    ///     Removes a consecutive range of direct child nodes starting at the <paramref name="index" /> through the
+    ///     <paramref name="length" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to start removing the child nodes.</param>
-    /// <param name="length">The amount of child nodes to remove, starting at <see cref="index" />.</param>
+    /// <param name="length">The amount of child nodes to remove, starting at <paramref name="index" />.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
         XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
     /// <summary>
-    ///     Returns an <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.
+    ///     Returns an <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to retrieve the <see cref="Output" /> cell.</param>
-    /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.</returns>
+    /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.</returns>
     public Output? Get(Transaction transaction, uint index)
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);

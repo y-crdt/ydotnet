@@ -5,9 +5,12 @@ using YDotNet.Native.Cells.Outputs;
 
 namespace YDotNet.Document.Cells;
 
+/// <summary>
+/// Represents a json array.
+/// </summary>
 public sealed class JsonArray : ReadOnlyCollection<Output>
 {
-    public JsonArray(nint handle, uint length, IResourceOwner owner)
+    internal JsonArray(nint handle, uint length, IResourceOwner owner)
         : base(ReadItems(handle, length, owner))
     {
     }

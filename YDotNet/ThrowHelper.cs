@@ -1,6 +1,6 @@
 namespace YDotNet;
 
-public static class ThrowHelper
+internal static class ThrowHelper
 {
     public static void InternalError()
     {

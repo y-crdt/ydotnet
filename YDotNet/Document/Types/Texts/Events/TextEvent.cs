@@ -42,7 +42,8 @@ public class TextEvent : UnmanagedResource
         });
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }
@@ -50,13 +51,13 @@ public class TextEvent : UnmanagedResource
     /// <summary>
     ///     Gets the keys that changed within the <see cref="Text" /> instance and triggered this event.
     /// </summary>
-    /// <remarks>This property can only be accessed during the callback that exposes this instance.</para></remarks>
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
     public EventDeltas Delta => deltas.Value;
 
     /// <summary>
     ///     Gets the path from the observed instanced down to the current <see cref="Text" /> instance.
     /// </summary>
-    /// <remarks>This property can only be accessed during the callback that exposes this instance.</para></remarks>
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
     public EventPath Path => path.Value;
 
     /// <summary>

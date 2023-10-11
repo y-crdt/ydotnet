@@ -24,12 +24,16 @@ public class EventDeltas : UnmanagedCollectionResource<EventDelta>
         }
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="EventDeltas"/> class.
+    /// </summary>
     ~EventDeltas()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         EventChannel.DeltaDestroy(Handle, length);
     }

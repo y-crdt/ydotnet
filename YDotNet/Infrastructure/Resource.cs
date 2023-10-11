@@ -1,22 +1,34 @@
 namespace YDotNet.Infrastructure;
 
+/// <summary>
+/// Base class for all resoruces.
+/// </summary>
 public abstract class Resource : IResourceOwner, IDisposable
 {
-    protected Resource(IResourceOwner? owner = null)
+    internal Resource(IResourceOwner? owner = null)
     {
-        this.Owner = owner;
+        Owner = owner;
     }
 
+    /// <inheritdoc/>
     public bool IsDisposed { get; private set; }
 
+    /// <summary>
+    /// Gets the owner of this resource.
+    /// </summary>
     public IResourceOwner? Owner { get; }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         GC.SuppressFinalize(this);
         Dispose(true);
     }
 
+    /// <summary>
+    /// Throws an exception if this object or the owner is disposed.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Object or the owner has been disposed.</exception>
     protected void ThrowIfDisposed()
     {
         if (IsDisposed || Owner?.IsDisposed == true)
@@ -25,6 +37,10 @@ public abstract class Resource : IResourceOwner, IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all unmanaged resources.
+    /// </summary>
+    /// <param name="disposing">True, if also managed resources should be disposed.</param>
     protected void Dispose(bool disposing)
     {
         if (IsDisposed)
@@ -36,5 +52,9 @@ public abstract class Resource : IResourceOwner, IDisposable
         IsDisposed = true;
     }
 
-    protected abstract void DisposeCore(bool disposing);
+    /// <summary>
+    /// Releases all unmanaged resources.
+    /// </summary>
+    /// <param name="disposing">True, if also managed resources should be disposed.</param>
+    protected internal abstract void DisposeCore(bool disposing);
 }

@@ -17,12 +17,12 @@ public class IdRange
     }
 
     /// <summary>
-    ///     The start of the <see cref="IdRange" />.
+    ///     Gets the start of the <see cref="IdRange" />.
     /// </summary>
     public uint Start { get; }
 
     /// <summary>
-    ///     The end of the <see cref="IdRange" />.
+    ///     Gets the end of the <see cref="IdRange" />.
     /// </summary>
     public uint End { get; }
 }

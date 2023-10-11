@@ -1,12 +1,16 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace YDotNet.Infrastructure;
 
+/// <summary>
+/// Base class for resources that represent a collection.
+/// </summary>
+/// <typeparam name="T">The type of item.</typeparam>
 public abstract class UnmanagedCollectionResource<T> : UnmanagedResource, IReadOnlyList<T>
 {
-    private readonly List<T> items = new List<T>();
+    private readonly List<T> items = new();
 
-    public UnmanagedCollectionResource(nint handle, IResourceOwner? owner)
+    internal UnmanagedCollectionResource(nint handle, IResourceOwner? owner)
         : base(handle, owner)
     {
     }
@@ -17,7 +21,11 @@ public abstract class UnmanagedCollectionResource<T> : UnmanagedResource, IReadO
     /// <inheritdoc />
     public int Count => items.Count;
 
-    protected void AddItem(T item)
+    /// <summary>
+    /// Adds a new item to the collection.
+    /// </summary>
+    /// <param name="item">The item to add.</param>
+    protected internal void AddItem(T item)
     {
         items.Add(item);
     }

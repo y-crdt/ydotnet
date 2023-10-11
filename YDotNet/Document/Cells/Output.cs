@@ -29,12 +29,16 @@ public sealed class Output : UnmanagedResource
         value = BuildValue(handle, native.Length, Type, this);
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="Output"/> class.
+    /// </summary>
     ~Output()
     {
         Dispose(true);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         if (Owner == null)
         {

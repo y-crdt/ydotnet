@@ -19,12 +19,16 @@ public sealed class MapEntry : UnmanagedResource
         Value = new Output(outputHandle, owner ?? this);
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="MapEntry"/> class.
+    /// </summary>
     ~MapEntry()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         MapChannel.EntryDestroy(Handle);
     }

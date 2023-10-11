@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 

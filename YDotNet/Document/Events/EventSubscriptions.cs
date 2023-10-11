@@ -4,7 +4,7 @@ namespace YDotNet.Document.Events;
 
 internal sealed class EventSubscriptions
 {
-    private readonly HashSet<EventSubscription> subscriptions = new HashSet<EventSubscription>();
+    private readonly HashSet<EventSubscription> subscriptions = new();
 
     public IDisposable Add(object callback, Action unsubscribe)
     {
@@ -37,7 +37,7 @@ internal sealed class EventSubscriptions
 
         internal object? Callback { get; set; }
 
-        protected override void DisposeCore(bool disposing)
+        protected internal override void DisposeCore(bool disposing)
         {
             unsubscribe(this);
         }

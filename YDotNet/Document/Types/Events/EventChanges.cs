@@ -12,7 +12,7 @@ public class EventChanges : UnmanagedCollectionResource<EventChange>
 {
     private readonly uint length;
 
-    public EventChanges(nint handle, uint length, IResourceOwner owner)
+    internal EventChanges(nint handle, uint length, IResourceOwner owner)
         : base(handle, owner)
     {
         foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventChangeNative>()))
@@ -24,12 +24,16 @@ public class EventChanges : UnmanagedCollectionResource<EventChange>
         this.length = length;
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="EventChanges"/> class.
+    /// </summary>
     ~EventChanges()
     {
         Dispose(true);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         EventChannel.DeltaDestroy(Handle, length);
     }

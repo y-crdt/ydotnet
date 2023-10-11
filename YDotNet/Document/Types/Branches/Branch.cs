@@ -11,7 +11,7 @@ namespace YDotNet.Document.Types.Branches;
 /// </summary>
 public abstract class Branch
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Branch" /> class.
@@ -22,7 +22,7 @@ public abstract class Branch
         Handle = handle;
     }
 
-    public nint Handle { get; }
+    internal nint Handle { get; }
 
     /// <summary>
     ///     Subscribes a callback function for changes performed within the <see cref="Branch" /> instance

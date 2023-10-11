@@ -24,14 +24,17 @@ public class TextChunks : UnmanagedCollectionResource<TextChunk>
         this.length = length;
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="TextChunks"/> class.
+    /// </summary>
     ~TextChunks()
     {
         Dispose(true);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
-
         Console.WriteLine("---DISPOSE {0} - {1}", Handle, length);
         Console.Out.Flush();
         Thread.Sleep(100);

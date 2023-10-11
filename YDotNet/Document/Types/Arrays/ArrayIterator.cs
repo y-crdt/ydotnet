@@ -18,12 +18,16 @@ public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
     {
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="ArrayIterator"/> class.
+    /// </summary>
     ~ArrayIterator()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         ArrayChannel.IteratorDestroy(Handle);
     }

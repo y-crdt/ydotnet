@@ -1,4 +1,7 @@
-﻿namespace YDotNet.Document.Options;
+﻿using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlTexts;
+
+namespace YDotNet.Document.Options;
 
 /// <summary>
 ///     Determines how string length and offsets are calculated for <see cref="Text" /> and <see cref="XmlText" />.

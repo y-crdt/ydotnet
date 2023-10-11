@@ -21,7 +21,8 @@ public class StickyIndex : UnmanagedResource
     {
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
     }
 

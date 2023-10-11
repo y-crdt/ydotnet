@@ -28,9 +28,6 @@ internal class ArrayEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
 
-    /// <summary>
-    ///     Gets the <see cref="Iterator" /> instance that holds the <see cref="ArrayIterator.Handle" /> used by this enumerator.
-    /// </summary>
     private ArrayIterator Iterator { get; }
 
     /// <inheritdoc />

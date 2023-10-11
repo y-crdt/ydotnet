@@ -1,6 +1,6 @@
 namespace YDotNet.Infrastructure;
 
-public static class Extensions
+internal static class Extensions
 {
     public static nint Checked(this nint input)
     {

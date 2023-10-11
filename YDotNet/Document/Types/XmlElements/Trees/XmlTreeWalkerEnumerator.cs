@@ -35,10 +35,6 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
 
-    /// <summary>
-    ///     Gets the <see cref="TreeWalker" /> instance that holds the
-    ///     <see cref="XmlTreeWalker.Handle" /> used by this enumerator.
-    /// </summary>
     private XmlTreeWalker TreeWalker { get; }
 
     /// <inheritdoc />

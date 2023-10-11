@@ -16,7 +16,7 @@ namespace YDotNet.Document.Types.XmlTexts;
 /// </summary>
 public class XmlText : Branch
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     internal XmlText(nint handle)
         : base(handle)
@@ -73,7 +73,7 @@ public class XmlText : Branch
     ///     Inserts an attribute.
     /// </summary>
     /// <remarks>
-    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    ///     If another attribute with the same <paramref name="name" /> already exists, it will be replaced.
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be added.</param>
@@ -99,7 +99,7 @@ public class XmlText : Branch
     }
 
     /// <summary>
-    ///     Gets an attribute with the given <see cref="name" />.
+    ///     Gets an attribute with the given <paramref name="name" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be retrieved.</param>
@@ -227,13 +227,13 @@ public class XmlText : Branch
     }
 
     /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
+    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);

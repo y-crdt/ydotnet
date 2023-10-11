@@ -18,12 +18,16 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<XmlAttribute>
     {
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="XmlAttributeIterator"/> class.
+    /// </summary>
     ~XmlAttributeIterator()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         XmlAttributeChannel.IteratorDestroy(Handle);
     }

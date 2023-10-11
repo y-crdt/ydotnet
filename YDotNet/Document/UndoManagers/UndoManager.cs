@@ -12,7 +12,7 @@ namespace YDotNet.Document.UndoManagers;
 /// </summary>
 public class UndoManager : UnmanagedResource
 {
-    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+    private readonly EventSubscriptions subscriptions = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
@@ -32,12 +32,16 @@ public class UndoManager : UnmanagedResource
         return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="UndoManager"/> class.
+    /// </summary>
     ~UndoManager()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         UndoManagerChannel.Destroy(Handle);
     }

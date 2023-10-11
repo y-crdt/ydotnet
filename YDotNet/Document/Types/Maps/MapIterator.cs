@@ -24,12 +24,16 @@ public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
     {
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="MapIterator"/> class.
+    /// </summary>
     ~MapIterator()
     {
         Dispose(false);
     }
 
-    protected override void DisposeCore(bool disposing)
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         MapChannel.IteratorDestroy(Handle);
     }
