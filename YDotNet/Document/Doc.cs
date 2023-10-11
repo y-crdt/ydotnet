@@ -29,8 +29,10 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : IDisposable
+public class Doc
 {
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
     /// </summary>
@@ -49,7 +51,9 @@ public class Doc : IDisposable
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
     {
-        Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
+        var unsafeOptions = DocOptionsNative.From(options);
+
+        Handle = DocChannel.NewWithOptions(unsafeOptions);
     }
 
     /// <summary>
@@ -82,7 +86,6 @@ public class Doc : IDisposable
         get
         {
             MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
-
             return result;
         }
     }
@@ -110,13 +113,6 @@ public class Doc : IDisposable
     /// </summary>
     internal nint Handle { get; }
 
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        DocChannel.Destroy(Handle);
-    }
-
     /// <summary>
     ///     Creates a copy of the current <see cref="Doc" /> instance.
     /// </summary>
@@ -140,11 +136,11 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Types.Texts.Text" /> instance related to the <c>name</c> provided.</returns>
     public Text Text(string name)
     {
-        var textName = MemoryWriter.WriteUtf8String(name);
-        var textHandle = DocChannel.Text(Handle, textName);
-        MemoryWriter.Release(textName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return new Text(textHandle.Checked());
+        var handle = DocChannel.Text(Handle, unsafeName.Handle);
+
+        return new Text(handle.Checked());
     }
 
     /// <summary>
@@ -158,11 +154,11 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Types.Maps.Map" /> instance related to the <c>name</c> provided.</returns>
     public Map Map(string name)
     {
-        var mapName = MemoryWriter.WriteUtf8String(name);
-        var mapHandle = DocChannel.Map(Handle, mapName);
-        MemoryWriter.Release(mapName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return new Map(mapHandle.Checked());
+        var handle = DocChannel.Map(Handle, unsafeName.Handle);
+
+        return new Map(handle.Checked());
     }
 
     /// <summary>
@@ -176,11 +172,11 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Types.Arrays.Array" /> instance related to the <c>name</c> provided.</returns>
     public Array Array(string name)
     {
-        var arrayName = MemoryWriter.WriteUtf8String(name);
-        var arrayHandle = DocChannel.Array(Handle, arrayName);
-        MemoryWriter.Release(arrayName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return new Array(arrayHandle.Checked());
+        var handle = DocChannel.Array(Handle, unsafeName.Handle);
+
+        return new Array(handle.Checked());
     }
 
     /// <summary>
@@ -194,11 +190,11 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided.</returns>
     public XmlElement XmlElement(string name)
     {
-        var xmlElementName = MemoryWriter.WriteUtf8String(name);
-        var xmlElementHandle = DocChannel.XmlElement(Handle, xmlElementName);
-        MemoryWriter.Release(xmlElementName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return new XmlElement(xmlElementHandle.Checked());
+        var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
+
+        return new XmlElement(handle.Checked());
     }
 
     /// <summary>
@@ -212,11 +208,11 @@ public class Doc : IDisposable
     /// <returns>The <see cref="Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided.</returns>
     public XmlText XmlText(string name)
     {
-        var xmlTextName = MemoryWriter.WriteUtf8String(name);
-        var xmlTextHandle = DocChannel.XmlText(Handle, xmlTextName);
-        MemoryWriter.Release(xmlTextName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return new XmlText(xmlTextHandle.Checked());
+        var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
+
+        return new XmlText(handle.Checked());
     }
 
     /// <summary>
@@ -257,11 +253,12 @@ public class Doc : IDisposable
     }
 
     /// <summary>
-    ///     Destroys the current document, sending a <c>destroy</c> event and
-    ///     clearing up all the registered callbacks.
+    ///     Destroys the current document, sending a <c>destroy</c> event and clearing up all the registered callbacks.
     /// </summary>
     public void Clear()
     {
+        subscriptions.Clear();
+
         DocChannel.Clear(Handle);
     }
 
@@ -282,24 +279,19 @@ public class Doc : IDisposable
     /// </summary>
     /// <param name="action">The callback function.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveClear(Action<ClearEvent> action)
+    public IDisposable ObserveClear(Action<ClearEvent> action)
     {
+        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent());
+
         var subscriptionId = DocChannel.ObserveClear(
             Handle,
             nint.Zero,
-            (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance,
-    ///     for the <see cref="Clear" /> method.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveClear(EventSubscription subscription)
-    {
-        DocChannel.UnobserveClear(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            DocChannel.UnobserveClear(Handle, subscriptionId);
+        });
     }
 
     /// <summary>
@@ -310,24 +302,19 @@ public class Doc : IDisposable
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
+    public IDisposable ObserveUpdatesV1(Action<UpdateEvent> action)
     {
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent());
+
         var subscriptionId = DocChannel.ObserveUpdatesV1(
             Handle,
             nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Transaction" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveUpdatesV1(EventSubscription subscription)
-    {
-        DocChannel.UnobserveUpdatesV1(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            DocChannel.UnobserveUpdatesV1(Handle, subscriptionId);
+        });
     }
 
     /// <summary>
@@ -338,24 +325,19 @@ public class Doc : IDisposable
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveUpdatesV2(Action<UpdateEvent> action)
+    public IDisposable ObserveUpdatesV2(Action<UpdateEvent> action)
     {
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent());
+
         var subscriptionId = DocChannel.ObserveUpdatesV2(
             Handle,
             nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Transaction" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveUpdatesV2(EventSubscription subscription)
-    {
-        DocChannel.UnobserveUpdatesV2(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            DocChannel.UnobserveUpdatesV2(Handle, subscriptionId);
+        });
     }
 
     /// <summary>
@@ -366,24 +348,19 @@ public class Doc : IDisposable
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
+    public IDisposable ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
+        DocChannel.ObserveAfterTransactionCallback callback = (_, eventHandler) => action(MemoryReader.ReadStruct<AfterTransactionEventNative>(eventHandler).ToAfterTransactionEvent());
+
         var subscriptionId = DocChannel.ObserveAfterTransaction(
             Handle,
             nint.Zero,
-            (_, eventHandler) => action(MemoryReader.ReadStruct<AfterTransactionEventNative>(eventHandler).ToAfterTransactionEvent()));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Transaction" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveAfterTransaction(EventSubscription subscription)
-    {
-        DocChannel.UnobserveAfterTransaction(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            DocChannel.UnobserveAfterTransaction(Handle, subscriptionId);
+        });
     }
 
     /// <summary>
@@ -391,23 +368,18 @@ public class Doc : IDisposable
     /// </summary>
     /// <param name="action">The callback to be executed when a sub-document changes.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
+    public IDisposable ObserveSubDocs(Action<SubDocsEvent> action)
     {
+        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent());
+
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent()));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed in the sub-documents.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveSubDocs(EventSubscription subscription)
-    {
-        DocChannel.UnobserveSubDocs(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            DocChannel.UnobserveSubDocs(Handle, subscriptionId);
+        });
     }
 }

@@ -13,14 +13,11 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 public class Map : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Map" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     internal Map(nint handle)
         : base(handle)
     {
-        // Nothing here.
     }
 
     /// <summary>
@@ -34,13 +31,10 @@ public class Map : Branch
     /// <param name="input">The <see cref="Input" /> instance to be inserted.</param>
     public void Insert(Transaction transaction, string key, Input input)
     {
-        var keyHandle = MemoryWriter.WriteUtf8String(key);
-        var valuePointer = MemoryWriter.WriteStruct(input.InputNative);
+        using var unsafeKey = MemoryWriter.WriteUtf8String(key);
+        using var unsafeValue = MemoryWriter.WriteStruct(input.InputNative);
 
-        MapChannel.Insert(Handle, transaction.Handle, keyHandle, valuePointer);
-
-        MemoryWriter.Release(keyHandle);
-        MemoryWriter.Release(valuePointer);
+        MapChannel.Insert(Handle, transaction.Handle, unsafeKey.Handle, unsafeValue.Handle);
     }
 
     /// <summary>
@@ -54,11 +48,15 @@ public class Map : Branch
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
     public Output? Get(Transaction transaction, string key)
     {
-        var outputName = MemoryWriter.WriteUtf8String(key);
-        var outputHandle = MapChannel.Get(Handle, transaction.Handle, outputName);
-        MemoryWriter.Release(outputName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(key);
+        var outputHandle = MapChannel.Get(Handle, transaction.Handle, unsafeName.Handle);
 
-        return outputHandle != nint.Zero ? new Output(outputHandle, false) : null;
+        if (outputHandle == nint.Zero)
+        {
+            return null;
+        }
+
+        return new Output(outputHandle, null);
     }
 
     /// <summary>
@@ -79,12 +77,9 @@ public class Map : Branch
     /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
     public bool Remove(Transaction transaction, string key)
     {
-        var keyHandle = MemoryWriter.WriteUtf8String(key);
-        var result = MapChannel.Remove(Handle, transaction.Handle, keyHandle) == 1;
+        using var unsafeKey = MemoryWriter.WriteUtf8String(key);
 
-        MemoryWriter.Release(keyHandle);
-
-        return result;
+        return MapChannel.Remove(Handle, transaction.Handle, unsafeKey.Handle) == 1;
     }
 
     /// <summary>
@@ -117,23 +112,18 @@ public class Map : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<MapEvent> action)
+    public IDisposable Observe(Action<MapEvent> action)
     {
+        MapChannel.ObserveCallback callback = (_, eventHandle) => action(new MapEvent(eventHandle));
+
         var subscriptionId = MapChannel.Observe(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(new MapEvent(eventHandle)));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Map" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        MapChannel.Unobserve(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            MapChannel.Unobserve(Handle, subscriptionId);
+        });
     }
 }

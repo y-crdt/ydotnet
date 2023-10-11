@@ -107,7 +107,7 @@ public class InsertEmbedTests
         var chunks = text.Chunks(transaction);
 
         Assert.That(chunks.Count, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Collection.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.ElementAt(index: 1).Data.Collection.Count, Is.EqualTo(expected: 2));
     }
 
     [Test]

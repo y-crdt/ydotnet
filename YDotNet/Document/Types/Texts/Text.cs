@@ -6,7 +6,6 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.StickyIndex;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts;
@@ -16,14 +15,11 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class Text : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Text" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     internal Text(nint handle)
         : base(handle)
     {
-        // Nothing here.
     }
 
     /// <summary>
@@ -38,13 +34,10 @@ public class Text : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
-        var valueHandle = MemoryWriter.WriteUtf8String(value);
-        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesHandle);
+        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
-        TextChannel.Insert(Handle, transaction.Handle, index, valueHandle, attributesHandle);
-
-        MemoryWriter.TryRelease(attributesHandle);
-        MemoryWriter.Release(valueHandle);
+        TextChannel.Insert(Handle, transaction.Handle, index, unsafeValue.Handle, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -59,11 +52,10 @@ public class Text : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
-        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
-        var contentPointer = MemoryWriter.WriteStruct(content.InputNative);
-        TextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
-        MemoryWriter.TryRelease(attributesPointer);
-        MemoryWriter.TryRelease(contentPointer);
+        var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
+        var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
+
+        TextChannel.InsertEmbed(Handle, transaction.Handle, index, unsafeContent.Handle, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -95,10 +87,9 @@ public class Text : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
-        var attributesHnadle = MemoryWriter.WriteStruct(attributes.InputNative);
-        TextChannel.Format(Handle, transaction.Handle, index, length, attributesHnadle);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
-        MemoryWriter.Release(attributesHnadle);
+        TextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -120,14 +111,9 @@ public class Text : Branch
     /// <returns>The full string stored in the instance.</returns>
     public string String(Transaction transaction)
     {
-        // Get the string pointer and read it into a managed instance.
         var handle = TextChannel.String(Handle, transaction.Handle);
-        var result = MemoryReader.ReadUtf8String(handle);
 
-        // Dispose the resources used by the underlying string.
-        StringChannel.Destroy(handle);
-
-        return result;
+        return MemoryReader.ReadStringAndDestroy(handle);
     }
 
     /// <summary>
@@ -148,24 +134,19 @@ public class Text : Branch
     /// </summary>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<TextEvent> action)
+    public IDisposable Observe(Action<TextEvent> action)
     {
+        TextChannel.ObserveCallback callback = (_, eventHandle) => action(new TextEvent(eventHandle));
+
         var subscriptionId = TextChannel.Observe(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(new TextEvent(eventHandle)));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Text" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        TextChannel.Unobserve(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            TextChannel.Unobserve(Handle, subscriptionId);
+        });
     }
 
     /// <summary>

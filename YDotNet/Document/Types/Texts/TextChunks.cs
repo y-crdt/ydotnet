@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -7,31 +6,35 @@ namespace YDotNet.Document.Types.Texts;
 /// <summary>
 ///     Represents a collection of <see cref="TextChunk" /> instances.
 /// </summary>
-public class TextChunks : ReadOnlyCollection<TextChunk>
+public class TextChunks : UnmanagedCollectionResource<TextChunk>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TextChunks" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    /// <param name="length">The length of <see cref="TextChunk" /> instances to be read from <see cref="Handle" />.</param>
+    private readonly uint length;
+
     internal TextChunks(nint handle, uint length)
-        : base(ReadItems(handle, length))
+        : base(handle, null)
     {
-        Handle = handle;
+        foreach (var chunkHandle in MemoryReader.ReadIntPtrArray(handle, length, size: 32))
+        {
+            // The cunks create output that are owned by this block of allocated memory.
+            AddItem(new TextChunk(chunkHandle, this));
+        }
+
+        GC.Collect();
+
+        this.length = length;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    private static IList<TextChunk> ReadItems(nint handle, uint length)
+    ~TextChunks()
     {
-        var result = MemoryReader.ReadIntPtrArray(handle, length, size: 32).Select(x => new TextChunk(x)).ToList();
+        Dispose(true);
+    }
 
-        // We are done reading and can release the memory.
-        // ChunksChannel.Destroy(handle, length);
+    protected override void DisposeCore(bool disposing)
+    {
 
-        return result;
+        Console.WriteLine("---DISPOSE {0} - {1}", Handle, length);
+        Console.Out.Flush();
+        Thread.Sleep(100);
+        ChunksChannel.Destroy(Handle, length);
     }
 }

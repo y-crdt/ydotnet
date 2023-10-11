@@ -66,7 +66,7 @@ public class RemoveAttributeTests
         var transaction = doc.WriteTransaction();
         array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("link") });
 
-        var xmlElement = array.Get(transaction, index: 0).ResolveXmlElement();
+        var xmlElement = array.Get(transaction, index: 0).XmlElement;
         xmlElement.InsertAttribute(transaction, string.Empty, string.Empty);
         xmlElement.InsertAttribute(transaction, "as", "stylesheet");
 

@@ -39,7 +39,7 @@ public class SubDocsTests
 
         // Act
         subDocsEvent = null;
-        doc.UnobserveSubDocs(subscription);
+        subscription.Dispose();
 
         AddSubDoc(doc, map, "sub-doc-2");
 
@@ -82,7 +82,7 @@ public class SubDocsTests
 
         // Act
         subDocsEvent = null;
-        doc.UnobserveSubDocs(subscription);
+        subscription.Dispose();
 
         RemoveSubDoc(doc, map, "sub-doc-2");
 

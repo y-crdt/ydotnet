@@ -5,29 +5,28 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents an entry of a <see cref="Map" />. It contains a <see cref="Key" /> and <see cref="Value" />.
+///     Represents an entry of a <see cref="Map" />.
 /// </summary>
-public sealed class MapEntry
+public sealed class MapEntry : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MapEntry" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal MapEntry(nint handle, bool shouldDispose)
+    internal MapEntry(nint handle, IResourceOwner? owner)
+        : base(handle)
     {
-        Handle = handle;
-
         var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
         Key = MemoryReader.ReadUtf8String(mapEntry.Field);
 
-        // The output memory is part of the entry memory. Therefore we don't release it.
-        Value = new Output(outputHandle, false);
+        // The output can not released independently and will be released when the entry is not needed anymore.
+        Value = new Output(outputHandle, owner ?? this);
+    }
 
-        if (shouldDispose)
-        {
-            // We are done reading and can release the memory.
-            MapChannel.EntryDestroy(handle);
-        }
+    ~MapEntry()
+    {
+        Dispose(false);
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        MapChannel.EntryDestroy(Handle);
     }
 
     /// <summary>
@@ -39,9 +38,4 @@ public sealed class MapEntry
     ///     Gets the value of this <see cref="MapEntry" /> that is represented the <see cref="Key" />.
     /// </summary>
     public Output Value { get; }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 }

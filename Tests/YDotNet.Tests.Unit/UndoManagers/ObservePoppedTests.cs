@@ -224,6 +224,7 @@ public class ObservePoppedTests
         AssertDeleteSet(undoEvent.Insertions, (7938, new[] { new IdRange(start: 0, end: 5) }));
 
         // Act
+        GC.Collect();
         undoEvent = null;
         undoManager.Redo();
 
@@ -309,6 +310,7 @@ public class ObservePoppedTests
         AssertDeleteSet(undoEvent.Deletions);
         AssertDeleteSet(undoEvent.Insertions, (5903, new[] { new IdRange(start: 0, end: 1) }));
 
+        GC.Collect();
         // Act (redo add element)
         undoEvent = null;
         undoManager.Redo();

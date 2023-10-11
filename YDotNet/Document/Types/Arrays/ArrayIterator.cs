@@ -1,5 +1,6 @@
 using System.Collections;
 using YDotNet.Document.Cells;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.Arrays;
@@ -10,24 +11,19 @@ namespace YDotNet.Document.Types.Arrays;
 /// <remarks>
 ///     The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate values.
 /// </remarks>
-public class ArrayIterator : IEnumerable<Output>, IDisposable
+public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ArrayIterator" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal ArrayIterator(nint handle)
+        : base(handle)
     {
-        Handle = handle;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    ~ArrayIterator()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    protected override void DisposeCore(bool disposing)
     {
         ArrayChannel.IteratorDestroy(Handle);
     }
@@ -35,6 +31,7 @@ public class ArrayIterator : IEnumerable<Output>, IDisposable
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()
     {
+        ThrowIfDisposed();
         return new ArrayEnumerator(this);
     }
 

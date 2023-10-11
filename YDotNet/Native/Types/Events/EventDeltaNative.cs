@@ -18,7 +18,7 @@ internal readonly struct EventDeltaNative
 
     public nint Attributes { get; }
 
-    public EventDelta ToEventDelta()
+    public EventDelta ToEventDelta(IResourceOwner owner)
     {
         var tag = TagNative switch
         {
@@ -29,13 +29,15 @@ internal readonly struct EventDeltaNative
         };
 
         var attributes =
-            MemoryReader.ReadIntPtrArray(Attributes, AttributesLength, size: 16)
-                .Select(x => new EventDeltaAttribute(x)).ToArray();
+            Attributes != nint.Zero ?
+            MemoryReader.ReadIntPtrArray(Attributes, AttributesLength, size: 16).Select(x => new EventDeltaAttribute(x, owner)).ToList() :
+            new List<EventDeltaAttribute>();
 
-        return new EventDelta(
-            tag,
-            Length,
-            InsertHandle != nint.Zero ? new Output(InsertHandle, false) : null,
-            attributes);
+        var insert =
+            InsertHandle != nint.Zero ?
+            new Output(InsertHandle, owner) :
+            null;
+
+        return new EventDelta(tag, Length, insert, attributes);
     }
 }

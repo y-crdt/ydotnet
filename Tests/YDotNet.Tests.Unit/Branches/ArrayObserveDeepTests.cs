@@ -24,10 +24,10 @@ public class ArrayObserveDeepTests
                 Input.Map(new Dictionary<string, Input>())
             });
 
-        var map2 = array1.Get(transaction, index: 3).ResolveMap();
+        var map2 = array1.Get(transaction, index: 3).Map;
         map2.Insert(transaction, "array-3", Input.Array(Array.Empty<Input>()));
 
-        var array3 = map2.Get(transaction, "array-3").ResolveArray();
+        var array3 = map2.Get(transaction, "array-3").Array;
         array3.InsertRange(
             transaction, index: 0, new[]
             {
@@ -64,7 +64,7 @@ public class ArrayObserveDeepTests
         Assert.That(pathSegments.ElementAt(index: 1).Key, Is.EqualTo("array-3"));
         Assert.That(pathSegments.ElementAt(index: 1).Index, Is.Null);
 
-        array1.UnobserveDeep(subscription);
+        subscription.Dispose();
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class ArrayObserveDeepTests
                 Input.Boolean(value: false)
             });
 
-        var array2 = array1.Get(transaction, index: 2).ResolveArray();
+        var array2 = array1.Get(transaction, index: 2).Array;
         array2.InsertRange(
             transaction, index: 0, new[]
             {
@@ -94,7 +94,7 @@ public class ArrayObserveDeepTests
                 Input.Array(Array.Empty<Input>())
             });
 
-        var array3 = array2.Get(transaction, index: 3).ResolveArray();
+        var array3 = array2.Get(transaction, index: 3).Array;
         array3.InsertRange(
             transaction, index: 0, new[]
             {
@@ -130,6 +130,6 @@ public class ArrayObserveDeepTests
         Assert.That(pathSegments.ElementAt(index: 1).Index, Is.EqualTo(expected: 3));
         Assert.That(pathSegments.ElementAt(index: 1).Key, Is.Null);
 
-        array1.UnobserveDeep(subscription);
+        subscription.Dispose();
     }
 }

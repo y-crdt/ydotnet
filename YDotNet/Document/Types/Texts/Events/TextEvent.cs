@@ -7,7 +7,7 @@ namespace YDotNet.Document.Types.Texts.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Text" /> instance.
 /// </summary>
-public class TextEvent
+public class TextEvent : UnmanagedResource
 {
     private readonly Lazy<EventPath> path;
     private readonly Lazy<EventDeltas> deltas;
@@ -18,26 +18,33 @@ public class TextEvent
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     internal TextEvent(nint handle)
+        : base(handle)
     {
-        Handle = handle;
-
         path = new Lazy<EventPath>(() =>
         {
             var pathHandle = TextChannel.ObserveEventPath(handle, out var length).Checked();
-            return new EventPath(pathHandle, length);
+
+            return new EventPath(pathHandle, length, this);
         });
 
         deltas = new Lazy<EventDeltas>(() =>
         {
             var deltaHandle = TextChannel.ObserveEventDelta(handle, out var length).Checked();
-            return new EventDeltas(deltaHandle, length);
+
+            return new EventDeltas(deltaHandle, length, this);
         });
 
         target = new Lazy<Text>(() =>
         {
             var targetHandle = TextChannel.ObserveEventTarget(handle).Checked();
+
             return new Text(targetHandle);
         });
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }
 
     /// <summary>
@@ -53,14 +60,8 @@ public class TextEvent
     public EventPath Path => path.Value;
 
     /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
     ///     Gets the <see cref="Text" /> instance that is related to this <see cref="TextEvent" /> instance.
     /// </summary>
     /// <returns>The target of the event.</returns>
-    /// <remarks>You are responsible to dispose the text, if you use this property.</remarks>
-    public Text ResolveTarget() => target.Value;
+    public Text Target => target.Value;
 }

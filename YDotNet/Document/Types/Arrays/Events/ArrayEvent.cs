@@ -7,37 +7,40 @@ namespace YDotNet.Document.Types.Arrays.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Array" /> instance.
 /// </summary>
-public class ArrayEvent
+public class ArrayEvent : UnmanagedResource
 {
     private readonly Lazy<EventPath> path;
     private readonly Lazy<EventChanges> delta;
     private readonly Lazy<Array> target;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ArrayEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal ArrayEvent(nint handle)
+        : base(handle)
     {
-        Handle = handle;
-
         path = new Lazy<EventPath>(() =>
         {
             var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
-            return new EventPath(pathHandle, length);
+
+            return new EventPath(pathHandle, length, this);
         });
 
         delta = new Lazy<EventChanges>(() =>
         {
             var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
-            return new EventChanges(deltaHandle, length);
+
+            return new EventChanges(deltaHandle, length, this);
         });
 
         target = new Lazy<Array>(() =>
         {
             var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
+
             return new Array(targetHandle);
         });
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }
 
     /// <summary>
@@ -50,25 +53,11 @@ public class ArrayEvent
     ///     Gets the changes within the <see cref="Array" /> instance and triggered this event.
     /// </summary>
     /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
-    public EventChanges Delta
-    {
-        get
-        {
-            var handle = ArrayChannel.ObserveEventDelta(Handle, out var length);
-
-            return new EventChanges(handle, length);
-        }
-    }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    public EventChanges Delta => delta.Value;
 
     /// <summary>
     ///     Gets the <see cref="Array" /> instance that is related to this <see cref="ArrayEvent" /> instance.
     /// </summary>
     /// <returns>The target of the event.</returns>
-    /// <remarks>You are responsible to dispose the text, if you use this property.</remarks>
-    public Array ResolveTarget() => target.Value;
+    public Array Target => target.Value;
 }

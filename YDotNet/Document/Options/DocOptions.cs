@@ -57,7 +57,7 @@ public class DocOptions
     ///         Read more about the possible values in <see cref="DocEncoding" />.
     ///     </para>
     /// </remarks>
-    public DocEncoding? Encoding { get; init; }
+    public DocEncoding Encoding { get; init; }
 
     /// <summary>
     ///     Gets the flag that determines whether deleted blocks should be garbage collected during transaction commits.

@@ -35,7 +35,7 @@ public class ParentTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var xmlElement = array.Get(transaction, index: 0).ResolveXmlElement();
+        var xmlElement = array.Get(transaction, index: 0).XmlElement;
         var parentXmlElement = xmlElement.Parent(transaction);
         transaction.Commit();
 
@@ -56,7 +56,7 @@ public class ParentTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var xmlElement = map.Get(transaction, "attributes").ResolveXmlElement();
+        var xmlElement = map.Get(transaction, "attributes").XmlElement;
         var parentXmlElement = xmlElement.Parent(transaction);
         transaction.Commit();
 
@@ -78,7 +78,7 @@ public class ParentTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var childXmlElement = xmlElement.Get(transaction, index: 0).ResolveXmlElement();
+        var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
 
         var parentXmlElement = childXmlElement.Parent(transaction);
         var childLength = parentXmlElement.ChildLength(transaction);

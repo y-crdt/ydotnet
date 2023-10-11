@@ -11,6 +11,8 @@ namespace YDotNet.Document.Types.Branches;
 /// </summary>
 public abstract class Branch
 {
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Branch" /> class.
     /// </summary>
@@ -20,10 +22,7 @@ public abstract class Branch
         Handle = handle;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    public nint Handle { get; }
 
     /// <summary>
     ///     Subscribes a callback function for changes performed within the <see cref="Branch" /> instance
@@ -34,31 +33,24 @@ public abstract class Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveDeep(Action<IEnumerable<EventBranch>> action)
+    public IDisposable ObserveDeep(Action<IEnumerable<EventBranch>> action)
     {
+        BranchChannel.ObserveCallback callback = (_, length, eventsHandle) =>
+        {
+            var events = MemoryReader.ReadIntPtrArray(eventsHandle, length, size: 24).Select(x => new EventBranch(x)).ToArray();
+
+            action(events);
+        };
+
         var subscriptionId = BranchChannel.ObserveDeep(
             Handle,
             nint.Zero,
-            (_, length, eventsHandle) =>
-            {
-                var events = MemoryReader.TryReadIntPtrArray(eventsHandle, length, size: 24)!
-                    .Select(x => new EventBranch(x))
-                    .ToArray();
+            callback);
 
-                action(events);
-            });
-
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Branch" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveDeep(EventSubscription subscription)
-    {
-        BranchChannel.UnobserveDeep(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            BranchChannel.UnobserveDeep(Handle, subscriptionId);
+        });
     }
 
     /// <summary>

@@ -15,19 +15,19 @@ internal readonly struct EventChangeNative
 
     public nint Values { get; }
 
-    public EventChange ToEventChange()
+    public EventChange ToEventChange(IResourceOwner owner)
     {
         var tag = TagNative switch
         {
             EventChangeTagNative.Add => EventChangeTag.Add,
             EventChangeTagNative.Remove => EventChangeTag.Remove,
             EventChangeTagNative.Retain => EventChangeTag.Retain,
-            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventChangeTagNative)} is not supported.")
+            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventChangeTagNative)} is not supported."),
         };
 
         var values =
             MemoryReader.TryReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>())?
-                .Select(x => new Output(x, false)).ToList() ?? new List<Output>();
+                .Select(x => new Output(x, owner)).ToList() ?? new List<Output>();
 
         return new EventChange(tag, Length, values);
     }

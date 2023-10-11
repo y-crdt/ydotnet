@@ -1,4 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Maps;
@@ -13,13 +12,9 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class TextChunk
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TextChunk" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal TextChunk(nint handle)
+    internal TextChunk(nint handle, IResourceOwner owner)
     {
-        Data = new Output(handle, false);
+        Data = new Output(handle, owner);
 
         var offset = Marshal.SizeOf<OutputNative>();
 
@@ -33,10 +28,10 @@ public class TextChunk
         }
 
         Attributes = MemoryReader.ReadIntPtrArray(
-            attributesHandle,
-            attributesLength,
-            Marshal.SizeOf<MapEntryNative>())
-            .Select(x => new MapEntry(x, false)).ToList();
+                attributesHandle,
+                attributesLength,
+                Marshal.SizeOf<MapEntryNative>())
+            .Select(x => new MapEntry(x, owner)).ToList();
     }
 
     /// <summary>

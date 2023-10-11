@@ -15,7 +15,7 @@ public class ObserveTests
         var doc = new Doc();
         var array = doc.Array("array");
         Array? target = null;
-        array.Observe(e => target = e.ResolveTarget());
+        array.Observe(e => target = e.Target);
 
         // Act
         var transaction = doc.WriteTransaction();
@@ -42,7 +42,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
         Assert.That(eventChanges.Count, Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Add));
@@ -76,7 +75,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
         Assert.That(eventChanges.Count, Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Remove));
@@ -110,7 +108,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(eventChanges, Is.Not.Null);
         Assert.That(eventChanges.Count, Is.EqualTo(expected: 3));
 

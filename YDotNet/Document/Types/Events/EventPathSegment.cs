@@ -20,8 +20,7 @@ public class EventPathSegment
         switch (Tag)
         {
             case EventPathSegmentTag.Key:
-                var pointer = Marshal.ReadIntPtr(handle + MemoryConstants.PointerSize);
-                Key = Marshal.PtrToStringAnsi(pointer);
+                Key = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(handle + MemoryConstants.PointerSize));
                 break;
 
             case EventPathSegmentTag.Index:

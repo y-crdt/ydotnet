@@ -15,7 +15,7 @@ public class ObserveTests
         var doc = new Doc();
         var text = doc.Text("value");
         Text? target = null;
-        text.Observe(e => target = e.ResolveTarget());
+        text.Observe(e => target = e.Target);
 
         // Act
         var transaction = doc.WriteTransaction();

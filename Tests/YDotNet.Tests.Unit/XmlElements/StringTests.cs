@@ -50,14 +50,14 @@ public class StringTests
 
         var transaction = doc.WriteTransaction();
         map.Insert(transaction, "xml-element", Input.XmlElement("color"));
-        var xmlElement = map.Get(transaction, "xml-element").ResolveXmlElement();
+        var xmlElement = map.Get(transaction, "xml-element").XmlElement;
         var xmlText = xmlElement.InsertText(transaction, index: 0);
         xmlText.Insert(transaction, index: 0, "blue");
         transaction.Commit();
 
         // Act
         transaction = doc.ReadTransaction();
-        xmlElement = map.Get(transaction, "xml-element").ResolveXmlElement();
+        xmlElement = map.Get(transaction, "xml-element").XmlElement;
         var text = xmlElement.String(transaction);
         transaction.Commit();
 
@@ -74,14 +74,14 @@ public class StringTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("color") });
-        var xmlElement = array.Get(transaction, index: 0).ResolveXmlElement();
+        var xmlElement = array.Get(transaction, index: 0).XmlElement;
         var xmlText = xmlElement.InsertText(transaction, index: 0);
         xmlText.Insert(transaction, index: 0, "purple");
         transaction.Commit();
 
         // Act
         transaction = doc.ReadTransaction();
-        var text = array.Get(transaction, index: 0).ResolveXmlElement().String(transaction);
+        var text = array.Get(transaction, index: 0).XmlElement.String(transaction);
         transaction.Commit();
 
         // Assert

@@ -45,10 +45,10 @@ public class TreeWalkerTests
 
         Assert.That(xmlTreeWalker, Is.Not.Null);
         Assert.That(xmlNodes.Length, Is.EqualTo(expected: 3));
-        Assert.That(xmlNodes.ElementAt(index: 0).ResolveXmlText(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 1).ResolveXmlElement(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 1).ResolveXmlElement().Tag, Is.EqualTo("color"));
-        Assert.That(xmlNodes.ElementAt(index: 2).ResolveXmlText(), Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 0).XmlText, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 1).XmlElement, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 1).XmlElement.Tag, Is.EqualTo("color"));
+        Assert.That(xmlNodes.ElementAt(index: 2).XmlText, Is.Not.Null);
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class TreeWalkerTests
         var transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
-        var childXmlElement = xmlElement.Get(transaction, index: 1).ResolveXmlElement();
+        var childXmlElement = xmlElement.Get(transaction, index: 1).XmlElement;
         childXmlElement.InsertElement(transaction, index: 0, "alpha");
         childXmlElement.InsertElement(transaction, index: 1, "hex");
         childXmlElement.InsertText(transaction, index: 2);
@@ -77,13 +77,13 @@ public class TreeWalkerTests
 
         Assert.That(xmlTreeWalker, Is.Not.Null);
         Assert.That(xmlNodes.Length, Is.EqualTo(expected: 5));
-        Assert.That(xmlNodes.ElementAt(index: 0).ResolveXmlText(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 1).ResolveXmlElement(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 1).ResolveXmlElement().Tag, Is.EqualTo("color"));
-        Assert.That(xmlNodes.ElementAt(index: 2).ResolveXmlElement(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 2).ResolveXmlElement().Tag, Is.EqualTo("alpha"));
-        Assert.That(xmlNodes.ElementAt(index: 3).ResolveXmlElement(), Is.Not.Null);
-        Assert.That(xmlNodes.ElementAt(index: 3).ResolveXmlElement().Tag, Is.EqualTo("hex"));
-        Assert.That(xmlNodes.ElementAt(index: 4).ResolveXmlText(), Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 0).XmlText, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 1).XmlElement, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 1).XmlElement.Tag, Is.EqualTo("color"));
+        Assert.That(xmlNodes.ElementAt(index: 2).XmlElement, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 2).XmlElement.Tag, Is.EqualTo("alpha"));
+        Assert.That(xmlNodes.ElementAt(index: 3).XmlElement, Is.Not.Null);
+        Assert.That(xmlNodes.ElementAt(index: 3).XmlElement.Tag, Is.EqualTo("hex"));
+        Assert.That(xmlNodes.ElementAt(index: 4).XmlText, Is.Not.Null);
     }
 }

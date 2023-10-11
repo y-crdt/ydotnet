@@ -45,7 +45,7 @@ public class ObserveUpdatesV2
 
         // Act
         data = null;
-        doc.UnobserveUpdatesV2(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "The ");

@@ -14,12 +14,12 @@ public class NextSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 0).ResolveXmlText();
+        var target = xmlElement.Get(transaction, index: 0).XmlText;
         var sibling = target.NextSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.ResolveXmlElement(), Is.Not.Null);
+        Assert.That(sibling.XmlElement, Is.Not.Null);
     }
 
     [Test]
@@ -30,12 +30,12 @@ public class NextSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 2).ResolveXmlText();
+        var target = xmlElement.Get(transaction, index: 2).XmlText;
         var sibling = target.NextSibling(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(sibling.ResolveXmlElement(), Is.Not.Null);
+        Assert.That(sibling.XmlElement, Is.Not.Null);
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class NextSiblingTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var target = xmlElement.Get(transaction, index: 4).ResolveXmlText();
+        var target = xmlElement.Get(transaction, index: 4).XmlText;
         var sibling = target.NextSibling(transaction);
         transaction.Commit();
 

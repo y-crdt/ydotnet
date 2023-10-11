@@ -17,7 +17,7 @@ public class EventDelta
     ///     <see cref="EventDeltaTag.Add" />.
     /// </param>
     /// <param name="attributes">The attributes that are part of the changed content.</param>
-    public EventDelta(EventDeltaTag tag, uint length, Output? insert, IEnumerable<EventDeltaAttribute> attributes)
+    public EventDelta(EventDeltaTag tag, uint length, Output? insert, List<EventDeltaAttribute> attributes)
     {
         Tag = tag;
         Length = length;
@@ -43,5 +43,5 @@ public class EventDelta
     /// <summary>
     ///     Gets the attributes that are part of the changed content.
     /// </summary>
-    public IEnumerable<EventDeltaAttribute> Attributes { get; }
+    public IReadOnlyList<EventDeltaAttribute> Attributes { get; }
 }

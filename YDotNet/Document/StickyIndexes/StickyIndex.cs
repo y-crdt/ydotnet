@@ -2,7 +2,6 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
 using YDotNet.Native.StickyIndex;
-using YDotNet.Native.Types;
 
 namespace YDotNet.Document.StickyIndexes;
 
@@ -15,32 +14,21 @@ namespace YDotNet.Document.StickyIndexes;
 ///     Also, placing a sticky index at the end of a <see cref="Branch" /> will always point to the end of that
 ///     <see cref="Branch" />.
 /// </remarks>
-public class StickyIndex : IDisposable
+public class StickyIndex : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="StickyIndex" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal StickyIndex(nint handle)
+        : base(handle)
     {
-        Handle = handle;
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
     }
 
     /// <summary>
     ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
     /// </summary>
     public StickyAssociationType AssociationType => (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        StickyIndexChannel.Destroy(Handle);
-    }
 
     /// <summary>
     ///     Creates a <see cref="StickyIndex" /> from the result of <see cref="Encode" />.
@@ -76,10 +64,7 @@ public class StickyIndex : IDisposable
     public byte[] Encode()
     {
         var handle = StickyIndexChannel.Encode(Handle, out var length);
-        var result = MemoryReader.ReadBytes(handle, length);
 
-        BinaryChannel.Destroy(handle, length);
-
-        return result;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 }

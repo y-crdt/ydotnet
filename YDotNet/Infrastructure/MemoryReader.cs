@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Infrastructure;
@@ -9,15 +10,8 @@ internal static class MemoryReader
     internal static unsafe byte[] ReadBytes(nint handle, uint length)
     {
         var data = new byte[length];
-        var stream = new UnmanagedMemoryStream((byte*)handle.ToPointer(), length);
-        int bytesRead;
 
-        do
-        {
-            bytesRead = stream.Read(data, offset: 0, data.Length);
-        } while (bytesRead < data.Length);
-
-        stream.Dispose();
+        Marshal.Copy(handle, data, 0, (int)length);
 
         return data;
     }
@@ -59,7 +53,6 @@ internal static class MemoryReader
     internal static string ReadUtf8String(nint handle)
     {
         ReadOnlySpan<byte> readOnlySpan;
-
         unsafe
         {
             var index = 0;
@@ -70,7 +63,6 @@ internal static class MemoryReader
                 {
                     // Decrease the index to discard the zero byte.
                     index--;
-
                     break;
                 }
             }
@@ -92,5 +84,21 @@ internal static class MemoryReader
         result = ReadUtf8String(handle);
 
         return true;
+    }
+
+    public static byte[] ReadAndDestroyBytes(nint handle, uint length)
+    {
+        var data = ReadBytes(handle, length);
+
+        BinaryChannel.Destroy(handle, length);
+        return data;
+    }
+
+    public static string ReadStringAndDestroy(nint handle)
+    {
+        var result = ReadUtf8String(handle);
+
+        StringChannel.Destroy(handle);
+        return result;
     }
 }

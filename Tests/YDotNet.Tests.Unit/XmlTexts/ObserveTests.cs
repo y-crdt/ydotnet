@@ -16,7 +16,7 @@ public class ObserveTests
         var xmlText = doc.XmlText("xml-text");
 
         XmlText? target = null;
-        var subscription = xmlText.Observe(e => target = e.ResolveTarget());
+        var subscription = xmlText.Observe(e => target = e.Target);
 
         // Act
         var transaction = doc.WriteTransaction();
@@ -24,7 +24,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(target, Is.Not.Null);
         Assert.That(target.Handle, Is.Not.EqualTo(nint.Zero));
     }

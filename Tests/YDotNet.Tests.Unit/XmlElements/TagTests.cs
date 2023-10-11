@@ -50,7 +50,7 @@ public class TagTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = map.Get(transaction, "xml-element").ResolveXmlElement().Tag;
+        var tag = map.Get(transaction, "xml-element").XmlElement.Tag;
         transaction.Commit();
 
         // Assert
@@ -70,7 +70,7 @@ public class TagTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = array.Get(transaction, index: 0).ResolveXmlElement().Tag;
+        var tag = array.Get(transaction, index: 0).XmlElement.Tag;
         transaction.Commit();
 
         // Assert

@@ -6,15 +6,29 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 ///     Represents a cell used to send information to be stored.
 /// </summary>
-public abstract class Input : IDisposable
+public sealed class Input : Resource
 {
-    /// <summary>
-    ///     Gets or sets the native input cell represented by this cell.
-    /// </summary>
-    internal InputNative InputNative { get; set; }
+    private readonly IDisposable[] allocatedMemory;
 
-    /// <inheritdoc />
-    public abstract void Dispose();
+    internal Input(InputNative native, params IDisposable[] allocatedMemory)
+    {
+        this.allocatedMemory = allocatedMemory;
+
+        InputNative = native;
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        foreach (var memory in allocatedMemory)
+        {
+            memory.Dispose();
+        }
+    }
+
+    /// <summary>
+    ///     Gets the native input cell represented by this cell.
+    /// </summary>
+    internal InputNative InputNative { get; }
 
     /// <summary>
     ///     Creates a new instance of the <see cref="Input" /> class.
@@ -23,7 +37,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Doc(Doc value)
     {
-        return new InputEmpty(InputChannel.Doc(value.Handle));
+        return new Input(InputChannel.Doc(value.Handle));
     }
 
     /// <summary>
@@ -33,9 +47,9 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input String(string value)
     {
-        var pointer = MemoryWriter.WriteUtf8String(value);
+        var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        return new InputPointer(InputChannel.String(pointer), pointer);
+        return new Input(InputChannel.String(unsafeValue.Handle), unsafeValue);
     }
 
     /// <summary>
@@ -45,7 +59,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Boolean(bool value)
     {
-        return new InputEmpty(InputChannel.Boolean(value));
+        return new Input(InputChannel.Boolean(value));
     }
 
     /// <summary>
@@ -55,7 +69,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Double(double value)
     {
-        return new InputEmpty(InputChannel.Double(value));
+        return new Input(InputChannel.Double(value));
     }
 
     /// <summary>
@@ -65,7 +79,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Long(long value)
     {
-        return new InputEmpty(InputChannel.Long(value));
+        return new Input(InputChannel.Long(value));
     }
 
     /// <summary>
@@ -75,7 +89,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
-        return new InputEmpty(InputChannel.Bytes(value, (uint)value.Length));
+        return new Input(InputChannel.Bytes(value, (uint)value.Length));
     }
 
     /// <summary>
@@ -85,10 +99,9 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Collection(Input[] value)
     {
-        var inputs = value.Select(x => x.InputNative).ToArray();
-        var pointer = MemoryWriter.WriteStructArray(inputs);
+        var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new InputPointer(InputChannel.Collection(pointer, (uint)value.Length), pointer);
+        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -98,12 +111,10 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Object(IDictionary<string, Input> value)
     {
-        var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
-        var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
+        var unsageKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new InputPointerArray(
-            InputChannel.Object(keys.Head, values, (uint)value.Count),
-            keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
+        return new Input(InputChannel.Object(unsageKeys.Handle, unsafeValues.Handle, (uint)value.Count), unsageKeys, unsafeValues);
     }
 
     /// <summary>
@@ -112,7 +123,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Null()
     {
-        return new InputEmpty(InputChannel.Null());
+        return new Input(InputChannel.Null());
     }
 
     /// <summary>
@@ -121,7 +132,7 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Undefined()
     {
-        return new InputEmpty(InputChannel.Undefined());
+        return new Input(InputChannel.Undefined());
     }
 
     /// <summary>
@@ -131,10 +142,9 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Array(Input[] value)
     {
-        var inputs = value.Select(x => x.InputNative).ToArray();
-        var pointer = MemoryWriter.WriteStructArray(inputs);
+        var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new InputPointer(InputChannel.Array(pointer, (uint)value.Length), pointer);
+        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -144,12 +154,10 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Map(IDictionary<string, Input> value)
     {
-        var keys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
-        var values = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
+        var unsageKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new InputPointerArray(
-            InputChannel.Map(keys.Head, values, (uint)value.Count),
-            keys.Pointers.Concat(new[] { keys.Head, values }).ToArray());
+        return new Input(InputChannel.Map(unsageKeys.Handle, unsafeValues.Handle, (uint)value.Count), unsageKeys, unsafeValues);
     }
 
     /// <summary>
@@ -159,9 +167,9 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Text(string value)
     {
-        var pointer = MemoryWriter.WriteUtf8String(value);
+        var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        return new InputPointer(InputChannel.Text(pointer), pointer);
+        return new Input(InputChannel.Text(unsafeValue.Handle), unsafeValue);
     }
 
     /// <summary>
@@ -171,9 +179,9 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlElement(string name)
     {
-        var pointer = MemoryWriter.WriteUtf8String(name);
+        var unsafeValue = MemoryWriter.WriteUtf8String(name);
 
-        return new InputPointer(InputChannel.XmlElement(pointer), pointer);
+        return new Input(InputChannel.XmlElement(unsafeValue.Handle), unsafeValue);
     }
 
     /// <summary>
@@ -183,8 +191,8 @@ public abstract class Input : IDisposable
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input XmlText(string value)
     {
-        var pointer = MemoryWriter.WriteUtf8String(value);
+        var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        return new InputPointer(InputChannel.XmlText(pointer), pointer);
+        return new Input(InputChannel.XmlText(unsafeValue.Handle), unsafeValue);
     }
 }

@@ -30,7 +30,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
@@ -60,7 +59,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
@@ -90,7 +88,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
@@ -120,7 +117,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
@@ -156,7 +152,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, pathSegments, "map-2", "map-3");
     }
 
@@ -186,7 +181,6 @@ public class MapObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         AssertPath(called, mapEvents.ElementAt(index: 0));
         AssertPath(called, mapEvents.ElementAt(index: 1), "map-2");
         AssertPath(called, mapEvents.ElementAt(index: 2), "map-2", "map-3");
@@ -200,10 +194,10 @@ public class MapObserveDeepTests
         var transaction = doc.WriteTransaction();
         map1.Insert(transaction, "map-2", Input.Map(new Dictionary<string, Input>()));
 
-        var map2 = map1.Get(transaction, "map-2").ResolveMap();
+        var map2 = map1.Get(transaction, "map-2").Map;
         map2.Insert(transaction, "map-3", Input.Map(new Dictionary<string, Input>()));
 
-        var map3 = map2.Get(transaction, "map-3").ResolveMap();
+        var map3 = map2.Get(transaction, "map-3").Map;
         transaction.Commit();
 
         return (doc, map1, map2, map3);

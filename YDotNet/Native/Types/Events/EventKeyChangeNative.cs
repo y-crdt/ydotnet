@@ -16,7 +16,7 @@ internal readonly struct EventKeyChangeNative
 
     public nint NewValue { get; }
 
-    public EventKeyChange ToEventKeyChange()
+    public EventKeyChange ToEventKeyChange(IResourceOwner owner)
     {
         var tag = TagNative switch
         {
@@ -26,12 +26,18 @@ internal readonly struct EventKeyChangeNative
             _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventKeyChangeTagNative)} is not supported."),
         };
 
-        var result = new EventKeyChange(
-            MemoryReader.ReadUtf8String(Key),
-            tag,
-            OldValue != nint.Zero ? new Output(OldValue, false) : null,
-            NewValue != nint.Zero ? new Output(NewValue, false) : null);
+        var key = MemoryReader.ReadUtf8String(Key);
 
-        return result;
+        var oldOutput =
+            OldValue != nint.Zero ?
+            new Output(OldValue, owner) :
+            null;
+
+        var newOutput =
+            NewValue != nint.Zero ?
+            new Output(NewValue, owner) :
+            null;
+
+        return new EventKeyChange(key, tag, oldOutput, newOutput);
     }
 }

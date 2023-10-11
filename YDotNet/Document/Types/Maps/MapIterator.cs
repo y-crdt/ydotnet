@@ -1,4 +1,5 @@
 using System.Collections;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;
@@ -7,7 +8,7 @@ namespace YDotNet.Document.Types.Maps;
 ///     Represents an enumerable to read <see cref="MapEntry" /> instances from a <see cref="Map" />.
 /// </summary>
 /// <remarks>
-///     Two important details about <see cref="MapIterator" />:
+///     Two important details about <see cref="MapIterator" />.
 ///     <ul>
 ///         <li>The <see cref="MapEntry" /> instances are unordered when iterating;</li>
 ///         <li>
@@ -16,24 +17,19 @@ namespace YDotNet.Document.Types.Maps;
 ///         </li>
 ///     </ul>
 /// </remarks>
-public class MapIterator : IEnumerable<MapEntry>, IDisposable
+public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MapIterator" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal MapIterator(nint handle)
+        : base(handle)
     {
-        Handle = handle;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    ~MapIterator()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    protected override void DisposeCore(bool disposing)
     {
         MapChannel.IteratorDestroy(Handle);
     }
@@ -41,6 +37,7 @@ public class MapIterator : IEnumerable<MapEntry>, IDisposable
     /// <inheritdoc />
     public IEnumerator<MapEntry> GetEnumerator()
     {
+        ThrowIfDisposed();
         return new MapEnumerator(this);
     }
 

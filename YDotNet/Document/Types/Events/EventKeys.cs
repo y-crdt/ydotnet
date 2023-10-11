@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
@@ -10,33 +9,29 @@ namespace YDotNet.Document.Types.Events;
 ///     Represents the keys that changed the shared type that emitted the event related to this <see cref="EventKeys" />
 ///     instance.
 /// </summary>
-public class EventKeys : ReadOnlyCollection<EventKeyChange>
+public class EventKeys : UnmanagedCollectionResource<EventKeyChange>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventKeys" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the beginning of the array of <see cref="EventKeyChangeNative" /> instances.</param>
-    /// <param name="length">The length of the array.</param>
-    internal EventKeys(nint handle, uint length)
-        : base(ReadItems(handle, length))
+    private readonly uint length;
+
+    internal EventKeys(nint handle, uint length, IResourceOwner owner)
+        : base(handle, owner)
     {
-        Handle = handle;
+        foreach (var keyHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventKeyChangeNative>()))
+        {
+            // The event delta creates output that are owned by this block of allocated memory.
+            AddItem(Marshal.PtrToStructure<EventKeyChangeNative>(keyHandle).ToEventKeyChange(this));
+        }
+
+        this.length = length;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    private static IList<EventKeyChange> ReadItems(nint handle, uint length)
+    ~EventKeys()
     {
-        var result = MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventKeyChangeNative>())
-            .Select(Marshal.PtrToStructure<EventKeyChangeNative>)
-            .Select(x => x.ToEventKeyChange())
-            .ToList();
+        Dispose(true);
+    }
 
-        // We are done reading and can release the memory.
-        EventChannel.KeysDestroy(handle, length);
-        return result;
+    protected override void DisposeCore(bool disposing)
+    {
+        EventChannel.KeysDestroy(Handle, length);
     }
 }

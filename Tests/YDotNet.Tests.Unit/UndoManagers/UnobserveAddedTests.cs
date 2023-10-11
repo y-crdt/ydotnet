@@ -28,7 +28,7 @@ public class UnobserveAddedTests
 
         // Act
         undoEvent = null;
-        undoManager.UnobserveAdded(subscription);
+        subscription.Dispose();
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 5, " Viana");
         transaction.Commit();

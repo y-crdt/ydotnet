@@ -25,6 +25,11 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     }
 
     /// <inheritdoc />
+    public void Dispose()
+    {
+    }
+
+    /// <inheritdoc />
     public Output Current => current!;
 
     /// <inheritdoc />
@@ -41,7 +46,7 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     {
         var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
 
-        current = handle != nint.Zero ? new Output(handle, false) : null;
+        current = handle != nint.Zero ? new Output(handle, null) : null;
 
         return Current != null;
     }
@@ -50,11 +55,5 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        TreeWalker.Dispose();
     }
 }

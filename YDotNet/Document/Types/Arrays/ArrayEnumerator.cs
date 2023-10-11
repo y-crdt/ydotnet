@@ -12,16 +12,14 @@ internal class ArrayEnumerator : IEnumerator<Output>
 {
     private Output? current;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ArrayEnumerator" /> class.
-    /// </summary>
-    /// <param name="iterator">
-    ///     The <see cref="Iterator" /> instance used by this enumerator.
-    ///     Check <see cref="Iterator" /> for more details.
-    /// </param>
     internal ArrayEnumerator(ArrayIterator iterator)
     {
         Iterator = iterator;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
     }
 
     /// <inheritdoc />
@@ -40,20 +38,15 @@ internal class ArrayEnumerator : IEnumerator<Output>
     {
         var handle = ArrayChannel.IteratorNext(Iterator.Handle);
 
-        current = handle != nint.Zero ? new Output(handle, false) : null;
+        // The output has now owner and can just be disposed when not needed anymore.
+        current = handle != nint.Zero ? new Output(handle, null) : null;
 
-        return Current != null;
+        return current != null;
     }
 
     /// <inheritdoc />
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Iterator.Dispose();
     }
 }

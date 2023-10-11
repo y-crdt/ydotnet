@@ -5,7 +5,6 @@ using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
-using YDotNet.Native.Types.Maps;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 #pragma warning disable SA1623 // Property summary documentation should match accessors
@@ -15,27 +14,31 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 ///     Represents a cell used to read information from the storage.
 /// </summary>
-public class Output
+public sealed class Output : UnmanagedResource
 {
     private readonly Lazy<object?> value;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Output" /> class.
-    /// </summary>
-    /// <param name="handle">The pointer to the native resource that represents the storage.</param>
-    /// <param name="shouldDispose">Indicates if the memory has been allocated and needs to be disposed.</param>
-    internal Output(nint handle, bool shouldDispose)
+    internal Output(nint handle, IResourceOwner? owner)
+        : base(handle, owner)
     {
         var native = Marshal.PtrToStructure<OutputNative>(handle.Checked());
 
         Type = (OutputType)native.Tag;
 
         // We use lazy because some types like Doc and Map need to be disposed and therefore they should not be allocated, if not needed.
-        value = BuildValue(handle, native.Length, Type);
+        value = BuildValue(handle, native.Length, Type, this);
+    }
 
-        if (shouldDispose)
+    ~Output()
+    {
+        Dispose(true);
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        if (Owner == null)
         {
-            OutputChannel.Destroy(handle);
+            OutputChannel.Destroy(Handle);
         }
     }
 
@@ -84,55 +87,50 @@ public class Output
     ///     Gets the <see cref="Output" /> collection.
     /// </summary>
     /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
-    public Output[] Collection => GetValue<Output[]>(OutputType.Collection);
+    public JsonArray Collection => GetValue<JsonArray>(OutputType.Collection);
 
     /// <summary>
     ///     Gets the value as json object.
     /// </summary>
     /// <exception cref="YDotNetException">Value is not a json object.</exception>
-    public IDictionary<string, Output>? Object => GetValue<IDictionary<string, Output>>(OutputType.Object);
+    public JsonObject Object => GetValue<JsonObject>(OutputType.Object);
 
     /// <summary>
     ///     Gets the <see cref="Array" /> value.
     /// </summary>
     /// <returns>The resolved array.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
-    /// <remarks>You are responsible to dispose the array, if you use this property.</remarks>
-    public Array ResolveArray() => GetValue<Array>(OutputType.Array);
+    public Array Array => GetValue<Array>(OutputType.Array);
 
     /// <summary>
     ///     Gets the <see cref="Map" /> value.
     /// </summary>
     /// <returns>The resolved map.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
-    /// <remarks>You are responsible to dispose the map, if you use this property.</remarks>
-    public Map ResolveMap() => GetValue<Map>(OutputType.Map);
+    public Map Map => GetValue<Map>(OutputType.Map);
 
     /// <summary>
     ///     Gets the <see cref="Map" /> value.
     /// </summary>
     /// <returns>The resolved text.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
-    /// <remarks>You are responsible to dispose the text, if you use this property.</remarks>
-    public Text ResolveText() => GetValue<Text>(OutputType.Text);
+    public Text Text => GetValue<Text>(OutputType.Text);
 
     /// <summary>
     ///     Gets the <see cref="XmlElement" /> value.
     /// </summary>
     /// <returns>The resolved xml element.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
-    /// <remarks>You are responsible to dispose the xml element, if you use this property.</remarks>
-    public XmlElement ResolveXmlElement() => GetValue<XmlElement>(OutputType.XmlElement);
+    public XmlElement XmlElement => GetValue<XmlElement>(OutputType.XmlElement);
 
     /// <summary>
     ///     Gets the <see cref="XmlText" /> value.
     /// </summary>
     /// <returns>The resolved xml text.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
-    /// <remarks>You are responsible to dispose the xml text, if you use this property.</remarks>
-    public XmlText ResolveXmlText() => GetValue<XmlText>(OutputType.XmlText);
+    public XmlText XmlText => GetValue<XmlText>(OutputType.XmlText);
 
-    private static Lazy<object?> BuildValue(nint handle, uint length, OutputType type)
+    private static Lazy<object?> BuildValue(nint handle, uint length, OutputType type, IResourceOwner owner)
     {
         switch (type)
         {
@@ -166,52 +164,20 @@ public class Output
 
             case OutputType.Bytes:
                 {
-                    var pointer = OutputChannel.Bytes(handle).Checked();
+                    var bytesHandle = OutputChannel.Bytes(handle).Checked();
+                    var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
 
-                    var result = MemoryReader.TryReadBytes(OutputChannel.Bytes(handle), length) ??
-                        throw new YDotNetException("Internal type mismatch, native library returns null.");
-
-                    if (result == null)
-                    {
-                        throw new YDotNetException("Internal type mismatch, native library returns null.");
-                    }
-
-                    OutputChannel.Destroy(pointer);
-                    return new Lazy<object?>(result);
+                    return new Lazy<object?>(bytesArray);
                 }
 
             case OutputType.Collection:
                 {
-                    var pointer = OutputChannel.Collection(handle).Checked();
-
-                    var handles = MemoryReader.TryReadIntPtrArray(pointer, length, Marshal.SizeOf<OutputNative>())
-                        ?? throw new YDotNetException("Internal type mismatch, native library returns null.");
-
-                    var result = handles.Select(x => new Output(x, false)).ToArray();
-
-                    OutputChannel.Destroy(pointer);
-                    return new Lazy<object?>(result);
+                    return new Lazy<object?>(() => new JsonArray(handle, length, owner));
                 }
 
             case OutputType.Object:
                 {
-                    var pointer = OutputChannel.Object(handle).Checked();
-
-                    var handlesArray = MemoryReader.TryReadIntPtrArray(pointer, length, Marshal.SizeOf<MapEntryNative>())
-                        ?? throw new YDotNetException("Internal type mismatch, native library returns null.");
-
-                    var result = new Dictionary<string, Output>();
-
-                    foreach (var itemHandle in handlesArray)
-                    {
-                        var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(itemHandle);
-                        var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
-
-                        result[mapEntryKey] = new Output(outputHandle, false);
-                    }
-
-                    OutputChannel.Destroy(pointer);
-                    return new Lazy<object?>(result);
+                    return new Lazy<object?>(() => new JsonObject(handle, length, owner));
                 }
 
             case OutputType.Array:
@@ -239,6 +205,8 @@ public class Output
 
     private T GetValue<T>(OutputType expectedType)
     {
+        ThrowIfDisposed();
+
         var resolvedValue = value.Value;
 
         if (resolvedValue is not T typed)

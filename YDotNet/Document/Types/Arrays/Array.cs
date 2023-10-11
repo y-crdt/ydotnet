@@ -15,14 +15,11 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 public class Array : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Array" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     internal Array(nint handle)
         : base(handle)
     {
-        // Nothing here.
     }
 
     /// <summary>
@@ -36,12 +33,11 @@ public class Array : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The starting index to insert the items.</param>
     /// <param name="inputs">The items to be inserted.</param>
-    public void InsertRange(Transaction transaction, uint index, IEnumerable<Input> inputs)
+    public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
-        var inputsArray = inputs.Select(x => x.InputNative).ToArray();
-        var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
+        using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
-        ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint)inputsArray.Length);
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
     }
 
     /// <summary>
@@ -69,7 +65,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return handle != nint.Zero ? new Output(handle, true) : null;
+        return handle != nint.Zero ? new Output(handle, null) : null;
     }
 
     /// <summary>
@@ -107,24 +103,19 @@ public class Array : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<ArrayEvent> action)
+    public IDisposable Observe(Action<ArrayEvent> action)
     {
+        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle));
+
         var subscriptionId = ArrayChannel.Observe(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(new ArrayEvent(eventHandle)));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Array" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        ArrayChannel.Unobserve(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            ArrayChannel.Unobserve(Handle, subscriptionId);
+        });
     }
 
     /// <summary>

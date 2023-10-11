@@ -24,6 +24,11 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     }
 
     /// <inheritdoc />
+    public void Dispose()
+    {
+    }
+
+    /// <inheritdoc />
     public XmlAttribute Current => current!;
 
     /// <inheritdoc />
@@ -49,11 +54,5 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Iterator.Dispose();
     }
 }

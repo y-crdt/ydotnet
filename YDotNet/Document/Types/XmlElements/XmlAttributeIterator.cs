@@ -1,4 +1,5 @@
 using System.Collections;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -10,24 +11,19 @@ namespace YDotNet.Document.Types.XmlElements;
 /// <remarks>
 ///     The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate values.
 /// </remarks>
-public class XmlAttributeIterator : IEnumerable<XmlAttribute>, IDisposable
+public class XmlAttributeIterator : UnmanagedResource, IEnumerable<XmlAttribute>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlAttributeIterator" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal XmlAttributeIterator(nint handle)
+        : base(handle)
     {
-        Handle = handle;
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    ~XmlAttributeIterator()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    protected override void DisposeCore(bool disposing)
     {
         XmlAttributeChannel.IteratorDestroy(Handle);
     }

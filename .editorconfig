@@ -31,6 +31,8 @@ dotnet_diagnostic.SA1101.severity = none       # Prefix local calls with this
 
 # Ordering rules
 dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
+dotnet_diagnostic.SA1201.severity = none
+dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1204.severity = suggestion # Static elements should appear before instance elements
 
 # Maintainability rules

@@ -57,7 +57,7 @@ public class GetTests
     }
 
     [Test]
-    public void GetOnDefinedKeyWithWrongTypeReturnsNull()
+    public void GetOnDefinedKeyWithWrongTypeThrowsException()
     {
         // Arrange
         var doc = new Doc();
@@ -69,18 +69,11 @@ public class GetTests
 
         // Act
         var transaction = doc.ReadTransaction();
-        var array = transaction.GetArray("map");
-        var map = transaction.GetMap("text");
-        var text = transaction.GetText("xml-element");
-        var xmlElement = transaction.GetXmlElement("xml-text");
-        var xmlText = transaction.GetXmlText("array");
+        Assert.Throws<YDotNetException>(() => transaction.GetArray("map"));
+        Assert.Throws<YDotNetException>(() => transaction.GetMap("text"));
+        Assert.Throws<YDotNetException>(() => transaction.GetText("xml-element"));
+        Assert.Throws<YDotNetException>(() => transaction.GetXmlElement("xml-text"));
+        Assert.Throws<YDotNetException>(() => transaction.GetXmlText("array"));
         transaction.Commit();
-
-        // Assert
-        Assert.That(array, Is.Null);
-        Assert.That(map, Is.Null);
-        Assert.That(text, Is.Null);
-        Assert.That(xmlElement, Is.Null);
-        Assert.That(xmlText, Is.Null);
     }
 }

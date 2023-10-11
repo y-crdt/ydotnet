@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
@@ -9,34 +8,29 @@ namespace YDotNet.Document.Types.Events;
 /// <summary>
 ///     Represents a collection of <see cref="EventDelta" /> instances.
 /// </summary>
-public class EventDeltas : ReadOnlyCollection<EventDelta>
+public class EventDeltas : UnmanagedCollectionResource<EventDelta>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventDeltas" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    /// <param name="length">The length of the array of <see cref="EventDelta" /> to read from <see cref="Handle" />.</param>
-    internal EventDeltas(nint handle, uint length)
-        : base(ReadItems(handle, length))
+    private readonly uint length;
+
+    internal EventDeltas(nint handle, uint length, IResourceOwner owner)
+        : base(handle, owner)
     {
-        Handle = handle;
+        this.length = length;
+
+        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventDeltaNative>()))
+        {
+            // The event delta creates output that are owned by this block of allocated memory.
+            AddItem(Marshal.PtrToStructure<EventDeltaNative>(itemHandle).ToEventDelta(this));
+        }
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    private static IList<EventDelta> ReadItems(nint handle, uint length)
+    ~EventDeltas()
     {
-        var result = MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventDeltaNative>())
-            .Select(Marshal.PtrToStructure<EventDeltaNative>)
-            .Select(x => x.ToEventDelta())
-            .ToList();
+        Dispose(false);
+    }
 
-        // We are done reading and can release the memory.
-        EventChannel.DeltaDestroy(handle, length);
-
-        return result;
+    protected override void DisposeCore(bool disposing)
+    {
+        EventChannel.DeltaDestroy(Handle, length);
     }
 }

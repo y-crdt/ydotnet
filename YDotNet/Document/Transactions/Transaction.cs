@@ -6,7 +6,6 @@ using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Transaction;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Branches;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
@@ -22,32 +21,25 @@ namespace YDotNet.Document.Transactions;
 ///     </para>
 ///     <para>A <see cref="Transaction" /> is automatically committed during <see cref="Dispose" />.</para>
 /// </remarks>
-public class Transaction : IDisposable
+public class Transaction : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Transaction" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal Transaction(nint handle)
+        : base(handle)
     {
-        Handle = handle;
+    }
+
+    protected override void DisposeCore(bool disposing)
+    {
+        if (disposing)
+        {
+            Commit();
+        }
     }
 
     /// <summary>
     ///     Gets a value indicating whether the transaction is writeable.
     /// </summary>
     public bool Writeable => TransactionChannel.Writeable(Handle) == 1;
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Commit();
-    }
 
     /// <summary>
     ///     Commit and dispose provided read-write transaction.
@@ -58,6 +50,7 @@ public class Transaction : IDisposable
     /// </remarks>
     public void Commit()
     {
+        ThrowIfDisposed();
         TransactionChannel.Commit(Handle);
     }
 
@@ -68,12 +61,11 @@ public class Transaction : IDisposable
     public Doc[] SubDocs()
     {
         var handle = TransactionChannel.SubDocs(Handle, out var length);
-        var docs = new Doc[length];
 
+        var docs = new Doc[length];
         for (var i = 0; i < length; i++)
         {
-            var doc = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
-            docs[i] = doc;
+            docs[i] = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
         }
 
         return docs;
@@ -95,10 +87,8 @@ public class Transaction : IDisposable
     public byte[] StateVectorV1()
     {
         var handle = TransactionChannel.StateVectorV1(Handle, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -128,10 +118,8 @@ public class Transaction : IDisposable
     public byte[] StateDiffV1(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint)(stateVector != null ? stateVector.Length : 0), out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -161,10 +149,8 @@ public class Transaction : IDisposable
     public byte[] StateDiffV2(byte[] stateVector)
     {
         var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint)stateVector.Length, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -209,10 +195,8 @@ public class Transaction : IDisposable
     public byte[] Snapshot()
     {
         var handle = TransactionChannel.Snapshot(Handle, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle.Checked(), length);
     }
 
     /// <summary>
@@ -247,10 +231,8 @@ public class Transaction : IDisposable
             snapshot,
             (uint)snapshot.Length,
             out var length);
-        var data = MemoryReader.TryReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
     }
 
     /// <summary>
@@ -285,10 +267,8 @@ public class Transaction : IDisposable
             snapshot,
             (uint)snapshot.Length,
             out var length);
-        var data = MemoryReader.TryReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
     }
 
     /// <summary>
@@ -371,13 +351,22 @@ public class Transaction : IDisposable
         return handle != nint.Zero ? new XmlText(handle) : null;
     }
 
-    private nint GetWithKind(string name, BranchKind branchKind)
+    private nint GetWithKind(string name, BranchKind expectedKind)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var handle = TransactionChannel.Get(Handle, nameHandle);
-        var kind = (BranchKind)BranchChannel.Kind(handle);
-        MemoryWriter.Release(nameHandle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return kind != branchKind ? nint.Zero : handle;
+        var branchHandle = TransactionChannel.Get(Handle, unsafeName.Handle);
+        if (branchHandle == nint.Zero)
+        {
+            return nint.Zero;
+        }
+
+        var branchKind = (BranchKind)BranchChannel.Kind(branchHandle);
+        if (branchKind != expectedKind)
+        {
+            ThrowHelper.YDotnet($"Expected '{expectedKind}', got '{branchKind}'.");
+        }
+
+        return branchHandle;
     }
 }

@@ -4,23 +4,20 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents the iterator to provide instances of <see cref="MapEntry" /> or <c>null</c> to
-///     <see cref="MapIterator" />.
+///     Represents the iterator to provide instances of <see cref="MapEntry" />.
 /// </summary>
 internal class MapEnumerator : IEnumerator<MapEntry>
 {
     private MapEntry? current;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MapEnumerator" /> class.
-    /// </summary>
-    /// <param name="mapIterator">
-    ///     The <see cref="MapIterator" /> instance used by this enumerator.
-    ///     Check <see cref="MapIterator" /> for more details.
-    /// </param>
-    internal MapEnumerator(MapIterator mapIterator)
+    internal MapEnumerator(MapIterator iterator)
     {
-        MapIterator = mapIterator;
+        Iterator = iterator;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
     }
 
     /// <inheritdoc />
@@ -30,16 +27,17 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     object? IEnumerator.Current => current!;
 
     /// <summary>
-    ///     Gets the <see cref="MapIterator" /> instance that holds the <see cref="Types.MapIterator.Handle" /> used by this enumerator.
+    ///     Gets the <see cref="Iterator" /> instance that holds the <see cref="Types.MapIterator.Handle" /> used by this enumerator.
     /// </summary>
-    private MapIterator MapIterator { get; }
+    private MapIterator Iterator { get; }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = MapChannel.IteratorNext(MapIterator.Handle);
+        var handle = MapChannel.IteratorNext(Iterator.Handle);
 
-        current = handle != nint.Zero ? new MapEntry(handle, true) : null;
+        // The map entry also manages the value of the output.
+        current = handle != nint.Zero ? new MapEntry(handle, Iterator) : null;
 
         return current != null;
     }
@@ -48,11 +46,5 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        MapIterator.Dispose();
     }
 }

@@ -118,7 +118,7 @@ public class GetTests
 
         // Assert
         //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value1.Length, Is.EqualTo(expected: 2));
+        Assert.That(value1.Count, Is.EqualTo(expected: 2));
         Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
         Assert.That(value2.Type, Is.EqualTo(OutputType.Bool));
@@ -201,7 +201,7 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").ResolveText();
+        var value1 = map.Get(transaction, "value1").Text;
         var value2 = map.Get(transaction, "value2");
 
         // Assert
@@ -225,7 +225,7 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").ResolveArray();
+        var value1 = map.Get(transaction, "value1").Array;
         var value2 = map.Get(transaction, "value2");
 
         // Assert
@@ -249,7 +249,7 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").ResolveMap();
+        var value1 = map.Get(transaction, "value1").Map;
         var value2 = map.Get(transaction, "value2");
 
         // Assert
@@ -270,7 +270,7 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").ResolveXmlElement();
+        var value1 = map.Get(transaction, "value1").XmlElement;
         var value2 = map.Get(transaction, "value2");
 
         // Assert
@@ -289,7 +289,7 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").ResolveXmlText();
+        var value1 = map.Get(transaction, "value1").XmlText;
         var value2 = map.Get(transaction, "value2");
 
         // Assert

@@ -15,7 +15,7 @@ public class InsertRangeTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 0, Enumerable.Empty<Input>());
+        array.InsertRange(transaction, index: 0);
         transaction.Commit();
 
         // Assert

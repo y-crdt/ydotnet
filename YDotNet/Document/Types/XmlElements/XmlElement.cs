@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
@@ -16,14 +15,11 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlElement : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlElement" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
+    private readonly EventSubscriptions subscriptions = new EventSubscriptions();
+
     internal XmlElement(nint handle)
         : base(handle)
     {
-        // Nothing here.
     }
 
     /// <summary>
@@ -37,10 +33,8 @@ public class XmlElement : Branch
         get
         {
             var handle = XmlElementChannel.Tag(Handle);
-            var result = Marshal.PtrToStringAnsi(handle);
-            StringChannel.Destroy(handle);
 
-            return result;
+            return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
         }
     }
 
@@ -55,10 +49,8 @@ public class XmlElement : Branch
     public string String(Transaction transaction)
     {
         var handle = XmlElementChannel.String(Handle, transaction.Handle);
-        var result = MemoryReader.ReadUtf8String(handle);
-        StringChannel.Destroy(handle);
 
-        return result;
+        return MemoryReader.ReadStringAndDestroy(handle.Checked());
     }
 
     /// <summary>
@@ -72,13 +64,10 @@ public class XmlElement : Branch
     /// <param name="value">The value of the attribute to be added.</param>
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var valueHandle = MemoryWriter.WriteUtf8String(value);
+        using var unsageName = MemoryWriter.WriteUtf8String(name);
+        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
-
-        MemoryWriter.Release(nameHandle);
-        MemoryWriter.Release(valueHandle);
+        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, unsageName.Handle, unsafeValue.Handle);
     }
 
     /// <summary>
@@ -88,11 +77,9 @@ public class XmlElement : Branch
     /// <param name="name">The name of the attribute to be removed.</param>
     public void RemoveAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, nameHandle);
-
-        MemoryWriter.Release(nameHandle);
+        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, unsafeName.Handle);
     }
 
     /// <summary>
@@ -103,12 +90,11 @@ public class XmlElement : Branch
     /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
     public string? GetAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, nameHandle);
-        MemoryReader.TryReadUtf8String(handle, out var result);
-        StringChannel.Destroy(handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        return result;
+        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, unsafeName.Handle);
+
+        return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
     }
 
     /// <summary>
@@ -162,9 +148,9 @@ public class XmlElement : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
     public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
-        var elementName = MemoryWriter.WriteUtf8String(name);
-        var elementHandle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, elementName);
-        MemoryWriter.Release(elementName);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+
+        var elementHandle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
 
         return new XmlElement(elementHandle.Checked());
     }
@@ -191,7 +177,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return handle != nint.Zero ? new Output(handle, true) : null;
+        return handle != nint.Zero ? new Output(handle, null) : null;
     }
 
     /// <summary>
@@ -208,7 +194,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, true) : null;
+        return handle != nint.Zero ? new Output(handle, null) : null;
     }
 
     /// <summary>
@@ -225,7 +211,23 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, true) : null;
+        return handle != nint.Zero ? new Output(handle, null) : null;
+    }
+
+    /// <summary>
+    ///     Returns the first child of the current <see cref="XmlElement" /> node which can be an
+    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The first child of the current <see cref="XmlElement" /> node which can be an
+    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
+    /// </returns>
+    public Output? FirstChild(Transaction transaction)
+    {
+        var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
+
+        return handle != nint.Zero ? new Output(handle, null) : null;
     }
 
     /// <summary>
@@ -242,22 +244,6 @@ public class XmlElement : Branch
         var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
 
         return handle != nint.Zero ? new XmlElement(handle) : null;
-    }
-
-    /// <summary>
-    ///     Returns the first child of the current <see cref="XmlElement" /> node which can be an
-    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
-    /// </summary>
-    /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>
-    ///     The first child of the current <see cref="XmlElement" /> node which can be an
-    ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
-    /// </returns>
-    public Output? FirstChild(Transaction transaction)
-    {
-        var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
-
-        return handle != nint.Zero ? new Output(handle, true) : null;
     }
 
     /// <summary>
@@ -283,23 +269,18 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<XmlElementEvent> action)
+    public IDisposable Observe(Action<XmlElementEvent> action)
     {
+        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle));
+
         var subscriptionId = XmlElementChannel.Observe(
             Handle,
             nint.Zero,
-            (_, eventHandle) => action(new XmlElementEvent(eventHandle)));
+            callback);
 
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, that
-    ///     was subscribed via <see cref="Observe" />.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        XmlElementChannel.Unobserve(Handle, subscription.Id);
+        return subscriptions.Add(callback, () =>
+        {
+            XmlElementChannel.Unobserve(Handle, subscriptionId);
+        });
     }
 }

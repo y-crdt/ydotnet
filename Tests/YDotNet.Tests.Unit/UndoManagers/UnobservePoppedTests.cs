@@ -29,7 +29,7 @@ public class UnobservePoppedTests
 
         // Act
         undoEvent = null;
-        undoManager.UnobservePopped(subscription);
+        subscription.Dispose();
         undoManager.Redo();
 
         // Assert
