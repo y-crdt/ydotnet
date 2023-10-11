@@ -6,6 +6,20 @@ namespace YDotNet.Tests.Unit.Transactions;
 public class StateDiffV1Tests
 {
     [Test]
+    public void Null()
+    {
+        // Arrange
+        var senderDoc = ArrangeSenderDoc();
+
+        // Act
+        var stateDiff = senderDoc.ReadTransaction().StateDiffV1(stateVector: null);
+
+        // Assert
+        Assert.That(stateDiff, Is.Not.Null);
+        Assert.That(stateDiff, Has.Length.EqualTo(26));
+    }
+
+    [Test]
     public void ReadOnly()
     {
         // Arrange
