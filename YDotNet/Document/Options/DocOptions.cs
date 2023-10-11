@@ -10,7 +10,7 @@ public class DocOptions
     /// </summary>
     internal static DocOptions Default => new()
     {
-        Id = (ulong) Random.Shared.NextInt64(),
+        Id = (ulong) Random.Shared.Next(),
         ShouldLoad = true,
         Encoding = DocEncoding.Utf16
     };
