@@ -161,8 +161,8 @@ public class Transaction : IDisposable
     /// </returns>
     public byte[] StateDiffV2(byte[]? stateVector)
     {
-        var handle = TransactionChannel.StateDiffV2(
-            Handle, stateVector, (uint) (stateVector != null ? stateVector.Length : 0), out var length);
+        var stateVectorLength = stateVector?.Length ?? 0;
+        var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVectorLength, out var length);
         var data = MemoryReader.ReadBytes(handle, length);
         BinaryChannel.Destroy(handle, length);
 
