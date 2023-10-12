@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
@@ -11,24 +10,20 @@ namespace YDotNet.Document.Cells;
 /// </summary>
 public sealed class JsonObject : ReadOnlyDictionary<string, Output>
 {
-    internal JsonObject(nint handle, uint length, Doc doc, IResourceOwner owner)
-        : base(ReadItems(handle, length, doc, owner))
+    internal JsonObject(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
     }
 
-    private static Dictionary<string, Output> ReadItems(nint handle, uint length, Doc doc, IResourceOwner owner)
+    private static Dictionary<string, Output> ReadItems(nint handle, uint length, Doc doc)
     {
         var entriesHandle = OutputChannel.Object(handle).Checked();
-        var entriesNatives = MemoryReader.ReadIntPtrArray(entriesHandle, length, Marshal.SizeOf<MapEntryNative>());
 
         var result = new Dictionary<string, Output>();
 
-        foreach (var itemHandle in entriesNatives)
+        foreach (var (native, ptr) in MemoryReader.ReadIntPtrArray<MapEntryNative>(entriesHandle, length))
         {
-            var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(itemHandle);
-            var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
-
-            result[mapEntryKey] = new Output(outputHandle, doc, owner);
+            result[native.Key()] = new Output(native.ValueHandle(ptr), doc);
         }
 
         return result;

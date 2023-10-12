@@ -14,36 +14,27 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 ///     Represents a cell used to read information from the storage.
 /// </summary>
-public sealed class Output : UnmanagedResource
+public sealed class Output
 {
-    private readonly Lazy<object?> value;
+    private readonly object? value;
 
-    internal Output(nint handle, Doc doc, IResourceOwner? owner)
-        : base(handle, owner)
+    internal Output(nint handle, Doc doc)
     {
-        var native = Marshal.PtrToStructure<OutputNative>(handle.Checked());
+        var native = MemoryReader.PtrToStruct<OutputNative>(handle);
 
         Type = (OutputType)native.Tag;
 
-        // We use lazy because some types like Doc and Map need to be disposed and therefore they should not be allocated, if not needed.
-        value = BuildValue(handle, native.Length, doc, Type, this);
+        value = BuildValue(handle, native.Length, doc, Type);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="Output"/> class.
-    /// </summary>
-    ~Output()
+    internal static Output CreateAndRelease(nint handle, Doc doc)
     {
-        Dispose(true);
-    }
+        var result = new Output(handle, doc);
 
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        if (Owner == null)
-        {
-            OutputChannel.Destroy(Handle);
-        }
+        // The output reads everything so we can just destroy it.
+        OutputChannel.Destroy(handle);
+
+        return result;
     }
 
     /// <summary>
@@ -134,7 +125,7 @@ public sealed class Output : UnmanagedResource
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
     public XmlText XmlText => GetValue<XmlText>(OutputType.XmlText);
 
-    private static Lazy<object?> BuildValue(nint handle, uint length, Doc doc, OutputType type, IResourceOwner owner)
+    private static object? BuildValue(nint handle, uint length, Doc doc, OutputType type)
     {
         switch (type)
         {
@@ -142,28 +133,28 @@ public sealed class Output : UnmanagedResource
                 {
                     var value = OutputChannel.Boolean(handle).Checked();
 
-                    return new Lazy<object?>((object?)(Marshal.PtrToStructure<byte>(value) == 1));
+                    return Marshal.PtrToStructure<byte>(value) == 1;
                 }
 
             case OutputType.Double:
                 {
                     var value = OutputChannel.Double(handle).Checked();
 
-                    return new Lazy<object?>(Marshal.PtrToStructure<double>(value));
+                    return Marshal.PtrToStructure<double>(value);
                 }
 
             case OutputType.Long:
                 {
                     var value = OutputChannel.Long(handle).Checked();
 
-                    return new Lazy<object?>(Marshal.PtrToStructure<long>(value));
+                    return Marshal.PtrToStructure<long>(value);
                 }
 
             case OutputType.String:
                 {
                     MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
 
-                    return new Lazy<object?>(result);
+                    return result;
                 }
 
             case OutputType.Bytes:
@@ -171,49 +162,45 @@ public sealed class Output : UnmanagedResource
                     var bytesHandle = OutputChannel.Bytes(handle).Checked();
                     var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
 
-                    return new Lazy<object?>(bytesArray);
+                    return bytesArray;
                 }
 
             case OutputType.Collection:
                 {
-                    return new Lazy<object?>(() => new JsonArray(handle, length, doc, owner));
+                    return new JsonArray(handle, length, doc);
                 }
 
             case OutputType.Object:
                 {
-                    return new Lazy<object?>(() => new JsonObject(handle, length, doc, owner));
+                    return new JsonObject(handle, length, doc);
                 }
 
             case OutputType.Array:
-                return new Lazy<object?>(() => doc.GetArray(OutputChannel.Array(handle)));
+                return doc.GetArray(OutputChannel.Array(handle));
 
             case OutputType.Map:
-                return new Lazy<object?>(() => doc.GetMap(OutputChannel.Map(handle)));
+                return doc.GetMap(OutputChannel.Map(handle));
 
             case OutputType.Text:
-                return new Lazy<object?>(() => doc.GetText(OutputChannel.Text(handle)));
+                return doc.GetText(OutputChannel.Text(handle));
 
             case OutputType.XmlElement:
-                return new Lazy<object?>(() => doc.GetXmlElement(OutputChannel.XmlElement(handle)));
+                return doc.GetXmlElement(OutputChannel.XmlElement(handle));
 
             case OutputType.XmlText:
-                return new Lazy<object?>(() => doc.GetXmlText(OutputChannel.XmlText(handle)));
+                return doc.GetXmlText(OutputChannel.XmlText(handle));
 
             case OutputType.Doc:
-                return new Lazy<object?>(() => doc.GetDoc(OutputChannel.Doc(handle)));
+                return doc.GetDoc(OutputChannel.Doc(handle));
 
             default:
-                return new Lazy<object?>((object?)null);
+                return null;
         }
     }
 
     private T GetValue<T>(OutputType expectedType)
     {
-        ThrowIfDisposed();
-
-        var resolvedValue = value.Value;
-
-        if (resolvedValue is not T typed)
+        if (value is not T typed)
         {
             throw new YDotNetException($"Expected {expectedType}, got {Type}.");
         }

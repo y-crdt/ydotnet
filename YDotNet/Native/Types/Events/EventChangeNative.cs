@@ -1,7 +1,4 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document;
-using YDotNet.Document.Cells;
-using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 
@@ -16,20 +13,16 @@ internal readonly struct EventChangeNative
 
     public nint Values { get; }
 
-    public EventChange ToEventChange(IResourceOwner owner, Doc doc)
+    public nint[] ValuesHandles
     {
-        var tag = TagNative switch
+        get
         {
-            EventChangeTagNative.Add => EventChangeTag.Add,
-            EventChangeTagNative.Remove => EventChangeTag.Remove,
-            EventChangeTagNative.Retain => EventChangeTag.Retain,
-            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventChangeTagNative)} is not supported."),
-        };
+            if (Values == nint.Zero)
+            {
+                return Array.Empty<nint>();
+            }
 
-        var values =
-            MemoryReader.TryReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>())?
-                .Select(x => new Output(x, doc, owner)).ToList() ?? new List<Output>();
-
-        return new EventChange(tag, Length, values);
+            return MemoryReader.ReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>()).ToArray();
+        }
     }
 }

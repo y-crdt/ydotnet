@@ -184,7 +184,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>

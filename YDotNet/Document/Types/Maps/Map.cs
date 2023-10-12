@@ -49,14 +49,10 @@ public class Map : Branch
     public Output? Get(Transaction transaction, string key)
     {
         using var unsafeName = MemoryWriter.WriteUtf8String(key);
-        var outputHandle = MapChannel.Get(Handle, transaction.Handle, unsafeName.Handle);
 
-        if (outputHandle == nint.Zero)
-        {
-            return null;
-        }
+        var handle = MapChannel.Get(Handle, transaction.Handle, unsafeName.Handle);
 
-        return new Output(outputHandle, Doc, null);
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>

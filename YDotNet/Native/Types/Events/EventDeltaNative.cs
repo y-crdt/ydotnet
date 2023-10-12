@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document;
-using YDotNet.Document.Cells;
-using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Native.Types.Events;
 
@@ -17,28 +15,18 @@ internal readonly struct EventDeltaNative
 
     public uint AttributesLength { get; }
 
-    public nint Attributes { get; }
+    public nint AttributesHandle { get; }
 
-    public EventDelta ToEventDelta(Doc doc, IResourceOwner owner)
+    public NativeWithHandle<MapEntryNative>[] Attributes
     {
-        var tag = TagNative switch
+        get
         {
-            EventDeltaTagNative.Add => EventDeltaTag.Add,
-            EventDeltaTagNative.Remove => EventDeltaTag.Remove,
-            EventDeltaTagNative.Retain => EventDeltaTag.Retain,
-            _ => throw new NotSupportedException($"The value \"{TagNative}\" for {nameof(EventDeltaTagNative)} is not supported."),
-        };
+            if (AttributesHandle == nint.Zero || AttributesLength == 0)
+            {
+                return Array.Empty<NativeWithHandle<MapEntryNative>>();
+            }
 
-        var attributes =
-            Attributes != nint.Zero ?
-            MemoryReader.ReadIntPtrArray(Attributes, AttributesLength, size: 16).Select(x => new EventDeltaAttribute(x, doc, owner)).ToList() :
-            new List<EventDeltaAttribute>();
-
-        var insert =
-            InsertHandle != nint.Zero ?
-            new Output(InsertHandle, doc, owner) :
-            null;
-
-        return new EventDelta(tag, Length, insert, attributes);
+            return MemoryReader.ReadIntPtrArray<MapEntryNative>(AttributesHandle, AttributesLength).ToArray();
+        }
     }
 }

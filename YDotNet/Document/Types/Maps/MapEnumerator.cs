@@ -1,4 +1,6 @@
 using System.Collections;
+using YDotNet.Document.Cells;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;
@@ -6,9 +8,9 @@ namespace YDotNet.Document.Types.Maps;
 /// <summary>
 ///     Represents the iterator to provide instances of <see cref="MapEntry" />.
 /// </summary>
-internal class MapEnumerator : IEnumerator<MapEntry>
+internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 {
-    private MapEntry? current;
+    private KeyValuePair<string, Output> current;
 
     internal MapEnumerator(MapIterator iterator)
     {
@@ -21,7 +23,7 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     }
 
     /// <inheritdoc />
-    public MapEntry Current => current!;
+    public KeyValuePair<string, Output> Current => current;
 
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
@@ -33,10 +35,24 @@ internal class MapEnumerator : IEnumerator<MapEntry>
     {
         var handle = MapChannel.IteratorNext(Iterator.Handle);
 
-        // The map entry also manages the value of the output.
-        current = handle != nint.Zero ? new MapEntry(handle, Iterator.Doc, Iterator) : null;
+        if (handle != nint.Zero)
+        {
+            var native = MemoryReader.PtrToStruct<MapEntryNative>(handle);
 
-        return current != null;
+            current = new KeyValuePair<string, Output>(
+                native.Key(),
+                new Output(native.ValueHandle(handle), Iterator.Doc));
+
+            // We are done reading, so we can release the memory.
+            MapChannel.EntryDestroy(handle);
+
+            return true;
+        }
+        else
+        {
+            current = default;
+            return false;
+        }
     }
 
     /// <inheritdoc />

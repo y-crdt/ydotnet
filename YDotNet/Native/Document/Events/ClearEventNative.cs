@@ -11,10 +11,7 @@ internal readonly struct ClearEventNative
 
     public static ClearEventNative From(Doc doc)
     {
-        return new ClearEventNative
-        {
-            Doc = doc
-        };
+        return new ClearEventNative { Doc = doc };
     }
 
     public ClearEvent ToClearEvent()

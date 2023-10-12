@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -7,24 +8,25 @@ namespace YDotNet.Document.Types.Events;
 ///     Represents the path from the root type to the shared type that emitted the event related to this
 ///     <see cref="EventPath" /> instance.
 /// </summary>
-public sealed class EventPath : UnmanagedCollectionResource<EventPathSegment>
+public sealed class EventPath : ReadOnlyCollection<EventPathSegment>
 {
-    internal EventPath(nint handle, uint length, IResourceOwner owner)
-        : base(handle, owner)
+    internal EventPath(nint handle, uint length)
+        : base(ReadItems(handle, length))
     {
-        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(Handle, length, size: 16))
+    }
+
+    private static IList<EventPathSegment> ReadItems(nint handle, uint length)
+    {
+        var result = new List<EventPathSegment>();
+
+        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, size: 16))
         {
-            // The segment does not make any further allocations.
-            AddItem(new EventPathSegment(itemHandle));
+            result.Add(new EventPathSegment(itemHandle));
         }
 
         // We have read everything, so we can release the memory immediately.
-        PathChannel.Destroy(Handle, length);
-    }
+        PathChannel.Destroy(handle, length);
 
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // We have read everything in the constructor, therefore there is no unmanaged memory to be released.
+        return result;
     }
 }

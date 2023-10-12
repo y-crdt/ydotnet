@@ -1,10 +1,23 @@
 using System.Runtime.InteropServices;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 
 namespace YDotNet.Native.Types.Maps;
 
-[StructLayout(LayoutKind.Sequential, Size = OutputNative.Size + 8)]
+[StructLayout(LayoutKind.Sequential, Size = Size)]
 internal readonly struct MapEntryNative
 {
-    public nint Field { get; }
+    internal const int Size = 8 + OutputNative.Size;
+
+    public nint KeyHandle { get; }
+
+    public nint ValueHandle(nint baseHandle)
+    {
+        return baseHandle + MemoryConstants.PointerSize;
+    }
+
+    public string Key()
+    {
+        return MemoryReader.ReadUtf8String(KeyHandle);
+    }
 }

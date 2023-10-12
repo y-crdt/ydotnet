@@ -1,9 +1,6 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Types.Maps;
-using YDotNet.Infrastructure;
-using YDotNet.Native.Cells.Outputs;
-using YDotNet.Native.Types.Maps;
+using YDotNet.Native;
+using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts;
 
@@ -12,36 +9,25 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class TextChunk
 {
-    internal TextChunk(nint handle, Doc doc, IResourceOwner owner)
+    internal TextChunk(NativeWithHandle<TextChunkNative> native, Doc doc)
     {
-        Data = new Output(handle, doc, owner);
+        Data = new Output(native.Handle, doc);
 
-        var offset = Marshal.SizeOf<OutputNative>();
-
-        var attributesLength = (uint)Marshal.ReadInt32(handle + offset);
-        var attributesHandle = Marshal.ReadIntPtr(handle + offset + MemoryConstants.PointerSize);
-
-        if (attributesHandle == nint.Zero)
-        {
-            Attributes = new List<MapEntry>();
-            return;
-        }
-
-        Attributes = MemoryReader.ReadIntPtrArray(
-                attributesHandle,
-                attributesLength,
-                Marshal.SizeOf<MapEntryNative>())
-            .Select(x => new MapEntry(x, doc, owner)).ToList();
+        Attributes = native.Value.Attributes().ToDictionary(
+            x => x.Value.Key(),
+            x => new Output(x.Value.ValueHandle(x.Handle), doc));
     }
 
     /// <summary>
     ///     Gets the piece of <see cref="Text" /> formatted using the same attributes.
-    ///     It can be a string, embedded object or another shared type.
     /// </summary>
+    /// <remarks>
+    ///     It can be a string, embedded object or another shared type.
+    /// </remarks>
     public Output Data { get; }
 
     /// <summary>
     ///     Gets the formatting attributes applied to the <see cref="Data" />.
     /// </summary>
-    public IReadOnlyList<MapEntry> Attributes { get; }
+    public IReadOnlyDictionary<string, Output> Attributes { get; }
 }

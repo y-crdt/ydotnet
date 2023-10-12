@@ -21,14 +21,14 @@ public class MapEvent : UnmanagedResource
         {
             var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length, this);
+            return new EventPath(pathHandle, length);
         });
 
         keys = new Lazy<EventKeys>(() =>
         {
             var keysHandle = MapChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc, this);
+            return new EventKeys(keysHandle, length, doc);
         });
 
         target = new Lazy<Map>(() =>

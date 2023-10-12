@@ -1,4 +1,5 @@
 using YDotNet.Document.Cells;
+using YDotNet.Native.Types.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -7,22 +8,26 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventDelta
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventDelta" /> class.
-    /// </summary>
-    /// <param name="tag">The type of change represented by this instance.</param>
-    /// <param name="length">The amount of changes represented by this instance.</param>
-    /// <param name="insert">
-    ///     The value that was added, this property is if <see cref="Tag" /> is
-    ///     <see cref="EventDeltaTag.Add" />.
-    /// </param>
-    /// <param name="attributes">The attributes that are part of the changed content.</param>
-    public EventDelta(EventDeltaTag tag, uint length, Output? insert, List<EventDeltaAttribute> attributes)
+    internal EventDelta(EventDeltaNative native, Doc doc)
     {
-        Tag = tag;
-        Length = length;
-        Insert = insert;
-        Attributes = attributes;
+        Length = native.Length;
+
+        Tag = native.TagNative switch
+        {
+            EventDeltaTagNative.Add => EventDeltaTag.Add,
+            EventDeltaTagNative.Remove => EventDeltaTag.Remove,
+            EventDeltaTagNative.Retain => EventDeltaTag.Retain,
+            _ => throw new NotSupportedException($"The value \"{native.TagNative}\" for {nameof(EventDeltaTagNative)} is not supported."),
+        };
+
+        Attributes = native.Attributes.ToDictionary(
+            x => x.Value.Key(),
+            x => new Output(x.Value.ValueHandle(x.Handle), doc));
+
+        if (native.InsertHandle != nint.Zero)
+        {
+            Insert = new Output(native.InsertHandle, doc);
+        }
     }
 
     /// <summary>
@@ -43,5 +48,5 @@ public class EventDelta
     /// <summary>
     ///     Gets the attributes that are part of the changed content.
     /// </summary>
-    public IReadOnlyList<EventDeltaAttribute> Attributes { get; }
+    public IReadOnlyDictionary<string, Output> Attributes { get; }
 }

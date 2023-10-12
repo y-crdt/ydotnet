@@ -1,5 +1,3 @@
-using YDotNet.Document.Types.XmlElements;
-using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Inputs;
 

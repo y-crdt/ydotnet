@@ -22,7 +22,7 @@ public class TextEvent : UnmanagedResource
 
             var pathHandle = TextChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length, this);
+            return new EventPath(pathHandle, length);
         });
 
         deltas = new Lazy<EventDeltas>(() =>
@@ -31,7 +31,7 @@ public class TextEvent : UnmanagedResource
 
             var deltaHandle = TextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, doc, this);
+            return new EventDeltas(deltaHandle, length, doc);
         });
 
         target = new Lazy<Text>(() =>

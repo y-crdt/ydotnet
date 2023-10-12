@@ -3,20 +3,12 @@ namespace YDotNet.Infrastructure;
 /// <summary>
 /// Base class for all resoruces.
 /// </summary>
-public abstract class Resource : IResourceOwner, IDisposable
+public abstract class Resource : IDisposable
 {
-    internal Resource(IResourceOwner? owner = null)
-    {
-        Owner = owner;
-    }
-
-    /// <inheritdoc/>
-    public bool IsDisposed { get; private set; }
-
     /// <summary>
-    /// Gets the owner of this resource.
+    /// Gets a value indicating whether this instance is disposed.
     /// </summary>
-    public IResourceOwner? Owner { get; }
+    public bool IsDisposed { get; private set; }
 
     /// <inheritdoc/>
     public void Dispose()
@@ -31,7 +23,7 @@ public abstract class Resource : IResourceOwner, IDisposable
     /// <exception cref="ObjectDisposedException">Object or the owner has been disposed.</exception>
     protected void ThrowIfDisposed()
     {
-        if (IsDisposed || Owner?.IsDisposed == true)
+        if (IsDisposed)
         {
             throw new ObjectDisposedException(GetType().Name);
         }

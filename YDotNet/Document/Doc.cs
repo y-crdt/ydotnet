@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;

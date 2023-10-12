@@ -21,21 +21,21 @@ public class XmlElementEvent : UnmanagedResource
         {
             var pathHandle = XmlElementChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length, this);
+            return new EventPath(pathHandle, length);
         });
 
         delta = new Lazy<EventChanges>(() =>
         {
             var deltaHandle = XmlElementChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, doc, this);
+            return new EventChanges(deltaHandle, length, doc);
         });
 
         keys = new Lazy<EventKeys>(() =>
         {
             var keysHandle = XmlElementChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc, this);
+            return new EventKeys(keysHandle, length, doc);
         });
 
         target = new Lazy<XmlElement>(() =>

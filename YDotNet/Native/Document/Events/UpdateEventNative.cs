@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using YDotNet.Document.Events;
 using YDotNet.Infrastructure;

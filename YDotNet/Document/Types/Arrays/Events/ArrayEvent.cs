@@ -22,7 +22,7 @@ public class ArrayEvent : UnmanagedResource
 
             var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length, this);
+            return new EventPath(pathHandle, length);
         });
 
         delta = new Lazy<EventChanges>(() =>
@@ -31,7 +31,7 @@ public class ArrayEvent : UnmanagedResource
 
             var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, doc, this);
+            return new EventChanges(deltaHandle, length, doc);
         });
 
         target = new Lazy<Array>(() =>

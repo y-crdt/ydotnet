@@ -20,14 +20,14 @@ public class XmlTextEvent : UnmanagedResource
         {
             var deltaHandle = XmlTextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, doc, this);
+            return new EventDeltas(deltaHandle, length, doc);
         });
 
         keys = new Lazy<EventKeys>(() =>
         {
             var keysHandle = XmlTextChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc, this);
+            return new EventKeys(keysHandle, length, doc);
         });
 
         target = new Lazy<XmlText>(() =>

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Events;
@@ -8,33 +8,25 @@ namespace YDotNet.Document.Types.Events;
 /// <summary>
 ///     Represents a collection of <see cref="EventDelta" /> instances.
 /// </summary>
-public class EventDeltas : UnmanagedCollectionResource<EventDelta>
+public class EventDeltas : ReadOnlyCollection<EventDelta>
 {
-    private readonly uint length;
-
-    internal EventDeltas(nint handle, uint length, Doc doc, IResourceOwner owner)
-        : base(handle, owner)
+    internal EventDeltas(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
-        this.length = length;
+    }
 
-        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventDeltaNative>()))
+    private static IList<EventDelta> ReadItems(nint handle, uint length, Doc doc)
+    {
+        var result = new List<EventDelta>((int)length);
+
+        foreach (var native in MemoryReader.ReadIntPtrArray<EventDeltaNative>(handle, length))
         {
-            // The event delta creates output that are owned by this block of allocated memory.
-            AddItem(Marshal.PtrToStructure<EventDeltaNative>(itemHandle).ToEventDelta(doc, this));
+            result.Add(new EventDelta(native.Value, doc));
         }
-    }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="EventDeltas"/> class.
-    /// </summary>
-    ~EventDeltas()
-    {
-        Dispose(false);
-    }
+        // We are done reading and can release the memory.
+        EventChannel.DeltaDestroy(handle, length);
 
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        EventChannel.DeltaDestroy(Handle, length);
+        return result;
     }
 }

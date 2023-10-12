@@ -17,7 +17,7 @@ internal readonly struct EventKeyChangeNative
 
     public nint NewValue { get; }
 
-    public EventKeyChange ToEventKeyChange(Doc doc, IResourceOwner owner)
+    public EventKeyChange ToEventKeyChange(Doc doc)
     {
         var tag = TagNative switch
         {
@@ -31,12 +31,12 @@ internal readonly struct EventKeyChangeNative
 
         var oldOutput =
             OldValue != nint.Zero ?
-            new Output(OldValue, doc, owner) :
+            new Output(OldValue, doc) :
             null;
 
         var newOutput =
             NewValue != nint.Zero ?
-            new Output(NewValue, doc, owner) :
+            new Output(NewValue, doc) :
             null;
 
         return new EventKeyChange(key, tag, oldOutput, newOutput);

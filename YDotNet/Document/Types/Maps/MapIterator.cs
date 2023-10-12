@@ -1,4 +1,5 @@
 using System.Collections;
+using YDotNet.Document.Cells;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
@@ -17,7 +18,7 @@ namespace YDotNet.Document.Types.Maps;
 ///         </li>
 ///     </ul>
 /// </remarks>
-public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
+public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, Output>>
 {
     internal MapIterator(nint handle, Doc doc)
         : base(handle)
@@ -42,7 +43,7 @@ public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
     internal Doc Doc { get; }
 
     /// <inheritdoc />
-    public IEnumerator<MapEntry> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, Output>> GetEnumerator()
     {
         ThrowIfDisposed();
         return new MapEnumerator(this);

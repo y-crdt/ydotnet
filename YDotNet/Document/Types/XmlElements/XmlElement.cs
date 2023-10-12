@@ -6,6 +6,7 @@ using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -177,7 +178,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc) : null;
     }
 
     /// <summary>
@@ -194,7 +195,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -211,7 +212,16 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        if (handle == nint.Zero)
+        {
+            return null;
+        }
+
+        // The output reads everything so we can just destroy it.
+        var result = new Output(handle, Doc);
+        OutputChannel.Destroy(handle);
+
+        return result;
     }
 
     /// <summary>
@@ -227,7 +237,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Events;
@@ -8,33 +8,25 @@ namespace YDotNet.Document.Types.Events;
 /// <summary>
 ///     Represents a collection of <see cref="EventChange" /> instances.
 /// </summary>
-public class EventChanges : UnmanagedCollectionResource<EventChange>
+public class EventChanges : ReadOnlyCollection<EventChange>
 {
-    private readonly uint length;
-
-    internal EventChanges(nint handle, uint length, Doc doc, IResourceOwner owner)
-        : base(handle, owner)
+    internal EventChanges(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
-        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventChangeNative>()))
+    }
+
+    private static IList<EventChange> ReadItems(nint handle, uint length, Doc doc)
+    {
+        var result = new List<EventChange>();
+
+        foreach (var native in MemoryReader.ReadIntPtrArray<EventChangeNative>(handle, length))
         {
-            // The event delta creates output that are owned by this block of allocated memory.
-            AddItem(Marshal.PtrToStructure<EventChangeNative>(itemHandle).ToEventChange(this, doc));
+            result.Add(new EventChange(native.Value, doc));
         }
 
-        this.length = length;
-    }
+        // We are done reading and can release the resource.
+        EventChannel.DeltaDestroy(handle, length);
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="EventChanges"/> class.
-    /// </summary>
-    ~EventChanges()
-    {
-        Dispose(true);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        EventChannel.DeltaDestroy(Handle, length);
+        return result;
     }
 }

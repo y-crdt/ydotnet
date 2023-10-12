@@ -1,9 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
-using YDotNet.Document.State;
-using YDotNet.Native.Document.State;
+using YDotNet.Native;
 using YDotNet.Native.Types;
-using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Infrastructure;
 
@@ -43,27 +41,39 @@ internal static class MemoryReader
         return handle == nint.Zero ? null : ReadBytes(handle, length);
     }
 
-    internal static nint[] ReadIntPtrArray(nint handle, uint length, int size)
+    internal static IEnumerable<nint> ReadIntPtrArray(nint handle, uint length, int size)
     {
-        var result = new nint[length];
+        var itemSize = size;
 
-        for (var i = 0; i < result.Length; i++)
+        for (var i = 0; i < length; i++)
         {
-            var output = handle + i * size;
-            result[i] = output;
-        }
+            yield return handle;
 
-        return result;
+            handle += itemSize;
+        }
+    }
+
+    internal static IEnumerable<NativeWithHandle<T>> ReadIntPtrArray<T>(nint handle, uint length) where T : struct
+    {
+        var itemSize = Marshal.SizeOf<T>();
+
+        for (var i = 0; i < length; i++)
+        {
+            yield return new NativeWithHandle<T>(Marshal.PtrToStructure<T>(handle), handle);
+
+            handle += itemSize;
+        }
     }
 
     internal static nint[]? TryReadIntPtrArray(nint handle, uint length, int size)
     {
-        return handle == nint.Zero ? null : ReadIntPtrArray(handle, length, size);
+        return handle == nint.Zero ? null : ReadIntPtrArray(handle, length, size).ToArray();
     }
 
-    internal static (MapEntryNative MapEntryNative, nint OutputHandle) ReadMapEntryAndOutputHandle(nint handle)
+    internal static T PtrToStruct<T>(nint handle)
+        where T : struct
     {
-        return (Marshal.PtrToStructure<MapEntryNative>(handle), handle + MemoryConstants.PointerSize);
+        return Marshal.PtrToStructure<T>(handle.Checked());
     }
 
     internal static string ReadUtf8String(nint handle)
