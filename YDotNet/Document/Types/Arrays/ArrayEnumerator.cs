@@ -36,7 +36,7 @@ internal class ArrayEnumerator : IEnumerator<Output>
         var handle = ArrayChannel.IteratorNext(Iterator.Handle);
 
         // The output has now owner and can just be disposed when not needed anymore.
-        current = handle != nint.Zero ? new Output(handle, null) : null;
+        current = handle != nint.Zero ? new Output(handle, Iterator.Doc, null) : null;
 
         return current != null;
     }

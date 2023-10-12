@@ -12,9 +12,9 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class TextChunk
 {
-    internal TextChunk(nint handle, IResourceOwner owner)
+    internal TextChunk(nint handle, Doc doc, IResourceOwner owner)
     {
-        Data = new Output(handle, owner);
+        Data = new Output(handle, doc, owner);
 
         var offset = Marshal.SizeOf<OutputNative>();
 
@@ -31,7 +31,7 @@ public class TextChunk
                 attributesHandle,
                 attributesLength,
                 Marshal.SizeOf<MapEntryNative>())
-            .Select(x => new MapEntry(x, owner)).ToList();
+            .Select(x => new MapEntry(x, doc, owner)).ToList();
     }
 
     /// <summary>

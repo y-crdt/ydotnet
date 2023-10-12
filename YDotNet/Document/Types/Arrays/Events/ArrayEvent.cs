@@ -13,11 +13,13 @@ public class ArrayEvent : UnmanagedResource
     private readonly Lazy<EventChanges> delta;
     private readonly Lazy<Array> target;
 
-    internal ArrayEvent(nint handle)
+    internal ArrayEvent(nint handle, Doc doc)
         : base(handle)
     {
         path = new Lazy<EventPath>(() =>
         {
+            ThrowIfDisposed();
+
             var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
 
             return new EventPath(pathHandle, length, this);
@@ -25,16 +27,20 @@ public class ArrayEvent : UnmanagedResource
 
         delta = new Lazy<EventChanges>(() =>
         {
+            ThrowIfDisposed();
+
             var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, this);
+            return new EventChanges(deltaHandle, length, doc, this);
         });
 
         target = new Lazy<Array>(() =>
         {
+            ThrowIfDisposed();
+
             var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
 
-            return new Array(targetHandle);
+            return new Array(targetHandle, doc);
         });
     }
 

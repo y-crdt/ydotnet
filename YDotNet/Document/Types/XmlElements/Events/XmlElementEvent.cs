@@ -14,11 +14,7 @@ public class XmlElementEvent : UnmanagedResource
     private readonly Lazy<EventKeys> keys;
     private readonly Lazy<XmlElement> target;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlElementEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal XmlElementEvent(nint handle)
+    internal XmlElementEvent(nint handle, Doc doc)
         : base(handle)
     {
         path = new Lazy<EventPath>(() =>
@@ -32,21 +28,21 @@ public class XmlElementEvent : UnmanagedResource
         {
             var deltaHandle = XmlElementChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, this);
+            return new EventChanges(deltaHandle, length, doc, this);
         });
 
         keys = new Lazy<EventKeys>(() =>
         {
             var keysHandle = XmlElementChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, this);
+            return new EventKeys(keysHandle, length, doc, this);
         });
 
         target = new Lazy<XmlElement>(() =>
         {
             var targetHandle = XmlElementChannel.ObserveEventTarget(handle).Checked();
 
-            return new XmlElement(targetHandle);
+            return doc.GetXmlElement(targetHandle);
         });
     }
 

@@ -10,13 +10,13 @@ public class TextChunks : UnmanagedCollectionResource<TextChunk>
 {
     private readonly uint length;
 
-    internal TextChunks(nint handle, uint length)
+    internal TextChunks(nint handle, uint length, Doc doc)
         : base(handle, null)
     {
         foreach (var chunkHandle in MemoryReader.ReadIntPtrArray(handle, length, size: 32))
         {
             // The cunks create output that are owned by this block of allocated memory.
-            AddItem(new TextChunk(chunkHandle, this));
+            AddItem(new TextChunk(chunkHandle, doc, this));
         }
 
         GC.Collect();

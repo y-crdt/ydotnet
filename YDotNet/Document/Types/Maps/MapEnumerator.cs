@@ -34,7 +34,7 @@ internal class MapEnumerator : IEnumerator<MapEntry>
         var handle = MapChannel.IteratorNext(Iterator.Handle);
 
         // The map entry also manages the value of the output.
-        current = handle != nint.Zero ? new MapEntry(handle, Iterator) : null;
+        current = handle != nint.Zero ? new MapEntry(handle, Iterator.Doc, Iterator) : null;
 
         return current != null;
     }

@@ -19,9 +19,10 @@ namespace YDotNet.Document.Types.Maps;
 /// </remarks>
 public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
 {
-    internal MapIterator(nint handle)
+    internal MapIterator(nint handle, Doc doc)
         : base(handle)
     {
+        Doc = doc;
     }
 
     /// <summary>
@@ -37,6 +38,8 @@ public class MapIterator : UnmanagedResource, IEnumerable<MapEntry>
     {
         MapChannel.IteratorDestroy(Handle);
     }
+
+    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<MapEntry> GetEnumerator()

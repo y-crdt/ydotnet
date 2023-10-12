@@ -15,8 +15,8 @@ public class Map : Branch
 {
     private readonly EventSubscriptions subscriptions = new();
 
-    internal Map(nint handle)
-        : base(handle)
+    internal Map(nint handle, Doc doc)
+        : base(handle, doc)
     {
     }
 
@@ -56,7 +56,7 @@ public class Map : Branch
             return null;
         }
 
-        return new Output(outputHandle, null);
+        return new Output(outputHandle, Doc, null);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public class Map : Branch
     {
         var handle = MapChannel.Iterator(Handle, transaction.Handle).Checked();
 
-        return new MapIterator(handle);
+        return new MapIterator(handle, Doc);
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public class Map : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<MapEvent> action)
     {
-        MapChannel.ObserveCallback callback = (_, eventHandle) => action(new MapEvent(eventHandle));
+        MapChannel.ObserveCallback callback = (_, eventHandle) => action(new MapEvent(eventHandle, Doc));
 
         var subscriptionId = MapChannel.Observe(
             Handle,

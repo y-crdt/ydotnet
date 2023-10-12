@@ -11,12 +11,12 @@ namespace YDotNet.Document.Cells;
 /// </summary>
 public sealed class JsonObject : ReadOnlyDictionary<string, Output>
 {
-    internal JsonObject(nint handle, uint length, IResourceOwner owner)
-        : base(ReadItems(handle, length, owner))
+    internal JsonObject(nint handle, uint length, Doc doc, IResourceOwner owner)
+        : base(ReadItems(handle, length, doc, owner))
     {
     }
 
-    private static Dictionary<string, Output> ReadItems(nint handle, uint length, IResourceOwner owner)
+    private static Dictionary<string, Output> ReadItems(nint handle, uint length, Doc doc, IResourceOwner owner)
     {
         var entriesHandle = OutputChannel.Object(handle).Checked();
         var entriesNatives = MemoryReader.ReadIntPtrArray(entriesHandle, length, Marshal.SizeOf<MapEntryNative>());
@@ -28,7 +28,7 @@ public sealed class JsonObject : ReadOnlyDictionary<string, Output>
             var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(itemHandle);
             var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
 
-            result[mapEntryKey] = new Output(outputHandle, owner);
+            result[mapEntryKey] = new Output(outputHandle, doc, owner);
         }
 
         return result;

@@ -12,7 +12,7 @@ public class EventDeltas : UnmanagedCollectionResource<EventDelta>
 {
     private readonly uint length;
 
-    internal EventDeltas(nint handle, uint length, IResourceOwner owner)
+    internal EventDeltas(nint handle, uint length, Doc doc, IResourceOwner owner)
         : base(handle, owner)
     {
         this.length = length;
@@ -20,7 +20,7 @@ public class EventDeltas : UnmanagedCollectionResource<EventDelta>
         foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventDeltaNative>()))
         {
             // The event delta creates output that are owned by this block of allocated memory.
-            AddItem(Marshal.PtrToStructure<EventDeltaNative>(itemHandle).ToEventDelta(this));
+            AddItem(Marshal.PtrToStructure<EventDeltaNative>(itemHandle).ToEventDelta(doc, this));
         }
     }
 

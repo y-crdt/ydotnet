@@ -11,7 +11,7 @@ public sealed class EventDeltaAttribute
 {
     private readonly Lazy<Output> value;
 
-    internal EventDeltaAttribute(nint handle, IResourceOwner owner)
+    internal EventDeltaAttribute(nint handle, Doc doc, IResourceOwner owner)
     {
         Handle = handle;
 
@@ -20,7 +20,7 @@ public sealed class EventDeltaAttribute
 
         value = new Lazy<Output>(() =>
         {
-            return new Output(handle + MemoryConstants.PointerSize, owner);
+            return new Output(handle + MemoryConstants.PointerSize, doc, owner);
         });
     }
 

@@ -14,7 +14,7 @@ public class MapEvent : UnmanagedResource
     private readonly Lazy<EventKeys> keys;
     private readonly Lazy<Map> target;
 
-    internal MapEvent(nint handle)
+    internal MapEvent(nint handle, Doc doc)
         : base(handle)
     {
         path = new Lazy<EventPath>(() =>
@@ -28,14 +28,14 @@ public class MapEvent : UnmanagedResource
         {
             var keysHandle = MapChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, this);
+            return new EventKeys(keysHandle, length, doc, this);
         });
 
         target = new Lazy<Map>(() =>
         {
             var targetHandle = MapChannel.ObserveEventTarget(handle).Checked();
 
-            return new Map(targetHandle);
+            return doc.GetMap(targetHandle);
         });
     }
 

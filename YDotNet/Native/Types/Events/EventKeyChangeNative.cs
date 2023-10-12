@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
@@ -16,7 +17,7 @@ internal readonly struct EventKeyChangeNative
 
     public nint NewValue { get; }
 
-    public EventKeyChange ToEventKeyChange(IResourceOwner owner)
+    public EventKeyChange ToEventKeyChange(Doc doc, IResourceOwner owner)
     {
         var tag = TagNative switch
         {
@@ -30,12 +31,12 @@ internal readonly struct EventKeyChangeNative
 
         var oldOutput =
             OldValue != nint.Zero ?
-            new Output(OldValue, owner) :
+            new Output(OldValue, doc, owner) :
             null;
 
         var newOutput =
             NewValue != nint.Zero ?
-            new Output(NewValue, owner) :
+            new Output(NewValue, doc, owner) :
             null;
 
         return new EventKeyChange(key, tag, oldOutput, newOutput);

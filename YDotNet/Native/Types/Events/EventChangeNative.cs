@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
@@ -15,7 +16,7 @@ internal readonly struct EventChangeNative
 
     public nint Values { get; }
 
-    public EventChange ToEventChange(IResourceOwner owner)
+    public EventChange ToEventChange(IResourceOwner owner, Doc doc)
     {
         var tag = TagNative switch
         {
@@ -27,7 +28,7 @@ internal readonly struct EventChangeNative
 
         var values =
             MemoryReader.TryReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>())?
-                .Select(x => new Output(x, owner)).ToList() ?? new List<Output>();
+                .Select(x => new Output(x, doc, owner)).ToList() ?? new List<Output>();
 
         return new EventChange(tag, Length, values);
     }

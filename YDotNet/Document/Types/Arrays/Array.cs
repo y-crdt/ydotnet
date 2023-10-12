@@ -17,8 +17,8 @@ public class Array : Branch
 {
     private readonly EventSubscriptions subscriptions = new();
 
-    internal Array(nint handle)
-        : base(handle)
+    internal Array(nint handle, Doc doc)
+        : base(handle, doc)
     {
     }
 
@@ -65,7 +65,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class Array : Branch
     {
         var handle = ArrayChannel.Iterator(Handle, transaction.Handle);
 
-        return new ArrayIterator(handle.Checked());
+        return new ArrayIterator(handle.Checked(), Doc);
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<ArrayEvent> action)
     {
-        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle));
+        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle, Doc));
 
         var subscriptionId = ArrayChannel.Observe(
             Handle,

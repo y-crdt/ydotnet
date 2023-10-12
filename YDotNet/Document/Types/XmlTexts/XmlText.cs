@@ -18,8 +18,8 @@ public class XmlText : Branch
 {
     private readonly EventSubscriptions subscriptions = new();
 
-    internal XmlText(nint handle)
-        : base(handle)
+    internal XmlText(nint handle, Doc doc)
+        : base(handle, doc)
     {
     }
 
@@ -184,7 +184,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public class XmlText : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public class XmlText : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlTextEvent> action)
     {
-        XmlTextChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlTextEvent(eventHandle));
+        XmlTextChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlTextEvent(eventHandle, Doc));
 
         var subscriptionId = XmlTextChannel.Observe(
             Handle,

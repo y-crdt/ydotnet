@@ -17,8 +17,8 @@ public class Text : Branch
 {
     private readonly EventSubscriptions subscriptions = new();
 
-    internal Text(nint handle)
-        : base(handle)
+    internal Text(nint handle, Doc doc)
+        : base(handle, doc)
     {
     }
 
@@ -101,7 +101,7 @@ public class Text : Branch
     {
         var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length).Checked();
 
-        return new TextChunks(handle, length);
+        return new TextChunks(handle, length, Doc);
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public class Text : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<TextEvent> action)
     {
-        TextChannel.ObserveCallback callback = (_, eventHandle) => action(new TextEvent(eventHandle));
+        TextChannel.ObserveCallback callback = (_, eventHandle) => action(new TextEvent(eventHandle, Doc));
 
         var subscriptionId = TextChannel.Observe(
             Handle,

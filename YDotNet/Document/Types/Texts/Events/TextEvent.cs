@@ -13,15 +13,13 @@ public class TextEvent : UnmanagedResource
     private readonly Lazy<EventDeltas> deltas;
     private readonly Lazy<Text> target;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TextEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal TextEvent(nint handle)
+    internal TextEvent(nint handle, Doc doc)
         : base(handle)
     {
         path = new Lazy<EventPath>(() =>
         {
+            ThrowIfDisposed();
+
             var pathHandle = TextChannel.ObserveEventPath(handle, out var length).Checked();
 
             return new EventPath(pathHandle, length, this);
@@ -29,16 +27,20 @@ public class TextEvent : UnmanagedResource
 
         deltas = new Lazy<EventDeltas>(() =>
         {
+            ThrowIfDisposed();
+
             var deltaHandle = TextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, this);
+            return new EventDeltas(deltaHandle, length, doc, this);
         });
 
         target = new Lazy<Text>(() =>
         {
+            ThrowIfDisposed();
+
             var targetHandle = TextChannel.ObserveEventTarget(handle).Checked();
 
-            return new Text(targetHandle);
+            return doc.GetText(targetHandle);
         });
     }
 

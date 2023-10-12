@@ -15,9 +15,10 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </remarks>
 public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
 {
-    internal XmlTreeWalker(nint handle)
+    internal XmlTreeWalker(nint handle, Doc doc)
         : base(handle)
     {
+        Doc = doc;
     }
 
     /// <summary>
@@ -33,6 +34,8 @@ public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
     {
         XmlElementChannel.TreeWalkerDestroy(Handle);
     }
+
+    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()

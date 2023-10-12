@@ -20,15 +20,15 @@ internal readonly struct SubDocsEventNative
 
     public nint Loaded { get; }
 
-    public SubDocsEvent ToSubDocsEvent()
+    public SubDocsEvent ToSubDocsEvent(Doc doc)
     {
         var nativeAdded = MemoryReader.ReadStructArray<nint>(Added, AddedLength);
         var nativeRemoved = MemoryReader.ReadStructArray<nint>(Removed, RemovedLength);
         var nativeLoaded = MemoryReader.ReadStructArray<nint>(Loaded, LoadedLength);
 
-        var docsAdded = nativeAdded.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
-        var docsRemoved = nativeRemoved.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
-        var docsLoaded = nativeLoaded.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
+        var docsAdded = nativeAdded.Select(doc.GetDoc).ToArray();
+        var docsRemoved = nativeRemoved.Select(doc.GetDoc).ToArray();
+        var docsLoaded = nativeLoaded.Select(doc.GetDoc).ToArray();
 
         return new SubDocsEvent(docsAdded, docsRemoved, docsLoaded);
     }

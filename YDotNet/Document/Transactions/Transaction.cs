@@ -22,9 +22,12 @@ namespace YDotNet.Document.Transactions;
 /// </remarks>
 public class Transaction : UnmanagedResource
 {
-    internal Transaction(nint handle)
+    private readonly Doc doc;
+
+    internal Transaction(nint handle, Doc doc)
         : base(handle)
     {
+        this.doc = doc;
     }
 
     /// <inheritdoc/>
@@ -63,7 +66,7 @@ public class Transaction : UnmanagedResource
         var handle = TransactionChannel.SubDocs(Handle, out var length);
         var handles = MemoryReader.ReadStructArray<nint>(handle, length);
 
-        return handles.Select(x => new Doc(handle, false)).ToArray();
+        return handles.Select(h => doc.GetDoc(h)).ToArray();
     }
 
     /// <summary>
@@ -279,7 +282,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Array);
 
-        return handle != nint.Zero ? new Array(handle) : null;
+        return handle != nint.Zero ? doc.GetArray(handle) : null;
     }
 
     /// <summary>
@@ -295,7 +298,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Map);
 
-        return handle != nint.Zero ? new Map(handle) : null;
+        return handle != nint.Zero ? doc.GetMap(handle) : null;
     }
 
     /// <summary>
@@ -311,7 +314,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Text);
 
-        return handle != nint.Zero ? new Text(handle) : null;
+        return handle != nint.Zero ? doc.GetText(handle) : null;
     }
 
     /// <summary>
@@ -327,7 +330,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.XmlElement);
 
-        return handle != nint.Zero ? new XmlElement(handle) : null;
+        return handle != nint.Zero ? doc.GetXmlElement(handle) : null;
     }
 
     /// <summary>
@@ -343,7 +346,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.XmlText);
 
-        return handle != nint.Zero ? new XmlText(handle) : null;
+        return handle != nint.Zero ? doc.GetXmlText(handle) : null;
     }
 
     private nint GetWithKind(string name, BranchKind expectedKind)

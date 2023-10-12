@@ -9,14 +9,14 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 public sealed class MapEntry : UnmanagedResource
 {
-    internal MapEntry(nint handle, IResourceOwner? owner)
+    internal MapEntry(nint handle, Doc doc, IResourceOwner? owner)
         : base(handle)
     {
         var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
         Key = MemoryReader.ReadUtf8String(mapEntry.Field);
 
         // The output can not released independently and will be released when the entry is not needed anymore.
-        Value = new Output(outputHandle, owner ?? this);
+        Value = new Output(outputHandle, doc, owner ?? this);
     }
 
     /// <summary>

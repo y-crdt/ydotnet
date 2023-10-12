@@ -13,13 +13,13 @@ public class EventKeys : UnmanagedCollectionResource<EventKeyChange>
 {
     private readonly uint length;
 
-    internal EventKeys(nint handle, uint length, IResourceOwner owner)
+    internal EventKeys(nint handle, uint length, Doc doc, IResourceOwner owner)
         : base(handle, owner)
     {
         foreach (var keyHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventKeyChangeNative>()))
         {
             // The event delta creates output that are owned by this block of allocated memory.
-            AddItem(Marshal.PtrToStructure<EventKeyChangeNative>(keyHandle).ToEventKeyChange(this));
+            AddItem(Marshal.PtrToStructure<EventKeyChangeNative>(keyHandle).ToEventKeyChange(doc, owner));
         }
 
         this.length = length;

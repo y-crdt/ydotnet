@@ -9,18 +9,19 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-public abstract class Branch
+public abstract class Branch : TypeBase
 {
     private readonly EventSubscriptions subscriptions = new();
+    private readonly Doc doc;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Branch" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    protected Branch(nint handle)
+    internal Branch(nint handle, Doc doc)
     {
+        Doc = doc;
+
         Handle = handle;
     }
+
+    internal Doc Doc { get; }
 
     internal nint Handle { get; }
 
@@ -37,7 +38,7 @@ public abstract class Branch
     {
         BranchChannel.ObserveCallback callback = (_, length, eventsHandle) =>
         {
-            var events = MemoryReader.ReadIntPtrArray(eventsHandle, length, size: 24).Select(x => new EventBranch(x)).ToArray();
+            var events = MemoryReader.ReadIntPtrArray(eventsHandle, length, size: 24).Select(x => new EventBranch(x, doc)).ToArray();
 
             action(events);
         };
@@ -68,7 +69,7 @@ public abstract class Branch
             return default!;
         }
 
-        return new Transaction(handle);
+        return new Transaction(handle, doc);
     }
 
     /// <summary>
@@ -86,6 +87,6 @@ public abstract class Branch
             return default!;
         }
 
-        return new Transaction(handle);
+        return new Transaction(handle, doc);
     }
 }

@@ -30,8 +30,9 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : UnmanagedResource
+public class Doc : UnmanagedResource, ITypeBase
 {
+    private readonly TypeCache typeCache = new TypeCache();
     private readonly EventSubscriptions subscriptions = new();
     private readonly bool isCloned;
 
@@ -56,7 +57,7 @@ public class Doc : UnmanagedResource
     {
     }
 
-    internal Doc(nint handle, bool isCloned)
+    internal Doc(nint handle, bool isCloned, Doc? parent)
         : base(handle)
     {
         this.isCloned = isCloned;
@@ -136,7 +137,7 @@ public class Doc : UnmanagedResource
     {
         var handle = DocChannel.Clone(Handle).Checked();
 
-        return new Doc(handle, true);
+        return new Doc(handle, true, null);
     }
 
     /// <summary>
@@ -154,7 +155,7 @@ public class Doc : UnmanagedResource
 
         var handle = DocChannel.Text(Handle, unsafeName.Handle);
 
-        return new Text(handle.Checked());
+        return GetText(handle);
     }
 
     /// <summary>
@@ -172,7 +173,7 @@ public class Doc : UnmanagedResource
 
         var handle = DocChannel.Map(Handle, unsafeName.Handle);
 
-        return new Map(handle.Checked());
+        return GetMap(handle);
     }
 
     /// <summary>
@@ -190,7 +191,7 @@ public class Doc : UnmanagedResource
 
         var handle = DocChannel.Array(Handle, unsafeName.Handle);
 
-        return new Array(handle.Checked());
+        return GetArray(handle);
     }
 
     /// <summary>
@@ -208,7 +209,7 @@ public class Doc : UnmanagedResource
 
         var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
 
-        return new XmlElement(handle.Checked());
+        return GetXmlElement(handle);
     }
 
     /// <summary>
@@ -226,7 +227,7 @@ public class Doc : UnmanagedResource
 
         var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
 
-        return new XmlText(handle.Checked());
+        return GetXmlText(handle);
     }
 
     /// <summary>
@@ -245,7 +246,7 @@ public class Doc : UnmanagedResource
             return default!;
         }
 
-        return new Transaction(handle);
+        return new Transaction(handle, this);
     }
 
     /// <summary>
@@ -263,7 +264,7 @@ public class Doc : UnmanagedResource
             return default!;
         }
 
-        return new Transaction(handle);
+        return new Transaction(handle, this);
     }
 
     /// <summary>
@@ -295,7 +296,7 @@ public class Doc : UnmanagedResource
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveClear(Action<ClearEvent> action)
     {
-        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(new Doc(doc, false)).ToClearEvent());
+        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(this).ToClearEvent());
 
         var subscriptionId = DocChannel.ObserveClear(
             Handle,
@@ -384,7 +385,7 @@ public class Doc : UnmanagedResource
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent());
+        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent(this));
 
         var subscriptionId = DocChannel.ObserveSubDocs(
             Handle,
@@ -395,5 +396,40 @@ public class Doc : UnmanagedResource
         {
             DocChannel.UnobserveSubDocs(Handle, subscriptionId);
         });
+    }
+
+    internal Doc GetDoc(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new Doc(h, false, this));
+    }
+
+    internal Map GetMap(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new Map(h, this));
+    }
+
+    internal Array GetArray(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new Array(h, this));
+    }
+
+    internal Text GetText(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new Text(h, this));
+    }
+
+    internal XmlText GetXmlText(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new XmlText(h, this));
+    }
+
+    internal XmlElement GetXmlElement(nint handle)
+    {
+        return typeCache.GetOrAdd(handle, h => new XmlElement(h, this));
+    }
+
+    public void MarkDeleted()
+    {
+        throw new NotImplementedException();
     }
 }

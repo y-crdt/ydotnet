@@ -17,8 +17,8 @@ public class XmlElement : Branch
 {
     private readonly EventSubscriptions subscriptions = new();
 
-    internal XmlElement(nint handle)
-        : base(handle)
+    internal XmlElement(nint handle, Doc doc)
+        : base(handle, doc)
     {
     }
 
@@ -135,7 +135,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
 
-        return new XmlText(handle.Checked());
+        return Doc.GetXmlText(handle);
     }
 
     /// <summary>
@@ -150,9 +150,9 @@ public class XmlElement : Branch
     {
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        var elementHandle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
+        var handle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
 
-        return new XmlElement(elementHandle.Checked());
+        return Doc.GetXmlElement(handle);
     }
 
     /// <summary>
@@ -177,7 +177,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ public class XmlElement : Branch
     {
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new Output(handle, null) : null;
+        return handle != nint.Zero ? new Output(handle, Doc, null) : null;
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? new XmlElement(handle) : null;
+        return handle != nint.Zero ? Doc.GetXmlElement(handle) : null;
     }
 
     /// <summary>
@@ -258,7 +258,7 @@ public class XmlElement : Branch
     {
         var handle = XmlElementChannel.TreeWalker(Handle, transaction.Handle);
 
-        return new XmlTreeWalker(handle.Checked());
+        return new XmlTreeWalker(handle.Checked(), Doc);
     }
 
     /// <summary>
@@ -271,7 +271,7 @@ public class XmlElement : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlElementEvent> action)
     {
-        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle));
+        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle, Doc));
 
         var subscriptionId = XmlElementChannel.Observe(
             Handle,

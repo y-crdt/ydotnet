@@ -13,28 +13,28 @@ public class XmlTextEvent : UnmanagedResource
     private readonly Lazy<EventKeys> keys;
     private readonly Lazy<XmlText> target;
 
-    internal XmlTextEvent(nint handle)
+    internal XmlTextEvent(nint handle, Doc doc)
         : base(handle)
     {
         delta = new Lazy<EventDeltas>(() =>
         {
             var deltaHandle = XmlTextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, this);
+            return new EventDeltas(deltaHandle, length, doc, this);
         });
 
         keys = new Lazy<EventKeys>(() =>
         {
             var keysHandle = XmlTextChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, this);
+            return new EventKeys(keysHandle, length, doc, this);
         });
 
         target = new Lazy<XmlText>(() =>
         {
             var targetHandle = XmlTextChannel.ObserveEventTarget(handle).Checked();
 
-            return new XmlText(targetHandle);
+            return doc.GetXmlText(handle);
         });
     }
 

@@ -13,9 +13,10 @@ namespace YDotNet.Document.Types.Arrays;
 /// </remarks>
 public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
 {
-    internal ArrayIterator(nint handle)
+    internal ArrayIterator(nint handle, Doc doc)
         : base(handle)
     {
+        Doc = doc;
     }
 
     /// <summary>
@@ -31,6 +32,8 @@ public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
     {
         ArrayChannel.IteratorDestroy(Handle);
     }
+
+    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()

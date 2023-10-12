@@ -14,11 +14,7 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventBranch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventBranch" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    public EventBranch(nint handle)
+    internal EventBranch(nint handle, Doc doc)
     {
         Handle = handle;
         Tag = (EventBranchTag)Marshal.ReadByte(handle);
@@ -26,19 +22,19 @@ public class EventBranch
         switch (Tag)
         {
             case EventBranchTag.Map:
-                MapEvent = new MapEvent(handle + MemoryConstants.PointerSize);
+                MapEvent = new MapEvent(handle + MemoryConstants.PointerSize, doc);
                 break;
             case EventBranchTag.Text:
-                TextEvent = new TextEvent(handle + MemoryConstants.PointerSize);
+                TextEvent = new TextEvent(handle + MemoryConstants.PointerSize, doc);
                 break;
             case EventBranchTag.Array:
-                ArrayEvent = new ArrayEvent(handle + MemoryConstants.PointerSize);
+                ArrayEvent = new ArrayEvent(handle + MemoryConstants.PointerSize, doc);
                 break;
             case EventBranchTag.XmlElement:
-                XmlElementEvent = new XmlElementEvent(handle + MemoryConstants.PointerSize);
+                XmlElementEvent = new XmlElementEvent(handle + MemoryConstants.PointerSize, doc);
                 break;
             case EventBranchTag.XmlText:
-                XmlTextEvent = new XmlTextEvent(handle + MemoryConstants.PointerSize);
+                XmlTextEvent = new XmlTextEvent(handle + MemoryConstants.PointerSize, doc);
                 break;
             default:
                 throw new NotSupportedException(

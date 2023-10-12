@@ -42,7 +42,7 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     {
         var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
 
-        current = handle != nint.Zero ? new Output(handle, null) : null;
+        current = handle != nint.Zero ? new Output(handle, TreeWalker.Doc, null) : null;
 
         return Current != null;
     }

@@ -18,7 +18,7 @@ public sealed class Output : UnmanagedResource
 {
     private readonly Lazy<object?> value;
 
-    internal Output(nint handle, IResourceOwner? owner)
+    internal Output(nint handle, Doc doc, IResourceOwner? owner)
         : base(handle, owner)
     {
         var native = Marshal.PtrToStructure<OutputNative>(handle.Checked());
@@ -26,7 +26,7 @@ public sealed class Output : UnmanagedResource
         Type = (OutputType)native.Tag;
 
         // We use lazy because some types like Doc and Map need to be disposed and therefore they should not be allocated, if not needed.
-        value = BuildValue(handle, native.Length, Type, this);
+        value = BuildValue(handle, native.Length, doc, Type, this);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public sealed class Output : UnmanagedResource
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
     public XmlText XmlText => GetValue<XmlText>(OutputType.XmlText);
 
-    private static Lazy<object?> BuildValue(nint handle, uint length, OutputType type, IResourceOwner owner)
+    private static Lazy<object?> BuildValue(nint handle, uint length, Doc doc, OutputType type, IResourceOwner owner)
     {
         switch (type)
         {
@@ -176,31 +176,31 @@ public sealed class Output : UnmanagedResource
 
             case OutputType.Collection:
                 {
-                    return new Lazy<object?>(() => new JsonArray(handle, length, owner));
+                    return new Lazy<object?>(() => new JsonArray(handle, length, doc, owner));
                 }
 
             case OutputType.Object:
                 {
-                    return new Lazy<object?>(() => new JsonObject(handle, length, owner));
+                    return new Lazy<object?>(() => new JsonObject(handle, length, doc, owner));
                 }
 
             case OutputType.Array:
-                return new Lazy<object?>(() => new Array(OutputChannel.Array(handle).Checked()));
+                return new Lazy<object?>(() => doc.GetArray(OutputChannel.Array(handle)));
 
             case OutputType.Map:
-                return new Lazy<object?>(() => new Map(OutputChannel.Map(handle).Checked()));
+                return new Lazy<object?>(() => doc.GetMap(OutputChannel.Map(handle)));
 
             case OutputType.Text:
-                return new Lazy<object?>(() => new Text(OutputChannel.Text(handle).Checked()));
+                return new Lazy<object?>(() => doc.GetText(OutputChannel.Text(handle)));
 
             case OutputType.XmlElement:
-                return new Lazy<object?>(() => new XmlElement(OutputChannel.XmlElement(handle).Checked()));
+                return new Lazy<object?>(() => doc.GetXmlElement(OutputChannel.XmlElement(handle)));
 
             case OutputType.XmlText:
-                return new Lazy<object?>(() => new XmlText(OutputChannel.XmlText(handle).Checked()));
+                return new Lazy<object?>(() => doc.GetXmlText(OutputChannel.XmlText(handle)));
 
             case OutputType.Doc:
-                return new Lazy<object?>(() => new Doc(OutputChannel.Doc(handle).Checked(), false));
+                return new Lazy<object?>(() => doc.GetDoc(OutputChannel.Doc(handle)));
 
             default:
                 return new Lazy<object?>((object?)null);
