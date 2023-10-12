@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document.Events;
 using YDotNet.Native.Document.State;
 
 namespace YDotNet.Native.Document.Events;
@@ -12,12 +11,4 @@ internal readonly struct AfterTransactionEventNative
     public StateVectorNative AfterState { get; }
 
     public DeleteSetNative DeleteSet { get; }
-
-    public AfterTransactionEvent ToAfterTransactionEvent()
-    {
-        return new AfterTransactionEvent(
-            BeforeState.ToStateVector(),
-            AfterState.ToStateVector(),
-            DeleteSet.ToDeleteSet());
-    }
 }

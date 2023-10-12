@@ -15,11 +15,21 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 public class Array : Branch
 {
-    private readonly EventSubscriptions subscriptions = new();
+    private readonly EventSubscriber<ArrayEvent> onObserve;
 
     internal Array(nint handle, Doc doc)
         : base(handle, doc)
     {
+        onObserve = new EventSubscriber<ArrayEvent>(
+            handle,
+            (array, action) =>
+            {
+                ArrayChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new ArrayEvent(eventHandle, Doc));
+
+                return (ArrayChannel.Observe(array, nint.Zero, callback), callback);
+            },
+            ArrayChannel.Unobserve);
     }
 
     /// <summary>
@@ -105,17 +115,7 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<ArrayEvent> action)
     {
-        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle, Doc));
-
-        var subscriptionId = ArrayChannel.Observe(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            ArrayChannel.Unobserve(Handle, subscriptionId);
-        });
+        return onObserve.Subscribe(action);
     }
 
     /// <summary>

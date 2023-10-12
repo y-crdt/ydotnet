@@ -1,4 +1,5 @@
 using YDotNet.Document.Cells;
+using YDotNet.Native.Types.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -11,19 +12,27 @@ namespace YDotNet.Document.Types.Events;
 /// </remarks>
 public class EventKeyChange
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventKeyChange" /> class.
-    /// </summary>
-    /// <param name="key">The key of the value that changed in the parent instance.</param>
-    /// <param name="tag">The type of change that was performed in the <see cref="Key" /> entry.</param>
-    /// <param name="oldValue">The old value that was present in the <see cref="Key" /> before the change.</param>
-    /// <param name="newValue">The new value that is present in the <see cref="Key" /> after the change.</param>
-    internal EventKeyChange(string key, EventKeyChangeTag tag, Output? oldValue, Output? newValue)
+    internal EventKeyChange(EventKeyChangeNative native, Doc doc)
     {
-        Key = key;
-        Tag = tag;
-        OldValue = oldValue;
-        NewValue = newValue;
+        Key = native.Key();
+
+        Tag = native.TagNative switch
+        {
+            EventKeyChangeTagNative.Add => EventKeyChangeTag.Add,
+            EventKeyChangeTagNative.Remove => EventKeyChangeTag.Remove,
+            EventKeyChangeTagNative.Update => EventKeyChangeTag.Update,
+            _ => throw new NotSupportedException($"The value \"{native.TagNative}\" for {nameof(EventKeyChangeTagNative)} is not supported."),
+        };
+
+        if (native.OldValue != nint.Zero)
+        {
+            OldValue = new Output(native.OldValue, doc);
+        }
+
+        if (native.NewValue != nint.Zero)
+        {
+            NewValue = new Output(native.NewValue, doc);
+        }
     }
 
     /// <summary>

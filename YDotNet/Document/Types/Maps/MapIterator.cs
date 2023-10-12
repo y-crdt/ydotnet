@@ -6,12 +6,12 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents an enumerable to read <see cref="MapEntry" /> instances from a <see cref="Map" />.
+///     Represents an enumerable to read key value pairs from a <see cref="Map" />.
 /// </summary>
 /// <remarks>
 ///     Two important details about <see cref="MapIterator" />.
 ///     <ul>
-///         <li>The <see cref="MapEntry" /> instances are unordered when iterating;</li>
+///         <li>The entries instances are unordered when iterating;</li>
 ///         <li>
 ///             The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate
 ///             values.

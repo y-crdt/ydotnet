@@ -1,3 +1,5 @@
+using YDotNet.Native.UndoManager;
+
 namespace YDotNet.Document.UndoManagers;
 
 /// <summary>
@@ -12,4 +14,12 @@ public class UndoManagerOptions
     ///     The updates are grouped together in time-constrained snapshots.
     /// </remarks>
     public uint CaptureTimeoutMilliseconds { get; init; }
+
+    internal UndoManagerOptionsNative ToNative()
+    {
+        return new UndoManagerOptionsNative
+        {
+            CaptureTimeoutMilliseconds = CaptureTimeoutMilliseconds
+        };
+    }
 }

@@ -36,7 +36,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Type, Is.EqualTo(OutputType.Bool));
+        Assert.That(output.Tag, Is.EqualTo(OutputTage.Bool));
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Type, Is.EqualTo(OutputType.Undefined));
+        Assert.That(output.Tag, Is.EqualTo(OutputTage.Undefined));
     }
 
     [Test]

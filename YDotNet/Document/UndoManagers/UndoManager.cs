@@ -12,7 +12,8 @@ namespace YDotNet.Document.UndoManagers;
 /// </summary>
 public class UndoManager : UnmanagedResource
 {
-    private readonly EventSubscriptions subscriptions = new();
+    private readonly EventSubscriber<UndoEvent> onAdded;
+    private readonly EventSubscriber<UndoEvent> onPopped;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
@@ -23,20 +24,45 @@ public class UndoManager : UnmanagedResource
     public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
         : base(Create(doc, branch, options))
     {
+        onAdded = new EventSubscriber<UndoEvent>(
+            Handle,
+            (owner, action) =>
+            {
+                UndoManagerChannel.ObserveAddedCallback callback =
+                    (_, undoEvent) => action(new UndoEvent(undoEvent));
+
+                return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
+            },
+            (owner, s) => UndoManagerChannel.UnobserveAdded(owner, s));
+
+        onPopped = new EventSubscriber<UndoEvent>(
+            Handle,
+            (owner, action) =>
+            {
+                UndoManagerChannel.ObservePoppedCallback callback =
+                    (_, undoEvent) => action(new UndoEvent(undoEvent));
+
+                return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
+            },
+            (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
     }
 
     private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
     {
-        var unsafeOptions = MemoryWriter.WriteStruct(UndoManagerOptionsNative.From(options));
+        var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
 
         return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="UndoManager"/> class.
+    /// </summary>
     ~UndoManager()
     {
         Dispose(false);
     }
 
+    /// <inheritdoc/>
     protected internal override void DisposeCore(bool disposing)
     {
         UndoManagerChannel.Destroy(Handle);
@@ -51,17 +77,7 @@ public class UndoManager : UnmanagedResource
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveAdded(Action<UndoEvent> action)
     {
-        UndoManagerChannel.ObserveAddedCallback callback = (_, undoEvent) => action(undoEvent.ToUndoEvent());
-
-        var subscriptionId = UndoManagerChannel.ObserveAdded(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            UndoManagerChannel.UnobserveAdded(Handle, subscriptionId);
-        });
+        return onAdded.Subscribe(action);
     }
 
     /// <summary>
@@ -72,17 +88,7 @@ public class UndoManager : UnmanagedResource
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObservePopped(Action<UndoEvent> action)
     {
-        UndoManagerChannel.ObservePoppedCallback callback = (_, undoEvent) => action(undoEvent.ToUndoEvent());
-
-        var subscriptionId = UndoManagerChannel.ObservePopped(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            UndoManagerChannel.UnobservePopped(Handle, subscriptionId);
-        });
+        return onPopped.Subscribe(action);
     }
 
     /// <summary>

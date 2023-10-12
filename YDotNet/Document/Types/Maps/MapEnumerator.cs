@@ -6,7 +6,7 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents the iterator to provide instances of <see cref="MapEntry" />.
+///     Represents the iterator to provide instances of key value pairs.
 /// </summary>
 internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 {

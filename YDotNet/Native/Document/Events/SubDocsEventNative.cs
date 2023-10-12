@@ -1,6 +1,4 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document;
-using YDotNet.Document.Events;
 using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.Events;
@@ -14,22 +12,39 @@ internal readonly struct SubDocsEventNative
 
     public uint LoadedLength { get; }
 
-    public nint Added { get; }
+    public nint AddedHandle { get; }
 
-    public nint Removed { get; }
+    public nint RemovedHandle { get; }
 
-    public nint Loaded { get; }
+    public nint LoadedHandle { get; }
 
-    public SubDocsEvent ToSubDocsEvent(Doc doc)
+    public nint[] Added()
     {
-        var nativeAdded = MemoryReader.ReadStructArray<nint>(Added, AddedLength);
-        var nativeRemoved = MemoryReader.ReadStructArray<nint>(Removed, RemovedLength);
-        var nativeLoaded = MemoryReader.ReadStructArray<nint>(Loaded, LoadedLength);
+        if (AddedHandle == nint.Zero || AddedLength == 0)
+        {
+            return Array.Empty<nint>();
+        }
 
-        var docsAdded = nativeAdded.Select(doc.GetDoc).ToArray();
-        var docsRemoved = nativeRemoved.Select(doc.GetDoc).ToArray();
-        var docsLoaded = nativeLoaded.Select(doc.GetDoc).ToArray();
+        return MemoryReader.ReadStructArray<nint>(AddedHandle, AddedLength);
+    }
 
-        return new SubDocsEvent(docsAdded, docsRemoved, docsLoaded);
+    public nint[] Removed()
+    {
+        if (RemovedHandle == nint.Zero || RemovedLength == 0)
+        {
+            return Array.Empty<nint>();
+        }
+
+        return MemoryReader.ReadStructArray<nint>(RemovedHandle, RemovedLength);
+    }
+
+    public nint[] Loaded()
+    {
+        if (LoadedHandle == nint.Zero || LoadedLength == 0)
+        {
+            return Array.Empty<nint>();
+        }
+
+        return MemoryReader.ReadStructArray<nint>(LoadedHandle, LoadedLength);
     }
 }

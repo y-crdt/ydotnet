@@ -13,11 +13,21 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 public class Map : Branch
 {
-    private readonly EventSubscriptions subscriptions = new();
+    private readonly EventSubscriber<MapEvent> onObserve;
 
     internal Map(nint handle, Doc doc)
         : base(handle, doc)
     {
+        onObserve = new EventSubscriber<MapEvent>(
+            handle,
+            (map, action) =>
+            {
+                MapChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new MapEvent(eventHandle, Doc));
+
+                return (MapChannel.Observe(map, nint.Zero, callback), callback);
+            },
+            MapChannel.Unobserve);
     }
 
     /// <summary>
@@ -110,16 +120,6 @@ public class Map : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<MapEvent> action)
     {
-        MapChannel.ObserveCallback callback = (_, eventHandle) => action(new MapEvent(eventHandle, Doc));
-
-        var subscriptionId = MapChannel.Observe(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            MapChannel.Unobserve(Handle, subscriptionId);
-        });
+        return onObserve.Subscribe(action);
     }
 }

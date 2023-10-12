@@ -1,4 +1,5 @@
 using YDotNet.Document.State;
+using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Document.Events;
 
@@ -7,17 +8,11 @@ namespace YDotNet.Document.Events;
 /// </summary>
 public class AfterTransactionEvent
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="AfterTransactionEvent" /> class.
-    /// </summary>
-    /// <param name="beforeState">The initial value for <see cref="BeforeState" />.</param>
-    /// <param name="afterState">The initial value for <see cref="AfterState" />.</param>
-    /// <param name="deleteSet">The initial value for <see cref="DeleteSet" />.</param>
-    public AfterTransactionEvent(StateVector beforeState, StateVector afterState, DeleteSet deleteSet)
+    internal AfterTransactionEvent(AfterTransactionEventNative native)
     {
-        BeforeState = beforeState;
-        AfterState = afterState;
-        DeleteSet = deleteSet;
+        BeforeState = new StateVector(native.BeforeState);
+        AfterState = new StateVector(native.AfterState);
+        DeleteSet = new DeleteSet(native.DeleteSet);
     }
 
     /// <summary>

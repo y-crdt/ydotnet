@@ -16,11 +16,21 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlElement : Branch
 {
-    private readonly EventSubscriptions subscriptions = new();
+    private readonly EventSubscriber<XmlElementEvent> onObserve;
 
     internal XmlElement(nint handle, Doc doc)
         : base(handle, doc)
     {
+        onObserve = new EventSubscriber<XmlElementEvent>(
+            handle,
+            (xmlElement, action) =>
+            {
+                XmlElementChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new XmlElementEvent(eventHandle, Doc));
+
+                return (XmlElementChannel.Observe(xmlElement, nint.Zero, callback), callback);
+            },
+            XmlElementChannel.Unobserve);
     }
 
     /// <summary>
@@ -281,16 +291,6 @@ public class XmlElement : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlElementEvent> action)
     {
-        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle, Doc));
-
-        var subscriptionId = XmlElementChannel.Observe(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            XmlElementChannel.Unobserve(Handle, subscriptionId);
-        });
+        return onObserve.Subscribe(action);
     }
 }

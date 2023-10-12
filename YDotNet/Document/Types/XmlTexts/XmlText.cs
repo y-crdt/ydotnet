@@ -16,11 +16,21 @@ namespace YDotNet.Document.Types.XmlTexts;
 /// </summary>
 public class XmlText : Branch
 {
-    private readonly EventSubscriptions subscriptions = new();
+    private readonly EventSubscriber<XmlTextEvent> onObserve;
 
     internal XmlText(nint handle, Doc doc)
         : base(handle, doc)
     {
+        onObserve = new EventSubscriber<XmlTextEvent>(
+            handle,
+            (xmlText, action) =>
+            {
+                XmlTextChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new XmlTextEvent(eventHandle, Doc));
+
+                return (XmlTextChannel.Observe(xmlText, nint.Zero, callback), callback);
+            },
+            XmlTextChannel.Unobserve);
     }
 
     /// <summary>
@@ -213,17 +223,7 @@ public class XmlText : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlTextEvent> action)
     {
-        XmlTextChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlTextEvent(eventHandle, Doc));
-
-        var subscriptionId = XmlTextChannel.Observe(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            XmlTextChannel.Unobserve(Handle, subscriptionId);
-        });
+        return onObserve.Subscribe(action);
     }
 
     /// <summary>

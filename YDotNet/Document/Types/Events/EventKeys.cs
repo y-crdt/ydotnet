@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Events;
@@ -14,16 +13,15 @@ public class EventKeys : ReadOnlyCollection<EventKeyChange>
     internal EventKeys(nint handle, uint length, Doc doc)
         : base(ReadItems(handle, length, doc))
     {
-
     }
 
     private static IList<EventKeyChange> ReadItems(nint handle, uint length, Doc doc)
     {
         var result = new List<EventKeyChange>();
 
-        foreach (var keyHandle in MemoryReader.ReadIntPtrArray(handle, length, Marshal.SizeOf<EventKeyChangeNative>()))
+        foreach (var native in MemoryReader.ReadIntPtrArray<EventKeyChangeNative>(handle, length))
         {
-            result.Add(Marshal.PtrToStructure<EventKeyChangeNative>(keyHandle).ToEventKeyChange(doc));
+            result.Add(new EventKeyChange(native.Value, doc));
         }
 
         // We are done reading and can destroy the resource.

@@ -10,7 +10,6 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class TextChunks : ReadOnlyCollection<TextChunk>
 {
-
     internal TextChunks(nint handle, uint length, Doc doc)
         : base(ReadItems(handle, length, doc))
     {

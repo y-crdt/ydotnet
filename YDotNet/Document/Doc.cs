@@ -10,6 +10,8 @@ using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
+#pragma warning disable CA1806 // Do not ignore method results
+
 namespace YDotNet.Document;
 
 /// <summary>
@@ -29,11 +31,15 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : UnmanagedResource, ITypeBase
+public class Doc : TypeBase
 {
-    private readonly TypeCache typeCache = new TypeCache();
-    private readonly EventSubscriptions subscriptions = new();
-    private readonly bool isCloned;
+    private readonly TypeCache typeCache = new();
+    private readonly EventSubscriber<ClearEvent> onClear;
+    private readonly EventSubscriber<UpdateEvent> onUpdateV1;
+    private readonly EventSubscriber<UpdateEvent> onUpdateV2;
+    private readonly EventSubscriber<AfterTransactionEvent> onAfterTransaction;
+    private readonly EventSubscriber<SubDocsEvent> onSubDocs;
+    private readonly Doc? parent;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
@@ -52,38 +58,75 @@ public class Doc : UnmanagedResource, ITypeBase
     /// </summary>
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
-        : base(CreateDoc(options))
+        : this(CreateDoc(options), null)
     {
     }
 
-    internal Doc(nint handle, bool isCloned, Doc? parent)
-        : base(handle)
+    internal Doc(nint handle, Doc? parent)
     {
-        this.isCloned = isCloned;
+        this.parent = parent;
+
+        onClear = new EventSubscriber<ClearEvent>(
+            handle,
+            (doc, action) =>
+            {
+                DocChannel.ObserveClearCallback callback =
+                    (_, doc) => action(new ClearEvent(GetDoc(doc)));
+
+                return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
+            },
+            (doc, s) => DocChannel.UnobserveClear(doc, s));
+
+        onUpdateV1 = new EventSubscriber<UpdateEvent>(
+            handle,
+            (doc, action) =>
+            {
+                DocChannel.ObserveUpdatesCallback callback =
+                    (_, length, data) => action(new UpdateEvent(UpdateEventNative.From(length, data)));
+
+                return (DocChannel.ObserveUpdatesV1(Handle, nint.Zero, callback), callback);
+            },
+            (doc, s) => DocChannel.UnobserveUpdatesV1(doc, s));
+
+        onUpdateV2 = new EventSubscriber<UpdateEvent>(
+            handle,
+            (doc, action) =>
+            {
+                DocChannel.ObserveUpdatesCallback callback =
+                    (_, length, data) => action(new UpdateEvent(UpdateEventNative.From(length, data)));
+
+                return (DocChannel.ObserveUpdatesV2(Handle, nint.Zero, callback), callback);
+            },
+            (doc, s) => DocChannel.UnobserveUpdatesV2(doc, s));
+
+        onAfterTransaction = new EventSubscriber<AfterTransactionEvent>(
+            handle,
+            (doc, action) =>
+            {
+                DocChannel.ObserveAfterTransactionCallback callback =
+                    (_, ev) => action(new AfterTransactionEvent(MemoryReader.ReadStruct<AfterTransactionEventNative>(ev)));
+
+                return (DocChannel.ObserveAfterTransaction(doc, nint.Zero, callback), callback);
+            },
+            (doc, s) => DocChannel.UnobserveAfterTransaction(doc, s));
+
+        onSubDocs = new EventSubscriber<SubDocsEvent>(
+            handle,
+            (doc, action) =>
+            {
+                DocChannel.ObserveSubdocsCallback callback =
+                    (_, ev) => action(new SubDocsEvent(MemoryReader.ReadStruct<SubDocsEventNative>(ev), this));
+
+                return (DocChannel.ObserveSubDocs(doc, nint.Zero, callback), callback);
+            },
+            (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
+
+        Handle = handle;
     }
 
     private static nint CreateDoc(DocOptions options)
     {
-        var unsafeOptions = DocOptionsNative.From(options);
-
-        return DocChannel.NewWithOptions(unsafeOptions);
-    }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="Doc"/> class.
-    /// </summary>
-    ~Doc()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        if (isCloned)
-        {
-            DocChannel.Destroy(Handle);
-        }
+        return DocChannel.NewWithOptions(options.ToNative());
     }
 
     /// <summary>
@@ -127,17 +170,7 @@ public class Doc : UnmanagedResource, ITypeBase
     /// </remarks>
     public bool AutoLoad => DocChannel.AutoLoad(Handle);
 
-    /// <summary>
-    ///     Creates a copy of the current <see cref="Doc" /> instance.
-    /// </summary>
-    /// <remarks>The instance returned will not be the same, but they will both control the same document.</remarks>
-    /// <returns>A new <see cref="Doc" /> instance that controls the same document.</returns>
-    public Doc Clone()
-    {
-        var handle = DocChannel.Clone(Handle).Checked();
-
-        return new Doc(handle, true, null);
-    }
+    internal nint Handle { get; }
 
     /// <summary>
     ///     Gets or creates a new shared <see cref="Types.Texts.Text" /> data type instance as a root-level
@@ -271,9 +304,12 @@ public class Doc : UnmanagedResource, ITypeBase
     /// </summary>
     public void Clear()
     {
-        subscriptions.Clear();
-
         DocChannel.Clear(Handle);
+        onClear.Clear();
+        onUpdateV1.Clear();
+        onUpdateV2.Clear();
+        onAfterTransaction.Clear();
+        onSubDocs.Clear();
     }
 
     /// <summary>
@@ -295,17 +331,7 @@ public class Doc : UnmanagedResource, ITypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveClear(Action<ClearEvent> action)
     {
-        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(this).ToClearEvent());
-
-        var subscriptionId = DocChannel.ObserveClear(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            DocChannel.UnobserveClear(Handle, subscriptionId);
-        });
+        return onClear.Subscribe(action);
     }
 
     /// <summary>
@@ -318,17 +344,7 @@ public class Doc : UnmanagedResource, ITypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveUpdatesV1(Action<UpdateEvent> action)
     {
-        DocChannel.ObserveUpdatesCallback callback = (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent());
-
-        var subscriptionId = DocChannel.ObserveUpdatesV1(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            DocChannel.UnobserveUpdatesV1(Handle, subscriptionId);
-        });
+        return onUpdateV1.Subscribe(action);
     }
 
     /// <summary>
@@ -341,17 +357,7 @@ public class Doc : UnmanagedResource, ITypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveUpdatesV2(Action<UpdateEvent> action)
     {
-        DocChannel.ObserveUpdatesCallback callback = (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent());
-
-        var subscriptionId = DocChannel.ObserveUpdatesV2(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            DocChannel.UnobserveUpdatesV2(Handle, subscriptionId);
-        });
+        return onUpdateV2.Subscribe(action);
     }
 
     /// <summary>
@@ -364,17 +370,7 @@ public class Doc : UnmanagedResource, ITypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
-        DocChannel.ObserveAfterTransactionCallback callback = (_, eventHandler) => action(MemoryReader.ReadStruct<AfterTransactionEventNative>(eventHandler).ToAfterTransactionEvent());
-
-        var subscriptionId = DocChannel.ObserveAfterTransaction(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            DocChannel.UnobserveAfterTransaction(Handle, subscriptionId);
-        });
+        return onAfterTransaction.Subscribe(action);
     }
 
     /// <summary>
@@ -384,51 +380,46 @@ public class Doc : UnmanagedResource, ITypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) => action(MemoryReader.ReadStruct<SubDocsEventNative>(eventHandle).ToSubDocsEvent(this));
-
-        var subscriptionId = DocChannel.ObserveSubDocs(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            DocChannel.UnobserveSubDocs(Handle, subscriptionId);
-        });
+        return onSubDocs.Subscribe(action);
     }
 
     internal Doc GetDoc(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new Doc(h, false, this));
+        return GetOrAdd(handle, h => new Doc(h,  this));
     }
 
     internal Map GetMap(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new Map(h, this));
+        return GetOrAdd(handle, h => new Map(h, this));
     }
 
     internal Array GetArray(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new Array(h, this));
+        return GetOrAdd(handle, h => new Array(h, this));
     }
 
     internal Text GetText(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new Text(h, this));
+        return GetOrAdd(handle, h => new Text(h, this));
     }
 
     internal XmlText GetXmlText(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new XmlText(h, this));
+        return GetOrAdd(handle, h => new XmlText(h, this));
     }
 
     internal XmlElement GetXmlElement(nint handle)
     {
-        return typeCache.GetOrAdd(handle, h => new XmlElement(h, this));
+        return GetOrAdd(handle, h => new XmlElement(h, this));
     }
 
-    public void MarkDeleted()
+    private T GetOrAdd<T>(nint handle, Func<nint, T> factory) where T : ITypeBase
     {
-        throw new NotImplementedException();
+        if (parent != null)
+        {
+            return parent.GetOrAdd<T>(handle, factory);
+        }
+
+        return typeCache.GetOrAdd(handle, factory);
     }
 }

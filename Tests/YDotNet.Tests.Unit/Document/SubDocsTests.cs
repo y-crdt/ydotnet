@@ -32,8 +32,8 @@ public class SubDocsTests
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(subDocsEvent, Is.Not.Null);
-        Assert.That(subDocsEvent.Added, Has.Length.EqualTo(expected: 1));
-        Assert.That(subDocsEvent.Loaded, Has.Length.EqualTo(expected: 1));
+        Assert.That(subDocsEvent.Added, Has.Count.EqualTo(expected: 1));
+        Assert.That(subDocsEvent.Loaded, Has.Count.EqualTo(expected: 1));
         Assert.That(subDocsEvent.Removed, Is.Empty);
         Assert.That(subDocsEvent.Added[0].Id, Is.EqualTo(subDoc1.Id));
 
@@ -77,7 +77,7 @@ public class SubDocsTests
         Assert.That(subDocsEvent, Is.Not.Null);
         Assert.That(subDocsEvent.Added, Is.Empty);
         Assert.That(subDocsEvent.Loaded, Is.Empty);
-        Assert.That(subDocsEvent.Removed, Has.Length.EqualTo(expected: 1));
+        Assert.That(subDocsEvent.Removed, Has.Count.EqualTo(expected: 1));
         Assert.That(subDocsEvent.Removed[0].Id, Is.EqualTo(subDoc1.Id));
 
         // Act
@@ -114,7 +114,7 @@ public class SubDocsTests
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(subDocsEvent, Is.Not.Null);
-        Assert.That(subDocsEvent.Added, Has.Length.EqualTo(expected: 1));
+        Assert.That(subDocsEvent.Added, Has.Count.EqualTo(expected: 1));
         Assert.That(subDocsEvent.Loaded, Is.Empty);
         Assert.That(subDocsEvent.Removed, Is.Empty);
         Assert.That(subDocsEvent.Added[0].Id, Is.EqualTo(subDoc1.Id));

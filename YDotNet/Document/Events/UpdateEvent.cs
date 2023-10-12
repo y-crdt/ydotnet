@@ -1,3 +1,5 @@
+using YDotNet.Native.Document.Events;
+
 namespace YDotNet.Document.Events;
 
 /// <summary>
@@ -6,13 +8,9 @@ namespace YDotNet.Document.Events;
 /// </summary>
 public class UpdateEvent
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UpdateEvent" /> class.
-    /// </summary>
-    /// <param name="update">The binary information this event represents.</param>
-    public UpdateEvent(byte[] update)
+    internal UpdateEvent(UpdateEventNative native)
     {
-        Update = update;
+        Update = native.Bytes();
     }
 
     /// <summary>

@@ -2,7 +2,10 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Document.Events;
 using YDotNet.Native.Types.Branches;
+
+#pragma warning disable CA1806 // Do not ignore method results
 
 namespace YDotNet.Document.Types.Branches;
 
@@ -11,12 +14,26 @@ namespace YDotNet.Document.Types.Branches;
 /// </summary>
 public abstract class Branch : TypeBase
 {
-    private readonly EventSubscriptions subscriptions = new();
-    private readonly Doc doc;
+    private readonly EventSubscriber<EventBranch[]> onDeep;
 
     internal Branch(nint handle, Doc doc)
     {
         Doc = doc;
+
+        onDeep = new EventSubscriber<EventBranch[]>(
+            handle,
+            (branch, action) =>
+            {
+                BranchChannel.ObserveCallback callback = (_, length, ev) =>
+                {
+                    var events = MemoryReader.ReadIntPtrArray<EventBranchNative>(ev, length).Select(x => new EventBranch(x, doc)).ToArray();
+
+                    action(events);
+                };
+
+                return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
+            },
+            (branch, s) => BranchChannel.UnobserveDeep(branch, s));
 
         Handle = handle;
     }
@@ -36,22 +53,7 @@ public abstract class Branch : TypeBase
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveDeep(Action<IEnumerable<EventBranch>> action)
     {
-        BranchChannel.ObserveCallback callback = (_, length, eventsHandle) =>
-        {
-            var events = MemoryReader.ReadIntPtrArray(eventsHandle, length, size: 24).Select(x => new EventBranch(x, doc)).ToArray();
-
-            action(events);
-        };
-
-        var subscriptionId = BranchChannel.ObserveDeep(
-            Handle,
-            nint.Zero,
-            callback);
-
-        return subscriptions.Add(callback, () =>
-        {
-            BranchChannel.UnobserveDeep(Handle, subscriptionId);
-        });
+        return onDeep.Subscribe(action);
     }
 
     /// <summary>
@@ -69,7 +71,7 @@ public abstract class Branch : TypeBase
             return default!;
         }
 
-        return new Transaction(handle, doc);
+        return new Transaction(handle, Doc);
     }
 
     /// <summary>
@@ -87,6 +89,6 @@ public abstract class Branch : TypeBase
             return default!;
         }
 
-        return new Transaction(handle, doc);
+        return new Transaction(handle, Doc);
     }
 }

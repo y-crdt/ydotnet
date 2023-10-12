@@ -1,4 +1,5 @@
 using YDotNet.Document.State;
+using YDotNet.Native.UndoManager.Events;
 
 namespace YDotNet.Document.UndoManagers.Events;
 
@@ -7,19 +8,20 @@ namespace YDotNet.Document.UndoManagers.Events;
 /// </summary>
 public class UndoEvent
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UndoEvent" /> class.
-    /// </summary>
-    /// <param name="kind">The kind of the event.</param>
-    /// <param name="origin">The origin of the event.</param>
-    /// <param name="insertions">The <see cref="DeleteSet" /> entries for inserted content.</param>
-    /// <param name="deletions">The <see cref="DeleteSet" /> entries for deleted content.</param>
-    internal UndoEvent(UndoEventKind kind, byte[]? origin, DeleteSet insertions, DeleteSet deletions)
+    internal UndoEvent(UndoEventNative native)
     {
-        Kind = kind;
-        Origin = origin;
-        Insertions = insertions;
-        Deletions = deletions;
+        Origin = native.Origin();
+
+        Kind = native.KindNative switch
+        {
+            UndoEventKindNative.Undo => UndoEventKind.Undo,
+            UndoEventKindNative.Redo => UndoEventKind.Redo,
+            _ => throw new NotSupportedException($"The value \"{native.KindNative}\" for {nameof(UndoEventKindNative)} is not supported."),
+        };
+
+        Insertions = new DeleteSet(native.Insertions);
+
+        Deletions = new DeleteSet(native.Deletions);
     }
 
     /// <summary>
