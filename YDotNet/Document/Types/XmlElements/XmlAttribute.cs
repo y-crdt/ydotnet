@@ -10,10 +10,6 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlAttribute
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlAttribute" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal XmlAttribute(nint handle)
     {
         Handle = handle;

@@ -32,15 +32,11 @@ public class UndoManager : UnmanagedResource
         return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="UndoManager"/> class.
-    /// </summary>
     ~UndoManager()
     {
         Dispose(false);
     }
 
-    /// <inheritdoc/>
     protected internal override void DisposeCore(bool disposing)
     {
         UndoManagerChannel.Destroy(Handle);

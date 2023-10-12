@@ -19,6 +19,14 @@ public sealed class Input : Resource
         InputNative = native;
     }
 
+    /// <summary>
+    /// Finalizes an instance of the <see cref="Input"/> class.
+    /// </summary>
+    ~Input()
+    {
+        Dispose(false);
+    }
+
     /// <inheritdoc />
     protected internal override void DisposeCore(bool disposing)
     {

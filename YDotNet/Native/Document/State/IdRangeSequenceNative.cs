@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document.State;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.State;
 
@@ -12,15 +13,8 @@ internal readonly struct IdRangeSequenceNative
 
     public IdRange[] ToIdRanges()
     {
-        var idRangeSize = Marshal.SizeOf<IdRangeNative>();
-        var sequence = new IdRange[Length];
+        var rangeNatives = MemoryReader.ReadStructArray<IdRangeNative>(Sequence, Length);
 
-        for (var i = 0; i < Length; i++)
-        {
-            var idRange = Marshal.PtrToStructure<IdRangeNative>(Sequence + i * idRangeSize);
-            sequence[i] = idRange.ToIdRange();
-        }
-
-        return sequence;
+        return rangeNatives.Select(x => x.ToIdRange()).ToArray(); ;
     }
 }

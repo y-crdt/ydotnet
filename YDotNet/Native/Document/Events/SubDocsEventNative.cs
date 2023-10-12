@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Document;
 using YDotNet.Document.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.Events;
 
@@ -21,25 +22,14 @@ internal readonly struct SubDocsEventNative
 
     public SubDocsEvent ToSubDocsEvent()
     {
-        var added = new Doc[AddedLength];
-        var removed = new Doc[RemovedLength];
-        var loaded = new Doc[LoadedLength];
+        var nativeAdded = MemoryReader.ReadStructArray<nint>(Added, AddedLength);
+        var nativeRemoved = MemoryReader.ReadStructArray<nint>(Removed, RemovedLength);
+        var nativeLoaded = MemoryReader.ReadStructArray<nint>(Loaded, LoadedLength);
 
-        for (var i = 0; i < AddedLength; i++)
-        {
-            added[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Added, i * nint.Size)));
-        }
+        var docsAdded = nativeAdded.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
+        var docsRemoved = nativeRemoved.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
+        var docsLoaded = nativeLoaded.Select(x => new Doc(DocChannel.Clone(x), true)).ToArray();
 
-        for (var i = 0; i < RemovedLength; i++)
-        {
-            removed[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Removed, i * nint.Size)));
-        }
-
-        for (var i = 0; i < LoadedLength; i++)
-        {
-            loaded[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Loaded, i * nint.Size)));
-        }
-
-        return new SubDocsEvent(added, removed, loaded);
+        return new SubDocsEvent(docsAdded, docsRemoved, docsLoaded);
     }
 }

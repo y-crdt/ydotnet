@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
@@ -62,14 +61,9 @@ public class Transaction : UnmanagedResource
     public Doc[] SubDocs()
     {
         var handle = TransactionChannel.SubDocs(Handle, out var length);
+        var handles = MemoryReader.ReadStructArray<nint>(handle, length);
 
-        var docs = new Doc[length];
-        for (var i = 0; i < length; i++)
-        {
-            docs[i] = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
-        }
-
-        return docs;
+        return handles.Select(x => new Doc(handle, false)).ToArray();
     }
 
     /// <summary>

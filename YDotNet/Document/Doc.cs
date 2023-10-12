@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
@@ -29,9 +30,10 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc
+public class Doc : UnmanagedResource
 {
     private readonly EventSubscriptions subscriptions = new();
+    private readonly bool isCloned;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
@@ -50,19 +52,38 @@ public class Doc
     /// </summary>
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
+        : base(CreateDoc(options))
+    {
+    }
+
+    internal Doc(nint handle, bool isCloned)
+        : base(handle)
+    {
+        this.isCloned = isCloned;
+    }
+
+    private static nint CreateDoc(DocOptions options)
     {
         var unsafeOptions = DocOptionsNative.From(options);
 
-        Handle = DocChannel.NewWithOptions(unsafeOptions);
+        return DocChannel.NewWithOptions(unsafeOptions);
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Doc" /> class with the specified <see cref="Handle" />.
+    /// Finalizes an instance of the <see cref="Doc"/> class.
     /// </summary>
-    /// <param name="handle">The pointer to be used by this document to manage the native resource.</param>
-    internal Doc(nint handle)
+    ~Doc()
     {
-        Handle = handle;
+        Dispose(false);
+    }
+
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
+    {
+        if (isCloned)
+        {
+            DocChannel.Destroy(Handle);
+        }
     }
 
     /// <summary>
@@ -94,8 +115,7 @@ public class Doc
     ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
     /// </summary>
     /// <remarks>
-    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" />
-    ///     instance requested a data load.
+    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" /> instance requested a data load.
     /// </remarks>
     public bool ShouldLoad => DocChannel.ShouldLoad(Handle);
 
@@ -103,15 +123,9 @@ public class Doc
     ///     Gets a value indicating whether this <see cref="Doc" /> instance will auto load.
     /// </summary>
     /// <remarks>
-    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent
-    ///     <see cref="Doc" /> instances.
+    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent <see cref="Doc" /> instances.
     /// </remarks>
     public bool AutoLoad => DocChannel.AutoLoad(Handle);
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 
     /// <summary>
     ///     Creates a copy of the current <see cref="Doc" /> instance.
@@ -122,7 +136,7 @@ public class Doc
     {
         var handle = DocChannel.Clone(Handle).Checked();
 
-        return new Doc(handle);
+        return new Doc(handle, true);
     }
 
     /// <summary>
@@ -281,7 +295,7 @@ public class Doc
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveClear(Action<ClearEvent> action)
     {
-        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent());
+        DocChannel.ObserveClearCallback callback = (_, doc) => action(ClearEventNative.From(new Doc(doc, false)).ToClearEvent());
 
         var subscriptionId = DocChannel.ObserveClear(
             Handle,

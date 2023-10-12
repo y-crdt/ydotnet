@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using YDotNet.Document.State;
+using YDotNet.Native.Document.State;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
@@ -20,6 +22,20 @@ internal static class MemoryReader
         where T : struct
     {
         return Marshal.PtrToStructure<T>(handle);
+    }
+
+    internal static T[] ReadStructArray<T>(nint handle, uint length)
+        where T : struct
+    {
+        var itemSize = Marshal.SizeOf<T>();
+        var itemBuffer = new T[length];
+
+        for (var i = 0; i < length; i++)
+        {
+            itemBuffer[i] = Marshal.PtrToStructure<T>(handle + (i * itemSize));
+        }
+
+        return itemBuffer;
     }
 
     internal static byte[]? TryReadBytes(nint handle, uint length)

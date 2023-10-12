@@ -200,7 +200,7 @@ public sealed class Output : UnmanagedResource
                 return new Lazy<object?>(() => new XmlText(OutputChannel.XmlText(handle).Checked()));
 
             case OutputType.Doc:
-                return new Lazy<object?>(() => new Doc(OutputChannel.Doc(handle).Checked()));
+                return new Lazy<object?>(() => new Doc(OutputChannel.Doc(handle).Checked(), false));
 
             default:
                 return new Lazy<object?>((object?)null);
