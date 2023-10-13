@@ -34,7 +34,7 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : Resource, ITypeBase
+public class Doc : TypeBase, IDisposable
 {
     private readonly TypeCache typeCache = new();
     private readonly EventSubscriber<ClearEvent> onClear;
@@ -66,6 +66,7 @@ public class Doc : Resource, ITypeBase
     }
 
     internal Doc(nint handle, Doc? parent, bool isDeleted)
+        : base(isDeleted)
     {
         this.parent = parent;
 
@@ -125,11 +126,6 @@ public class Doc : Resource, ITypeBase
             (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
 
         Handle = handle;
-
-        if (isDeleted)
-        {
-            Dispose();
-        }
     }
 
     private static nint CreateDoc(DocOptions options)
@@ -142,23 +138,24 @@ public class Doc : Resource, ITypeBase
     /// </summary>
     ~Doc()
     {
-        Dispose(false);
+        DisposeCore();
     }
 
-    /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    public void Dispose()
     {
-        if (parent != null)
+        GC.SuppressFinalize(this);
+        DisposeCore();
+    }
+
+    private void DisposeCore()
+    {
+        if (IsDisposed)
         {
-            DocChannel.Destroy(Handle);
+            return;
         }
-    }
 
-    bool ITypeBase.IsDeleted => IsDisposed;
-
-    void ITypeBase.MarkDeleted()
-    {
-        Dispose();
+        DocChannel.Destroy(Handle);
+        MarkDisposed();
     }
 
     /// <summary>

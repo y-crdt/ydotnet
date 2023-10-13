@@ -60,7 +60,7 @@ internal class TypeCache
         {
             if (weakRef.TryGetTarget(out var item))
             {
-                item.MarkDeleted();
+                item.MarkDisposed();
             }
 
             cache.Remove(handle);

@@ -8,30 +8,30 @@ public abstract class TypeBase : ITypeBase
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeBase"/> class.
     /// </summary>
-    /// <param name="isDeleted">A value indicating if the instance is deleted.</param>
-    protected TypeBase(bool isDeleted)
+    /// <param name="isDisposed">A value indicating if the instance is deleted.</param>
+    protected TypeBase(bool isDisposed)
     {
-        IsDeleted = isDeleted;
+        IsDisposed = isDisposed;
     }
 
     /// <inheritdoc/>
-    public bool IsDeleted { get; private set; }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
-    /// Throws an exception if the type is deleted.
+    /// Throws an exception if the type is disposed.
     /// </summary>
     protected void ThrowIfDeleted()
     {
-        if (IsDeleted)
+        if (IsDisposed)
         {
             throw new ObjectDisposedException(GetType().Name);
         }
     }
 
     /// <inheritdoc/>
-    public void MarkDeleted()
+    public void MarkDisposed()
     {
-        IsDeleted = true;
+        IsDisposed = true;
     }
 }
 
@@ -41,12 +41,12 @@ public abstract class TypeBase : ITypeBase
 public interface ITypeBase
 {
     /// <summary>
-    /// Marks the object as deleted to stop all further calls.
+    /// Marks the object as disposed to stop all further calls.
     /// </summary>
-    void MarkDeleted();
+    void MarkDisposed();
 
     /// <summary>
-    /// Gets a value indicating whether the instance is deleted.
+    /// Gets a value indicating whether the instance is disposed.
     /// </summary>
-    bool IsDeleted { get; }
+    bool IsDisposed { get; }
 }
