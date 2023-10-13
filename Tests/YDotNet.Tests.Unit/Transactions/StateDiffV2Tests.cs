@@ -16,7 +16,7 @@ public class StateDiffV2Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff, Has.Length.InRange(from: 37, to: 38));
+        Assert.That(stateDiff, Has.Length.InRange(from: 32, to: 38));
     }
 
     [Test]

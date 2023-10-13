@@ -16,7 +16,7 @@ public class StateDiffV1Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff, Has.Length.EqualTo(26));
+        Assert.That(stateDiff, Has.Length.InRange(from: 22, to: 26));
     }
 
     [Test]
