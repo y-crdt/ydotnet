@@ -39,7 +39,7 @@ public class Array : Branch
     {
         get
         {
-            ThrowIfDeleted();
+            ThrowIfDisposed();
 
             return ArrayChannel.Length(Handle);
         }
@@ -53,7 +53,7 @@ public class Array : Branch
     /// <param name="inputs">The items to be inserted.</param>
     public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
@@ -68,7 +68,7 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         ArrayChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
@@ -85,7 +85,7 @@ public class Array : Branch
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
@@ -103,7 +103,7 @@ public class Array : Branch
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         ArrayChannel.Move(Handle, transaction.Handle, sourceIndex, targetIndex);
     }
@@ -116,7 +116,7 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = ArrayChannel.Iterator(Handle, transaction.Handle);
 
@@ -133,7 +133,7 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<ArrayEvent> action)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         return onObserve.Subscribe(action);
     }
@@ -148,7 +148,7 @@ public class Array : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 

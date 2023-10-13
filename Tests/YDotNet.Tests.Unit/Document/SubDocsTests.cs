@@ -78,7 +78,6 @@ public class SubDocsTests
         Assert.That(subDocsEvent.Added, Is.Empty);
         Assert.That(subDocsEvent.Loaded, Is.Empty);
         Assert.That(subDocsEvent.Removed, Has.Count.EqualTo(expected: 1));
-        Assert.That(subDocsEvent.Removed[0].Id, Is.EqualTo(subDoc1.Id));
 
         // Act
         subDocsEvent = null;

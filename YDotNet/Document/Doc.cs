@@ -161,12 +161,60 @@ public class Doc : TypeBase, IDisposable
     /// <summary>
     ///     Gets the unique client identifier of this <see cref="Doc" /> instance.
     /// </summary>
-    public ulong Id => DocChannel.Id(Handle);
+    public ulong Id
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return DocChannel.Id(Handle);
+        }
+    }
 
     /// <summary>
     ///     Gets the unique document identifier of this <see cref="Doc" /> instance.
     /// </summary>
-    public string Guid => MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
+    public string Guid
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
+        }
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
+    /// </summary>
+    /// <remarks>
+    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" /> instance requested a data load.
+    /// </remarks>
+    public bool ShouldLoad
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return DocChannel.ShouldLoad(Handle);
+        }
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether this <see cref="Doc" /> instance will auto load.
+    /// </summary>
+    /// <remarks>
+    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent <see cref="Doc" /> instances.
+    /// </remarks>
+    public bool AutoLoad
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return DocChannel.AutoLoad(Handle);
+        }
+    }
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
@@ -178,26 +226,12 @@ public class Doc : TypeBase, IDisposable
     {
         get
         {
+            ThrowIfDisposed();
+
             MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
             return result;
         }
     }
-
-    /// <summary>
-    ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
-    /// </summary>
-    /// <remarks>
-    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" /> instance requested a data load.
-    /// </remarks>
-    public bool ShouldLoad => DocChannel.ShouldLoad(Handle);
-
-    /// <summary>
-    ///     Gets a value indicating whether this <see cref="Doc" /> instance will auto load.
-    /// </summary>
-    /// <remarks>
-    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent <see cref="Doc" /> instances.
-    /// </remarks>
-    public bool AutoLoad => DocChannel.AutoLoad(Handle);
 
     internal nint Handle { get; }
 

@@ -41,7 +41,7 @@ public class Map : Branch
     /// <param name="input">The <see cref="Input" /> instance to be inserted.</param>
     public void Insert(Transaction transaction, string key, Input input)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         using var unsafeKey = MemoryWriter.WriteUtf8String(key);
         using var unsafeValue = MemoryWriter.WriteStruct(input.InputNative);
@@ -60,7 +60,7 @@ public class Map : Branch
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
     public Output? Get(Transaction transaction, string key)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         using var unsafeName = MemoryWriter.WriteUtf8String(key);
 
@@ -76,7 +76,7 @@ public class Map : Branch
     /// <returns>The number of entries stored in the <see cref="Map" />.</returns>
     public uint Length(Transaction transaction)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         return MapChannel.Length(Handle, transaction.Handle);
     }
@@ -89,7 +89,7 @@ public class Map : Branch
     /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
     public bool Remove(Transaction transaction, string key)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         using var unsafeKey = MemoryWriter.WriteUtf8String(key);
 
@@ -102,7 +102,7 @@ public class Map : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     public void RemoveAll(Transaction transaction)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         MapChannel.RemoveAll(Handle, transaction.Handle);
     }
@@ -115,7 +115,7 @@ public class Map : Branch
     /// <returns>The <see cref="MapIterator" /> instance.</returns>
     public MapIterator Iterate(Transaction transaction)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = MapChannel.Iterator(Handle, transaction.Handle).Checked();
 
@@ -132,7 +132,7 @@ public class Map : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<MapEvent> action)
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         return onObserve.Subscribe(action);
     }

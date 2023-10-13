@@ -64,7 +64,7 @@ public abstract class Branch : TypeBase
     /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction WriteTransaction()
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = BranchChannel.WriteTransaction(Handle);
 
@@ -84,7 +84,7 @@ public abstract class Branch : TypeBase
     /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction ReadTransaction()
     {
-        ThrowIfDeleted();
+        ThrowIfDisposed();
 
         var handle = BranchChannel.ReadTransaction(Handle);
 

@@ -89,7 +89,10 @@ public class Program
                 GC.Collect();
                 try
                 {
-                    method.Invoke(instance, null);
+                    for (var j = 0; j < 10000; j++)
+                    {
+                        method.Invoke(instance, null);
+                    }
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Success");
@@ -98,13 +101,13 @@ public class Program
                 catch (RuntimeWrappedException ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Failed: {0}", ex.Message);
+                    Console.WriteLine("Failed: {0}", ex);
                     Console.ForegroundColor = defaultColor;
                 }
                 catch (Exception ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Failed: {0}", ex.Message);
+                    Console.WriteLine("Failed: {0}", ex);
                     Console.ForegroundColor = defaultColor;
                 }
             }

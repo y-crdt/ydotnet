@@ -20,7 +20,7 @@ public abstract class TypeBase : ITypeBase
     /// <summary>
     /// Throws an exception if the type is disposed.
     /// </summary>
-    protected void ThrowIfDeleted()
+    protected void ThrowIfDisposed()
     {
         if (IsDisposed)
         {
