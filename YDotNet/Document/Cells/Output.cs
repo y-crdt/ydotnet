@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
@@ -18,18 +17,18 @@ public sealed class Output
 {
     private readonly object? value;
 
-    internal Output(nint handle, Doc doc)
+    internal Output(nint handle, Doc doc, bool isDeleted)
     {
-        var native = MemoryReader.PtrToStruct<OutputNative>(handle);
+        var native = MemoryReader.ReadStruct<OutputNative>(handle);
 
-        Tag = (OutputTage)native.Tag;
+        Tag = (OutputTag)native.Tag;
 
-        value = BuildValue(handle, native.Length, doc, Tag);
+        value = BuildValue(handle, native.Length, doc, isDeleted, Tag);
     }
 
     internal static Output CreateAndRelease(nint handle, Doc doc)
     {
-        var result = new Output(handle, doc);
+        var result = new Output(handle, doc, false);
 
         // The output reads everything so we can just destroy it.
         OutputChannel.Destroy(handle);
@@ -37,127 +36,39 @@ public sealed class Output
         return result;
     }
 
-    /// <summary>
-    ///     Gets the type of the output.
-    /// </summary>
-    public OutputTage Tag { get; private set; }
-
-    /// <summary>
-    ///     Gets the <see cref="Doc" /> value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
-    public Doc Doc => GetValue<Doc>(OutputTage.Doc);
-
-    /// <summary>
-    ///     Gets the <see cref="string" /> value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
-    public string String => GetValue<string>(OutputTage.String);
-
-    /// <summary>
-    ///     Gets the <see cref="bool" /> value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
-    public bool Boolean => GetValue<bool>(OutputTage.Bool);
-
-    /// <summary>
-    ///     Gets the <see cref="double" /> value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="double" />.</exception>
-    public double Double => GetValue<double>(OutputTage.Double);
-
-    /// <summary>
-    ///     Gets the <see cref="long" /> value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="long" />.</exception>
-    public long Long => GetValue<long>(OutputTage.Long);
-
-    /// <summary>
-    ///     Gets the <see cref="byte" /> array value.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="byte" /> array.</exception>
-    public byte[] Bytes => GetValue<byte[]>(OutputTage.Bytes);
-
-    /// <summary>
-    ///     Gets the <see cref="Output" /> collection.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
-    public JsonArray Collection => GetValue<JsonArray>(OutputTage.Collection);
-
-    /// <summary>
-    ///     Gets the value as json object.
-    /// </summary>
-    /// <exception cref="YDotNetException">Value is not a json object.</exception>
-    public JsonObject Object => GetValue<JsonObject>(OutputTage.Object);
-
-    /// <summary>
-    ///     Gets the <see cref="Array" /> value.
-    /// </summary>
-    /// <returns>The resolved array.</returns>
-    /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
-    public Array Array => GetValue<Array>(OutputTage.Array);
-
-    /// <summary>
-    ///     Gets the <see cref="Map" /> value.
-    /// </summary>
-    /// <returns>The resolved map.</returns>
-    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
-    public Map Map => GetValue<Map>(OutputTage.Map);
-
-    /// <summary>
-    ///     Gets the <see cref="Map" /> value.
-    /// </summary>
-    /// <returns>The resolved text.</returns>
-    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
-    public Text Text => GetValue<Text>(OutputTage.Text);
-
-    /// <summary>
-    ///     Gets the <see cref="XmlElement" /> value.
-    /// </summary>
-    /// <returns>The resolved xml element.</returns>
-    /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
-    public XmlElement XmlElement => GetValue<XmlElement>(OutputTage.XmlElement);
-
-    /// <summary>
-    ///     Gets the <see cref="XmlText" /> value.
-    /// </summary>
-    /// <returns>The resolved xml text.</returns>
-    /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
-    public XmlText XmlText => GetValue<XmlText>(OutputTage.XmlText);
-
-    private static object? BuildValue(nint handle, uint length, Doc doc, OutputTage type)
+    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag type)
     {
         switch (type)
         {
-            case OutputTage.Bool:
+            case OutputTag.Bool:
                 {
                     var value = OutputChannel.Boolean(handle).Checked();
 
-                    return Marshal.PtrToStructure<byte>(value) == 1;
+                    return MemoryReader.ReadStruct<byte>(value) == 1;
                 }
 
-            case OutputTage.Double:
+            case OutputTag.Double:
                 {
                     var value = OutputChannel.Double(handle).Checked();
 
-                    return Marshal.PtrToStructure<double>(value);
+                    return MemoryReader.ReadStruct<double>(value);
                 }
 
-            case OutputTage.Long:
+            case OutputTag.Long:
                 {
                     var value = OutputChannel.Long(handle).Checked();
 
-                    return Marshal.PtrToStructure<long>(value);
+                    return MemoryReader.ReadStruct<long>(value);
                 }
 
-            case OutputTage.String:
+            case OutputTag.String:
                 {
                     MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
 
                     return result;
                 }
 
-            case OutputTage.Bytes:
+            case OutputTag.Bytes:
                 {
                     var bytesHandle = OutputChannel.Bytes(handle).Checked();
                     var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
@@ -165,40 +76,128 @@ public sealed class Output
                     return bytesArray;
                 }
 
-            case OutputTage.Collection:
+            case OutputTag.Collection:
                 {
-                    return new JsonArray(handle, length, doc);
+                    return new JsonArray(handle, length, doc, isDeleted);
                 }
 
-            case OutputTage.Object:
+            case OutputTag.Object:
                 {
-                    return new JsonObject(handle, length, doc);
+                    return new JsonObject(handle, length, doc, isDeleted);
                 }
 
-            case OutputTage.Array:
-                return doc.GetArray(OutputChannel.Array(handle));
+            case OutputTag.Array:
+                return doc.GetArray(OutputChannel.Array(handle), isDeleted);
 
-            case OutputTage.Map:
-                return doc.GetMap(OutputChannel.Map(handle));
+            case OutputTag.Map:
+                return doc.GetMap(OutputChannel.Map(handle), isDeleted);
 
-            case OutputTage.Text:
-                return doc.GetText(OutputChannel.Text(handle));
+            case OutputTag.Text:
+                return doc.GetText(OutputChannel.Text(handle), isDeleted);
 
-            case OutputTage.XmlElement:
-                return doc.GetXmlElement(OutputChannel.XmlElement(handle));
+            case OutputTag.XmlElement:
+                return doc.GetXmlElement(OutputChannel.XmlElement(handle), isDeleted);
 
-            case OutputTage.XmlText:
-                return doc.GetXmlText(OutputChannel.XmlText(handle));
+            case OutputTag.XmlText:
+                return doc.GetXmlText(OutputChannel.XmlText(handle), isDeleted);
 
-            case OutputTage.Doc:
-                return doc.GetDoc(OutputChannel.Doc(handle));
+            case OutputTag.Doc:
+                return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
 
             default:
                 return null;
         }
     }
 
-    private T GetValue<T>(OutputTage expectedType)
+    /// <summary>
+    ///     Gets the type of the output.
+    /// </summary>
+    public OutputTag Tag { get; private set; }
+
+    /// <summary>
+    ///     Gets the <see cref="Doc" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public Doc Doc => GetValue<Doc>(OutputTag.Doc);
+
+    /// <summary>
+    ///     Gets the <see cref="string" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public string String => GetValue<string>(OutputTag.String);
+
+    /// <summary>
+    ///     Gets the <see cref="bool" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public bool Boolean => GetValue<bool>(OutputTag.Bool);
+
+    /// <summary>
+    ///     Gets the <see cref="double" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="double" />.</exception>
+    public double Double => GetValue<double>(OutputTag.Double);
+
+    /// <summary>
+    ///     Gets the <see cref="long" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="long" />.</exception>
+    public long Long => GetValue<long>(OutputTag.Long);
+
+    /// <summary>
+    ///     Gets the <see cref="byte" /> array value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="byte" /> array.</exception>
+    public byte[] Bytes => GetValue<byte[]>(OutputTag.Bytes);
+
+    /// <summary>
+    ///     Gets the <see cref="Output" /> collection.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
+    public JsonArray Collection => GetValue<JsonArray>(OutputTag.Collection);
+
+    /// <summary>
+    ///     Gets the value as json object.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a json object.</exception>
+    public JsonObject Object => GetValue<JsonObject>(OutputTag.Object);
+
+    /// <summary>
+    ///     Gets the <see cref="Array" /> value.
+    /// </summary>
+    /// <returns>The resolved array.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
+    public Array Array => GetValue<Array>(OutputTag.Array);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved map.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Map Map => GetValue<Map>(OutputTag.Map);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Text Text => GetValue<Text>(OutputTag.Text);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElement" /> value.
+    /// </summary>
+    /// <returns>The resolved xml element.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
+    public XmlElement XmlElement => GetValue<XmlElement>(OutputTag.XmlElement);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlText" /> value.
+    /// </summary>
+    /// <returns>The resolved xml text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
+    public XmlText XmlText => GetValue<XmlText>(OutputTag.XmlText);
+
+    private T GetValue<T>(OutputTag expectedType)
     {
         if (value is not T typed)
         {

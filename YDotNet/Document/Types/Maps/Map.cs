@@ -15,8 +15,8 @@ public class Map : Branch
 {
     private readonly EventSubscriber<MapEvent> onObserve;
 
-    internal Map(nint handle, Doc doc)
-        : base(handle, doc)
+    internal Map(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<MapEvent>(
             handle,
@@ -41,6 +41,8 @@ public class Map : Branch
     /// <param name="input">The <see cref="Input" /> instance to be inserted.</param>
     public void Insert(Transaction transaction, string key, Input input)
     {
+        ThrowIfDeleted();
+
         using var unsafeKey = MemoryWriter.WriteUtf8String(key);
         using var unsafeValue = MemoryWriter.WriteStruct(input.InputNative);
 
@@ -58,6 +60,8 @@ public class Map : Branch
     /// <returns>The <see cref="Output" /> or <c>null</c> if entry not found.</returns>
     public Output? Get(Transaction transaction, string key)
     {
+        ThrowIfDeleted();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(key);
 
         var handle = MapChannel.Get(Handle, transaction.Handle, unsafeName.Handle);
@@ -72,6 +76,8 @@ public class Map : Branch
     /// <returns>The number of entries stored in the <see cref="Map" />.</returns>
     public uint Length(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         return MapChannel.Length(Handle, transaction.Handle);
     }
 
@@ -83,6 +89,8 @@ public class Map : Branch
     /// <returns>`true` if the entry was found and removed, `false` if no entry was found.</returns>
     public bool Remove(Transaction transaction, string key)
     {
+        ThrowIfDeleted();
+
         using var unsafeKey = MemoryWriter.WriteUtf8String(key);
 
         return MapChannel.Remove(Handle, transaction.Handle, unsafeKey.Handle) == 1;
@@ -94,6 +102,8 @@ public class Map : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     public void RemoveAll(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         MapChannel.RemoveAll(Handle, transaction.Handle);
     }
 
@@ -105,6 +115,8 @@ public class Map : Branch
     /// <returns>The <see cref="MapIterator" /> instance.</returns>
     public MapIterator Iterate(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = MapChannel.Iterator(Handle, transaction.Handle).Checked();
 
         return new MapIterator(handle, Doc);
@@ -120,6 +132,8 @@ public class Map : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<MapEvent> action)
     {
+        ThrowIfDeleted();
+
         return onObserve.Subscribe(action);
     }
 }

@@ -6,7 +6,7 @@ internal class EventSubscriber<TEvent>
     private readonly nint owner;
     private readonly Func<nint, Action<TEvent>, (uint Handle, object Callback)> subscribe;
     private readonly Action<nint, uint> unsubscribe;
-    private (uint Handle, object Callback) nativeSubscription;
+    private (uint Handle, object? Callback) nativeSubscription;
 
     public EventSubscriber(
         nint owner,
@@ -25,7 +25,7 @@ internal class EventSubscriber<TEvent>
 
     public IDisposable Subscribe(Action<TEvent> handler)
     {
-        if (nativeSubscription.Handle == nint.Zero)
+        if (nativeSubscription.Callback == null)
         {
             nativeSubscription = subscribe(owner, publisher.Publish);
         }
@@ -42,7 +42,7 @@ internal class EventSubscriber<TEvent>
     {
         publisher.Unsubscribe(handler);
 
-        if (publisher.Count == 0 && nativeSubscription.Handle != nint.Zero)
+        if (publisher.Count == 0 && nativeSubscription.Callback != null)
         {
             unsubscribe(owner, nativeSubscription.Handle);
 

@@ -64,9 +64,9 @@ public class Transaction : UnmanagedResource
     public Doc[] SubDocs()
     {
         var handle = TransactionChannel.SubDocs(Handle, out var length);
-        var handles = MemoryReader.ReadStructArray<nint>(handle, length);
+        var handles = MemoryReader.ReadStructs<nint>(handle, length);
 
-        return handles.Select(h => doc.GetDoc(h)).ToArray();
+        return handles.Select(h => doc.GetDoc(h, false)).ToArray();
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Array);
 
-        return handle != nint.Zero ? doc.GetArray(handle) : null;
+        return handle != nint.Zero ? doc.GetArray(handle, false) : null;
     }
 
     /// <summary>
@@ -298,7 +298,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Map);
 
-        return handle != nint.Zero ? doc.GetMap(handle) : null;
+        return handle != nint.Zero ? doc.GetMap(handle, false) : null;
     }
 
     /// <summary>
@@ -314,7 +314,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.Text);
 
-        return handle != nint.Zero ? doc.GetText(handle) : null;
+        return handle != nint.Zero ? doc.GetText(handle, false) : null;
     }
 
     /// <summary>
@@ -330,7 +330,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.XmlElement);
 
-        return handle != nint.Zero ? doc.GetXmlElement(handle) : null;
+        return handle != nint.Zero ? doc.GetXmlElement(handle, false) : null;
     }
 
     /// <summary>
@@ -346,7 +346,7 @@ public class Transaction : UnmanagedResource
     {
         var handle = GetWithKind(name, BranchKind.XmlText);
 
-        return handle != nint.Zero ? doc.GetXmlText(handle) : null;
+        return handle != nint.Zero ? doc.GetXmlText(handle, false) : null;
     }
 
     private nint GetWithKind(string name, BranchKind expectedKind)

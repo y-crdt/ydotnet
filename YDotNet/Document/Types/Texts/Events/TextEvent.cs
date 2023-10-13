@@ -40,7 +40,7 @@ public class TextEvent : UnmanagedResource
 
             var targetHandle = TextChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetText(targetHandle);
+            return doc.GetText(targetHandle, false);
         });
     }
 

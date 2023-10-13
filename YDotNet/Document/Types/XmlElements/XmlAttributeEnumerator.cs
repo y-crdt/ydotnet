@@ -1,15 +1,15 @@
 using System.Collections;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
 
 /// <summary>
-///     Represents the iterator to provide instances of <see cref="XmlAttribute" /> or <c>null</c> to
-///     <see cref="XmlAttributeIterator" />.
+///     Represents the iterator to provide instances of key value paris.
 /// </summary>
-internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
+internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>>
 {
-    private XmlAttribute? current;
+    private KeyValuePair<string, string> current;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlAttributeEnumerator" /> class.
@@ -29,7 +29,7 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     }
 
     /// <inheritdoc />
-    public XmlAttribute Current => current!;
+    public KeyValuePair<string, string> Current => current;
 
     /// <inheritdoc />
     object? IEnumerator.Current => current!;
@@ -41,9 +41,22 @@ internal class XmlAttributeEnumerator : IEnumerator<XmlAttribute>
     {
         var handle = XmlAttributeChannel.IteratorNext(Iterator.Handle);
 
-        current = handle != nint.Zero ? new XmlAttribute(handle) : null;
+        if (handle != nint.Zero)
+        {
+            var native = MemoryReader.ReadStruct<XmlAttributeNative>(handle);
 
-        return current != null;
+            current = new KeyValuePair<string, string>(native.Key(), native.Value());
+
+            // We are done reading, therefore we can release memory.
+            XmlAttributeChannel.Destroy(handle);
+
+            return true;
+        }
+        else
+        {
+            current = default;
+            return false;
+        }
     }
 
     /// <inheritdoc />

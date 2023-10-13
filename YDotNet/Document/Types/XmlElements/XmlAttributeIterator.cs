@@ -11,7 +11,7 @@ namespace YDotNet.Document.Types.XmlElements;
 /// <remarks>
 ///     The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate values.
 /// </remarks>
-public class XmlAttributeIterator : UnmanagedResource, IEnumerable<XmlAttribute>
+public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, string>>
 {
     internal XmlAttributeIterator(nint handle)
         : base(handle)
@@ -33,7 +33,7 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<XmlAttribute>
     }
 
     /// <inheritdoc />
-    public IEnumerator<XmlAttribute> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
     {
         return new XmlAttributeEnumerator(this);
     }

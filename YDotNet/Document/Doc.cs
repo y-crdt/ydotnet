@@ -1,6 +1,9 @@
+using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.Branches;
+using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
@@ -31,7 +34,7 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : TypeBase
+public class Doc : Resource, ITypeBase
 {
     private readonly TypeCache typeCache = new();
     private readonly EventSubscriber<ClearEvent> onClear;
@@ -58,11 +61,11 @@ public class Doc : TypeBase
     /// </summary>
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
-        : this(CreateDoc(options), null)
+        : this(CreateDoc(options), null, false)
     {
     }
 
-    internal Doc(nint handle, Doc? parent)
+    internal Doc(nint handle, Doc? parent, bool isDeleted)
     {
         this.parent = parent;
 
@@ -71,7 +74,7 @@ public class Doc : TypeBase
             (doc, action) =>
             {
                 DocChannel.ObserveClearCallback callback =
-                    (_, doc) => action(new ClearEvent(GetDoc(doc)));
+                    (_, doc) => action(new ClearEvent(GetDoc(doc, false)));
 
                 return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
             },
@@ -122,11 +125,40 @@ public class Doc : TypeBase
             (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
 
         Handle = handle;
+
+        if (isDeleted)
+        {
+            Dispose();
+        }
     }
 
     private static nint CreateDoc(DocOptions options)
     {
         return DocChannel.NewWithOptions(options.ToNative());
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="Doc"/> class.
+    /// </summary>
+    ~Doc()
+    {
+        Dispose(false);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        if (parent != null)
+        {
+            DocChannel.Destroy(Handle);
+        }
+    }
+
+    bool ITypeBase.IsDeleted => IsDisposed;
+
+    void ITypeBase.MarkDeleted()
+    {
+        Dispose();
     }
 
     /// <summary>
@@ -187,7 +219,7 @@ public class Doc : TypeBase
 
         var handle = DocChannel.Text(Handle, unsafeName.Handle);
 
-        return GetText(handle);
+        return GetText(handle, false);
     }
 
     /// <summary>
@@ -205,7 +237,7 @@ public class Doc : TypeBase
 
         var handle = DocChannel.Map(Handle, unsafeName.Handle);
 
-        return GetMap(handle);
+        return GetMap(handle, false);
     }
 
     /// <summary>
@@ -223,7 +255,7 @@ public class Doc : TypeBase
 
         var handle = DocChannel.Array(Handle, unsafeName.Handle);
 
-        return GetArray(handle);
+        return GetArray(handle, false);
     }
 
     /// <summary>
@@ -241,7 +273,7 @@ public class Doc : TypeBase
 
         var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
 
-        return GetXmlElement(handle);
+        return GetXmlElement(handle, false);
     }
 
     /// <summary>
@@ -259,15 +291,15 @@ public class Doc : TypeBase
 
         var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
 
-        return GetXmlText(handle);
+        return GetXmlText(handle, false);
     }
 
     /// <summary>
     ///     Starts a new read-write <see cref="Transaction" /> on this document.
     /// </summary>
     /// <param name="origin">Optional byte marker to indicate the source of changes to be applied by this transaction.</param>
-    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    /// <returns>The <see cref="Transaction" /> to perform write operations in the document.</returns>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction WriteTransaction(byte[]? origin = null)
     {
         var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
@@ -284,8 +316,8 @@ public class Doc : TypeBase
     /// <summary>
     ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
-    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    /// <returns>The <see cref="Transaction" /> to perform read operations in the document.</returns>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction ReadTransaction()
     {
         var handle = DocChannel.ReadTransaction(Handle);
@@ -383,43 +415,56 @@ public class Doc : TypeBase
         return onSubDocs.Subscribe(action);
     }
 
-    internal Doc GetDoc(nint handle)
+    internal Doc GetDoc(nint handle, bool isDeleted)
     {
-        return GetOrAdd(handle, h => new Doc(h,  this));
-    }
-
-    internal Map GetMap(nint handle)
-    {
-        return GetOrAdd(handle, h => new Map(h, this));
-    }
-
-    internal Array GetArray(nint handle)
-    {
-        return GetOrAdd(handle, h => new Array(h, this));
-    }
-
-    internal Text GetText(nint handle)
-    {
-        return GetOrAdd(handle, h => new Text(h, this));
-    }
-
-    internal XmlText GetXmlText(nint handle)
-    {
-        return GetOrAdd(handle, h => new XmlText(h, this));
-    }
-
-    internal XmlElement GetXmlElement(nint handle)
-    {
-        return GetOrAdd(handle, h => new XmlElement(h, this));
-    }
-
-    private T GetOrAdd<T>(nint handle, Func<nint, T> factory) where T : ITypeBase
-    {
-        if (parent != null)
+        if (handle == Handle)
         {
-            return parent.GetOrAdd<T>(handle, factory);
+            return this;
         }
 
-        return typeCache.GetOrAdd(handle, factory);
+        if (!isDeleted)
+        {
+            // Prevent the sub document to be released while we are working with it.
+            handle = DocChannel.Clone(handle);
+        }
+
+        return GetOrAdd(handle, (h, doc) => new Doc(handle, doc, isDeleted));
+    }
+
+    internal Map GetMap(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new Map(h, doc, isDeleted));
+    }
+
+    internal Array GetArray(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new Array(h, doc, isDeleted));
+    }
+
+    internal Text GetText(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new Text(h, doc, isDeleted));
+    }
+
+    internal XmlText GetXmlText(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new XmlText(h, doc, isDeleted));
+    }
+
+    internal XmlElement GetXmlElement(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new XmlElement(h, doc, isDeleted));
+    }
+
+    private T GetOrAdd<T>(nint handle, Func<nint, Doc, T> factory) where T : ITypeBase
+    {
+        var doc = GetRootDoc();
+
+        return doc.typeCache.GetOrAdd(handle, h => factory(h, doc));
+    }
+
+    private Doc GetRootDoc()
+    {
+        return parent?.GetRootDoc() ?? this;
     }
 }

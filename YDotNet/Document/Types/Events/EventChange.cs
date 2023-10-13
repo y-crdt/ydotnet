@@ -20,7 +20,7 @@ public class EventChange
             _ => throw new NotSupportedException($"The value \"{native.TagNative}\" for {nameof(EventChangeTagNative)} is not supported."),
         };
 
-        Values = native.ValuesHandles.Select(x => new Output(x, doc)).ToList();
+        Values = native.ValuesHandles.Select(x => new Output(x, doc, false)).ToList();
     }
 
     /// <summary>

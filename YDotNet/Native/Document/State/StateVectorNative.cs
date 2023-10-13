@@ -12,11 +12,11 @@ internal readonly struct StateVectorNative
 
     public ulong[] ClientIds()
     {
-        return MemoryReader.ReadStructArray<ulong>(ClientIdsHandle, EntriesCount);
+        return MemoryReader.ReadStructs<ulong>(ClientIdsHandle, EntriesCount);
     }
 
     public uint[] Clocks()
     {
-        return MemoryReader.ReadStructArray<uint>(ClientIdsHandle, EntriesCount);
+        return MemoryReader.ReadStructs<uint>(ClientIdsHandle, EntriesCount);
     }
 }

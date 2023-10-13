@@ -17,8 +17,8 @@ public class Array : Branch
 {
     private readonly EventSubscriber<ArrayEvent> onObserve;
 
-    internal Array(nint handle, Doc doc)
-        : base(handle, doc)
+    internal Array(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<ArrayEvent>(
             handle,
@@ -35,7 +35,15 @@ public class Array : Branch
     /// <summary>
     ///     Gets the number of elements stored within current instance of <see cref="YDotNet.Document.Types.Arrays.Array" />.
     /// </summary>
-    public uint Length => ArrayChannel.Length(Handle);
+    public uint Length
+    {
+        get
+        {
+            ThrowIfDeleted();
+
+            return ArrayChannel.Length(Handle);
+        }
+    }
 
     /// <summary>
     ///     Inserts a range of <paramref name="inputs" /> into the current instance of <see cref="Array" />.
@@ -45,6 +53,8 @@ public class Array : Branch
     /// <param name="inputs">The items to be inserted.</param>
     public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
+        ThrowIfDeleted();
+
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
         ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
@@ -58,6 +68,8 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDeleted();
+
         ArrayChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
@@ -73,6 +85,8 @@ public class Array : Branch
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
     {
+        ThrowIfDeleted();
+
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
@@ -89,6 +103,8 @@ public class Array : Branch
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
+        ThrowIfDeleted();
+
         ArrayChannel.Move(Handle, transaction.Handle, sourceIndex, targetIndex);
     }
 
@@ -100,6 +116,8 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = ArrayChannel.Iterator(Handle, transaction.Handle);
 
         return new ArrayIterator(handle.Checked(), Doc);
@@ -115,6 +133,8 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<ArrayEvent> action)
     {
+        ThrowIfDeleted();
+
         return onObserve.Subscribe(action);
     }
 
@@ -128,6 +148,8 @@ public class Array : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
+        ThrowIfDeleted();
+
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;

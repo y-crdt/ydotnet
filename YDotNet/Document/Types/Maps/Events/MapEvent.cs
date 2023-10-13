@@ -35,7 +35,7 @@ public class MapEvent : UnmanagedResource
         {
             var targetHandle = MapChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetMap(targetHandle);
+            return doc.GetMap(targetHandle, false);
         });
     }
 

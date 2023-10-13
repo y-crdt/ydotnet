@@ -19,7 +19,7 @@ public class TextChunks : ReadOnlyCollection<TextChunk>
     {
         var result = new List<TextChunk>((int)length);
 
-        foreach (var native in MemoryReader.ReadIntPtrArray<TextChunkNative>(handle, length))
+        foreach (var native in MemoryReader.ReadStructsWithHandles<TextChunkNative>(handle, length))
         {
             result.Add(new TextChunk(native, doc));
         }

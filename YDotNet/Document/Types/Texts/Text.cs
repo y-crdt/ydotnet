@@ -17,8 +17,8 @@ public class Text : Branch
 {
     private readonly EventSubscriber<TextEvent> onObserve;
 
-    internal Text(nint handle, Doc doc)
-        : base(handle, doc)
+    internal Text(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<TextEvent>(
             handle,
@@ -44,6 +44,8 @@ public class Text : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
+        ThrowIfDeleted();
+
         using var unsafeValue = MemoryWriter.WriteUtf8String(value);
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
@@ -62,6 +64,8 @@ public class Text : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
+        ThrowIfDeleted();
+
         var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
         var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
@@ -79,6 +83,8 @@ public class Text : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDeleted();
+
         TextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
@@ -97,6 +103,8 @@ public class Text : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
+        ThrowIfDeleted();
+
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
         TextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
@@ -109,6 +117,8 @@ public class Text : Branch
     /// <returns>The <see cref="TextChunks" /> that compose this <see cref="Text" />.</returns>
     public TextChunks Chunks(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length).Checked();
 
         return new TextChunks(handle, length, Doc);
@@ -121,6 +131,8 @@ public class Text : Branch
     /// <returns>The full string stored in the instance.</returns>
     public string String(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = TextChannel.String(Handle, transaction.Handle);
 
         return MemoryReader.ReadStringAndDestroy(handle);
@@ -136,6 +148,8 @@ public class Text : Branch
     /// <returns>The length, in bytes, of the string stored in the instance.</returns>
     public uint Length(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         return TextChannel.Length(Handle, transaction.Handle);
     }
 
@@ -146,6 +160,8 @@ public class Text : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<TextEvent> action)
     {
+        ThrowIfDeleted();
+
         return onObserve.Subscribe(action);
     }
 
@@ -159,6 +175,8 @@ public class Text : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
+        ThrowIfDeleted();
+
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;

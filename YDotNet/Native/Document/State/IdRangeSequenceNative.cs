@@ -12,6 +12,6 @@ internal readonly struct IdRangeSequenceNative
 
     public IdRangeNative[] Sequence()
     {
-        return MemoryReader.ReadStructArray<IdRangeNative>(SequenceHandle, SequenceLength);
+        return MemoryReader.ReadStructs<IdRangeNative>(SequenceHandle, SequenceLength);
     }
 }

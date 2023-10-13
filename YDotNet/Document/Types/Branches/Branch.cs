@@ -16,7 +16,8 @@ public abstract class Branch : TypeBase
 {
     private readonly EventSubscriber<EventBranch[]> onDeep;
 
-    internal Branch(nint handle, Doc doc)
+    internal Branch(nint handle, Doc doc, bool isDeleted)
+        : base(isDeleted)
     {
         Doc = doc;
 
@@ -26,7 +27,7 @@ public abstract class Branch : TypeBase
             {
                 BranchChannel.ObserveCallback callback = (_, length, ev) =>
                 {
-                    var events = MemoryReader.ReadIntPtrArray<EventBranchNative>(ev, length).Select(x => new EventBranch(x, doc)).ToArray();
+                    var events = MemoryReader.ReadStructsWithHandles<EventBranchNative>(ev, length).Select(x => new EventBranch(x, doc)).ToArray();
 
                     action(events);
                 };
@@ -60,9 +61,11 @@ public abstract class Branch : TypeBase
     ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction WriteTransaction()
     {
+        ThrowIfDeleted();
+
         var handle = BranchChannel.WriteTransaction(Handle);
 
         if (handle == nint.Zero)
@@ -78,9 +81,11 @@ public abstract class Branch : TypeBase
     ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
-    /// <exception cref="YDotNetException">Another exception is pending.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction ReadTransaction()
     {
+        ThrowIfDeleted();
+
         var handle = BranchChannel.ReadTransaction(Handle);
 
         if (handle == nint.Zero)

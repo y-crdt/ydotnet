@@ -19,9 +19,9 @@ public class EventDeltas : ReadOnlyCollection<EventDelta>
     {
         var result = new List<EventDelta>((int)length);
 
-        foreach (var native in MemoryReader.ReadIntPtrArray<EventDeltaNative>(handle, length))
+        foreach (var native in MemoryReader.ReadStructs<EventDeltaNative>(handle, length))
         {
-            result.Add(new EventDelta(native.Value, doc));
+            result.Add(new EventDelta(native, doc));
         }
 
         // We are done reading and can release the memory.

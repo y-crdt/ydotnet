@@ -42,7 +42,7 @@ public class XmlElementEvent : UnmanagedResource
         {
             var targetHandle = XmlElementChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetXmlElement(targetHandle);
+            return doc.GetXmlElement(targetHandle, false);
         });
     }
 

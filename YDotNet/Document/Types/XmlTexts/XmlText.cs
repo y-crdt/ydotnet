@@ -18,8 +18,8 @@ public class XmlText : Branch
 {
     private readonly EventSubscriber<XmlTextEvent> onObserve;
 
-    internal XmlText(nint handle, Doc doc)
-        : base(handle, doc)
+    internal XmlText(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<XmlTextEvent>(
             handle,
@@ -40,6 +40,8 @@ public class XmlText : Branch
     /// <returns>The length of the text, in bytes, stored in the <see cref="XmlText" />.</returns>
     public uint Length(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         return XmlTextChannel.Length(Handle, transaction.Handle);
     }
 
@@ -55,6 +57,8 @@ public class XmlText : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
+        ThrowIfDeleted();
+
         using var unsafeValue = MemoryWriter.WriteUtf8String(value);
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
@@ -73,6 +77,8 @@ public class XmlText : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
+        ThrowIfDeleted();
+
         using var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
@@ -90,6 +96,8 @@ public class XmlText : Branch
     /// <param name="value">The value of the attribute to be added.</param>
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
+        ThrowIfDeleted();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         using var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
@@ -103,6 +111,8 @@ public class XmlText : Branch
     /// <param name="name">The name of the attribute to be removed.</param>
     public void RemoveAttribute(Transaction transaction, string name)
     {
+        ThrowIfDeleted();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
         XmlTextChannel.RemoveAttribute(Handle, transaction.Handle, unsafeName.Handle);
@@ -116,6 +126,8 @@ public class XmlText : Branch
     /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
     public string? GetAttribute(Transaction transaction, string name)
     {
+        ThrowIfDeleted();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
         var handle = XmlTextChannel.GetAttribute(Handle, transaction.Handle, unsafeName.Handle);
@@ -130,6 +142,8 @@ public class XmlText : Branch
     /// <returns>The <see cref="XmlAttributeIterator" /> instance.</returns>
     public XmlAttributeIterator Iterate(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = XmlTextChannel.AttributeIterator(Handle, transaction.Handle).Checked();
 
         return new XmlAttributeIterator(handle);
@@ -142,6 +156,8 @@ public class XmlText : Branch
     /// <returns>The string representation of the <see cref="XmlText" /> instance.</returns>
     public string String(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = XmlTextChannel.String(Handle, transaction.Handle);
 
         return MemoryReader.ReadStringAndDestroy(handle);
@@ -158,6 +174,8 @@ public class XmlText : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDeleted();
+
         XmlTextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
@@ -176,6 +194,8 @@ public class XmlText : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
+        ThrowIfDeleted();
+
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
         XmlTextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
@@ -192,6 +212,8 @@ public class XmlText : Branch
     /// </returns>
     public Output? PreviousSibling(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
@@ -208,6 +230,8 @@ public class XmlText : Branch
     /// </returns>
     public Output? NextSibling(Transaction transaction)
     {
+        ThrowIfDeleted();
+
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
@@ -223,6 +247,8 @@ public class XmlText : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlTextEvent> action)
     {
+        ThrowIfDeleted();
+
         return onObserve.Subscribe(action);
     }
 
@@ -236,6 +262,8 @@ public class XmlText : Branch
     /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
+        ThrowIfDeleted();
+
         var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;

@@ -40,7 +40,7 @@ public class ArrayEvent : UnmanagedResource
 
             var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
 
-            return new Array(targetHandle, doc);
+            return doc.GetArray(targetHandle, false);
         });
     }
 

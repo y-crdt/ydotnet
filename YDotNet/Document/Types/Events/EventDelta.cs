@@ -22,11 +22,11 @@ public class EventDelta
 
         Attributes = native.Attributes.ToDictionary(
             x => x.Value.Key(),
-            x => new Output(x.Value.ValueHandle(x.Handle), doc));
+            x => new Output(x.Value.ValueHandle(x.Handle), doc, false));
 
         if (native.InsertHandle != nint.Zero)
         {
-            Insert = new Output(native.InsertHandle, doc);
+            Insert = new Output(native.InsertHandle, doc, false);
         }
     }
 

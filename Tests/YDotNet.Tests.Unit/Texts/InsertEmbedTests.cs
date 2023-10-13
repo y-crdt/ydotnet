@@ -147,7 +147,7 @@ public class InsertEmbedTests
         var chunks = text.Chunks(transaction);
 
         Assert.That(chunks.Count, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTage.Null));
+        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTag.Null));
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class InsertEmbedTests
         var chunks = text.Chunks(transaction);
 
         Assert.That(chunks.Count, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTage.Undefined));
+        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTag.Undefined));
     }
 
     [Test]

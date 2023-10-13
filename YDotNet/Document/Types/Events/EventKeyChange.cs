@@ -26,12 +26,12 @@ public class EventKeyChange
 
         if (native.OldValue != nint.Zero)
         {
-            OldValue = new Output(native.OldValue, doc);
+            OldValue = new Output(native.OldValue, doc, true);
         }
 
         if (native.NewValue != nint.Zero)
         {
-            NewValue = new Output(native.NewValue, doc);
+            NewValue = new Output(native.NewValue, doc, false);
         }
     }
 

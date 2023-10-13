@@ -22,7 +22,7 @@ internal readonly struct EventChangeNative
                 return Array.Empty<nint>();
             }
 
-            return MemoryReader.ReadIntPtrArray(Values, Length, Marshal.SizeOf<OutputNative>()).ToArray();
+            return MemoryReader.ReadPointers<OutputNative>(Values, Length).ToArray();
         }
     }
 }

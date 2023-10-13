@@ -19,9 +19,9 @@ public sealed class EventPath : ReadOnlyCollection<EventPathSegment>
     {
         var result = new List<EventPathSegment>();
 
-        foreach (var itemHandle in MemoryReader.ReadIntPtrArray(handle, length, size: 16))
+        foreach (var native in MemoryReader.ReadStructs<EventPathSegmentNative>(handle, length))
         {
-            result.Add(new EventPathSegment(itemHandle));
+            result.Add(new EventPathSegment(native));
         }
 
         // We have read everything, so we can release the memory immediately.

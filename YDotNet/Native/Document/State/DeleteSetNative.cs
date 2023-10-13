@@ -14,11 +14,11 @@ internal readonly struct DeleteSetNative
 
     public ulong[] Clients()
     {
-        return MemoryReader.ReadStructArray<ulong>(ClientIdsHandle, EntriesCount);
+        return MemoryReader.ReadStructs<ulong>(ClientIdsHandle, EntriesCount);
     }
 
     public IdRangeSequenceNative[] Ranges()
     {
-        return MemoryReader.ReadStructArray<IdRangeSequenceNative>(RangesHandle, EntriesCount);
+        return MemoryReader.ReadStructs<IdRangeSequenceNative>(RangesHandle, EntriesCount);
     }
 }

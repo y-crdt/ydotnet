@@ -11,11 +11,11 @@ public class TextChunk
 {
     internal TextChunk(NativeWithHandle<TextChunkNative> native, Doc doc)
     {
-        Data = new Output(native.Handle, doc);
+        Data = new Output(native.Handle, doc, false);
 
         Attributes = native.Value.Attributes().ToDictionary(
             x => x.Value.Key(),
-            x => new Output(x.Value.ValueHandle(x.Handle), doc));
+            x => new Output(x.Value.ValueHandle(x.Handle), doc, false));
     }
 
     /// <summary>

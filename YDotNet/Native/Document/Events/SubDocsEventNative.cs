@@ -25,7 +25,7 @@ internal readonly struct SubDocsEventNative
             return Array.Empty<nint>();
         }
 
-        return MemoryReader.ReadStructArray<nint>(AddedHandle, AddedLength);
+        return MemoryReader.ReadStructs<nint>(AddedHandle, AddedLength);
     }
 
     public nint[] Removed()
@@ -35,7 +35,7 @@ internal readonly struct SubDocsEventNative
             return Array.Empty<nint>();
         }
 
-        return MemoryReader.ReadStructArray<nint>(RemovedHandle, RemovedLength);
+        return MemoryReader.ReadStructs<nint>(RemovedHandle, RemovedLength);
     }
 
     public nint[] Loaded()
@@ -45,6 +45,6 @@ internal readonly struct SubDocsEventNative
             return Array.Empty<nint>();
         }
 
-        return MemoryReader.ReadStructArray<nint>(LoadedHandle, LoadedLength);
+        return MemoryReader.ReadStructs<nint>(LoadedHandle, LoadedLength);
     }
 }

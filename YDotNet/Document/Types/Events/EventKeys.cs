@@ -19,7 +19,7 @@ public class EventKeys : ReadOnlyCollection<EventKeyChange>
     {
         var result = new List<EventKeyChange>();
 
-        foreach (var native in MemoryReader.ReadIntPtrArray<EventKeyChangeNative>(handle, length))
+        foreach (var native in MemoryReader.ReadStructsWithHandles<EventKeyChangeNative>(handle, length))
         {
             result.Add(new EventKeyChange(native.Value, doc));
         }

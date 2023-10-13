@@ -16,62 +16,49 @@ internal static class MemoryReader
         return data;
     }
 
-    internal static T ReadStruct<T>(nint handle)
-        where T : struct
-    {
-        return Marshal.PtrToStructure<T>(handle);
-    }
-
-    internal static T[] ReadStructArray<T>(nint handle, uint length)
-        where T : struct
+    internal static T[] ReadStructs<T>(nint handle, uint length) where T : struct
     {
         var itemSize = Marshal.SizeOf<T>();
         var itemBuffer = new T[length];
 
         for (var i = 0; i < length; i++)
         {
-            itemBuffer[i] = Marshal.PtrToStructure<T>(handle + (i * itemSize));
+            itemBuffer[i] = Marshal.PtrToStructure<T>(handle);
+            handle += itemSize;
         }
 
         return itemBuffer;
     }
 
-    internal static byte[]? TryReadBytes(nint handle, uint length)
-    {
-        return handle == nint.Zero ? null : ReadBytes(handle, length);
-    }
-
-    internal static IEnumerable<nint> ReadIntPtrArray(nint handle, uint length, int size)
-    {
-        var itemSize = size;
-
-        for (var i = 0; i < length; i++)
-        {
-            yield return handle;
-
-            handle += itemSize;
-        }
-    }
-
-    internal static IEnumerable<NativeWithHandle<T>> ReadIntPtrArray<T>(nint handle, uint length) where T : struct
+    internal static nint[] ReadPointers<T>(nint handle, uint length) where T : struct
     {
         var itemSize = Marshal.SizeOf<T>();
+        var itemBuffer = new nint[length];
 
         for (var i = 0; i < length; i++)
         {
-            yield return new NativeWithHandle<T>(Marshal.PtrToStructure<T>(handle), handle);
-
+            itemBuffer[i] = handle;
             handle += itemSize;
         }
+
+        return itemBuffer;
     }
 
-    internal static nint[]? TryReadIntPtrArray(nint handle, uint length, int size)
+    internal static NativeWithHandle<T>[] ReadStructsWithHandles<T>(nint handle, uint length) where T : struct
     {
-        return handle == nint.Zero ? null : ReadIntPtrArray(handle, length, size).ToArray();
+        var itemSize = Marshal.SizeOf<T>();
+        var itemBuffer = new NativeWithHandle<T>[length];
+
+        for (var i = 0; i < length; i++)
+        {
+            itemBuffer[i] = new NativeWithHandle<T>(Marshal.PtrToStructure<T>(handle), handle);
+            handle += itemSize;
+        }
+
+        return itemBuffer;
     }
 
-    internal static T PtrToStruct<T>(nint handle)
-        where T : struct
+    internal static T ReadStruct<T>(nint handle) where T : struct
     {
         return Marshal.PtrToStructure<T>(handle.Checked());
     }

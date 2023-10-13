@@ -3,7 +3,7 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 /// The type of an output.
 /// </summary>
-public enum OutputTage
+public enum OutputTag
 {
     /// <summary>
     /// No defined.

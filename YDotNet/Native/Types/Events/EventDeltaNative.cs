@@ -26,7 +26,7 @@ internal readonly struct EventDeltaNative
                 return Array.Empty<NativeWithHandle<MapEntryNative>>();
             }
 
-            return MemoryReader.ReadIntPtrArray<MapEntryNative>(AttributesHandle, AttributesLength).ToArray();
+            return MemoryReader.ReadStructsWithHandles<MapEntryNative>(AttributesHandle, AttributesLength).ToArray();
         }
     }
 }

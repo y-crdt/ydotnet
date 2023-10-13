@@ -19,9 +19,9 @@ public class EventChanges : ReadOnlyCollection<EventChange>
     {
         var result = new List<EventChange>();
 
-        foreach (var native in MemoryReader.ReadIntPtrArray<EventChangeNative>(handle, length))
+        foreach (var native in MemoryReader.ReadStructs<EventChangeNative>(handle, length))
         {
-            result.Add(new EventChange(native.Value, doc));
+            result.Add(new EventChange(native, doc));
         }
 
         // We are done reading and can release the resource.

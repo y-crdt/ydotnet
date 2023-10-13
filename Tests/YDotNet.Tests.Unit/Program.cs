@@ -9,6 +9,7 @@ public class Program
 {
     public static void Main()
     {
+        /*
         var doc = new Doc();
         var a = doc.Map("A");
         Map b;
@@ -19,7 +20,10 @@ public class Program
 
             b = a.Get(t, "B").Map;
             b.Insert(t, "C", Input.Double(1));
+        }
 
+        using (var t = doc.WriteTransaction())
+        {
             a.Remove(t, "B");
         }
 
@@ -36,7 +40,7 @@ public class Program
             b.Insert(t, "D", Input.Double(1));
             
             var length = b.Length(t);
-        }
+        }*/
 
             var types = typeof(Program).Assembly.GetTypes();
 

@@ -1,6 +1,3 @@
-using System.Runtime.InteropServices;
-using YDotNet.Infrastructure;
-
 namespace YDotNet.Document.Types.Events;
 
 /// <summary>
@@ -8,23 +5,18 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventPathSegment
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventPathSegment" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    public EventPathSegment(nint handle)
+    internal EventPathSegment(EventPathSegmentNative native)
     {
-        Handle = handle;
-        Tag = (EventPathSegmentTag)Marshal.ReadByte(handle);
+        Tag = (EventPathSegmentTag)native.Tag;
 
         switch (Tag)
         {
             case EventPathSegmentTag.Key:
-                Key = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(handle + MemoryConstants.PointerSize));
+                Key = native.Key();
                 break;
 
             case EventPathSegmentTag.Index:
-                Index = (uint)Marshal.ReadInt32(handle + MemoryConstants.PointerSize);
+                Index = (uint)native.KeyOrIndex;
                 break;
         }
     }
@@ -35,19 +27,12 @@ public class EventPathSegment
     public EventPathSegmentTag Tag { get; }
 
     /// <summary>
-    ///     Gets the <see cref="string" /> key, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Key" />, or
-    ///     <c>null</c> otherwise.
+    ///     Gets the <see cref="string" /> key, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Key" />, or <c>null</c> otherwise.
     /// </summary>
     public string? Key { get; }
 
     /// <summary>
-    ///     Gets the <see ref="uint" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or
-    ///     <c>null</c> otherwise.
+    ///     Gets the <see ref="uint" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or <c>null</c> otherwise.
     /// </summary>
     public uint? Index { get; }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
 }

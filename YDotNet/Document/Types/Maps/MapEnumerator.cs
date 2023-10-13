@@ -37,11 +37,11 @@ internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 
         if (handle != nint.Zero)
         {
-            var native = MemoryReader.PtrToStruct<MapEntryNative>(handle);
+            var native = MemoryReader.ReadStruct<MapEntryNative>(handle);
 
             current = new KeyValuePair<string, Output>(
                 native.Key(),
-                new Output(native.ValueHandle(handle), Iterator.Doc));
+                new Output(native.ValueHandle(handle), Iterator.Doc, false));
 
             // We are done reading, so we can release the memory.
             MapChannel.EntryDestroy(handle);
