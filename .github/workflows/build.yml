@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'main'
-      - '50-implement-automated-tests-pipeline'
 
 jobs:
   test:
