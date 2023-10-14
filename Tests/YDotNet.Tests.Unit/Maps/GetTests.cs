@@ -18,12 +18,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "star-⭐").Boolean;
-        var value2 = map.Get(transaction, "moon-🌕").Boolean;
+        var value1 = map.Get(transaction, "star-⭐");
+        var value2 = map.Get(transaction, "moon-🌕");
 
         // Assert
-        Assert.That(value1, Is.True);
-        Assert.That(value2, Is.False);
+        Assert.That(value1.Boolean, Is.True);
+        Assert.That(value2.Boolean, Is.False);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Boolean));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -36,12 +38,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Double;
-        var value2 = map.Get(transaction, "value2").Double;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
-        Assert.That(value1, Is.EqualTo(expected: 24.69));
-        Assert.That(value2, Is.EqualTo(expected: -4.20));
+        Assert.That(value1.Double, Is.EqualTo(expected: 24.69));
+        Assert.That(value2.Double, Is.EqualTo(expected: -4.20));
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Double));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Double));
     }
 
     [Test]
@@ -54,12 +58,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Long;
-        var value2 = map.Get(transaction, "value2").Long;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
-        Assert.That(value1, Is.EqualTo(expected: 2469L));
-        Assert.That(value2, Is.EqualTo(expected: -420L));
+        Assert.That(value1.Long, Is.EqualTo(expected: 2469L));
+        Assert.That(value2.Long, Is.EqualTo(expected: -420L));
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Long));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Long));
     }
 
     [Test]
@@ -72,12 +78,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "name").String;
-        var value2 = map.Get(transaction, "earth-🌍").String;
+        var value1 = map.Get(transaction, "name");
+        var value2 = map.Get(transaction, "earth-🌍");
 
         // Assert
-        Assert.That(value1, Is.EqualTo("Lucas"));
-        Assert.That(value2, Is.EqualTo("globe-🌐"));
+        Assert.That(value1.String, Is.EqualTo("Lucas"));
+        Assert.That(value2.String, Is.EqualTo("globe-🌐"));
+        Assert.That(value1.Type, Is.EqualTo(OutputType.String));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.String));
     }
 
     [Test]
@@ -90,12 +98,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Bytes;
-        var value2 = map.Get(transaction, "value2").Bytes;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
-        Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1.Bytes, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
+        Assert.That(value2.Bytes, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Bytes));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -113,15 +123,18 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Collection;
-        var value2 = map.Get(transaction, "value2").Collection;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1Collection = value1.Collection;
 
         // Assert
-        //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value1.Length, Is.EqualTo(expected: 2));
-        Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
-        Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1Collection, Is.Not.Null);
+        Assert.That(value1Collection.Length, Is.EqualTo(expected: 2));
+        Assert.That(value1Collection[0].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1Collection[1].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2.Collection, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Collection));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -139,14 +152,18 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Object;
-        var value2 = map.Get(transaction, "value2").Object;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1Object = value1.Object;
 
         // Assert
-        Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
-        Assert.That(value1["star-⭐"].Long, Is.EqualTo(expected: 2469));
-        Assert.That(value1["moon-🌕"].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1Object, Is.Not.Null);
+        Assert.That(value1Object.Count, Is.EqualTo(expected: 2));
+        Assert.That(value1Object["star-⭐"].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1Object["moon-🌕"].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2.Object, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Object));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -160,14 +177,17 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Null;
-        var value2 = map.Get(transaction, "value2").Null;
-        var value3 = map.Get(transaction, "value3").Null;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value3 = map.Get(transaction, "value3");
 
         // Assert
-        Assert.That(value1, Is.True);
-        Assert.That(value2, Is.False);
-        Assert.That(value3, Is.False);
+        Assert.That(value1.Null, Is.True);
+        Assert.That(value2.Null, Is.False);
+        Assert.That(value3.Null, Is.False);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Null));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Undefined));
+        Assert.That(value3.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -181,14 +201,17 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Undefined;
-        var value2 = map.Get(transaction, "value2").Undefined;
-        var value3 = map.Get(transaction, "value3").Undefined;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value3 = map.Get(transaction, "value3");
 
         // Assert
-        Assert.That(value1, Is.True);
-        Assert.That(value2, Is.False);
-        Assert.That(value3, Is.False);
+        Assert.That(value1.Undefined, Is.True);
+        Assert.That(value2.Undefined, Is.False);
+        Assert.That(value3.Undefined, Is.False);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Undefined));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
+        Assert.That(value3.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -201,13 +224,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Text;
-        var value2 = map.Get(transaction, "value2").Text;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
-        Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.String(transaction), Is.EqualTo("Lucas"));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1.Text.String(transaction), Is.EqualTo("Lucas"));
+        Assert.That(value2.Text, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Text));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -225,13 +249,16 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Array;
-        var value2 = map.Get(transaction, "value2").Array;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1Array = value1.Array;
 
         // Assert
-        Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Length, Is.EqualTo(expected: 2));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1Array, Is.Not.Null);
+        Assert.That(value1Array.Length, Is.EqualTo(expected: 2));
+        Assert.That(value2.Array, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Array));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]
@@ -249,15 +276,18 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Map;
-        var value2 = map.Get(transaction, "value2").Map;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1Map = value1.Map;
 
         // Assert
-        Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Length(transaction), Is.EqualTo(expected: 2));
-        Assert.That(value1.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
-        Assert.That(value1.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1Map, Is.Not.Null);
+        Assert.That(value1Map.Length(transaction), Is.EqualTo(expected: 2));
+        Assert.That(value1Map.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
+        Assert.That(value1Map.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
+        Assert.That(value2.Map, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Map));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Boolean));
     }
 
     [Test]
@@ -270,13 +300,16 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").XmlElement;
-        var value2 = map.Get(transaction, "value2").XmlElement;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1XmlElement = value1.XmlElement;
 
         // Assert
-        Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Tag, Is.EqualTo("person"));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1XmlElement, Is.Not.Null);
+        Assert.That(value1XmlElement.Tag, Is.EqualTo("person"));
+        Assert.That(value2.XmlElement, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.XmlElement));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]
@@ -289,13 +322,16 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").XmlText;
-        var value2 = map.Get(transaction, "value2").XmlText;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
+        var value1XmlText = value1.XmlText;
 
         // Assert
-        Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Length(transaction), Is.EqualTo(expected: 5));
-        Assert.That(value2, Is.Null);
+        Assert.That(value1XmlText, Is.Not.Null);
+        Assert.That(value1XmlText.Length(transaction), Is.EqualTo(expected: 5));
+        Assert.That(value2.XmlText, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.XmlText));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Null));
     }
 
     [Test]
@@ -306,10 +342,11 @@ public class GetTests
         var (map, transaction) = ArrangeDoc(("sub-doc", Input.Doc(subDoc)));
 
         // Act
-        var subDocFromMap = map.Get(transaction, "sub-doc").Doc;
+        var value1 = map.Get(transaction, "sub-doc");
 
         // Assert
-        Assert.That(subDoc.Id, Is.EqualTo(subDocFromMap.Id));
+        Assert.That(subDoc.Id, Is.EqualTo(value1.Doc.Id));
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Doc));
     }
 
     [Test]
@@ -322,12 +359,14 @@ public class GetTests
         );
 
         // Act
-        var value1 = map.Get(transaction, "value1").Double;
-        var value2 = map.Get(transaction, "value2").Long;
+        var value1 = map.Get(transaction, "value1");
+        var value2 = map.Get(transaction, "value2");
 
         // Assert
-        Assert.That(value1, Is.Null);
-        Assert.That(value2, Is.Null);
+        Assert.That(value1.Double, Is.Null);
+        Assert.That(value2.Long, Is.Null);
+        Assert.That(value1.Type, Is.EqualTo(OutputType.Long));
+        Assert.That(value2.Type, Is.EqualTo(OutputType.Double));
     }
 
     [Test]
