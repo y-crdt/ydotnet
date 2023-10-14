@@ -64,7 +64,7 @@ public class ArrayObserveDeepTests
         Assert.That(pathSegments.ElementAt(index: 1).Key, Is.EqualTo("array-3"));
         Assert.That(pathSegments.ElementAt(index: 1).Index, Is.Null);
 
-        array1.UnobserveDeep(subscription);
+        subscription.Dispose();
     }
 
     [Test]
@@ -130,6 +130,6 @@ public class ArrayObserveDeepTests
         Assert.That(pathSegments.ElementAt(index: 1).Index, Is.EqualTo(expected: 3));
         Assert.That(pathSegments.ElementAt(index: 1).Key, Is.Null);
 
-        array1.UnobserveDeep(subscription);
+        subscription.Dispose();
     }
 }

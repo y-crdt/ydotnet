@@ -7,58 +7,58 @@ namespace YDotNet.Document.Types.XmlTexts.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within an <see cref="XmlText" /> instance.
 /// </summary>
-public class XmlTextEvent
+public class XmlTextEvent : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlTextEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal XmlTextEvent(nint handle)
+    private readonly Lazy<EventDeltas> delta;
+    private readonly Lazy<EventKeys> keys;
+    private readonly Lazy<XmlText> target;
+
+    internal XmlTextEvent(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        delta = new Lazy<EventDeltas>(() =>
+        {
+            var deltaHandle = XmlTextChannel.ObserveEventDelta(handle, out var length).Checked();
+
+            return new EventDeltas(deltaHandle, length, doc);
+        });
+
+        keys = new Lazy<EventKeys>(() =>
+        {
+            var keysHandle = XmlTextChannel.ObserveEventKeys(handle, out var length).Checked();
+
+            return new EventKeys(keysHandle, length, doc);
+        });
+
+        target = new Lazy<XmlText>(() =>
+        {
+            var targetHandle = XmlTextChannel.ObserveEventTarget(handle).Checked();
+
+            return doc.GetXmlText(handle, false);
+        });
+    }
+
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }
 
     /// <summary>
     ///     Gets the changes that triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventDelta" /> for more information.</para>
-    /// </remarks>
-    public EventDeltas Delta
-    {
-        get
-        {
-            var handle = XmlTextChannel.ObserveEventDelta(Handle, out var length);
-
-            return new EventDeltas(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventDeltas Delta => delta.Value;
 
     /// <summary>
     ///     Gets the attributes that changed and triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
-    /// </remarks>
-    public EventKeys Keys
-    {
-        get
-        {
-            var handle = XmlTextChannel.ObserveEventKeys(Handle, out var length);
-
-            return new EventKeys(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventKeys Keys => keys.Value;
 
     /// <summary>
-    ///     Gets the <see cref="XmlText" /> instance that is related to this event.
+    ///     Gets the <see cref="XmlText" /> instance that is related to this <see cref="XmlTextEvent" /> instance.
     /// </summary>
-    public XmlText? Target => ReferenceAccessor.Access(new XmlText(XmlTextChannel.ObserveEventTarget(Handle)));
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    /// <returns>The target of the event.</returns>
+    public XmlText Target => target.Value;
 }

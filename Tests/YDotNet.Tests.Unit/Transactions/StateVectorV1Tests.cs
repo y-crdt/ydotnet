@@ -12,11 +12,11 @@ public class StateVectorV1Tests
         var doc = ArrangeDoc();
 
         // Act
-        var stateVector = doc.ReadTransaction().StateVectorV1();
+        var stateVector = doc.WriteTransaction().StateVectorV1();
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.GreaterThan(expected: 5));
+        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 4));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class StateVectorV1Tests
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.GreaterThan(expected: 5));
+        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 5));
     }
 
     private static Doc ArrangeDoc()

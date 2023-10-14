@@ -5,112 +5,107 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryWriter
 {
-    internal static unsafe nint WriteUtf8String(string value)
+    internal static unsafe DisposableHandle WriteUtf8String(string? value)
     {
-        var bytes = Encoding.UTF8.GetBytes(value + '\0');
-        var pointer = Marshal.AllocHGlobal(bytes.Length);
-
-        using var stream = new UnmanagedMemoryStream(
-            (byte*) pointer.ToPointer(),
-            length: 0,
-            bytes.Length,
-            FileAccess.Write);
-
-        stream.Write(bytes);
-
-        return pointer;
-    }
-
-    internal static bool TryWriteUtf8String(string? value, out nint pointer)
-    {
-        if (value != null)
+        if (value == null)
         {
-            pointer = WriteUtf8String(value);
-            return true;
+            return new DisposableHandle(0);
         }
 
-        pointer = default;
-        return false;
+        return new DisposableHandle(WriteUtf8StringCore(value));
     }
 
-    internal static (nint Head, nint[] Pointers) WriteUtf8StringArray(string[] values)
+    private static unsafe nint WriteUtf8StringCore(string value)
+    {
+        var bufferLength = Encoding.UTF8.GetByteCount(value) + 1;
+        var bufferPointer = Marshal.AllocHGlobal(bufferLength);
+
+        var memory = new Span<byte>(bufferPointer.ToPointer(), bufferLength);
+
+        Encoding.UTF8.GetBytes(value, memory);
+        memory[bufferLength - 1] = (byte)'\0';
+
+        return bufferPointer;
+    }
+
+    internal static DisposableHandles WriteUtf8StringArray(string[] values)
     {
         var head = Marshal.AllocHGlobal(MemoryConstants.PointerSize * values.Length);
+
         var pointers = new nint[values.Length];
 
         for (var i = 0; i < values.Length; i++)
         {
-            pointers[i] = WriteUtf8String(values[i]);
+            pointers[i] = WriteUtf8StringCore(values[i]);
 
             Marshal.WriteIntPtr(head + i * MemoryConstants.PointerSize, pointers[i]);
         }
 
-        return (head, pointers);
+        return new DisposableHandles(head, pointers);
     }
 
-    internal static nint WriteStructArray<T>(T[] value)
+    internal static DisposableHandle WriteStructArray<T>(T[] value)
         where T : struct
     {
-        var size = Marshal.SizeOf<T>();
-        var handle = Marshal.AllocHGlobal(size * value.Length);
+        var itemSize = Marshal.SizeOf<T>();
+        var itemBuffer = Marshal.AllocHGlobal(itemSize * value.Length);
 
         for (var i = 0; i < value.Length; i++)
         {
-            Marshal.StructureToPtr(value[i], handle + i * size, fDeleteOld: false);
+            Marshal.StructureToPtr(value[i], itemBuffer + i * itemSize, fDeleteOld: false);
         }
 
-        return handle;
+        return new DisposableHandle(itemBuffer);
     }
 
-    internal static nint WriteStruct<T>(T value)
-    {
-        var handle = Marshal.AllocHGlobal(Marshal.SizeOf(value));
-        Marshal.StructureToPtr(value, handle, fDeleteOld: false);
-
-        return handle;
-    }
-
-    internal static bool TryToWriteStruct<T>(T? value, out nint handle)
+    internal static DisposableHandle WriteStruct<T>(T? value)
+        where T : struct
     {
         if (value == null)
         {
-            handle = nint.Zero;
-
-            return false;
+            return new DisposableHandle(0);
         }
 
-        handle = WriteStruct<T>(value);
-
-        return true;
+        return WriteStruct(value.Value);
     }
 
-    internal static void Release(nint pointer)
+    internal static DisposableHandle WriteStruct<T>(T value)
+        where T : struct
     {
-        Marshal.FreeHGlobal(pointer);
+        var handle = Marshal.AllocHGlobal(Marshal.SizeOf(value));
+
+        Marshal.StructureToPtr(value, handle, fDeleteOld: false);
+
+        return new DisposableHandle(handle);
     }
 
-    internal static void ReleaseArray(nint[] pointers)
+    internal sealed record DisposableHandle(nint Handle) : IDisposable
     {
-        foreach (var pointer in pointers)
+        public void Dispose()
         {
-            Release(pointer);
+            if (Handle != nint.Zero)
+            {
+                Marshal.FreeHGlobal(Handle);
+            }
         }
     }
 
-    internal static bool TryRelease(nint pointer)
+    internal sealed record DisposableHandles(nint Handle, nint[] Handles) : IDisposable
     {
-        if (pointer == nint.Zero)
+        public void Dispose()
         {
-            return false;
+            if (Handle != nint.Zero)
+            {
+                Marshal.FreeHGlobal(Handle);
+            }
+
+            foreach (var handle in Handles)
+            {
+                if (handle != nint.Zero)
+                {
+                    Marshal.FreeHGlobal(handle);
+                }
+            }
         }
-
-        // This method doesn't throw if called with `nint.Zero` but having a `Try*` version
-        // makes the API more future-friendly and easier to understand for C# developers.
-        //
-        // If they called a `TryWrite*` method, they should call a `TryRelease` method too.
-        // Otherwise, they should call `Release`.
-        Release(pointer);
-
-        return true;
     }
 }

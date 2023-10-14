@@ -50,7 +50,7 @@ public class AfterTransactionTests
 
         // Act
         afterTransactionEvent = null;
-        doc.UnobserveAfterTransaction(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "The ");

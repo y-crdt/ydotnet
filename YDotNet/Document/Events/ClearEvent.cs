@@ -5,11 +5,7 @@ namespace YDotNet.Document.Events;
 /// </summary>
 public class ClearEvent
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ClearEvent" /> class.
-    /// </summary>
-    /// <param name="doc">The initial value for <see cref="Doc" />.</param>
-    public ClearEvent(Doc doc)
+    internal ClearEvent(Doc doc)
     {
         Doc = doc;
     }

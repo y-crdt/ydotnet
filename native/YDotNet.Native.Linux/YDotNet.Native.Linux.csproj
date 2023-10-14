@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>YDotNetTest.Native.Linux</PackageId>
+    <PackageId>Squidex.YDotNet.Native.Linux</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

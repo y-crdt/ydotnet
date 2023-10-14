@@ -1,46 +1,51 @@
 using System.Collections;
+using YDotNet.Document.Cells;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents an enumerable to read <see cref="MapEntry" /> instances from a <see cref="Map" />.
+///     Represents an enumerable to read key value pairs from a <see cref="Map" />.
 /// </summary>
 /// <remarks>
-///     Two important details about <see cref="MapIterator" />:
+///     Two important details about <see cref="MapIterator" />.
 ///     <ul>
-///         <li>The <see cref="MapEntry" /> instances are unordered when iterating;</li>
+///         <li>The entries instances are unordered when iterating;</li>
 ///         <li>
 ///             The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate
 ///             values.
 ///         </li>
 ///     </ul>
 /// </remarks>
-public class MapIterator : IEnumerable<MapEntry>, IDisposable
+public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, Output>>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MapIterator" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal MapIterator(nint handle)
+    internal MapIterator(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        Doc = doc;
     }
 
     /// <summary>
-    ///     Gets the handle to the native resource.
+    /// Finalizes an instance of the <see cref="MapIterator"/> class.
     /// </summary>
-    internal nint Handle { get; }
+    ~MapIterator()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         MapChannel.IteratorDestroy(Handle);
     }
 
+    internal Doc Doc { get; }
+
     /// <inheritdoc />
-    public IEnumerator<MapEntry> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, Output>> GetEnumerator()
     {
+        ThrowIfDisposed();
         return new MapEnumerator(this);
     }
 

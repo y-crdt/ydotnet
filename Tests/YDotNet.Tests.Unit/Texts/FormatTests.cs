@@ -25,7 +25,7 @@ public class FormatTests
 
         // Assert
         var chunks = text.Chunks(transaction);
-        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 2));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class FormatTests
 
         // Assert
         var chunks = text.Chunks(transaction);
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class FormatTests
 
         // Assert
         var chunks = text.Chunks(transaction);
-        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 2));
     }
 
     private (Doc, Text) ArrangeText()

@@ -1,6 +1,6 @@
 namespace YDotNet.Native.Types.Events;
 
-public enum EventChangeTagNative : sbyte
+internal enum EventChangeTagNative : sbyte
 {
     Add = 1,
     Remove = 2,

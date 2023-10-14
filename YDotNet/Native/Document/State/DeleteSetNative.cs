@@ -1,33 +1,24 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document.State;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.State;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct DeleteSetNative
+internal readonly struct DeleteSetNative
 {
     public uint EntriesCount { get; }
 
-    public nint ClientIds { get; }
+    public nint ClientIdsHandle { get; }
 
-    public nint Ranges { get; }
+    public nint RangesHandle { get; }
 
-    public DeleteSet ToDeleteSet()
+    public ulong[] Clients()
     {
-        var longSize = sizeof(ulong);
-        var idRangeSequenceSize = Marshal.SizeOf<IdRangeSequenceNative>();
-        var entries = new Dictionary<ulong, IdRange[]>();
+        return MemoryReader.ReadStructs<ulong>(ClientIdsHandle, EntriesCount);
+    }
 
-        for (var i = 0; i < EntriesCount; i++)
-        {
-            var clientId = (ulong) Marshal.ReadInt64(ClientIds, i * longSize);
-            var rangeNative = Marshal.PtrToStructure<IdRangeSequenceNative>(Ranges + i * idRangeSequenceSize);
-
-            var range = rangeNative.ToIdRanges();
-
-            entries.Add(clientId, range);
-        }
-
-        return new DeleteSet(entries);
+    public IdRangeSequenceNative[] Ranges()
+    {
+        return MemoryReader.ReadStructs<IdRangeSequenceNative>(RangesHandle, EntriesCount);
     }
 }

@@ -23,7 +23,7 @@ public class TextUnobserveDeepTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        text.UnobserveDeep(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "Hello, ");

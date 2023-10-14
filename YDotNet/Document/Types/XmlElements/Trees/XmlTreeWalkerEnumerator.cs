@@ -10,6 +10,8 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </summary>
 internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
 {
+    private Output? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
     /// </summary>
@@ -20,40 +22,42 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     public XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker)
     {
         TreeWalker = treeWalker;
-        Current = null;
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="TreeWalker" /> instance that holds the
-    ///     <see cref="XmlTreeWalker.Handle" /> used by this enumerator.
-    /// </summary>
-    private XmlTreeWalker TreeWalker { get; }
-
-    /// <inheritdoc />
-    public Output? Current { get; private set; }
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => Current;
-
-    /// <inheritdoc />
-    public bool MoveNext()
-    {
-        var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
-
-        Current = handle != nint.Zero ? new Output(handle) : null;
-
-        return Current != null;
-    }
-
-    /// <inheritdoc />
-    public void Reset()
-    {
-        throw new NotImplementedException();
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
         TreeWalker.Dispose();
+    }
+
+    /// <inheritdoc />
+    public Output Current => current!;
+
+    /// <inheritdoc />
+    object? IEnumerator.Current => current!;
+
+    private XmlTreeWalker TreeWalker { get; }
+
+    /// <inheritdoc />
+    public bool MoveNext()
+    {
+        var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
+
+        if (handle != nint.Zero)
+        {
+            current = Output.CreateAndRelease(handle, TreeWalker.Doc);
+            return true;
+        }
+        else
+        {
+            current = null!;
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public void Reset()
+    {
+        throw new NotImplementedException();
     }
 }

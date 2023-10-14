@@ -15,33 +15,49 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 public class Array : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Array" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal Array(nint handle)
-        : base(handle)
+    private readonly EventSubscriber<ArrayEvent> onObserve;
+
+    internal Array(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
-        // Nothing here.
+        onObserve = new EventSubscriber<ArrayEvent>(
+            handle,
+            (array, action) =>
+            {
+                ArrayChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new ArrayEvent(eventHandle, Doc));
+
+                return (ArrayChannel.Observe(array, nint.Zero, callback), callback);
+            },
+            ArrayChannel.Unobserve);
     }
 
     /// <summary>
-    ///     Gets the number of elements stored within current instance of <see cref="Types.Array" />.
+    ///     Gets the number of elements stored within current instance of <see cref="YDotNet.Document.Types.Arrays.Array" />.
     /// </summary>
-    public uint Length => ArrayChannel.Length(Handle);
+    public uint Length
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return ArrayChannel.Length(Handle);
+        }
+    }
 
     /// <summary>
-    ///     Inserts a range of <see cref="inputs" /> into the current instance of <see cref="Array" />.
+    ///     Inserts a range of <paramref name="inputs" /> into the current instance of <see cref="Array" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The starting index to insert the items.</param>
     /// <param name="inputs">The items to be inserted.</param>
-    public void InsertRange(Transaction transaction, uint index, IEnumerable<Input> inputs)
+    public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
-        var inputsArray = inputs.Select(x => x.InputNative).ToArray();
-        var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
+        ThrowIfDisposed();
 
-        ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
+        using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
+
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
     }
 
     /// <summary>
@@ -52,28 +68,32 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDisposed();
+
         ArrayChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
     /// <summary>
-    ///     Gets the <see cref="Output" /> value at the given <see cref="index" /> or
-    ///     <c>null</c> if <see cref="index" /> is outside the bounds.
+    ///     Gets the <see cref="Output" /> value at the given <paramref name="index" /> or
+    ///     <c>null</c> if <paramref name="index" /> is outside the bounds.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to get the item.</param>
     /// <returns>
-    ///     The <see cref="Output" /> value at the given <see cref="index" /> or <c>null</c> if <see cref="index" /> is
+    ///     The <see cref="Output" /> value at the given <paramref name="index" /> or <c>null</c> if <paramref name="index" /> is
     ///     outside the bounds.
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
     {
+        ThrowIfDisposed();
+
         var handle = ArrayChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
-    ///     Moves the element at <see cref="sourceIndex" /> to the <see cref="targetIndex" />.
+    ///     Moves the element at <paramref name="sourceIndex" /> to the <paramref name="targetIndex" />.
     /// </summary>
     /// <remarks>
     ///     Both indexes must be lower than the <see cref="Length" />.
@@ -83,6 +103,8 @@ public class Array : Branch
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
+        ThrowIfDisposed();
+
         ArrayChannel.Move(Handle, transaction.Handle, sourceIndex, targetIndex);
     }
 
@@ -91,10 +113,14 @@ public class Array : Branch
     ///     over all values of this <see cref="Array" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>The <see cref="ArrayIterator" /> instance or <c>null</c> if failed.</returns>
-    public ArrayIterator? Iterate(Transaction transaction)
+    /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
+    public ArrayIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new ArrayIterator(ArrayChannel.Iterator(Handle, transaction.Handle)));
+        ThrowIfDisposed();
+
+        var handle = ArrayChannel.Iterator(Handle, transaction.Handle);
+
+        return new ArrayIterator(handle.Checked(), Doc);
     }
 
     /// <summary>
@@ -105,37 +131,27 @@ public class Array : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<ArrayEvent> action)
+    public IDisposable Observe(Action<ArrayEvent> action)
     {
-        var subscriptionId = ArrayChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new ArrayEvent(eventHandle)));
+        ThrowIfDisposed();
 
-        return new EventSubscription(subscriptionId);
+        return onObserve.Subscribe(action);
     }
 
     /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, for changes
-    ///     performed within <see cref="Array" /> scope.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        ArrayChannel.Unobserve(Handle, subscription.Id);
-    }
-
-    /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
+    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
+        ThrowIfDisposed();
+
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+
+        return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
 }

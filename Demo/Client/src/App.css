@@ -1,0 +1,87 @@
+/* this is a rough fix for the first cursor position when the first paragraph is empty */
+.ProseMirror>.ProseMirror-yjs-cursor:first-child {
+  margin-top: 16px;
+}
+
+.ProseMirror p:first-child,
+.ProseMirror h1:first-child,
+.ProseMirror h2:first-child,
+.ProseMirror h3:first-child,
+.ProseMirror h4:first-child,
+.ProseMirror h5:first-child,
+.ProseMirror h6:first-child {
+  margin-top: 16px
+}
+
+/* This gives the remote user caret. The colors are automatically overwritten*/
+.ProseMirror-yjs-cursor {
+  border-color: orange;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+/* This renders the username above the caret */
+.ProseMirror-yjs-cursor>div {
+  background-color: rgb(250, 129, 0);
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: normal;
+  left: -1px;
+  line-height: normal;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  position: absolute;
+  pointer-events: none;
+  top: -1.05em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.react-monaco-editor-container {
+  height: 300px !important;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  box-sizing: content-box;
+}
+
+.ProseMirror-menubar-wrapper {
+  height: 300px !important;
+  border: 1px solid silver;
+  border-radius: 2px;
+}
+
+.ProseMirror-icon {
+  line-height: inherit;
+}
+
+.ProseMirror-menubar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.chat {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  height: 200px;
+  margin-bottom: .5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: .5rem;
+}
+
+.chat div {
+  border: 1px solid #efefef;
+  border-radius: 4px;
+  background: #efefef;
+  padding: .5rem;
+  margin-bottom: .5rem;
+}

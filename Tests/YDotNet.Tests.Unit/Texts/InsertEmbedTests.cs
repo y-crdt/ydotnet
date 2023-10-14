@@ -20,7 +20,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.Boolean, Is.True);
     }
 
@@ -36,7 +36,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.Double, Is.EqualTo(expected: 24.69));
     }
 
@@ -52,7 +52,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.Long, Is.EqualTo(expected: 2469));
     }
 
@@ -68,7 +68,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.String, Is.EqualTo("Between"));
     }
 
@@ -84,7 +84,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.Bytes, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
     }
 
@@ -106,8 +106,8 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Collection.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
+        Assert.That(chunks.ElementAt(index: 1).Data.JsonArray.Count, Is.EqualTo(expected: 2));
     }
 
     [Test]
@@ -126,9 +126,9 @@ public class InsertEmbedTests
 
         // Assert
         var chunks = text.Chunks(transaction);
-        var secondChunk = chunks.ElementAt(index: 1).Data.Object;
+        var secondChunk = chunks.ElementAt(index: 1).Data.JsonObject;
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(secondChunk.Count, Is.EqualTo(expected: 1));
         Assert.That(secondChunk.Keys.First(), Is.EqualTo("italics"));
         Assert.That(secondChunk.Values.First().Boolean, Is.True);
@@ -146,8 +146,8 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Null, Is.True);
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
+        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTag.Null));
     }
 
     [Test]
@@ -162,8 +162,8 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
-        Assert.That(chunks.ElementAt(index: 1).Data.Undefined, Is.True);
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
+        Assert.That(chunks.ElementAt(index: 1).Data.Tag, Is.EqualTo(OutputTag.Undefined));
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class InsertEmbedTests
         // Assert
         var chunks = text.Chunks(transaction);
 
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
         Assert.That(chunks.ElementAt(index: 1).Data.Boolean, Is.True);
         Assert.That(chunks.ElementAt(index: 1).Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(chunks.ElementAt(index: 1).Attributes.First().Key, Is.EqualTo("bold"));

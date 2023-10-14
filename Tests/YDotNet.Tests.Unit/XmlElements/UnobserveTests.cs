@@ -24,7 +24,7 @@ public class UnobserveTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        xmlElement.Unobserve(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 1);

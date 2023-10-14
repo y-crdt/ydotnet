@@ -7,58 +7,64 @@ namespace YDotNet.Document.Types.Arrays.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Array" /> instance.
 /// </summary>
-public class ArrayEvent
+public class ArrayEvent : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ArrayEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal ArrayEvent(nint handle)
+    private readonly Lazy<EventPath> path;
+    private readonly Lazy<EventChanges> delta;
+    private readonly Lazy<Array> target;
+
+    internal ArrayEvent(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        path = new Lazy<EventPath>(() =>
+        {
+            ThrowIfDisposed();
+
+            var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
+
+            return new EventPath(pathHandle, length);
+        });
+
+        delta = new Lazy<EventChanges>(() =>
+        {
+            ThrowIfDisposed();
+
+            var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
+
+            return new EventChanges(deltaHandle, length, doc);
+        });
+
+        target = new Lazy<Array>(() =>
+        {
+            ThrowIfDisposed();
+
+            var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
+
+            return doc.GetArray(targetHandle, false);
+        });
+    }
+
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }
 
     /// <summary>
     ///     Gets the path from the observed instanced down to the current <see cref="Array" /> instance.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventPath" /> for more information.</para>
-    /// </remarks>
-    public EventPath Path
-    {
-        get
-        {
-            var handle = ArrayChannel.ObserveEventPath(Handle, out var length);
-
-            return new EventPath(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventPath Path => path.Value;
 
     /// <summary>
     ///     Gets the changes within the <see cref="Array" /> instance and triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventChange" /> for more information.</para>
-    /// </remarks>
-    public EventChanges Delta
-    {
-        get
-        {
-            var handle = ArrayChannel.ObserveEventDelta(Handle, out var length);
-
-            return new EventChanges(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventChanges Delta => delta.Value;
 
     /// <summary>
     ///     Gets the <see cref="Array" /> instance that is related to this <see cref="ArrayEvent" /> instance.
     /// </summary>
-    public Array? Target => ReferenceAccessor.Access(new Array(ArrayChannel.ObserveEventTarget(Handle)));
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    /// <returns>The target of the event.</returns>
+    public Array Target => target.Value;
 }
