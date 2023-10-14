@@ -11,13 +11,6 @@ internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>
 {
     private KeyValuePair<string, string> current;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlAttributeEnumerator" /> class.
-    /// </summary>
-    /// <param name="iterator">
-    ///     The <see cref="Iterator" /> instance used by this enumerator.
-    ///     Check <see cref="Iterator" /> for more details.
-    /// </param>
     internal XmlAttributeEnumerator(XmlAttributeIterator iterator)
     {
         Iterator = iterator;

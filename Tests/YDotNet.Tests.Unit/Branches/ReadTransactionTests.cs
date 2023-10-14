@@ -81,4 +81,74 @@ public class ReadTransactionTests
         Assert.Throws<YDotNetException>(() => branch.ReadTransaction());
         Assert.That(documentTransaction, Is.Not.Null);
     }
+
+    [Test]
+    public void GetRootMapWithOpenBranchTransactionNotAllowed()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("Map");
+
+        // Keep the transaction open.
+        map.Length(map.ReadTransaction());
+
+        // Assert
+        Assert.Throws<YDotNetException>(() => doc.Map("Item"));
+    }
+
+    [Test]
+    public void GetRootArrayWithOpenTransactionNotAllowed()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("Map");
+
+        // Keep the transaction open.
+        map.Length(map.ReadTransaction());
+
+        // Assert
+        Assert.Throws<YDotNetException>(() => doc.Array("Item"));
+    }
+
+    [Test]
+    public void GetRootTextWithOpenTransactionNotAllowed()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("Map");
+
+        // Keep the transaction open.
+        map.Length(map.ReadTransaction());
+
+        // Assert
+        Assert.Throws<YDotNetException>(() => doc.Text("Item"));
+    }
+
+    [Test]
+    public void GetRootXmlTextWithOpenTransactionNotAllowed()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("Map");
+
+        // Keep the transaction open.
+        map.Length(map.ReadTransaction());
+
+        // Assert
+        Assert.Throws<YDotNetException>(() => doc.XmlText("XmlText"));
+    }
+
+    [Test]
+    public void GetRootXmlElementWithOpenTransactionNotAllowed()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("Map");
+
+        // Keep the transaction open.
+        map.Length(map.ReadTransaction());
+
+        // Assert
+        Assert.Throws<YDotNetException>(() => doc.XmlElement("XmlElement"));
+    }
 }

@@ -233,4 +233,39 @@ public class ObserveTests
         Assert.That(add.NewValue, Is.Not.Null);
         Assert.That(add.NewValue.Long, Is.EqualTo(expected: -1337L));
     }
+
+    [Test]
+    public void ObserveOldValueIsDisposed()
+    {
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value", Input.Map(new Dictionary<string, Input>()));
+        transaction.Commit();
+
+        IEnumerable<EventKeyChange>? keyChanges = null;
+        var called = 0;
+
+        var subscription = map.Observe(
+            e =>
+            {
+                called++;
+                keyChanges = e.Keys.ToArray();
+            });
+
+        // Act
+        transaction = doc.WriteTransaction();
+
+        // Update, remove, and add, respectively
+        map.Insert(transaction, "value", Input.Long(value: -420L));
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(called, Is.EqualTo(expected: 1));
+        Assert.That(keyChanges, Is.Not.Null);
+        Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
+        Assert.That(keyChanges.ElementAt(0).OldValue.Map.IsDisposed, Is.True);
+    }
 }

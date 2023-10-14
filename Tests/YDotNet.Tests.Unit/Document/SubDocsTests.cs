@@ -78,6 +78,7 @@ public class SubDocsTests
         Assert.That(subDocsEvent.Added, Is.Empty);
         Assert.That(subDocsEvent.Loaded, Is.Empty);
         Assert.That(subDocsEvent.Removed, Has.Count.EqualTo(expected: 1));
+        Assert.That(subDocsEvent.Removed[0].IsDisposed, Is.True);
 
         // Act
         subDocsEvent = null;
