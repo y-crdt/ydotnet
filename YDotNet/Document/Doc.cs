@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
@@ -416,8 +417,8 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
-        DocChannel.ObserveAfterTransactionCallback callback = (_, afterTransactionEvent) =>
-            action(afterTransactionEvent.ToAfterTransactionEvent());
+        DocChannel.ObserveAfterTransactionCallback callback = (_, eventHandle) =>
+            action(Marshal.PtrToStructure<AfterTransactionEventNative>(eventHandle).ToAfterTransactionEvent());
 
         var subscriptionId = DocChannel.ObserveAfterTransaction(Handle, nint.Zero, callback);
 
@@ -441,7 +442,8 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        DocChannel.ObserveSubdocsCallback callback = (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent());
+        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) =>
+            action(Marshal.PtrToStructure<SubDocsEventNative>(eventHandle).ToSubDocsEvent());
 
         var subscriptionId = DocChannel.ObserveSubDocs(Handle, nint.Zero, callback);
 
