@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using YDotNet.Tests.Driver.Tasks.Texts;
+using YDotNet.Tests.Driver.Tasks.Arrays;
 
-new Observe().Run();
+new Create().Run();
