@@ -26,6 +26,7 @@ internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>
     /// <inheritdoc />
     public void Dispose()
     {
+        Iterator.Dispose();
     }
 
     /// <inheritdoc />

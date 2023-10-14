@@ -27,6 +27,7 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     public void Dispose()
     {
+        TreeWalker.Dispose();
     }
 
     /// <inheritdoc />

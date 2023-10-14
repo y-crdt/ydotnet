@@ -1,7 +1,4 @@
 using System.Runtime.CompilerServices;
-using YDotNet.Document;
-using YDotNet.Document.Cells;
-using YDotNet.Document.Types.Maps;
 
 namespace YDotNet.Tests.Unit;
 
@@ -9,40 +6,7 @@ public class Program
 {
     public static void Main()
     {
-        /*
-        var doc = new Doc();
-        var a = doc.Map("A");
-        Map b;
-        using (var t = doc.WriteTransaction())
-        {
-
-            a.Insert(t, "B", Input.Map(new Dictionary<string, Input>()));
-
-            b = a.Get(t, "B").Map;
-            b.Insert(t, "C", Input.Double(1));
-        }
-
-        using (var t = doc.WriteTransaction())
-        {
-            a.Remove(t, "B");
-        }
-
-        for (var j = 0; j < 10000; j++)
-        {
-            using (var t = doc.WriteTransaction())
-            {
-                b.Insert(t, "C", Input.Double(1));
-            }
-        }
-
-        using (var t = doc.WriteTransaction())
-        {
-            b.Insert(t, "D", Input.Double(1));
-            
-            var length = b.Length(t);
-        }*/
-
-            var types = typeof(Program).Assembly.GetTypes();
+        var types = typeof(Program).Assembly.GetTypes();
 
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
@@ -89,7 +53,7 @@ public class Program
                 GC.Collect();
                 try
                 {
-                    for (var j = 0; j < 10000; j++)
+                    for (var j = 0; j < 1000; j++)
                     {
                         method.Invoke(instance, null);
                     }

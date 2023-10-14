@@ -20,6 +20,7 @@ internal class ArrayEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     public void Dispose()
     {
+        Iterator.Dispose();
     }
 
     /// <inheritdoc />
