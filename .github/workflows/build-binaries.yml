@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'binaries'
-    branches:
-      - '50-implement-automated-tests-pipeline'
 
 env:
   YRS_REPO: https://github.com/LSViana/y-crdt
