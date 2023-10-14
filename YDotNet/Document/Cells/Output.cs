@@ -34,6 +34,11 @@ public class Output : IDisposable
     }
 
     /// <summary>
+    ///     Gets the <see cref="OutputType" /> value that represents the value stored in this cell.
+    /// </summary>
+    public OutputType Type => (OutputType) OutputNative.Value.Tag;
+
+    /// <summary>
     ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
     public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
