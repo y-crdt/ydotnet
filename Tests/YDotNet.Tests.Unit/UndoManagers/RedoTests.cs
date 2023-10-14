@@ -8,6 +8,7 @@ namespace YDotNet.Tests.Unit.UndoManagers;
 public class RedoTests
 {
     [Test]
+    [Ignore("Waiting for fix on yffi.")]
     public void ReturnsFalseWhenNoChangesApplied()
     {
         // Arrange
