@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - '34-investigate-possible-memory-leaks'
 
 jobs:
   test:
