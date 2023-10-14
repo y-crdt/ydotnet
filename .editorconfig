@@ -28,6 +28,7 @@ dotnet_diagnostic.SA1009.severity = suggestion # Closing parenthesis should be s
 
 # Readability rules
 dotnet_diagnostic.SA1101.severity = none       # Prefix local calls with this
+dotnet_diagnostic.SA1116.severity = none
 dotnet_diagnostic.SA1127.severity = none       # Prefix local calls with this
 
 # Ordering rules

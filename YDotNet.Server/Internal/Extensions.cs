@@ -16,16 +16,6 @@ internal static class Extensions
         return doc.WriteTransaction() ?? throw new InvalidOperationException("Failed to open transaction.");
     }
 
-    public static async ValueTask<byte[]> GetUpdateArray(this byte[] source)
-    {
-        return source;
-        var decoder = new MemoryDecoder(source);
-        await decoder.ReadVarUintAsync();
-        await decoder.ReadVarUintAsync();
-
-        return await decoder.ReadVarUint8ArrayAsync(default);
-    }
-
     class MemoryDecoder : Decoder
     {
         private readonly byte[] source;

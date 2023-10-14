@@ -1,4 +1,4 @@
-namespace YDotNet.Document.Cells;
+﻿namespace YDotNet.Document.Cells;
 
 /// <summary>
 /// The type of an output.
