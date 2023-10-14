@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Events;
@@ -7,54 +6,27 @@ using YDotNet.Native.Types.Events;
 namespace YDotNet.Document.Types.Events;
 
 /// <summary>
-///     Represents the keys that changed the shared type that emitted the event related to this <see cref="EventKeys" />
-///     instance.
+///     Represents the keys that changed the shared type that emitted the event related to this <see cref="EventKeys" /> instance.
 /// </summary>
-public class EventKeys : IEnumerable<EventKeyChange>, IDisposable
+public class EventKeys : ReadOnlyCollection<EventKeyChange>
 {
-    private readonly IEnumerable<EventKeyChange> collection;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventKeys" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the beginning of the array of <see cref="EventKeyChangeNative" /> instances.</param>
-    /// <param name="length">The length of the array.</param>
-    internal EventKeys(nint handle, uint length)
+    internal EventKeys(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
-        Handle = handle;
-        Length = length;
-
-        collection = MemoryReader.TryReadIntPtrArray(Handle, Length, Marshal.SizeOf<EventKeyChangeNative>())!
-            .Select(Marshal.PtrToStructure<EventKeyChangeNative>)
-            .Select(x => x.ToEventKeyChange())
-            .ToArray();
     }
 
-    /// <summary>
-    ///     Gets the length of the native resource.
-    /// </summary>
-    internal uint Length { get; }
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private static IList<EventKeyChange> ReadItems(nint handle, uint length, Doc doc)
     {
-        EventChannel.KeysDestroy(Handle, Length);
-    }
+        var result = new List<EventKeyChange>();
 
-    /// <inheritdoc />
-    public IEnumerator<EventKeyChange> GetEnumerator()
-    {
-        return collection.GetEnumerator();
-    }
+        foreach (var native in MemoryReader.ReadStructsWithHandles<EventKeyChangeNative>(handle, length))
+        {
+            result.Add(new EventKeyChange(native.Value, doc));
+        }
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
+        // We are done reading and can destroy the resource.
+        EventChannel.KeysDestroy(handle, length);
+
+        return result;
     }
 }

@@ -323,7 +323,7 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
-        Assert.That(value.Type, Is.EqualTo(OutputInputType.String));
+        Assert.That(value.Tag, Is.EqualTo(OutputTag.String));
         Assert.That(value.String, Is.EqualTo("Lucas"));
         Assert.That(length, Is.EqualTo(expected: 1));
     }

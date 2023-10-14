@@ -1,309 +1,209 @@
-using System.Formats.Asn1;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
-using YDotNet.Native.Types.Maps;
 using Array = YDotNet.Document.Types.Arrays.Array;
+
+#pragma warning disable SA1623 // Property summary documentation should match accessors
 
 namespace YDotNet.Document.Cells;
 
 /// <summary>
 ///     Represents a cell used to read information from the storage.
 /// </summary>
-public class Output : IDisposable
+public sealed class Output
 {
-    private readonly bool disposable;
+    private readonly object? value;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Output" /> class.
-    /// </summary>
-    /// <param name="handle">The pointer to the native resource that represents the storage.</param>
-    /// <param name="disposable">
-    ///     The flag determines if the resource associated with <see cref="Handle" /> should be disposed
-    ///     by this <see cref="Output" /> instance.
-    /// </param>
-    internal Output(nint handle, bool disposable = false)
+    internal Output(nint handle, Doc doc, bool isDeleted)
     {
-        this.disposable = disposable;
+        var native = MemoryReader.ReadStruct<OutputNative>(handle);
 
-        Handle = handle;
-        OutputNative = handle == nint.Zero ? null : Marshal.PtrToStructure<OutputNative>(handle);
+        Tag = (OutputTag)native.Tag;
+
+        value = BuildValue(handle, native.Length, doc, isDeleted, Tag);
     }
 
-    /// <summary>
-    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public string? String
+    internal static Output CreateAndRelease(nint handle, Doc doc)
     {
-        get
-        {
-            EnsureType(OutputInputType.String);
+        var result = new Output(handle, doc, false);
 
-            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
+        // The output reads everything so we can just destroy it.
+        OutputChannel.Destroy(handle);
 
-            return result;
-        }
+        return result;
     }
 
-    /// <summary>
-    ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public bool? Boolean
+    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag type)
     {
-        get
+        switch (type)
         {
-            EnsureType(OutputInputType.Bool);
+            case OutputTag.Bool:
+                {
+                    var value = OutputChannel.Boolean(handle).Checked();
 
-            var value = OutputChannel.Boolean(Handle);
+                    return MemoryReader.ReadStruct<byte>(value) == 1;
+                }
 
-            if (value == nint.Zero)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
+            case OutputTag.Double:
+                {
+                    var value = OutputChannel.Double(handle).Checked();
 
-            return Marshal.PtrToStructure<byte>(value) == 1;
-        }
-    }
+                    return MemoryReader.ReadStruct<double>(value);
+                }
 
-    /// <summary>
-    ///     Gets the <see cref="double" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public double? Double
-    {
-        get
-        {
-            EnsureType(OutputInputType.Double);
+            case OutputTag.Long:
+                {
+                    var value = OutputChannel.Long(handle).Checked();
 
-            var value = OutputChannel.Double(Handle);
+                    return MemoryReader.ReadStruct<long>(value);
+                }
 
-            if (value == nint.Zero)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
+            case OutputTag.String:
+                {
+                    MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
 
-            return Marshal.PtrToStructure<double>(value);
-        }
-    }
+                    return result;
+                }
 
-    /// <summary>
-    ///     Gets the <see cref="long" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public long? Long
-    {
-        get
-        {
-            EnsureType(OutputInputType.Long);
+            case OutputTag.Bytes:
+                {
+                    var bytesHandle = OutputChannel.Bytes(handle).Checked();
+                    var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
 
-            var value = OutputChannel.Long(Handle);
+                    return bytesArray;
+                }
 
-            if (value == nint.Zero)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
+            case OutputTag.JsonArray:
+                {
+                    return new JsonArray(handle, length, doc, isDeleted);
+                }
 
-            return Marshal.PtrToStructure<long>(value);
-        }
-    }
+            case OutputTag.JsonObject:
+                {
+                    return new JsonObject(handle, length, doc, isDeleted);
+                }
 
-    /// <summary>
-    ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public byte[] Bytes
-    {
-        get
-        {
-            EnsureType(OutputInputType.Bytes);
+            case OutputTag.Array:
+                return doc.GetArray(OutputChannel.Array(handle), isDeleted);
 
-            var result = MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Value.Length) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+            case OutputTag.Map:
+                return doc.GetMap(OutputChannel.Map(handle), isDeleted);
 
-            if (result == null)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
+            case OutputTag.Text:
+                return doc.GetText(OutputChannel.Text(handle), isDeleted);
 
-            return result;
-        }
-    }
+            case OutputTag.XmlElement:
+                return doc.GetXmlElement(OutputChannel.XmlElement(handle), isDeleted);
 
-    /// <summary>
-    ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public Output[] Collection
-    {
-        get
-        {
-            EnsureType(OutputInputType.Collection);
+            case OutputTag.XmlText:
+                return doc.GetXmlText(OutputChannel.XmlText(handle), isDeleted);
 
-            var handles = MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Collection(Handle), OutputNative!.Value.Length, Marshal.SizeOf<OutputNative>());
+            case OutputTag.Doc:
+                return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
 
-            if (handles == null)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
-
-            return handles.Select(x => new Output(x)).ToArray();
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="Input" /> dictionary or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public IDictionary<string, Output>? Object
-    {
-        get
-        {
-            EnsureType(OutputInputType.Object);
-
-            var handles = MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Object(Handle), OutputNative!.Value.Length, Marshal.SizeOf<MapEntryNative>());
-
-            if (handles == null)
-            {
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-            }
-
-            var result = new Dictionary<string, Output>();
-
-            foreach (var handle in handles)
-            {
-                var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
-                var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
-
-                result[mapEntryKey] = new Output(outputHandle);
-            }
-
-            return result;
-        }
-    }
-
-    /// <summary>
-    ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
-    /// </summary>
-    public bool Null => Type == OutputInputType.Null;
-
-    /// <summary>
-    ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
-    /// </summary>
-    public bool Undefined => Type == OutputInputType.Undefined;
-
-    /// <summary>
-    ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public Array Array
-    {
-        get
-        {
-            EnsureType(OutputInputType.Array);
-
-            return ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle))) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Maps.Map" /> or <c>null</c> if this output cells contains a different
-    ///     type stored.
-    /// </summary>
-    public Map Map
-    {
-        get
-        {
-            EnsureType(OutputInputType.Map);
-
-            return ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle))) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Texts.Text" /> or <c>null</c> if this output cells contains a different
-    ///     type
-    ///     stored.
-    /// </summary>
-    public Text Text
-    {
-        get
-        {
-            EnsureType(OutputInputType.Text);
-
-            return ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle))) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> or <c>null</c> if this output cells contains
-    ///     a different type stored.
-    /// </summary>
-    public XmlElement XmlElement
-    {
-        get
-        {
-            EnsureType(OutputInputType.XmlElement);
-
-            return ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle))) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
-        }
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> or <c>null</c> if this output cells contains a
-    ///     different type stored.
-    /// </summary>
-    public XmlText? XmlText
-    {
-        get
-        {
-            EnsureType(OutputInputType.XmlText);
-
-            return ReferenceAccessor.Access(new XmlText(OutputChannel.XmlText(Handle))) ??
-                throw new InvalidOperationException("Internal type mismatch, native library returns null.");
+            default:
+                return null;
         }
     }
 
     /// <summary>
     ///     Gets the type of the output.
     /// </summary>
-    public OutputInputType Type => (OutputInputType)(OutputNative?.Tag ?? -99);
+    public OutputTag Tag { get; private set; }
 
     /// <summary>
-    ///     Gets the handle to the native resource.
+    ///     Gets the <see cref="Doc" /> value.
     /// </summary>
-    internal nint Handle { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public Doc Doc => GetValue<Doc>(OutputTag.Doc);
 
     /// <summary>
-    ///     Gets the native output cell represented by this cell.
+    ///     Gets the <see cref="string" /> value.
     /// </summary>
-    private OutputNative? OutputNative { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public string String => GetValue<string>(OutputTag.String);
 
-    private void EnsureType(OutputInputType expectedType)
+    /// <summary>
+    ///     Gets the <see cref="bool" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public bool Boolean => GetValue<bool>(OutputTag.Bool);
+
+    /// <summary>
+    ///     Gets the <see cref="double" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="double" />.</exception>
+    public double Double => GetValue<double>(OutputTag.Double);
+
+    /// <summary>
+    ///     Gets the <see cref="long" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="long" />.</exception>
+    public long Long => GetValue<long>(OutputTag.Long);
+
+    /// <summary>
+    ///     Gets the <see cref="byte" /> array value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="byte" /> array.</exception>
+    public byte[] Bytes => GetValue<byte[]>(OutputTag.Bytes);
+
+    /// <summary>
+    ///     Gets the <see cref="Output" /> collection.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
+    public JsonArray JsonArray => GetValue<JsonArray>(OutputTag.JsonArray);
+
+    /// <summary>
+    ///     Gets the value as json object.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a json object.</exception>
+    public JsonObject JsonObject => GetValue<JsonObject>(OutputTag.JsonObject);
+
+    /// <summary>
+    ///     Gets the <see cref="Array" /> value.
+    /// </summary>
+    /// <returns>The resolved array.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
+    public Array Array => GetValue<Array>(OutputTag.Array);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved map.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Map Map => GetValue<Map>(OutputTag.Map);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Text Text => GetValue<Text>(OutputTag.Text);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElement" /> value.
+    /// </summary>
+    /// <returns>The resolved xml element.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
+    public XmlElement XmlElement => GetValue<XmlElement>(OutputTag.XmlElement);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlText" /> value.
+    /// </summary>
+    /// <returns>The resolved xml text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
+    public XmlText XmlText => GetValue<XmlText>(OutputTag.XmlText);
+
+    private T GetValue<T>(OutputTag expectedType)
     {
-        if (Type != expectedType)
+        if (value is not T typed)
         {
-            throw new InvalidOperationException($"Expected {expectedType}, got {Type}.");
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (!disposable)
-        {
-            return;
+            throw new YDotNetException($"Expected {expectedType}, got {Tag}.");
         }
 
-        OutputChannel.Destroy(Handle);
+        return typed;
     }
 }

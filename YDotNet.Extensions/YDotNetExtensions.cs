@@ -64,7 +64,7 @@ public static class YDotNetExtensions
 
         WriteValue(output, jsonWriter, transaction);
 
-        static void WriteObject(IDictionary<string, Output> obj, Utf8JsonWriter jsonWriter, Transaction transaction)
+        static void WriteJsonObject(JsonObject obj, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
             jsonWriter.WriteStartObject();
 
@@ -76,7 +76,7 @@ public static class YDotNetExtensions
             jsonWriter.WriteEndObject();
         }
 
-        static void WriteCollection(Output[] array, Utf8JsonWriter jsonWriter, Transaction transaction)
+        static void WriteCollection(JsonArray array, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
             jsonWriter.WriteStartArray();
 
@@ -121,47 +121,50 @@ public static class YDotNetExtensions
 
         static void WriteValue(Output output, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
-            if (output.String != null)
+            switch (output.Tag)
             {
-                jsonWriter.WriteStringValue(output.String);
-            }
-            else if (output.Boolean != null)
-            {
-                jsonWriter.WriteBooleanValue(output.Boolean.Value);
-            }
-            else if (output.Double != null)
-            {
-                jsonWriter.WriteNumberValue(output.Double.Value);
-            }
-            else if (output.Null)
-            {
-                jsonWriter.WriteNullValue();
-            }
-            else if (output.Object is IDictionary<string, Output> obj)
-            {
-                WriteObject(obj, jsonWriter, transaction);
-            }
-            else if (output.Collection is Output[] collection)
-            {
-                WriteCollection(collection, jsonWriter, transaction);
-            }
-            else if (output.Map is Map map)
-            {
-                WriteMap(map, jsonWriter, transaction);
-            }
-            else if (output.Array is Array array)
-            {
-                WriteArray(array, jsonWriter, transaction);
-            }
-            else
-            {
-                throw new InvalidOperationException("Unsupported data type.");
+                case OutputTag.NotSet:
+                    break;
+                case OutputTag.Bool:
+                    jsonWriter.WriteBooleanValue(output.Boolean);
+                    break;
+                case OutputTag.Double:
+                    jsonWriter.WriteNumberValue(output.Double);
+                    break;
+                case OutputTag.Long:
+                    jsonWriter.WriteNumberValue(output.Long);
+                    break;
+                case OutputTag.String:
+                    jsonWriter.WriteStringValue(output.String);
+                    break;
+                case OutputTag.JsonArray:
+                    WriteCollection(output.JsonArray, jsonWriter, transaction);
+                    break;
+                case OutputTag.JsonObject:
+                    WriteJsonObject(output.JsonObject, jsonWriter, transaction);
+                    break;
+                case OutputTag.Null:
+                    jsonWriter.WriteNullValue();
+                    break;
+                case OutputTag.Undefined:
+                    jsonWriter.WriteNullValue();
+                    break;
+                case OutputTag.Array:
+                    WriteArray(output.Array, jsonWriter, transaction);
+                    break;
+                case OutputTag.Map:
+                    WriteMap(output.Map, jsonWriter, transaction);
+                    break;
+                case OutputTag.Doc:
+                    break;
+                default:
+                    throw new InvalidOperationException("Unsupported data type.");
             }
         }
 
         jsonWriter.Flush();
         jsonStream.Position = 0;
 
-        return JsonSerializer.Deserialize<T>(jsonStream);
+        return JsonSerializer.Deserialize<T>(jsonStream)!;
     }
 }

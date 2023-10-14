@@ -10,8 +10,11 @@ namespace YDotNet.Document.UndoManagers;
 /// <summary>
 ///     The <see cref="UndoManager" /> is used to perform undo/redo operations over shared types in a <see cref="Doc" />.
 /// </summary>
-public class UndoManager : IDisposable
+public class UndoManager : UnmanagedResource
 {
+    private readonly EventSubscriber<UndoEvent> onAdded;
+    private readonly EventSubscriber<UndoEvent> onPopped;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
     /// </summary>
@@ -19,21 +22,48 @@ public class UndoManager : IDisposable
     /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over.</param>
     /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
     public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
+        : base(Create(doc, branch, options))
     {
-        MemoryWriter.TryToWriteStruct(UndoManagerOptionsNative.From(options), out var optionsHandle);
+        onAdded = new EventSubscriber<UndoEvent>(
+            Handle,
+            (owner, action) =>
+            {
+                UndoManagerChannel.ObserveAddedCallback callback =
+                    (_, undoEvent) => action(new UndoEvent(undoEvent));
 
-        Handle = UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, optionsHandle);
+                return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
+            },
+            (owner, s) => UndoManagerChannel.UnobserveAdded(owner, s));
 
-        MemoryWriter.TryRelease(optionsHandle);
+        onPopped = new EventSubscriber<UndoEvent>(
+            Handle,
+            (owner, action) =>
+            {
+                UndoManagerChannel.ObservePoppedCallback callback =
+                    (_, undoEvent) => action(new UndoEvent(undoEvent));
+
+                return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
+            },
+            (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
+    }
+
+    private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
+    {
+        var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
+
+        return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
     }
 
     /// <summary>
-    ///     Gets the handle to the native resource.
+    /// Finalizes an instance of the <see cref="UndoManager"/> class.
     /// </summary>
-    internal nint Handle { get; }
+    ~UndoManager()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         UndoManagerChannel.Destroy(Handle);
     }
@@ -45,24 +75,9 @@ public class UndoManager : IDisposable
     /// </summary>
     /// <param name="action">The callback to be executed when an update happens, respecting the capture timeout.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObserveAdded(Action<UndoEvent> action)
+    public IDisposable ObserveAdded(Action<UndoEvent> action)
     {
-        var subscriptionId = UndoManagerChannel.ObserveAdded(
-            Handle,
-            nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
-
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, previously
-    ///     registered via <see cref="ObserveAdded" />.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobserveAdded(EventSubscription subscription)
-    {
-        UndoManagerChannel.UnobserveAdded(Handle, subscription.Id);
+        return onAdded.Subscribe(action);
     }
 
     /// <summary>
@@ -71,24 +86,9 @@ public class UndoManager : IDisposable
     /// </summary>
     /// <param name="action">The callback to be executed when <see cref="Undo" /> or <see cref="Redo" /> is executed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription ObservePopped(Action<UndoEvent> action)
+    public IDisposable ObservePopped(Action<UndoEvent> action)
     {
-        var subscriptionId = UndoManagerChannel.ObservePopped(
-            Handle,
-            nint.Zero,
-            (_, undoEvent) => action(undoEvent.ToUndoEvent()));
-
-        return new EventSubscription(subscriptionId);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, previously
-    ///     registered via <see cref="ObservePopped" />.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void UnobservePopped(EventSubscription subscription)
-    {
-        UndoManagerChannel.UnobservePopped(Handle, subscription.Id);
+        return onPopped.Subscribe(action);
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public class UndoManager : IDisposable
     /// <param name="origin">The origin to be included in this <see cref="UndoManager" />.</param>
     public void AddOrigin(byte[] origin)
     {
-        UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.AddOrigin(Handle, (uint)origin.Length, origin);
     }
 
     /// <summary>
@@ -184,6 +184,6 @@ public class UndoManager : IDisposable
     /// <param name="origin">The origin to be removed from this <see cref="UndoManager" />.</param>
     public void RemoveOrigin(byte[] origin)
     {
-        UndoManagerChannel.RemoveOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.RemoveOrigin(Handle, (uint)origin.Length, origin);
     }
 }

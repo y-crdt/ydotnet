@@ -58,7 +58,7 @@ public class ClearTests
             });
 
         // Act
-        doc.UnobserveClear(subscription);
+        subscription.Dispose();
         doc.Clear();
 
         // Assert

@@ -16,14 +16,21 @@ namespace YDotNet.Document.Types.XmlTexts;
 /// </summary>
 public class XmlText : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlText" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal XmlText(nint handle)
-        : base(handle)
+    private readonly EventSubscriber<XmlTextEvent> onObserve;
+
+    internal XmlText(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
-        // Nothing here.
+        onObserve = new EventSubscriber<XmlTextEvent>(
+            handle,
+            (xmlText, action) =>
+            {
+                XmlTextChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new XmlTextEvent(eventHandle, Doc));
+
+                return (XmlTextChannel.Observe(xmlText, nint.Zero, callback), callback);
+            },
+            XmlTextChannel.Unobserve);
     }
 
     /// <summary>
@@ -33,6 +40,8 @@ public class XmlText : Branch
     /// <returns>The length of the text, in bytes, stored in the <see cref="XmlText" />.</returns>
     public uint Length(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         return XmlTextChannel.Length(Handle, transaction.Handle);
     }
 
@@ -48,13 +57,12 @@ public class XmlText : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
-        var valueHandle = MemoryWriter.WriteUtf8String(value);
-        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesHandle);
+        ThrowIfDisposed();
 
-        XmlTextChannel.Insert(Handle, transaction.Handle, index, valueHandle, attributesHandle);
+        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
-        MemoryWriter.TryRelease(attributesHandle);
-        MemoryWriter.Release(valueHandle);
+        XmlTextChannel.Insert(Handle, transaction.Handle, index, unsafeValue.Handle, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -69,31 +77,31 @@ public class XmlText : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
-        MemoryWriter.TryToWriteStruct(attributes?.InputNative, out var attributesPointer);
-        MemoryWriter.TryToWriteStruct(content.InputNative, out var contentPointer);
-        XmlTextChannel.InsertEmbed(Handle, transaction.Handle, index, contentPointer, attributesPointer);
-        MemoryWriter.TryRelease(attributesPointer);
-        MemoryWriter.TryRelease(contentPointer);
+        ThrowIfDisposed();
+
+        using var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
+
+        XmlTextChannel.InsertEmbed(Handle, transaction.Handle, index, unsafeContent.Handle, unsafeAttributes.Handle);
     }
 
     /// <summary>
     ///     Inserts an attribute.
     /// </summary>
     /// <remarks>
-    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    ///     If another attribute with the same <paramref name="name" /> already exists, it will be replaced.
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be added.</param>
     /// <param name="value">The value of the attribute to be added.</param>
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var valueHandle = MemoryWriter.WriteUtf8String(value);
+        ThrowIfDisposed();
 
-        XmlTextChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        MemoryWriter.Release(nameHandle);
-        MemoryWriter.Release(valueHandle);
+        XmlTextChannel.InsertAttribute(Handle, transaction.Handle, unsafeName.Handle, unsafeValue.Handle);
     }
 
     /// <summary>
@@ -103,38 +111,42 @@ public class XmlText : Branch
     /// <param name="name">The name of the attribute to be removed.</param>
     public void RemoveAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        ThrowIfDisposed();
 
-        XmlTextChannel.RemoveAttribute(Handle, transaction.Handle, nameHandle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        MemoryWriter.Release(nameHandle);
+        XmlTextChannel.RemoveAttribute(Handle, transaction.Handle, unsafeName.Handle);
     }
 
     /// <summary>
-    ///     Gets an attribute with the given <see cref="name" />.
+    ///     Gets an attribute with the given <paramref name="name" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be retrieved.</param>
     /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
     public string? GetAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var handle = XmlTextChannel.GetAttribute(Handle, transaction.Handle, nameHandle);
-        MemoryReader.TryReadUtf8String(handle, out var result);
-        StringChannel.Destroy(handle);
+        ThrowIfDisposed();
 
-        return result;
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+
+        var handle = XmlTextChannel.GetAttribute(Handle, transaction.Handle, unsafeName.Handle);
+
+        return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
     }
 
     /// <summary>
     ///     Returns a <see cref="XmlAttributeIterator" />, which can be used to traverse over all attributes.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
-    public XmlAttributeIterator? Iterate(Transaction transaction)
+    /// <returns>The <see cref="XmlAttributeIterator" /> instance.</returns>
+    public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(
-            new XmlAttributeIterator(XmlTextChannel.AttributeIterator(Handle, transaction.Handle)));
+        ThrowIfDisposed();
+
+        var handle = XmlTextChannel.AttributeIterator(Handle, transaction.Handle).Checked();
+
+        return new XmlAttributeIterator(handle);
     }
 
     /// <summary>
@@ -144,11 +156,11 @@ public class XmlText : Branch
     /// <returns>The string representation of the <see cref="XmlText" /> instance.</returns>
     public string String(Transaction transaction)
     {
-        var handle = XmlTextChannel.String(Handle, transaction.Handle);
-        var result = MemoryReader.ReadUtf8String(handle);
-        StringChannel.Destroy(handle);
+        ThrowIfDisposed();
 
-        return result;
+        var handle = XmlTextChannel.String(Handle, transaction.Handle);
+
+        return MemoryReader.ReadStringAndDestroy(handle);
     }
 
     /// <summary>
@@ -162,6 +174,8 @@ public class XmlText : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDisposed();
+
         XmlTextChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
@@ -180,9 +194,11 @@ public class XmlText : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
-        var attributesPointer = MemoryWriter.WriteStruct(attributes.InputNative);
-        XmlTextChannel.Format(Handle, transaction.Handle, index, length, attributesPointer);
-        MemoryWriter.Release(attributesPointer);
+        ThrowIfDisposed();
+
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
+
+        XmlTextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -196,9 +212,11 @@ public class XmlText : Branch
     /// </returns>
     public Output? PreviousSibling(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -212,9 +230,11 @@ public class XmlText : Branch
     /// </returns>
     public Output? NextSibling(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -225,37 +245,27 @@ public class XmlText : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<XmlTextEvent> action)
+    public IDisposable Observe(Action<XmlTextEvent> action)
     {
-        var subscriptionId = XmlTextChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new XmlTextEvent(eventHandle)));
+        ThrowIfDisposed();
 
-        return new EventSubscription(subscriptionId);
+        return onObserve.Subscribe(action);
     }
 
     /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, that
-    ///     was subscribed via <see cref="Observe" />.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        XmlTextChannel.Unobserve(Handle, subscription.Id);
-    }
-
-    /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <see cref="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <see cref="index" /> with the given <see cref="associationType" />.</returns>
+    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        return ReferenceAccessor.Access(
-            new StickyIndex(StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType)));
+        ThrowIfDisposed();
+
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+
+        return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
 }

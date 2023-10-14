@@ -39,7 +39,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 0, end: 5) }));
+        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(Start: 0, End: 5) }));
 
         // Act
         undoEvent = null;
@@ -52,7 +52,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(start: 5, end: 11) }));
+        AssertDeleteSet(undoEvent.Insertions, (1234, new[] { new IdRange(Start: 5, End: 11) }));
 
         // Act
         undoEvent = null;
@@ -66,7 +66,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(
             undoEvent.Deletions,
-            (1234, new[] { new IdRange(start: 0, end: 2), new IdRange(start: 8, end: 11) }));
+            (1234, new[] { new IdRange(Start: 0, End: 2), new IdRange(Start: 8, End: 11) }));
         AssertDeleteSet(undoEvent.Insertions);
     }
 
@@ -105,7 +105,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 0, end: 3) }));
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(Start: 0, End: 3) }));
 
         // Act
         undoEvent = null;
@@ -123,7 +123,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(start: 3, end: 10) }));
+        AssertDeleteSet(undoEvent.Insertions, (5678, new[] { new IdRange(Start: 3, End: 10) }));
 
         // Act
         undoEvent = null;
@@ -137,7 +137,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
         AssertDeleteSet(
-            undoEvent.Deletions, (5678, new[] { new IdRange(start: 1, end: 2), new IdRange(start: 3, end: 4) }));
+            undoEvent.Deletions, (5678, new[] { new IdRange(Start: 1, End: 2), new IdRange(Start: 3, End: 4) }));
     }
 
     [Test]
@@ -167,7 +167,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(start: 0, end: 3) }));
+        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(Start: 0, End: 3) }));
 
         // Act
         undoEvent = null;
@@ -181,7 +181,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(start: 3, end: 10) }));
+        AssertDeleteSet(undoEvent.Insertions, (9012, new[] { new IdRange(Start: 3, End: 10) }));
 
         // Act
         undoEvent = null;
@@ -196,7 +196,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
         AssertDeleteSet(
-            undoEvent.Deletions, (9012, new[] { new IdRange(start: 1, end: 2), new IdRange(start: 3, end: 4) }));
+            undoEvent.Deletions, (9012, new[] { new IdRange(Start: 1, End: 2), new IdRange(Start: 3, End: 4) }));
     }
 
     [Test]
@@ -224,7 +224,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(start: 0, end: 5) }));
+        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(Start: 0, End: 5) }));
 
         // Act
         undoEvent = null;
@@ -237,7 +237,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(start: 5, end: 6) }));
+        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(Start: 5, End: 6) }));
 
         // Act
         undoEvent = null;
@@ -250,7 +250,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(start: 6, end: 7) }));
+        AssertDeleteSet(undoEvent.Insertions, (7853, new[] { new IdRange(Start: 6, End: 7) }));
 
         // Act
         undoEvent = null;
@@ -264,7 +264,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
         AssertDeleteSet(
-            undoEvent.Deletions, (7853, new[] { new IdRange(start: 2, end: 3), new IdRange(start: 6, end: 7) }));
+            undoEvent.Deletions, (7853, new[] { new IdRange(Start: 2, End: 3), new IdRange(Start: 6, End: 7) }));
     }
 
     [Test]
@@ -292,7 +292,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 0, end: 1) }));
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(Start: 0, End: 1) }));
 
         // Act
         undoEvent = null;
@@ -305,7 +305,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 1, end: 6) }));
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(Start: 1, End: 6) }));
 
         // Act
         undoEvent = null;
@@ -318,7 +318,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 6, end: 7) }));
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(Start: 6, End: 7) }));
 
         // Act
         undoEvent = null;
@@ -331,7 +331,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 7, end: 8) }));
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(Start: 7, End: 8) }));
 
         // Act
         undoEvent = null;
@@ -345,7 +345,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Kind, Is.EqualTo(UndoEventKind.Redo));
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Deletions);
-        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(start: 8, end: 14) }));
+        AssertDeleteSet(undoEvent.Insertions, (8137, new[] { new IdRange(Start: 8, End: 14) }));
 
         // Act
         undoEvent = null;
@@ -359,7 +359,7 @@ public class ObserveAddedTests
         Assert.That(undoEvent.Origin, Is.Null);
         AssertDeleteSet(undoEvent.Insertions);
         AssertDeleteSet(
-            undoEvent.Deletions, (8137, new[] { new IdRange(start: 7, end: 14) }));
+            undoEvent.Deletions, (8137, new[] { new IdRange(Start: 7, End: 14) }));
     }
 
     private void AssertDeleteSet(DeleteSet deleteSet, params (uint ClientId, IdRange[] IdRanges)[] idRangesPerClientId)

@@ -1,6 +1,6 @@
 namespace YDotNet.Native.Types.Events;
 
-public enum EventDeltaTagNative : sbyte
+internal enum EventDeltaTagNative : sbyte
 {
     Add = 1,
     Remove = 2,

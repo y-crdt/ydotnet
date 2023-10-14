@@ -1,5 +1,7 @@
 using System.Collections;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Types.XmlTexts;
+using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements.Trees;
@@ -11,27 +13,29 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 ///     The <see cref="XmlTreeWalker" /> traverses values using depth-first and nodes can be either
 ///     <see cref="XmlElement" /> or <see cref="XmlText" /> nodes.
 /// </remarks>
-public class XmlTreeWalker : IEnumerable<Output>, IDisposable
+public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlTreeWalker" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    public XmlTreeWalker(nint handle)
+    internal XmlTreeWalker(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        Doc = doc;
     }
 
     /// <summary>
-    ///     Gets the handle to the native resource.
+    /// Finalizes an instance of the <see cref="XmlTreeWalker"/> class.
     /// </summary>
-    internal nint Handle { get; }
+    ~XmlTreeWalker()
+    {
+        Dispose(false);
+    }
 
-    /// <inheritdoc />
-    public void Dispose()
+    /// <inheritdoc/>
+    protected internal override void DisposeCore(bool disposing)
     {
         XmlElementChannel.TreeWalkerDestroy(Handle);
     }
+
+    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()

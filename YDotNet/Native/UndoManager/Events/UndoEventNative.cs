@@ -1,4 +1,3 @@
-using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document.State;
 
@@ -8,7 +7,7 @@ internal struct UndoEventNative
 {
     public UndoEventKindNative KindNative { get; set; }
 
-    public nint Origin { get; set; }
+    public nint OriginHandle { get; set; }
 
     public uint OriginLength { get; set; }
 
@@ -16,18 +15,13 @@ internal struct UndoEventNative
 
     public DeleteSetNative Deletions { get; set; }
 
-    public UndoEvent ToUndoEvent()
+    public byte[]? Origin()
     {
-        var kind = KindNative switch
+        if (OriginHandle == nint.Zero || OriginLength == 0)
         {
-            UndoEventKindNative.Undo => UndoEventKind.Undo,
-            UndoEventKindNative.Redo => UndoEventKind.Redo,
-            _ => throw new NotSupportedException(
-                $"The value \"{KindNative}\" for {nameof(UndoEventKindNative)} is not supported.")
-        };
+            return null;
+        }
 
-        var origin = MemoryReader.TryReadBytes(Origin, OriginLength);
-
-        return new UndoEvent(kind, origin, Insertions.ToDeleteSet(), Deletions.ToDeleteSet());
+        return MemoryReader.ReadBytes(OriginHandle, OriginLength);
     }
 }

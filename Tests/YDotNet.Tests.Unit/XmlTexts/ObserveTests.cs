@@ -24,7 +24,6 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(target, Is.Not.Null);
         Assert.That(target.Handle, Is.Not.EqualTo(nint.Zero));
     }

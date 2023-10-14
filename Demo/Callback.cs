@@ -51,8 +51,10 @@ public sealed class Callback : IDocumentCallback
         {
             var newNotificationsRaw =
                 changes
-                    .SelectMany(x => x.ArrayEvent?.Delta.Where(x => x.Tag == EventChangeTag.Add) ?? Enumerable.Empty<EventChange>())
-                    .SelectMany(x => x.Values ?? Enumerable.Empty<Output>())
+                    .Where(x => x.Tag == EventBranchTag.Array)
+                    .Select(x => x.ArrayEvent)
+                    .SelectMany(x => x.Delta.Where(x => x.Tag == EventChangeTag.Add))
+                    .SelectMany(x => x.Values)
                     .ToArray();
 
             if (newNotificationsRaw.Length == 0)
@@ -62,9 +64,9 @@ public sealed class Callback : IDocumentCallback
 
             List<Notification> notifications;
 
-            using (var transaction = @event.Document.ReadTransaction()!)
+            using (var transaction = @event.Document.ReadTransaction())
             {
-                notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList()!;
+                notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList();
             }
 
             var notificationCtx = new DocumentContext("notifications", 0);
@@ -73,11 +75,11 @@ public sealed class Callback : IDocumentCallback
             {
                 var array = doc.Array("stream");
 
-                // notifications = notifications.Select(x => new Notification { Text = $"You got the follow message: {x.Text}" }).ToList();
+                notifications = notifications.Select(x => new Notification { Text = $"You got the follow message: {x.Text}" }).ToList();
 
                 using (var transaction = doc.WriteTransaction() ?? throw new InvalidOperationException("Failed to open transaction."))
                 {
-                    array!.InsertRange(transaction, array.Length, notifications.Select(x => x.ToInput()).ToArray());
+                    array.InsertRange(transaction, array.Length, notifications.Select(x => x.ToInput()).ToArray());
                 }
             });
         });

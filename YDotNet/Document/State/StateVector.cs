@@ -1,3 +1,5 @@
+using YDotNet.Native.Document.State;
+
 namespace YDotNet.Document.State;
 
 /// <summary>
@@ -8,17 +10,23 @@ namespace YDotNet.Document.State;
 /// </remarks>
 public class StateVector
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="StateVector" /> class.
-    /// </summary>
-    /// <param name="state">The initial value for the <see cref="State" />.</param>
-    public StateVector(Dictionary<ulong, uint> state)
+    internal StateVector(StateVectorNative native)
     {
+        var allClientIds = native.ClientIds();
+        var allClocks = native.Clocks();
+
+        var state = new Dictionary<ulong, uint>();
+
+        for (var i = 0; i < native.EntriesCount; i++)
+        {
+            state.Add(allClientIds[i], allClocks[i]);
+        }
+
         State = state;
     }
 
     /// <summary>
     ///     Gets dictionary of unique client identifiers (keys) by their clocks (values).
     /// </summary>
-    public Dictionary<ulong, uint> State { get; }
+    public IReadOnlyDictionary<ulong, uint> State { get; }
 }

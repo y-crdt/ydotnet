@@ -41,7 +41,7 @@ public class IterateTests
 
         // Assert
         Assert.That(values.Length, Is.EqualTo(expected: 1));
-        Assert.That(values.First(x => x.Name == "href").Value, Is.EqualTo("https://lsviana.github.io/"));
+        Assert.That(values.First(x => x.Key == "href").Value, Is.EqualTo("https://lsviana.github.io/"));
     }
 
     [Test]
@@ -65,8 +65,8 @@ public class IterateTests
 
         // Assert
         Assert.That(values.Length, Is.EqualTo(expected: 3));
-        Assert.That(values.First(x => x.Name == "href").Value, Is.EqualTo("https://lsviana.github.io/"));
-        Assert.That(values.First(x => x.Name == "as").Value, Is.EqualTo("document"));
-        Assert.That(values.First(x => x.Name == "rel").Value, Is.EqualTo("preload"));
+        Assert.That(values.First(x => x.Key == "href").Value, Is.EqualTo("https://lsviana.github.io/"));
+        Assert.That(values.First(x => x.Key == "as").Value, Is.EqualTo("document"));
+        Assert.That(values.First(x => x.Key == "rel").Value, Is.EqualTo("preload"));
     }
 }

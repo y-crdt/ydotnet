@@ -23,7 +23,7 @@ public class XmlTextUnobserveDeepTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        xmlText.UnobserveDeep(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Hello, ");

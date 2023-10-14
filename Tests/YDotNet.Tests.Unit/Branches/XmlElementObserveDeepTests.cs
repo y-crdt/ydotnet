@@ -24,7 +24,6 @@ public class XmlElementObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
         Assert.That(pathSegments.All(x => x.Tag == EventPathSegmentTag.Index), Is.True);
@@ -38,7 +37,6 @@ public class XmlElementObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
         Assert.That(pathSegments.All(x => x.Tag == EventPathSegmentTag.Index), Is.True);
@@ -64,7 +62,6 @@ public class XmlElementObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
         Assert.That(pathSegments.All(x => x.Tag == EventPathSegmentTag.Index), Is.True);
@@ -94,7 +91,6 @@ public class XmlElementObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
         Assert.That(pathSegments.All(x => x.Tag == EventPathSegmentTag.Index), Is.True);
@@ -124,7 +120,6 @@ public class XmlElementObserveDeepTests
         transaction.Commit();
 
         // Assert
-        Assert.That(subscription.Id, Is.EqualTo(expected: 0L));
         Assert.That(pathSegments, Is.Not.Null);
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 2));
         Assert.That(pathSegments.All(x => x.Tag == EventPathSegmentTag.Index), Is.True);
