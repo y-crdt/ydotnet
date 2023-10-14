@@ -247,18 +247,10 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Texts.Text" /> instance related to the <c>name</c> provided.</returns>
     public Text Text(string name)
     {
-        try
-        {
-            using var unsafeName = MemoryWriter.WriteUtf8String(name);
-            var handle = DocChannel.Text(Handle, unsafeName.Handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        var handle = DocChannel.Text(Handle, unsafeName.Handle);
 
-            return GetText(handle, false);
-        }
-        catch
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+        return GetText(handle, false);
     }
 
     /// <summary>
@@ -272,18 +264,10 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Maps.Map" /> instance related to the <c>name</c> provided.</returns>
     public Map Map(string name)
     {
-        try
-        {
-            using var unsafeName = MemoryWriter.WriteUtf8String(name);
-            var handle = DocChannel.Map(Handle, unsafeName.Handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        var handle = DocChannel.Map(Handle, unsafeName.Handle);
 
-            return GetMap(handle, false);
-        }
-        catch
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+        return GetMap(handle, false);
     }
 
     /// <summary>
@@ -297,18 +281,10 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Arrays.Array" /> instance related to the <c>name</c> provided.</returns>
     public Array Array(string name)
     {
-        try
-        {
-            using var unsafeName = MemoryWriter.WriteUtf8String(name);
-            var handle = DocChannel.Array(Handle, unsafeName.Handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        var handle = DocChannel.Array(Handle, unsafeName.Handle);
 
-            return GetArray(handle, false);
-        }
-        catch
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+        return GetArray(handle, false);
     }
 
     /// <summary>
@@ -322,18 +298,10 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided.</returns>
     public XmlElement XmlElement(string name)
     {
-        try
-        {
-            using var unsafeName = MemoryWriter.WriteUtf8String(name);
-            var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
 
-            return GetXmlElement(handle, false);
-        }
-        catch
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+        return GetXmlElement(handle, false);
     }
 
     /// <summary>
@@ -347,18 +315,10 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided.</returns>
     public XmlText XmlText(string name)
     {
-        try
-        {
-            using var unsafeName = MemoryWriter.WriteUtf8String(name);
-            var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
 
-            return GetXmlText(handle, false);
-        }
-        catch
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+        return GetXmlText(handle, false);
     }
 
     /// <summary>
