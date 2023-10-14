@@ -49,7 +49,7 @@ public static class YDotNetExtensions
         }
     }
 
-    public static T? To<T>(this Output output, Doc doc)
+    public static T To<T>(this Output output, Doc doc)
     {
         using var transaction = doc.ReadTransaction()
             ?? throw new InvalidOperationException("Failed to open transaction.");
@@ -57,7 +57,7 @@ public static class YDotNetExtensions
         return output.To<T>(transaction);
     }
 
-    public static T? To<T>(this Output output, Transaction transaction)
+    public static T To<T>(this Output output, Transaction transaction)
     {
         var jsonStream = new MemoryStream();
         var jsonWriter = new Utf8JsonWriter(jsonStream);

@@ -62,17 +62,19 @@ public sealed class Callback : IDocumentCallback
                 return;
             }
 
-            List<Notification> notifications;
-
-            using (var transaction = @event.Document.ReadTransaction())
-            {
-                notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList();
-            }
+            await Task.Delay(100);
 
             var notificationCtx = new DocumentContext("notifications", 0);
 
             await @event.Source.UpdateDocAsync(notificationCtx, (doc) =>
             {
+                List<Notification> notifications;
+
+                using (var transaction = @event.Document.ReadTransaction())
+                {
+                    notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList();
+                }
+
                 var array = doc.Array("stream");
 
                 notifications = notifications.Select(x => new Notification { Text = $"You got the follow message: {x.Text}" }).ToList();
