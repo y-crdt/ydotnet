@@ -39,7 +39,6 @@ public class Get : ITask
                         Input.Long(value: 2469L),
                         Input.Boolean(value: false)
                     });
-
                 array.Get(transaction, index: 1);
                 transaction.Commit();
 

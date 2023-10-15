@@ -41,7 +41,6 @@ public class RemoveRange : ITask
                         Input.Null(),
                         Input.Undefined()
                     });
-
                 array.RemoveRange(transaction, index: 1, length: 2);
                 transaction.Commit();
 
