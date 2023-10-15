@@ -40,6 +40,7 @@ public class Doc : TypeBase, IDisposable
     private readonly EventSubscriber<AfterTransactionEvent> onAfterTransaction;
     private readonly EventSubscriber<SubDocsEvent> onSubDocs;
     private readonly Doc? parent;
+    private int openTransactions;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
@@ -258,6 +259,9 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Texts.Text" /> instance related to the <c>name</c> provided.</returns>
     public Text Text(string name)
     {
+        ThrowIfDisposed();
+        ThrowIfOpenTransaction();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Text(Handle, unsafeName.Handle);
 
@@ -275,6 +279,9 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Maps.Map" /> instance related to the <c>name</c> provided.</returns>
     public Map Map(string name)
     {
+        ThrowIfDisposed();
+        ThrowIfOpenTransaction();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Map(Handle, unsafeName.Handle);
 
@@ -292,6 +299,9 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.Arrays.Array" /> instance related to the <c>name</c> provided.</returns>
     public Array Array(string name)
     {
+        ThrowIfDisposed();
+        ThrowIfOpenTransaction();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Array(Handle, unsafeName.Handle);
 
@@ -309,6 +319,9 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided.</returns>
     public XmlElement XmlElement(string name)
     {
+        ThrowIfDisposed();
+        ThrowIfOpenTransaction();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
 
@@ -326,10 +339,21 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The <see cref="Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided.</returns>
     public XmlText XmlText(string name)
     {
+        ThrowIfDisposed();
+        ThrowIfOpenTransaction();
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
 
         return GetXmlText(handle, false);
+    }
+
+    internal void ThrowIfOpenTransaction()
+    {
+        if (openTransactions > 0)
+        {
+            ThrowHelper.PendingTransaction();
+        }
     }
 
     /// <summary>
@@ -340,6 +364,8 @@ public class Doc : TypeBase, IDisposable
     /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction WriteTransaction(byte[]? origin = null)
     {
+        ThrowIfDisposed();
+
         var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
 
         if (handle == nint.Zero)
@@ -358,6 +384,8 @@ public class Doc : TypeBase, IDisposable
     /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
     public Transaction ReadTransaction()
     {
+        ThrowIfDisposed();
+
         var handle = DocChannel.ReadTransaction(Handle);
 
         if (handle == nint.Zero)
@@ -374,7 +402,10 @@ public class Doc : TypeBase, IDisposable
     /// </summary>
     public void Clear()
     {
+        ThrowIfDisposed();
+
         DocChannel.Clear(Handle);
+
         onClear.Clear();
         onUpdateV1.Clear();
         onUpdateV2.Clear();
@@ -391,6 +422,8 @@ public class Doc : TypeBase, IDisposable
     /// <param name="transaction">A read-only <see cref="Transaction" /> of the parent document.</param>
     public void Load(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         DocChannel.Load(Handle, transaction.Handle);
     }
 
@@ -401,6 +434,8 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveClear(Action<ClearEvent> action)
     {
+        ThrowIfDisposed();
+
         return onClear.Subscribe(action);
     }
 
@@ -414,6 +449,8 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveUpdatesV1(Action<UpdateEvent> action)
     {
+        ThrowIfDisposed();
+
         return onUpdateV1.Subscribe(action);
     }
 
@@ -427,6 +464,8 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveUpdatesV2(Action<UpdateEvent> action)
     {
+        ThrowIfDisposed();
+
         return onUpdateV2.Subscribe(action);
     }
 
@@ -440,6 +479,8 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
+        ThrowIfDisposed();
+
         return onAfterTransaction.Subscribe(action);
     }
 
@@ -450,6 +491,8 @@ public class Doc : TypeBase, IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveSubDocs(Action<SubDocsEvent> action)
     {
+        ThrowIfDisposed();
+
         return onSubDocs.Subscribe(action);
     }
 
@@ -467,6 +510,16 @@ public class Doc : TypeBase, IDisposable
         }
 
         return GetOrAdd(handle, (h, doc) => new Doc(handle, doc, isDeleted));
+    }
+
+    internal void NotifyTransactionStarted()
+    {
+        openTransactions++;
+    }
+
+    internal void NotifyTransactionClosed()
+    {
+        openTransactions--;
     }
 
     internal Map GetMap(nint handle, bool isDeleted)

@@ -28,6 +28,8 @@ public class Transaction : UnmanagedResource
         : base(handle)
     {
         this.doc = doc;
+
+        doc.NotifyTransactionStarted();
     }
 
     /// <inheritdoc/>
@@ -35,7 +37,9 @@ public class Transaction : UnmanagedResource
     {
         if (disposing)
         {
-            Commit();
+            TransactionChannel.Commit(Handle);
+
+            doc.NotifyTransactionClosed();
         }
     }
 
@@ -53,8 +57,8 @@ public class Transaction : UnmanagedResource
     /// </remarks>
     public void Commit()
     {
-        ThrowIfDisposed();
-        TransactionChannel.Commit(Handle);
+        // The dispose method has a solution to prevent multiple dipose, so we can just use that.
+        Dispose();
     }
 
     /// <summary>

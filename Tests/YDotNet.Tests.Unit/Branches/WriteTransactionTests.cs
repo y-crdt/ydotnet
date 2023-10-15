@@ -96,7 +96,6 @@ public class WriteTransactionTests
     }
 
     [Test]
-    [Ignore("Still buggy in y-crdt")]
     public void GetRootArrayWithOpenTransactionNotAllowed()
     {
         // Arrange
@@ -111,7 +110,6 @@ public class WriteTransactionTests
     }
 
     [Test]
-    [Ignore("Still buggy in y-crdt")]
     public void GetRootTextWithOpenTransactionNotAllowed()
     {
         // Arrange
@@ -126,7 +124,6 @@ public class WriteTransactionTests
     }
 
     [Test]
-    [Ignore("Still buggy in y-crdt")]
     public void GetRootXmlTextWithOpenTransactionNotAllowed()
     {
         // Arrange
@@ -141,7 +138,6 @@ public class WriteTransactionTests
     }
 
     [Test]
-    [Ignore("Still buggy in y-crdt")]
     public void GetRootXmlElementWithOpenTransactionNotAllowed()
     {
         // Arrange
