@@ -13,8 +13,8 @@ public abstract class Resource : IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

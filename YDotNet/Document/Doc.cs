@@ -140,28 +140,32 @@ public class Doc : TypeBase, IDisposable
     /// </summary>
     ~Doc()
     {
-        DisposeCore();
+        Dispose(false);
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
+        Dispose(true);
         GC.SuppressFinalize(this);
-        DisposeCore();
     }
 
-    private void DisposeCore()
+    private void Dispose(bool disposing)
     {
         if (IsDisposed)
         {
             return;
         }
 
-        // Clears all active subscriptions that have not been closed yet.
-        EventManager.Clear();
+        MarkDisposed();
+
+        if (disposing)
+        {
+            // Clears all active subscriptions that have not been closed yet.
+            EventManager.Clear();
+        }
 
         DocChannel.Destroy(Handle);
-        MarkDisposed();
     }
 
     /// <summary>
