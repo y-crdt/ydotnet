@@ -197,5 +197,14 @@ public class Output : IDisposable
         }
 
         OutputChannel.Destroy(Handle);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="Output" /> class.
+    /// </summary>
+    ~Output()
+    {
+        Dispose();
     }
 }
