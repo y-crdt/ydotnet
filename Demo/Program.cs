@@ -10,6 +10,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddControllers();
         builder.Services.AddRazorPages();
         
         var yDotNet = 
@@ -62,6 +63,8 @@ public class Program
         app.UseStaticFiles();
         app.UseWebSockets();
         app.UseRouting();
+
+        app.MapControllers();
         app.Map("/collaboration", builder =>
         {
             builder.UseYDotnetWebSockets();

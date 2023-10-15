@@ -70,7 +70,14 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         return default;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext)
+    public Task InvokeAsync(HttpContext httpContext)
+    {
+        var documentName = httpContext.Request.Path.ToString().Substring(1);
+
+        return InvokeAsync(httpContext, documentName);
+    }
+
+    public async Task InvokeAsync(HttpContext httpContext, string documentName)
     {
         if (!httpContext.WebSockets.IsWebSocketRequest || documentManager == null)
         {
@@ -78,7 +85,6 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
             return;
         }
 
-        var documentName = httpContext.Request.Path.ToString().Substring(1);
         var documentStates = statesPerDocumentName.GetOrAdd(documentName, _ => new List<ClientState>());
 
         logger.LogDebug("Websocket connection to {document} established.", documentName);

@@ -45,7 +45,7 @@ function App() {
                             <Col>
                                 <h5>Notifications</h5>
 
-                                <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration'} roomName='notifications'>
+                                <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration2'} roomName='notifications'>
                                     <Chat isReadonly />
                                 </YjsContextProvider>
                             </Col>

@@ -18,9 +18,16 @@ internal class EventSubscriber<TEvent>
         this.unsubscribe = unsubscribe;
     }
 
+    ~EventSubscriber()
+    {
+        Clear();
+    }
+
     public void Clear()
     {
         publisher.Clear();
+
+        UnsubscribeWhenSubscribed();
     }
 
     public IDisposable Subscribe(Action<TEvent> handler)
@@ -42,6 +49,11 @@ internal class EventSubscriber<TEvent>
     {
         publisher.Unsubscribe(handler);
 
+        UnsubscribeWhenSubscribed();
+    }
+
+    private void UnsubscribeWhenSubscribed()
+    {
         if (publisher.Count == 0 && nativeSubscription.Callback != null)
         {
             unsubscribe(owner, nativeSubscription.Handle);
