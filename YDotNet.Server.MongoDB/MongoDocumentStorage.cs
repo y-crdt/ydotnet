@@ -7,7 +7,7 @@ namespace YDotNet.Server.MongoDB;
 
 public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
 {
-    private readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
+    private readonly UpdateOptions Upsert = new() { IsUpsert = true };
     private readonly MongoDocumentStorageOptions options;
     private readonly IMongoClient mongoClient;
     private IMongoCollection<DocumentEntity>? collection;

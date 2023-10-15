@@ -21,6 +21,7 @@ public class Array : Branch
         : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<ArrayEvent>(
+            doc.EventManager,
             handle,
             (array, action) =>
             {

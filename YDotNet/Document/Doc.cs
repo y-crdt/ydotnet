@@ -1,9 +1,6 @@
-using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
-using YDotNet.Document.Types.Branches;
-using YDotNet.Document.Types.Events;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
@@ -71,6 +68,7 @@ public class Doc : TypeBase, IDisposable
         this.parent = parent;
 
         onClear = new EventSubscriber<ClearEvent>(
+            EventManager,
             handle,
             (doc, action) =>
             {
@@ -82,6 +80,7 @@ public class Doc : TypeBase, IDisposable
             (doc, s) => DocChannel.UnobserveClear(doc, s));
 
         onUpdateV1 = new EventSubscriber<UpdateEvent>(
+            EventManager,
             handle,
             (doc, action) =>
             {
@@ -93,6 +92,7 @@ public class Doc : TypeBase, IDisposable
             (doc, s) => DocChannel.UnobserveUpdatesV1(doc, s));
 
         onUpdateV2 = new EventSubscriber<UpdateEvent>(
+            EventManager,
             handle,
             (doc, action) =>
             {
@@ -104,6 +104,7 @@ public class Doc : TypeBase, IDisposable
             (doc, s) => DocChannel.UnobserveUpdatesV2(doc, s));
 
         onAfterTransaction = new EventSubscriber<AfterTransactionEvent>(
+            EventManager,
             handle,
             (doc, action) =>
             {
@@ -115,6 +116,7 @@ public class Doc : TypeBase, IDisposable
             (doc, s) => DocChannel.UnobserveAfterTransaction(doc, s));
 
         onSubDocs = new EventSubscriber<SubDocsEvent>(
+            EventManager,
             handle,
             (doc, action) =>
             {
@@ -154,6 +156,9 @@ public class Doc : TypeBase, IDisposable
         {
             return;
         }
+
+        // Clears all active subscriptions that have not been closed yet.
+        EventManager.Clear();
 
         DocChannel.Destroy(Handle);
         MarkDisposed();
@@ -235,6 +240,8 @@ public class Doc : TypeBase, IDisposable
     }
 
     internal nint Handle { get; }
+
+    internal EventManager EventManager { get; } = new EventManager();
 
     /// <summary>
     ///     Gets or creates a new shared <see cref="Types.Texts.Text" /> data type instance as a root-level

@@ -21,6 +21,7 @@ public class Text : Branch
         : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<TextEvent>(
+            doc.EventManager,
             handle,
             (text, action) =>
             {

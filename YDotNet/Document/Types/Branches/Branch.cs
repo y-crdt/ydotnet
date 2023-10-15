@@ -22,6 +22,7 @@ public abstract class Branch : TypeBase
         Doc = doc;
 
         onDeep = new EventSubscriber<EventBranch[]>(
+            doc.EventManager,
             handle,
             (branch, action) =>
             {

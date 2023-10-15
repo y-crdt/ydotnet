@@ -25,6 +25,7 @@ public class UndoManager : UnmanagedResource
         : base(Create(doc, branch, options))
     {
         onAdded = new EventSubscriber<UndoEvent>(
+            doc.EventManager,
             Handle,
             (owner, action) =>
             {
@@ -36,6 +37,7 @@ public class UndoManager : UnmanagedResource
             (owner, s) => UndoManagerChannel.UnobserveAdded(owner, s));
 
         onPopped = new EventSubscriber<UndoEvent>(
+            doc.EventManager,
             Handle,
             (owner, action) =>
             {

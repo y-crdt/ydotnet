@@ -7,7 +7,7 @@ namespace YDotNet.Server.Redis;
 
 public sealed class RedisPubSub : IPubSub
 {
-    private readonly List<Func<byte[], Task>> handlers = new List<Func<byte[], Task>>();
+    private readonly List<Func<byte[], Task>> handlers = new();
     private readonly RedisClusteringOptions redisOptions;
     private ISubscriber? subscriber;
 

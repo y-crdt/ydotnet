@@ -18,10 +18,7 @@ internal sealed class EventPublisher<TEvent>
 
     public void Unsubscribe(Action<TEvent> handler)
     {
-        if (!subscriptions.Remove(handler))
-        {
-            return;
-        }
+        subscriptions.Remove(handler);
     }
 
     public void Publish(TEvent @event)
@@ -34,6 +31,7 @@ internal sealed class EventPublisher<TEvent>
             }
             catch
             {
+                // Exceptions could have unknown consequences in the rust part.
                 continue;
             }
         }

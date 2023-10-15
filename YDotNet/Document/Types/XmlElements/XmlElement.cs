@@ -22,6 +22,7 @@ public class XmlElement : Branch
         : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<XmlElementEvent>(
+            doc.EventManager,
             handle,
             (xmlElement, action) =>
             {

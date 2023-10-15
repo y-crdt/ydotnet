@@ -19,6 +19,7 @@ public class Map : Branch
         : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<MapEvent>(
+            doc.EventManager,
             handle,
             (map, action) =>
             {

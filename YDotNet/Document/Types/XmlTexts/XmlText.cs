@@ -22,6 +22,7 @@ public class XmlText : Branch
         : base(handle, doc, isDeleted)
     {
         onObserve = new EventSubscriber<XmlTextEvent>(
+            doc.EventManager,
             handle,
             (xmlText, action) =>
             {
