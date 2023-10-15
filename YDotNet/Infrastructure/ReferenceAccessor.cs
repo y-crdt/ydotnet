@@ -82,6 +82,18 @@ internal static class ReferenceAccessor
     private static T? Access<T>(T instance, nint pointer)
         where T : class
     {
-        return pointer == nint.Zero ? null : instance;
+        if (pointer == nint.Zero)
+        {
+            if (instance is IDisposable)
+            {
+                // Instances with null pointers do not need to be finalized
+                // because they are not holding any native resources.
+                GC.SuppressFinalize(instance);
+            }
+
+            return null;
+        }
+
+        return instance;
     }
 }
