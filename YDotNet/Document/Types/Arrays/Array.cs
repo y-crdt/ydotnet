@@ -42,6 +42,8 @@ public class Array : Branch
         var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
 
         ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
+
+        MemoryWriter.Release(inputsPointer);
     }
 
     /// <summary>
