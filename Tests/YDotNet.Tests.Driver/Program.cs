@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Arrays;
 
-new RemoveRange().Run();
+new Get().Run();
