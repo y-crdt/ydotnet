@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Arrays;
 
-new Get().Run();
+new Move().Run();
