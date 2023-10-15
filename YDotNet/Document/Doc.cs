@@ -333,8 +333,15 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveClear(Action<ClearEvent> action)
     {
-        DocChannel.ObserveClearCallback callback = (_, doc) =>
-            action(ClearEventNative.From(new Doc(doc)).ToClearEvent());
+        DocChannel.ObserveClearCallback callback = (_, docHandle) =>
+        {
+            var doc = new Doc(docHandle);
+
+            // Don't finalize this instance because there's another instance responsible for it somewhere else.
+            GC.SuppressFinalize(doc);
+
+            action(ClearEventNative.From(doc).ToClearEvent());
+        };
 
         var subscriptionId = DocChannel.ObserveClear(Handle, nint.Zero, callback);
 
