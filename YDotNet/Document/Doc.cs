@@ -34,6 +34,8 @@ namespace YDotNet.Document;
 /// </remarks>
 public class Doc : IDisposable
 {
+    private readonly bool disposable;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
     /// </summary>
@@ -63,8 +65,14 @@ public class Doc : IDisposable
     ///     Initializes a new instance of the <see cref="Doc" /> class with the specified <see cref="Handle" />.
     /// </summary>
     /// <param name="handle">The pointer to be used by this document to manage the native resource.</param>
-    internal Doc(nint handle)
+    /// <param name="disposable">
+    ///     The flag determines if the resource associated with <see cref="Handle" /> should be disposed
+    ///     by this <see cref="Doc" /> instance.
+    /// </param>
+    internal Doc(nint handle, bool disposable = true)
     {
+        this.disposable = disposable;
+
         Handle = handle;
     }
 
@@ -134,6 +142,11 @@ public class Doc : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
+        if (!disposable)
+        {
+            return;
+        }
+
         DocChannel.Destroy(Handle);
         GC.SuppressFinalize(this);
     }
