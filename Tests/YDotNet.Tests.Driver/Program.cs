@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Docs;
 
-new ObserveClear().Run();
+new ObserveUpdatesV1().Run();
