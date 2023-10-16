@@ -55,5 +55,14 @@ internal class ArrayEnumerator : IEnumerator<Output>
     public void Dispose()
     {
         Iterator.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="ArrayEnumerator" /> class.
+    /// </summary>
+    ~ArrayEnumerator()
+    {
+        Dispose();
     }
 }
