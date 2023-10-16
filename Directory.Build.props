@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/LSViana/YDotNet</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>0.2.5</Version>
+    <Version>0.2.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

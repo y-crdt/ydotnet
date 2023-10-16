@@ -3,7 +3,7 @@ using YDotNet.Document.Cells;
 
 namespace YDotNet.Extensions;
 
-internal class InputFactory
+public static class InputFactory
 {
     public static Input FromJson(string json)
     {
