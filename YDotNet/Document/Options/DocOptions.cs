@@ -15,7 +15,7 @@ public class DocOptions
     /// </summary>
     public static DocOptions Default => new()
     {
-        Id = (ulong)Random.Shared.Next()
+        Id = ClientId.GetRandom()
     };
 
     /// <summary>

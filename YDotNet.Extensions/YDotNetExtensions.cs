@@ -1,3 +1,5 @@
+using System.Formats.Asn1;
+using System.Text;
 using System.Text.Json;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
@@ -60,9 +62,34 @@ public static class YDotNetExtensions
     public static T To<T>(this Output output, Transaction transaction)
     {
         var jsonStream = new MemoryStream();
-        var jsonWriter = new Utf8JsonWriter(jsonStream);
+
+        output.ToJson(jsonStream, transaction);
+
+        jsonStream.Flush();
+        jsonStream.Position = 0;
+
+        return JsonSerializer.Deserialize<T>(jsonStream)!;
+    }
+
+    public static string ToJson(this Output output, Transaction transaction)
+    {
+        var jsonStream = new MemoryStream();
+
+        output.ToJson(jsonStream, transaction);
+
+        jsonStream.Flush();
+        jsonStream.Position = 0;
+
+        return Encoding.UTF8.GetString(jsonStream.ToArray());
+    }
+
+    public static void ToJson(this Output output, Stream stream, Transaction transaction)
+    {
+        var jsonWriter = new Utf8JsonWriter(stream);
 
         WriteValue(output, jsonWriter, transaction);
+
+        jsonWriter.Flush();
 
         static void WriteJsonObject(JsonObject obj, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
@@ -161,10 +188,5 @@ public static class YDotNetExtensions
                     throw new InvalidOperationException("Unsupported data type.");
             }
         }
-
-        jsonWriter.Flush();
-        jsonStream.Position = 0;
-
-        return JsonSerializer.Deserialize<T>(jsonStream)!;
     }
 }

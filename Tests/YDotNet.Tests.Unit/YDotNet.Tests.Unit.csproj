@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\YDotNet.Extensions\YDotNet.Extensions.csproj" />
     <ProjectReference Include="..\..\YDotNet\YDotNet.csproj" />
   </ItemGroup>
 
