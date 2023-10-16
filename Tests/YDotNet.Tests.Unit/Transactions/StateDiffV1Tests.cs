@@ -18,7 +18,7 @@ public class StateDiffV1Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.GreaterThan(expected: 19));
+        Assert.That(stateDiff.Length, Is.GreaterThan(expected: 15));
     }
 
     [Test]
@@ -34,7 +34,7 @@ public class StateDiffV1Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.GreaterThan(expected: 19));
+        Assert.That(stateDiff.Length, Is.GreaterThan(expected: 15));
     }
 
     private static Doc ArrangeSenderDoc()

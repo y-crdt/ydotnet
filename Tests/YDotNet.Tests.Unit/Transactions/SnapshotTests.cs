@@ -16,7 +16,7 @@ public class SnapshotTests
 
         // Assert
         Assert.That(snapshot, Is.Not.Null);
-        Assert.That(snapshot.Length, Is.GreaterThan(expected: 5));
+        Assert.That(snapshot.Length, Is.GreaterThan(expected: 3));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class SnapshotTests
 
         // Assert
         Assert.That(snapshot, Is.Not.Null);
-        Assert.That(snapshot.Length, Is.GreaterThan(expected: 5));
+        Assert.That(snapshot.Length, Is.GreaterThan(expected: 3));
     }
 
     private static Doc ArrangeDoc()

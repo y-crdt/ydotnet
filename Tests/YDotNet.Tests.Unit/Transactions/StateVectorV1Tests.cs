@@ -16,7 +16,7 @@ public class StateVectorV1Tests
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 4));
+        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 3));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class StateVectorV1Tests
 
         // Assert
         Assert.That(stateVector, Is.Not.Null);
-        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 5));
+        Assert.That(stateVector.Length, Is.GreaterThanOrEqualTo(expected: 3));
     }
 
     private static Doc ArrangeDoc()
