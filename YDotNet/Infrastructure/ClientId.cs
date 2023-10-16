@@ -16,7 +16,7 @@ public sealed class ClientId
     /// <returns>The random client id.</returns>
     public static ulong GetRandom()
     {
-        var value = (ulong)Random.Shared.Next() & MaxSafeInteger;
+        var value = ((ulong)Random.Shared.NextInt64() + 1000) & MaxSafeInteger;
 
         return value;
     }
