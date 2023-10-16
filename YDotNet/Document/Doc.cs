@@ -34,7 +34,7 @@ namespace YDotNet.Document;
 /// </remarks>
 public class Doc : IDisposable
 {
-    private readonly bool disposable;
+    private readonly bool disposable = true;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
