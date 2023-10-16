@@ -1,8 +1,12 @@
 # Decision
 
-## 2023-10-16 Do not document internal classes via XML ocmments
+## 2023-10-16 Publicly exposed elements must be documented
 
-They are tedious and annoying to write and have to be updated regularly. Thefore it does not make sense to add any XML comments for XML types. We should document code and the reason why something has been implemented in a certain way.
+The documentation for `class` and `struct` elements is important to instruct external users on how to use the library.
+These elements are normally under the `YDotNet.Document` namespace.
+
+The `internal` or `private` classes, however, must not be documented. It's allowed to add comments explaining why such
+code works the way it does, though. Bigger decisions must be documented in this document.
 
 ## 2023-10-16 No circular dependencies between native and types
 
