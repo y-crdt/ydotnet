@@ -85,3 +85,9 @@
   padding: .5rem;
   margin-bottom: .5rem;
 }
+
+textarea.form-control {
+  font-family: monospace;
+  font-size: 80%;
+  height: 200px !important;
+}

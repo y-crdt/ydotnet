@@ -5,11 +5,19 @@ import { Increment } from './components/Increment';
 import './App.css';
 import { YjsContextProvider } from './context/yjsContext';
 import { Chat } from './components/Chat';
+import { Awareness } from './components/Awareness';
 
 function App() {
     return (
         <>
             <Container>
+                <Row className='mt-5'>
+                    <Col>
+                        <h2>Awareness</h2>
+
+                        <Awareness />
+                    </Col>
+                </Row>
                 <Row className='mt-5'>
                     <Col>
                         <h2>Monaco Editor</h2>
@@ -47,6 +55,8 @@ function App() {
 
                                 <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration2'} roomName='notifications'>
                                     <Chat isReadonly />
+                                    
+                                    <Awareness />
                                 </YjsContextProvider>
                             </Col>
                         </Row>

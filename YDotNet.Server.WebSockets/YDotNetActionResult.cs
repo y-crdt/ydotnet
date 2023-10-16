@@ -16,6 +16,6 @@ public sealed class YDotNetActionResult : IActionResult
     {
         var middleware = context.HttpContext.RequestServices.GetRequiredService<YDotNetSocketMiddleware>();
 
-        await middleware.InvokeAsync(context.HttpContext, this.documentName);
+        await middleware.InvokeAsync(context.HttpContext, documentName);
     }
 }

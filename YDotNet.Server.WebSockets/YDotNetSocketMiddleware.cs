@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
+using YDotNet.Protocol;
 
 namespace YDotNet.Server.WebSockets;
 
@@ -33,11 +34,9 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
             foreach (var state in documentStates)
             {
-                await state.WriteLockedAsync(@event, async (encoder, @event, _, ct) =>
+                await state.WriteLockedAsync(@event, async (encoder, e, _, ct) =>
                 {
-                    await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
-                    await encoder.WriteVarUintAsync(1, ct);
-                    await encoder.WriteAwarenessAsync(@event.Context.ClientId, @event.ClientClock, @event.ClientState, ct);
+                    await encoder.WriteAwarenessAsync(new[] { (e.Context.ClientId, e.ClientClock, (string?)e.ClientState) }, ct);
                 }, default);
             }
         });
@@ -230,18 +229,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
     {
         var users = await documentManager!.GetAwarenessAsync(state.DocumentContext, ct);
 
-        if (users.Count == 0)
-        {
-            return;
-        }
-
-        await encoder.WriteVarUintAsync(MessageTypes.TypeAwareness, ct);
-        await encoder.WriteVarUintAsync(users.Count, ct);
-
-        foreach (var (clientId, user) in users)
-        {
-            await encoder.WriteAwarenessAsync(clientId, user.ClientClock, user.ClientState, ct);
-        }
+        await encoder.WriteAwarenessAsync(users.Select(x => (x.Key, x.Value.ClientClock, x.Value.ClientState)).ToArray(), ct);
     }
 
     private async Task HandleAwarenessAsync(ClientState state,
@@ -252,7 +240,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
 
         var clientCount = await state.Decoder.ReadVarUintAsync(ct);
 
-        for (var i = 0; i < clientCount; i++)
+        for (var i = 0ul; i < clientCount; i++)
         {
             var clientId = await state.Decoder.ReadVarUintAsync(ct);
             var clientClock = await state.Decoder.ReadVarUintAsync(ct);
@@ -273,7 +261,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         }
     }
 
-    private List<ClientState> GetOtherClients(string documentName, long clientId)
+    private List<ClientState> GetOtherClients(string documentName, ulong clientId)
     {
         var documentStates = statesPerDocumentName.GetOrAdd(documentName, _ => new List<ClientState>());
 

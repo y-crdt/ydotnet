@@ -31,10 +31,10 @@ public sealed class Message : ICanEstimateSize
     public string DocumentName { get; set; }
 
     [ProtoMember(3)]
-    public long ClientId { get; set; }
+    public ulong ClientId { get; set; }
 
     [ProtoMember(4)]
-    public long ClientClock { get; set; }
+    public ulong ClientClock { get; set; }
 
     [ProtoMember(5)]
     public string? ClientState { get; set; }

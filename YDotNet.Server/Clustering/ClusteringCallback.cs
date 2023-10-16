@@ -19,7 +19,7 @@ public sealed class ClusteringCallback : IDocumentCallback, IDisposable
         this.clusteringOptions = clusteringOptions.Value;
 
         this.publisher = publisher;
-        this.publishQueue = new PublishQueue<Message>(
+        publishQueue = new PublishQueue<Message>(
             this.clusteringOptions.MaxBatchCount,
             this.clusteringOptions.MaxBatchSize,
             (int)this.clusteringOptions.DebounceTime.TotalMilliseconds,
@@ -127,7 +127,7 @@ public sealed class ClusteringCallback : IDocumentCallback, IDisposable
         return EnqueueAsync(m, @event.Context);
     }
 
-    private ValueTask SendAwarenessAsync(DocumentContext context, string? state, long clock)
+    private ValueTask SendAwarenessAsync(DocumentContext context, string? state, ulong clock)
     {
         var m = new Message { Type = MessageType.ClientPinged, ClientState = state, ClientClock = clock };
 
