@@ -47,17 +47,6 @@ public class Program
                 }
         }
 
-        if (builder.Configuration["Clustering:Type"] == "Redis")
-        {
-            yDotNet.AddRedisClustering();
-            yDotNet.AddRedis(options =>
-            {
-                options.Configuration =
-                    ConfigurationOptions.Parse(
-                        builder.Configuration["Clustering:Redis:ConnectionString"]!);
-            });
-        }
-
         var app = builder.Build();
 
         app.UseStaticFiles();

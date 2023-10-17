@@ -255,6 +255,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         for (var i = 0; i < clientCount; i++)
         {
             var clientId = await state.Decoder.ReadVarUintAsync(ct);
+
             var clientClock = await state.Decoder.ReadVarUintAsync(ct);
             var clientState = await state.Decoder.ReadVarStringAsync(ct);
 

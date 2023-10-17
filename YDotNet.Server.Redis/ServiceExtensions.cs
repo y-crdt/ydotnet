@@ -1,4 +1,3 @@
-using YDotNet.Server;
 using YDotNet.Server.Redis;
 using YDotNet.Server.Storage;
 
@@ -10,14 +9,6 @@ public static class ServiceExtensions
     {
         registration.Services.Configure(configure ?? (x => { }));
         registration.Services.AddSingleton<RedisConnection>();
-
-        return registration;
-    }
-
-    public static YDotnetRegistration AddRedisClustering(this YDotnetRegistration registration, Action<RedisClusteringOptions>? configure = null)
-    {
-        registration.Services.Configure(configure ?? (x => { }));
-        registration.AddPubSub<RedisPubSub>();
 
         return registration;
     }
