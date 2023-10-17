@@ -6,31 +6,32 @@ on:
       - 'main'
       - 'for-pr'
 
-pack-nuget:
-  runs-on: ubuntu-latest
-  needs: test
+jobs:
+  pack-nuget:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
   
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Download artifacts
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        path: ./output
-        workflow: build-binaries.yml
-        workflow_conclusion: success
-
-    - name: Nuget pack
-      run: |
-        dotnet pack -c Release
-
-    - name: Nuget publish
-      run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }}
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        path: |
-          **/*.nupkg
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+  
+      - name: Nuget pack
+        run: |
+          dotnet pack -c Release
+  
+      - name: Nuget publish
+        run: |
+          dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }}
+  
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            **/*.nupkg
