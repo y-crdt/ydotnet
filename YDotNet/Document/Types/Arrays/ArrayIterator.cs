@@ -30,6 +30,7 @@ public class ArrayIterator : IEnumerable<Output>, IDisposable
     public void Dispose()
     {
         ArrayChannel.IteratorDestroy(Handle);
+        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc />
@@ -42,5 +43,13 @@ public class ArrayIterator : IEnumerable<Output>, IDisposable
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="ArrayIterator" /> class.
+    /// </summary>
+    ~ArrayIterator()
+    {
+        Dispose();
     }
 }

@@ -42,6 +42,8 @@ public class Array : Branch
         var inputsPointer = MemoryWriter.WriteStructArray(inputsArray);
 
         ArrayChannel.InsertRange(Handle, transaction.Handle, index, inputsPointer, (uint) inputsArray.Length);
+
+        MemoryWriter.Release(inputsPointer);
     }
 
     /// <summary>
@@ -107,12 +109,11 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription Observe(Action<ArrayEvent> action)
     {
-        var subscriptionId = ArrayChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new ArrayEvent(eventHandle)));
+        ArrayChannel.ObserveCallback callback = (_, eventHandle) => action(new ArrayEvent(eventHandle));
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = ArrayChannel.Observe(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

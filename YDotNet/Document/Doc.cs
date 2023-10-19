@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YDotNet.Document.Events;
 using YDotNet.Document.Options;
 using YDotNet.Document.Transactions;
@@ -9,6 +10,7 @@ using YDotNet.Document.UndoManagers;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document;
@@ -32,6 +34,8 @@ namespace YDotNet.Document;
 /// </remarks>
 public class Doc : IDisposable
 {
+    private readonly bool disposable = true;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class.
     /// </summary>
@@ -50,15 +54,25 @@ public class Doc : IDisposable
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
     {
-        Handle = DocChannel.NewWithOptions(DocOptionsNative.From(options));
+        var optionsNative = DocOptionsNative.From(options);
+
+        Handle = DocChannel.NewWithOptions(optionsNative);
+
+        optionsNative.Dispose();
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Doc" /> class with the specified <see cref="Handle" />.
     /// </summary>
     /// <param name="handle">The pointer to be used by this document to manage the native resource.</param>
-    internal Doc(nint handle)
+    /// <param name="disposable">
+    ///     The flag determines if the resource associated with <see cref="Handle" /> should be disposed
+    ///     by this <see cref="Doc" /> instance.
+    /// </param>
+    internal Doc(nint handle, bool disposable = true)
     {
+        this.disposable = disposable;
+
         Handle = handle;
     }
 
@@ -70,7 +84,18 @@ public class Doc : IDisposable
     /// <summary>
     ///     Gets the unique document identifier of this <see cref="Doc" /> instance.
     /// </summary>
-    public string Guid => MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
+    public string Guid
+    {
+        get
+        {
+            var handle = DocChannel.Guid(Handle);
+            var result = MemoryReader.ReadUtf8String(handle);
+
+            StringChannel.Destroy(handle);
+
+            return result;
+        }
+    }
 
     /// <summary>
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
@@ -82,7 +107,10 @@ public class Doc : IDisposable
     {
         get
         {
-            MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
+            var handle = DocChannel.CollectionId(Handle);
+            MemoryReader.TryReadUtf8String(handle, out var result);
+
+            StringChannel.Destroy(handle);
 
             return result;
         }
@@ -114,7 +142,21 @@ public class Doc : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
+        if (!disposable)
+        {
+            return;
+        }
+
         DocChannel.Destroy(Handle);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="Doc" /> class.
+    /// </summary>
+    ~Doc()
+    {
+        Dispose();
     }
 
     /// <summary>
@@ -304,12 +346,13 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveClear(Action<ClearEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveClear(
-            Handle,
-            nint.Zero,
-            (_, doc) => action(ClearEventNative.From(new Doc(doc)).ToClearEvent()));
+        // Don't finalize this instance because there's another instance responsible for it somewhere else.
+        DocChannel.ObserveClearCallback callback = (_, docHandle) =>
+            action(ClearEventNative.From(new Doc(docHandle, disposable: false)).ToClearEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveClear(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -332,12 +375,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV1(Action<UpdateEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveUpdatesV1(
-            Handle,
-            nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) =>
+            action(UpdateEventNative.From(length, data).ToUpdateEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveUpdatesV1(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -360,12 +403,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveUpdatesV2(Action<UpdateEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveUpdatesV2(
-            Handle,
-            nint.Zero,
-            (_, length, data) => action(UpdateEventNative.From(length, data).ToUpdateEvent()));
+        DocChannel.ObserveUpdatesCallback callback = (_, length, data) =>
+            action(UpdateEventNative.From(length, data).ToUpdateEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveUpdatesV2(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -388,12 +431,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveAfterTransaction(Action<AfterTransactionEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveAfterTransaction(
-            Handle,
-            nint.Zero,
-            (_, afterTransactionEvent) => action(afterTransactionEvent.ToAfterTransactionEvent()));
+        DocChannel.ObserveAfterTransactionCallback callback = (_, eventHandle) =>
+            action(Marshal.PtrToStructure<AfterTransactionEventNative>(eventHandle).ToAfterTransactionEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveAfterTransaction(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
@@ -413,12 +456,12 @@ public class Doc : IDisposable
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription ObserveSubDocs(Action<SubDocsEvent> action)
     {
-        var subscriptionId = DocChannel.ObserveSubDocs(
-            Handle,
-            nint.Zero,
-            (_, subDocsEvent) => action(subDocsEvent.ToSubDocsEvent()));
+        DocChannel.ObserveSubdocsCallback callback = (_, eventHandle) =>
+            action(Marshal.PtrToStructure<SubDocsEventNative>(eventHandle).ToSubDocsEvent());
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = DocChannel.ObserveSubDocs(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>

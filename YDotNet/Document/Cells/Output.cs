@@ -41,7 +41,7 @@ public class Output : IDisposable
     /// <summary>
     ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
     /// </summary>
-    public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle)));
+    public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle), disposable: false));
 
     /// <summary>
     ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
@@ -197,5 +197,14 @@ public class Output : IDisposable
         }
 
         OutputChannel.Destroy(Handle);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="Output" /> class.
+    /// </summary>
+    ~Output()
+    {
+        Dispose();
     }
 }

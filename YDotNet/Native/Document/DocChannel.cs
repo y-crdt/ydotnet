@@ -1,15 +1,14 @@
 using System.Runtime.InteropServices;
-using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Native.Document;
 
 internal static class DocChannel
 {
-    public delegate void ObserveAfterTransactionCallback(nint state, AfterTransactionEventNative afterTransactionEvent);
+    public delegate void ObserveAfterTransactionCallback(nint state, nint eventHandle);
 
-    public delegate void ObserveClearCallback(nint state, nint doc);
+    public delegate void ObserveClearCallback(nint state, nint docHandle);
 
-    public delegate void ObserveSubdocsCallback(nint state, SubDocsEventNative subDocsEvent);
+    public delegate void ObserveSubdocsCallback(nint state, nint eventHandle);
 
     public delegate void ObserveUpdatesCallback(nint state, uint length, nint data);
 

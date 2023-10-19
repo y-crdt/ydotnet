@@ -73,6 +73,10 @@ public class Transaction : IDisposable
         for (var i = 0; i < length; i++)
         {
             var doc = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
+
+            // Don't finalize this instance because there's another instance responsible for it somewhere else.
+            GC.SuppressFinalize(doc);
+
             docs[i] = doc;
         }
 

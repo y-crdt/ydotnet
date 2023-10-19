@@ -227,12 +227,11 @@ public class XmlText : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public EventSubscription Observe(Action<XmlTextEvent> action)
     {
-        var subscriptionId = XmlTextChannel.Observe(
-            Handle,
-            nint.Zero,
-            (_, eventHandle) => action(new XmlTextEvent(eventHandle)));
+        XmlTextChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlTextEvent(eventHandle));
 
-        return new EventSubscription(subscriptionId);
+        var subscriptionId = XmlTextChannel.Observe(Handle, nint.Zero, callback);
+
+        return new EventSubscription(subscriptionId, callback);
     }
 
     /// <summary>
