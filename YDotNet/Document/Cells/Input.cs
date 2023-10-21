@@ -18,11 +18,16 @@ public sealed class Input : Resource
     }
 
     /// <summary>
-    /// Finalizes an instance of the <see cref="Input"/> class.
+    ///     Gets the native input cell represented by this cell.
+    /// </summary>
+    internal InputNative InputNative { get; }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="Input" /> class.
     /// </summary>
     ~Input()
     {
-        Dispose(false);
+        Dispose(disposing: false);
     }
 
     /// <inheritdoc />
@@ -33,11 +38,6 @@ public sealed class Input : Resource
             memory.Dispose();
         }
     }
-
-    /// <summary>
-    ///     Gets the native input cell represented by this cell.
-    /// </summary>
-    internal InputNative InputNative { get; }
 
     /// <summary>
     ///     Creates a new instance of the <see cref="Input" /> class.
@@ -98,7 +98,7 @@ public sealed class Input : Resource
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
-        return new Input(InputChannel.Bytes(value, (uint)value.Length));
+        return new Input(InputChannel.Bytes(value, (uint) value.Length));
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
+        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint) value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -120,10 +120,13 @@ public sealed class Input : Resource
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Object(IDictionary<string, Input> value)
     {
-        var unsageKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var unsafeKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
         var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Object(unsageKeys.Handle, unsafeValues.Handle, (uint)value.Count), unsageKeys, unsafeValues);
+        return new Input(
+            InputChannel.Object(unsafeKeys.Head, unsafeValues.Handle, (uint) value.Count),
+            unsafeKeys,
+            unsafeValues);
     }
 
     /// <summary>
@@ -153,7 +156,7 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
+        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint) value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -163,10 +166,13 @@ public sealed class Input : Resource
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Map(IDictionary<string, Input> value)
     {
-        var unsageKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
+        var unsafeKeys = MemoryWriter.WriteUtf8StringArray(value.Keys.ToArray());
         var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Map(unsageKeys.Handle, unsafeValues.Handle, (uint)value.Count), unsageKeys, unsafeValues);
+        return new Input(
+            InputChannel.Map(unsafeKeys.Head, unsafeValues.Handle, (uint) value.Count),
+            unsafeKeys,
+            unsafeValues);
     }
 
     /// <summary>
