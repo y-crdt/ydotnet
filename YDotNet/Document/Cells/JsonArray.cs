@@ -5,7 +5,7 @@ using YDotNet.Native.Cells.Outputs;
 namespace YDotNet.Document.Cells;
 
 /// <summary>
-/// Represents a json array.
+///     Represents a JSON array.
 /// </summary>
 public sealed class JsonArray : ReadOnlyCollection<Output>
 {
