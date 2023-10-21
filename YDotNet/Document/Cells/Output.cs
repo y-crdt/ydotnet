@@ -6,8 +6,6 @@ using YDotNet.Infrastructure;
 using YDotNet.Native.Cells.Outputs;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
-#pragma warning disable SA1623 // Property summary documentation should match accessors
-
 namespace YDotNet.Document.Cells;
 
 /// <summary>
@@ -21,98 +19,15 @@ public sealed class Output
     {
         var native = MemoryReader.ReadStruct<OutputNative>(handle);
 
-        Tag = (OutputTag)native.Tag;
+        Tag = (OutputTag) native.Tag;
 
         value = BuildValue(handle, native.Length, doc, isDeleted, Tag);
-    }
-
-    internal static Output CreateAndRelease(nint handle, Doc doc)
-    {
-        var result = new Output(handle, doc, false);
-
-        // The output reads everything so we can just destroy it.
-        OutputChannel.Destroy(handle);
-
-        return result;
-    }
-
-    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag type)
-    {
-        switch (type)
-        {
-            case OutputTag.Bool:
-                {
-                    var value = OutputChannel.Boolean(handle).Checked();
-
-                    return MemoryReader.ReadStruct<byte>(value) == 1;
-                }
-
-            case OutputTag.Double:
-                {
-                    var value = OutputChannel.Double(handle).Checked();
-
-                    return MemoryReader.ReadStruct<double>(value);
-                }
-
-            case OutputTag.Long:
-                {
-                    var value = OutputChannel.Long(handle).Checked();
-
-                    return MemoryReader.ReadStruct<long>(value);
-                }
-
-            case OutputTag.String:
-                {
-                    MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
-
-                    return result;
-                }
-
-            case OutputTag.Bytes:
-                {
-                    var bytesHandle = OutputChannel.Bytes(handle).Checked();
-                    var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
-
-                    return bytesArray;
-                }
-
-            case OutputTag.JsonArray:
-                {
-                    return new JsonArray(handle, length, doc, isDeleted);
-                }
-
-            case OutputTag.JsonObject:
-                {
-                    return new JsonObject(handle, length, doc, isDeleted);
-                }
-
-            case OutputTag.Array:
-                return doc.GetArray(OutputChannel.Array(handle), isDeleted);
-
-            case OutputTag.Map:
-                return doc.GetMap(OutputChannel.Map(handle), isDeleted);
-
-            case OutputTag.Text:
-                return doc.GetText(OutputChannel.Text(handle), isDeleted);
-
-            case OutputTag.XmlElement:
-                return doc.GetXmlElement(OutputChannel.XmlElement(handle), isDeleted);
-
-            case OutputTag.XmlText:
-                return doc.GetXmlText(OutputChannel.XmlText(handle), isDeleted);
-
-            case OutputTag.Doc:
-                return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
-
-            default:
-                return null;
-        }
     }
 
     /// <summary>
     ///     Gets the type of the output.
     /// </summary>
-    public OutputTag Tag { get; private set; }
+    public OutputTag Tag { get; }
 
     /// <summary>
     ///     Gets the <see cref="Doc" /> value.
@@ -126,11 +41,13 @@ public sealed class Output
     /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
     public string String => GetValue<string>(OutputTag.String);
 
+#pragma warning disable SA1623 (This property documentation shouldn't start with the standard text)
     /// <summary>
     ///     Gets the <see cref="bool" /> value.
     /// </summary>
     /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
     public bool Boolean => GetValue<bool>(OutputTag.Bool);
+#pragma warning restore SA1623
 
     /// <summary>
     ///     Gets the <see cref="double" /> value.
@@ -196,6 +113,89 @@ public sealed class Output
     /// <returns>The resolved xml text.</returns>
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
     public XmlText XmlText => GetValue<XmlText>(OutputTag.XmlText);
+
+    internal static Output CreateAndRelease(nint handle, Doc doc)
+    {
+        var result = new Output(handle, doc, isDeleted: false);
+
+        // The output reads everything so we can just destroy it.
+        OutputChannel.Destroy(handle);
+
+        return result;
+    }
+
+    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag type)
+    {
+        switch (type)
+        {
+            case OutputTag.Bool:
+            {
+                var value = OutputChannel.Boolean(handle).Checked();
+
+                return MemoryReader.ReadStruct<byte>(value) == 1;
+            }
+
+            case OutputTag.Double:
+            {
+                var value = OutputChannel.Double(handle).Checked();
+
+                return MemoryReader.ReadStruct<double>(value);
+            }
+
+            case OutputTag.Long:
+            {
+                var value = OutputChannel.Long(handle).Checked();
+
+                return MemoryReader.ReadStruct<long>(value);
+            }
+
+            case OutputTag.String:
+            {
+                MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
+
+                return result;
+            }
+
+            case OutputTag.Bytes:
+            {
+                var bytesHandle = OutputChannel.Bytes(handle).Checked();
+                var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
+
+                return bytesArray;
+            }
+
+            case OutputTag.JsonArray:
+            {
+                return new JsonArray(handle, length, doc, isDeleted);
+            }
+
+            case OutputTag.JsonObject:
+            {
+                return new JsonObject(handle, length, doc, isDeleted);
+            }
+
+            case OutputTag.Array:
+                return doc.GetArray(OutputChannel.Array(handle), isDeleted);
+
+            case OutputTag.Map:
+                return doc.GetMap(OutputChannel.Map(handle), isDeleted);
+
+            case OutputTag.Text:
+                return doc.GetText(OutputChannel.Text(handle), isDeleted);
+
+            case OutputTag.XmlElement:
+                return doc.GetXmlElement(OutputChannel.XmlElement(handle), isDeleted);
+
+            case OutputTag.XmlText:
+                return doc.GetXmlText(OutputChannel.XmlText(handle), isDeleted);
+
+            case OutputTag.Doc:
+                return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
+
+            default:
+                return null;
+        }
+    }
 
     private T GetValue<T>(OutputTag expectedType)
     {
