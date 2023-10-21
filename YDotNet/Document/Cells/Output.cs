@@ -3,6 +3,7 @@ using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Cells.Outputs;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
@@ -124,55 +125,30 @@ public sealed class Output
         return result;
     }
 
-    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag type)
+    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag tag)
     {
-        switch (type)
+        switch (tag)
         {
             case OutputTag.Bool:
-            {
-                var value = OutputChannel.Boolean(handle).Checked();
-
-                return MemoryReader.ReadStruct<byte>(value) == 1;
-            }
+                return MemoryReader.ReadStruct<byte>(OutputChannel.Boolean(handle).Checked()) == 1;
 
             case OutputTag.Double:
-            {
-                var value = OutputChannel.Double(handle).Checked();
-
-                return MemoryReader.ReadStruct<double>(value);
-            }
+                return MemoryReader.ReadStruct<double>(OutputChannel.Double(handle).Checked());
 
             case OutputTag.Long:
-            {
-                var value = OutputChannel.Long(handle).Checked();
-
-                return MemoryReader.ReadStruct<long>(value);
-            }
+                return MemoryReader.ReadStruct<long>(OutputChannel.Long(handle).Checked());
 
             case OutputTag.String:
-            {
-                MemoryReader.TryReadUtf8String(OutputChannel.String(handle), out var result);
-
-                return result;
-            }
+                return MemoryReader.ReadUtf8String(OutputChannel.String(handle).Checked());
 
             case OutputTag.Bytes:
-            {
-                var bytesHandle = OutputChannel.Bytes(handle).Checked();
-                var bytesArray = MemoryReader.ReadBytes(OutputChannel.Bytes(handle), length);
-
-                return bytesArray;
-            }
+                return MemoryReader.ReadBytes(OutputChannel.Bytes(handle).Checked(), length);
 
             case OutputTag.JsonArray:
-            {
                 return new JsonArray(handle, length, doc, isDeleted);
-            }
 
             case OutputTag.JsonObject:
-            {
                 return new JsonObject(handle, length, doc, isDeleted);
-            }
 
             case OutputTag.Array:
                 return doc.GetArray(OutputChannel.Array(handle), isDeleted);
@@ -193,7 +169,7 @@ public sealed class Output
                 return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
 
             default:
-                return null;
+                throw new YDotNetException($"Unsupported OutputTag value: {tag}");
         }
     }
 
