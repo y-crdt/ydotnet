@@ -5,11 +5,11 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryWriter
 {
-    internal static unsafe DisposableHandle WriteUtf8String(string? value)
+    internal static DisposableHandle WriteUtf8String(string? value)
     {
         if (value == null)
         {
-            return new DisposableHandle(0);
+            return new DisposableHandle(Handle: 0);
         }
 
         return new DisposableHandle(WriteUtf8StringCore(value));
@@ -23,12 +23,12 @@ internal static class MemoryWriter
         var memory = new Span<byte>(bufferPointer.ToPointer(), bufferLength);
 
         Encoding.UTF8.GetBytes(value, memory);
-        memory[bufferLength - 1] = (byte)'\0';
+        memory[bufferLength - 1] = (byte) '\0';
 
         return bufferPointer;
     }
 
-    internal static DisposableHandles WriteUtf8StringArray(string[] values)
+    internal static DisposableHandleArray WriteUtf8StringArray(string[] values)
     {
         var head = Marshal.AllocHGlobal(MemoryConstants.PointerSize * values.Length);
 
@@ -41,7 +41,7 @@ internal static class MemoryWriter
             Marshal.WriteIntPtr(head + i * MemoryConstants.PointerSize, pointers[i]);
         }
 
-        return new DisposableHandles(head, pointers);
+        return new DisposableHandleArray(head, pointers);
     }
 
     internal static DisposableHandle WriteStructArray<T>(T[] value)
@@ -63,7 +63,7 @@ internal static class MemoryWriter
     {
         if (value == null)
         {
-            return new DisposableHandle(0);
+            return new DisposableHandle(Handle: 0);
         }
 
         return WriteStruct(value.Value);
@@ -90,13 +90,13 @@ internal static class MemoryWriter
         }
     }
 
-    internal sealed record DisposableHandles(nint Handle, nint[] Handles) : IDisposable
+    internal sealed record DisposableHandleArray(nint Head, nint[] Handles) : IDisposable
     {
         public void Dispose()
         {
-            if (Handle != nint.Zero)
+            if (Head != nint.Zero)
             {
-                Marshal.FreeHGlobal(Handle);
+                Marshal.FreeHGlobal(Head);
             }
 
             foreach (var handle in Handles)
