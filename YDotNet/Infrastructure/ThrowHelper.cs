@@ -2,7 +2,7 @@ namespace YDotNet.Infrastructure;
 
 internal static class ThrowHelper
 {
-    public static void InternalError()
+    public static void Null()
     {
         YDotNetException("Operation failed. The yffi library returned null without further details.");
     }
