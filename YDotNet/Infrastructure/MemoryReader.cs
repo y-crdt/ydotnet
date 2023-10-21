@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native;
 using YDotNet.Native.Types;
 
