@@ -47,7 +47,7 @@ public sealed class Output
     ///     Gets the <see cref="bool" /> value.
     /// </summary>
     /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
-    public bool Boolean => GetValue<bool>(OutputTag.Bool);
+    public bool Boolean => GetValue<bool>(OutputTag.Boolean);
 #pragma warning restore SA1623
 
     /// <summary>
@@ -129,7 +129,7 @@ public sealed class Output
     {
         switch (tag)
         {
-            case OutputTag.Bool:
+            case OutputTag.Boolean:
                 return MemoryReader.ReadStruct<byte>(OutputChannel.Boolean(handle).Checked()) == 1;
 
             case OutputTag.Double:
