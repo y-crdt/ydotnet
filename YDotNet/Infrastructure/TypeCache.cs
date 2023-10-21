@@ -9,7 +9,7 @@ internal class TypeCache
     {
         if (handle == nint.Zero)
         {
-            ThrowHelper.ArgumentException("Cannot create object for null handle.", nameof(handle));
+            throw new ArgumentException("Cannot create object for null handle.", nameof(handle));
         }
 
         Cleanup();
@@ -18,8 +18,7 @@ internal class TypeCache
         {
             if (item is not T typed)
             {
-                ThrowHelper.YDotnet($"Expected {typeof(T)}, got {item.GetType()}");
-                return default!;
+                throw new YDotNetException($"Expected {typeof(T)}, got {item.GetType()}");
             }
 
             return typed;
@@ -54,6 +53,7 @@ internal class TypeCache
         }
     }
 
+    // TODO [LSViana] Check with Sebastian why this method isn't used anywhere.
     public void Delete(nint handle)
     {
         if (cache.TryGetValue(handle, out var weakRef))
