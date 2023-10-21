@@ -9,7 +9,7 @@ internal readonly struct MapEntryNative
 {
     internal const int Size = 8 + OutputNative.Size;
 
-    public nint KeyHandle { get; }
+    internal nint KeyHandle { get; }
 
     public nint ValueHandle(nint baseHandle)
     {

@@ -6,7 +6,7 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Cells;
 
 /// <summary>
-/// Represents a json object.
+///     Represents a JSON object.
 /// </summary>
 public sealed class JsonObject : ReadOnlyDictionary<string, Output>
 {
