@@ -36,6 +36,13 @@ public static class YDotNetExtensions
         return JsonSerializer.Deserialize<T>(jsonStream)!;
     }
 
+    public static string ToJson(this Output output, Doc doc)
+    {
+        using var transaction = doc.ReadTransaction();
+
+        return output.ToJson(transaction);
+    }
+
     public static string ToJson(this Output output, Transaction transaction)
     {
         var jsonStream = new MemoryStream();
