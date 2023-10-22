@@ -11,12 +11,19 @@ namespace YDotNet.Document.Options;
 public class DocOptions
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="DocOptions" /> class.
+    /// </summary>
+    public DocOptions()
+    {
+        Id = ClientId.GetRandom();
+        ShouldLoad = true;
+        Encoding = DocEncoding.Utf16;
+    }
+
+    /// <summary>
     ///     Gets the default options value used to initialize <see cref="Doc" /> instances.
     /// </summary>
-    public static DocOptions Default => new()
-    {
-        Id = ClientId.GetRandom()
-    };
+    public static DocOptions Default => new();
 
     /// <summary>
     ///     Gets the globally unique 53-bit integer assigned to the <see cref="Doc" /> replica as its identifier.
@@ -60,7 +67,7 @@ public class DocOptions
     ///         Read more about the possible values in <see cref="DocEncoding" />.
     ///     </para>
     /// </remarks>
-    public DocEncoding Encoding { get; init; } = DocEncoding.Utf16;
+    public DocEncoding Encoding { get; init; }
 
     /// <summary>
     ///     Gets a value indicating whether deleted blocks should be garbage collected during transaction commits.
@@ -81,7 +88,7 @@ public class DocOptions
     /// <summary>
     ///     Gets a value indicating whether the <see cref="Doc" /> should be synchronized by the provider now.
     /// </summary>
-    public bool ShouldLoad { get; init; } = true;
+    public bool ShouldLoad { get; init; }
 
     internal DocOptionsNative ToNative()
     {
@@ -94,10 +101,10 @@ public class DocOptions
             Id = Id,
             Guid = unsafeGuid.Handle,
             CollectionId = unsafeCollection.Handle,
-            Encoding = (byte)Encoding,
-            SkipGc = (byte)(SkipGarbageCollection ? 1 : 0),
-            AutoLoad = (byte)(AutoLoad ? 1 : 0),
-            ShouldLoad = (byte)(ShouldLoad ? 1 : 0)
+            Encoding = (byte) Encoding,
+            SkipGc = (byte) (SkipGarbageCollection ? 1 : 0),
+            AutoLoad = (byte) (AutoLoad ? 1 : 0),
+            ShouldLoad = (byte) (ShouldLoad ? 1 : 0)
         };
     }
 }
