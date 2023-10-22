@@ -18,20 +18,6 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="XmlAttributeIterator"/> class.
-    /// </summary>
-    ~XmlAttributeIterator()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        XmlAttributeChannel.IteratorDestroy(Handle);
-    }
-
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
     {
@@ -42,5 +28,19 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="XmlAttributeIterator" /> class.
+    /// </summary>
+    ~XmlAttributeIterator()
+    {
+        Dispose(disposing: false);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        XmlAttributeChannel.IteratorDestroy(Handle);
     }
 }

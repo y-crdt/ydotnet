@@ -26,20 +26,6 @@ public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, O
         Doc = doc;
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="MapIterator"/> class.
-    /// </summary>
-    ~MapIterator()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        MapChannel.IteratorDestroy(Handle);
-    }
-
     internal Doc Doc { get; }
 
     /// <inheritdoc />
@@ -53,5 +39,19 @@ public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, O
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="MapIterator" /> class.
+    /// </summary>
+    ~MapIterator()
+    {
+        Dispose(disposing: false);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        MapChannel.IteratorDestroy(Handle);
     }
 }

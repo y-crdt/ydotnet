@@ -19,20 +19,6 @@ public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
         Doc = doc;
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ArrayIterator"/> class.
-    /// </summary>
-    ~ArrayIterator()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        ArrayChannel.IteratorDestroy(Handle);
-    }
-
     internal Doc Doc { get; }
 
     /// <inheritdoc />
@@ -46,5 +32,19 @@ public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="ArrayIterator" /> class.
+    /// </summary>
+    ~ArrayIterator()
+    {
+        Dispose(disposing: false);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        ArrayChannel.IteratorDestroy(Handle);
     }
 }
