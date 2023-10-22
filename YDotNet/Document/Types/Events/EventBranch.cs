@@ -18,35 +18,9 @@ public class EventBranch
 
     internal EventBranch(NativeWithHandle<EventBranchNative> native, Doc doc)
     {
-        Tag = (EventBranchTag)native.Value.Tag;
+        Tag = (EventBranchTag) native.Value.Tag;
 
-        value = CreateValue(native, doc, Tag);
-    }
-
-    private static object? CreateValue(NativeWithHandle<EventBranchNative> native, Doc doc, EventBranchTag tag)
-    {
-        var handle = native.Value.ValueHandle(native.Handle);
-
-        switch (tag)
-        {
-            case EventBranchTag.Map:
-                return new MapEvent(handle, doc);
-
-            case EventBranchTag.Text:
-                return new TextEvent(handle, doc);
-
-            case EventBranchTag.Array:
-                return new ArrayEvent(handle, doc);
-
-            case EventBranchTag.XmlElement:
-                return new XmlElementEvent(handle, doc);
-
-            case EventBranchTag.XmlText:
-                return new XmlTextEvent(handle, doc);
-
-            default:
-                return null;
-        }
+        value = BuildValue(native, doc, Tag);
     }
 
     /// <summary>
@@ -83,6 +57,32 @@ public class EventBranch
     /// </summary>
     /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
     public XmlTextEvent XmlTextEvent => GetValue<XmlTextEvent>(EventBranchTag.XmlText);
+
+    private static object? BuildValue(NativeWithHandle<EventBranchNative> native, Doc doc, EventBranchTag tag)
+    {
+        var handle = native.Value.ValueHandle(native.Handle);
+
+        switch (tag)
+        {
+            case EventBranchTag.Map:
+                return new MapEvent(handle, doc);
+
+            case EventBranchTag.Text:
+                return new TextEvent(handle, doc);
+
+            case EventBranchTag.Array:
+                return new ArrayEvent(handle, doc);
+
+            case EventBranchTag.XmlElement:
+                return new XmlElementEvent(handle, doc);
+
+            case EventBranchTag.XmlText:
+                return new XmlTextEvent(handle, doc);
+
+            default:
+                return null;
+        }
+    }
 
     private T GetValue<T>(EventBranchTag expectedType)
     {
