@@ -21,20 +21,6 @@ public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
         Doc = doc;
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="XmlTreeWalker"/> class.
-    /// </summary>
-    ~XmlTreeWalker()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        XmlElementChannel.TreeWalkerDestroy(Handle);
-    }
-
     internal Doc Doc { get; }
 
     /// <inheritdoc />
@@ -47,5 +33,19 @@ public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="XmlTreeWalker" /> class.
+    /// </summary>
+    ~XmlTreeWalker()
+    {
+        Dispose(disposing: false);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        XmlElementChannel.TreeWalkerDestroy(Handle);
     }
 }
