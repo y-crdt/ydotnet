@@ -6,7 +6,7 @@ internal static class DocChannel
 {
     public delegate void ObserveAfterTransactionCallback(nint state, nint eventHandle);
 
-    public delegate void ObserveClearCallback(nint state, nint doc);
+    public delegate void ObserveClearCallback(nint state, nint docHandle);
 
     public delegate void ObserveSubdocsCallback(nint state, nint eventHandle);
 

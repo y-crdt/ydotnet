@@ -14,8 +14,8 @@ public class AssociationTypeTests
         var text = doc.Text("text");
 
         var transaction = doc.WriteTransaction();
-        text.Insert(transaction, 0, "Lucas");
-        var stickyIndex = text.StickyIndex(transaction, 3, StickyAssociationType.Before);
+        text.Insert(transaction, index: 0, "Lucas");
+        var stickyIndex = text.StickyIndex(transaction, index: 3, StickyAssociationType.Before);
         transaction.Commit();
 
         // Act
@@ -33,8 +33,8 @@ public class AssociationTypeTests
         var text = doc.Text("text");
 
         var transaction = doc.WriteTransaction();
-        text.Insert(transaction, 0, "Lucas");
-        var stickyIndex = text.StickyIndex(transaction, 3, StickyAssociationType.After);
+        text.Insert(transaction, index: 0, "Lucas");
+        var stickyIndex = text.StickyIndex(transaction, index: 3, StickyAssociationType.After);
         transaction.Commit();
 
         // Act
