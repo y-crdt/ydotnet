@@ -2,9 +2,9 @@ namespace YDotNet.Document.Events;
 
 internal class EventSubscriber<TEvent> : IEventSubscriber
 {
-    private readonly EventPublisher<TEvent> publisher = new();
     private readonly EventManager manager;
     private readonly nint owner;
+    private readonly EventPublisher<TEvent> publisher = new();
     private readonly Func<nint, Action<TEvent>, (uint Handle, object Callback)> subscribe;
     private readonly Action<nint, uint> unsubscribe;
     private (uint Handle, object? Callback) nativeSubscription;
@@ -41,10 +41,7 @@ internal class EventSubscriber<TEvent> : IEventSubscriber
 
         publisher.Subscribe(handler);
 
-        return new DelegateDisposable(() =>
-        {
-            Unsubscribe(handler);
-        });
+        return new DelegateDisposable(() => Unsubscribe(handler));
     }
 
     private void Unsubscribe(Action<TEvent> handler)
@@ -56,7 +53,7 @@ internal class EventSubscriber<TEvent> : IEventSubscriber
 
     private void UnsubscribeWhenSubscribed()
     {
-        // If this is the last subscription we can unubscribe from the native source again.
+        // If this is the last subscription, we can unsubscribe from the native source again.
         if (publisher.Count == 0 && nativeSubscription.Callback != null)
         {
             unsubscribe(owner, nativeSubscription.Handle);
