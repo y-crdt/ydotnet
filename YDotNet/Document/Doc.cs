@@ -33,13 +33,13 @@ namespace YDotNet.Document;
 /// </remarks>
 public class Doc : TypeBase, IDisposable
 {
-    private readonly TypeCache typeCache = new();
+    private readonly EventSubscriber<AfterTransactionEvent> onAfterTransaction;
     private readonly EventSubscriber<ClearEvent> onClear;
+    private readonly EventSubscriber<SubDocsEvent> onSubDocs;
     private readonly EventSubscriber<UpdateEvent> onUpdateV1;
     private readonly EventSubscriber<UpdateEvent> onUpdateV2;
-    private readonly EventSubscriber<AfterTransactionEvent> onAfterTransaction;
-    private readonly EventSubscriber<SubDocsEvent> onSubDocs;
     private readonly Doc? parent;
+    private readonly TypeCache typeCache = new();
     private int openTransactions;
 
     /// <summary>
@@ -59,7 +59,7 @@ public class Doc : TypeBase, IDisposable
     /// </summary>
     /// <param name="options">The options to be used when initializing this document.</param>
     public Doc(DocOptions options)
-        : this(CreateDoc(options), null, false)
+        : this(CreateDoc(options), parent: null, isDeleted: false)
     {
     }
 
@@ -74,7 +74,7 @@ public class Doc : TypeBase, IDisposable
             (doc, action) =>
             {
                 DocChannel.ObserveClearCallback callback =
-                    (_, doc) => action(new ClearEvent(GetDoc(doc, false)));
+                    (_, doc) => action(new ClearEvent(GetDoc(doc, isDeleted: false)));
 
                 return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
             },
@@ -110,7 +110,8 @@ public class Doc : TypeBase, IDisposable
             (doc, action) =>
             {
                 DocChannel.ObserveAfterTransactionCallback callback =
-                    (_, ev) => action(new AfterTransactionEvent(MemoryReader.ReadStruct<AfterTransactionEventNative>(ev)));
+                    (_, ev) => action(
+                        new AfterTransactionEvent(MemoryReader.ReadStruct<AfterTransactionEventNative>(ev)));
 
                 return (DocChannel.ObserveAfterTransaction(doc, nint.Zero, callback), callback);
             },
@@ -129,44 +130,6 @@ public class Doc : TypeBase, IDisposable
             (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
 
         Handle = handle;
-    }
-
-    private static nint CreateDoc(DocOptions options)
-    {
-        return DocChannel.NewWithOptions(options.ToNative());
-    }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="Doc"/> class.
-    /// </summary>
-    ~Doc()
-    {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-
-        MarkDisposed();
-
-        if (disposing)
-        {
-            // Clears all active subscriptions that have not been closed yet.
-            EventManager.Clear();
-        }
-
-        DocChannel.Destroy(Handle);
     }
 
     /// <summary>
@@ -199,7 +162,8 @@ public class Doc : TypeBase, IDisposable
     ///     Gets a value indicating whether this <see cref="Doc" /> instance requested a data load.
     /// </summary>
     /// <remarks>
-    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" /> instance requested a data load.
+    ///     This flag is often used by the parent <see cref="Doc" /> instance to check if this <see cref="Doc" /> instance
+    ///     requested a data load.
     /// </remarks>
     public bool ShouldLoad
     {
@@ -215,7 +179,8 @@ public class Doc : TypeBase, IDisposable
     ///     Gets a value indicating whether this <see cref="Doc" /> instance will auto load.
     /// </summary>
     /// <remarks>
-    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent <see cref="Doc" /> instances.
+    ///     Auto loaded nested <see cref="Doc" /> instances automatically send a load request to their parent
+    ///     <see cref="Doc" /> instances.
     /// </remarks>
     public bool AutoLoad
     {
@@ -246,7 +211,45 @@ public class Doc : TypeBase, IDisposable
 
     internal nint Handle { get; }
 
-    internal EventManager EventManager { get; } = new EventManager();
+    internal EventManager EventManager { get; } = new();
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    private static nint CreateDoc(DocOptions options)
+    {
+        return DocChannel.NewWithOptions(options.ToNative());
+    }
+
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="Doc" /> class.
+    /// </summary>
+    ~Doc()
+    {
+        Dispose(disposing: false);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        MarkDisposed();
+
+        if (disposing)
+        {
+            // Clears all active subscriptions that have not been closed yet.
+            EventManager.Clear();
+        }
+
+        DocChannel.Destroy(Handle);
+    }
 
     /// <summary>
     ///     Gets or creates a new shared <see cref="Types.Texts.Text" /> data type instance as a root-level
@@ -265,7 +268,7 @@ public class Doc : TypeBase, IDisposable
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Text(Handle, unsafeName.Handle);
 
-        return GetText(handle, false);
+        return GetText(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -285,7 +288,7 @@ public class Doc : TypeBase, IDisposable
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Map(Handle, unsafeName.Handle);
 
-        return GetMap(handle, false);
+        return GetMap(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -305,7 +308,7 @@ public class Doc : TypeBase, IDisposable
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.Array(Handle, unsafeName.Handle);
 
-        return GetArray(handle, false);
+        return GetArray(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -325,7 +328,7 @@ public class Doc : TypeBase, IDisposable
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
 
-        return GetXmlElement(handle, false);
+        return GetXmlElement(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -345,15 +348,7 @@ public class Doc : TypeBase, IDisposable
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
         var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
 
-        return GetXmlText(handle, false);
-    }
-
-    internal void ThrowIfOpenTransaction()
-    {
-        if (openTransactions > 0)
-        {
-            ThrowHelper.PendingTransaction();
-        }
+        return GetXmlText(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -366,7 +361,7 @@ public class Doc : TypeBase, IDisposable
     {
         ThrowIfDisposed();
 
-        var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
+        var handle = DocChannel.WriteTransaction(Handle, (uint) (origin?.Length ?? 0), origin);
 
         if (handle == nint.Zero)
         {
@@ -505,7 +500,7 @@ public class Doc : TypeBase, IDisposable
 
         if (!isDeleted)
         {
-            // Prevent the sub document to be released while we are working with it.
+            // Prevent the sub-document to be released while we are working with it.
             handle = DocChannel.Clone(handle);
         }
 
@@ -552,6 +547,14 @@ public class Doc : TypeBase, IDisposable
         var doc = GetRootDoc();
 
         return doc.typeCache.GetOrAdd(handle, h => factory(h, doc));
+    }
+
+    private void ThrowIfOpenTransaction()
+    {
+        if (openTransactions > 0)
+        {
+            ThrowHelper.PendingTransaction();
+        }
     }
 
     private Doc GetRootDoc()

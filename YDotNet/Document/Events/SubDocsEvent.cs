@@ -9,14 +9,9 @@ public class SubDocsEvent
 {
     internal SubDocsEvent(SubDocsEventNative native, Doc doc)
     {
-        Added = native.Added()
-            .Select(h => doc.GetDoc(h, false)).ToList();
-
-        Removed = native.Removed()
-            .Select(h => doc.GetDoc(h, true)).ToList();
-
-        Loaded = native.Loaded()
-            .Select(h => doc.GetDoc(h, false)).ToList();
+        Added = native.Added().Select(h => doc.GetDoc(h, isDeleted: false)).ToList();
+        Removed = native.Removed().Select(h => doc.GetDoc(h, isDeleted: true)).ToList();
+        Loaded = native.Loaded().Select(h => doc.GetDoc(h, isDeleted: false)).ToList();
     }
 
     /// <summary>
