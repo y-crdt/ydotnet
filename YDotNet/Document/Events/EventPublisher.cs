@@ -31,8 +31,7 @@ internal sealed class EventPublisher<TEvent>
             }
             catch
             {
-                // Exceptions could have unknown consequences in the rust part.
-                continue;
+                // Exceptions could have unknown consequences in the Rust part.
             }
         }
     }
