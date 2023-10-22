@@ -10,50 +10,46 @@ namespace YDotNet.Document.Types.Maps;
 /// </summary>
 internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 {
-    private KeyValuePair<string, Output> current;
+    private readonly MapIterator iterator;
 
     internal MapEnumerator(MapIterator iterator)
     {
-        Iterator = iterator;
+        this.iterator = iterator;
     }
+
+    /// <inheritdoc />
+    public KeyValuePair<string, Output> Current { get; private set; }
+
+    /// <inheritdoc />
+    object IEnumerator.Current => Current;
 
     /// <inheritdoc />
     public void Dispose()
     {
-        Iterator.Dispose();
+        iterator.Dispose();
     }
-
-    /// <inheritdoc />
-    public KeyValuePair<string, Output> Current => current;
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => current!;
-
-    private MapIterator Iterator { get; }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = MapChannel.IteratorNext(Iterator.Handle);
+        var handle = MapChannel.IteratorNext(iterator.Handle);
 
         if (handle != nint.Zero)
         {
             var native = MemoryReader.ReadStruct<MapEntryNative>(handle);
 
-            current = new KeyValuePair<string, Output>(
+            Current = new KeyValuePair<string, Output>(
                 native.Key(),
-                new Output(native.ValueHandle(handle), Iterator.Doc, false));
+                new Output(native.ValueHandle(handle), iterator.Doc, isDeleted: false));
 
             // We are done reading, so we can release the memory.
             MapChannel.EntryDestroy(handle);
 
             return true;
         }
-        else
-        {
-            current = default;
-            return false;
-        }
+
+        Current = default;
+        return false;
     }
 
     /// <inheritdoc />

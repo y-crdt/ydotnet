@@ -10,42 +10,40 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 internal class ArrayEnumerator : IEnumerator<Output>
 {
+    private readonly ArrayIterator iterator;
     private Output? current;
 
     internal ArrayEnumerator(ArrayIterator iterator)
     {
-        Iterator = iterator;
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Iterator.Dispose();
+        this.iterator = iterator;
     }
 
     /// <inheritdoc />
     public Output Current => current!;
 
     /// <inheritdoc />
-    object? IEnumerator.Current => current!;
+    object IEnumerator.Current => current!;
 
-    private ArrayIterator Iterator { get; }
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        iterator.Dispose();
+    }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = ArrayChannel.IteratorNext(Iterator.Handle);
+        var handle = ArrayChannel.IteratorNext(iterator.Handle);
 
         if (handle != nint.Zero)
         {
-            current = Output.CreateAndRelease(handle, Iterator.Doc);
+            current = Output.CreateAndRelease(handle, iterator.Doc);
             return true;
         }
-        else
-        {
-            current = null!;
-            return false;
-        }
+
+        current = null!;
+
+        return false;
     }
 
     /// <inheritdoc />

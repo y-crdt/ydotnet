@@ -10,49 +10,46 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </summary>
 internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
 {
+    private readonly XmlTreeWalker treeWalker;
     private Output? current;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
     /// </summary>
     /// <param name="treeWalker">
-    ///     The <see cref="TreeWalker" /> instance used by this enumerator.
-    ///     Check <see cref="TreeWalker" /> for more details.
+    ///     The <see cref="XmlTreeWalker" /> instance used by this enumerator.
+    ///     Check <see cref="XmlTreeWalker" /> for more details.
     /// </param>
     public XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker)
     {
-        TreeWalker = treeWalker;
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        TreeWalker.Dispose();
+        this.treeWalker = treeWalker;
     }
 
     /// <inheritdoc />
     public Output Current => current!;
 
     /// <inheritdoc />
-    object? IEnumerator.Current => current!;
+    object IEnumerator.Current => current!;
 
-    private XmlTreeWalker TreeWalker { get; }
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        treeWalker.Dispose();
+    }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
+        var handle = XmlElementChannel.TreeWalkerNext(treeWalker.Handle);
 
         if (handle != nint.Zero)
         {
-            current = Output.CreateAndRelease(handle, TreeWalker.Doc);
+            current = Output.CreateAndRelease(handle, treeWalker.Doc);
             return true;
         }
-        else
-        {
-            current = null!;
-            return false;
-        }
+
+        current = null!;
+        return false;
     }
 
     /// <inheritdoc />

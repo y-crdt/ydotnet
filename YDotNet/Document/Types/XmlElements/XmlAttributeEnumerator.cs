@@ -9,48 +9,44 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>>
 {
-    private KeyValuePair<string, string> current;
+    private readonly XmlAttributeIterator iterator;
 
     internal XmlAttributeEnumerator(XmlAttributeIterator iterator)
     {
-        Iterator = iterator;
+        this.iterator = iterator;
     }
+
+    /// <inheritdoc />
+    public KeyValuePair<string, string> Current { get; private set; }
+
+    /// <inheritdoc />
+    object IEnumerator.Current => Current;
 
     /// <inheritdoc />
     public void Dispose()
     {
-        Iterator.Dispose();
+        iterator.Dispose();
     }
-
-    /// <inheritdoc />
-    public KeyValuePair<string, string> Current => current;
-
-    /// <inheritdoc />
-    object? IEnumerator.Current => current!;
-
-    private XmlAttributeIterator Iterator { get; }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = XmlAttributeChannel.IteratorNext(Iterator.Handle);
+        var handle = XmlAttributeChannel.IteratorNext(iterator.Handle);
 
         if (handle != nint.Zero)
         {
             var native = MemoryReader.ReadStruct<XmlAttributeNative>(handle);
 
-            current = new KeyValuePair<string, string>(native.Key(), native.Value());
+            Current = new KeyValuePair<string, string>(native.Key(), native.Value());
 
             // We are done reading, therefore we can release memory.
             XmlAttributeChannel.Destroy(handle);
 
             return true;
         }
-        else
-        {
-            current = default;
-            return false;
-        }
+
+        Current = default;
+        return false;
     }
 
     /// <inheritdoc />
