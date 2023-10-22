@@ -15,7 +15,7 @@ public class DocOptions
     /// </summary>
     public DocOptions()
     {
-        Id = ClientId.GetRandom();
+        Id = ClientIdGenerator.Random();
         ShouldLoad = true;
         Encoding = DocEncoding.Utf16;
     }
