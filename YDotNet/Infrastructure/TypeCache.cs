@@ -31,6 +31,20 @@ internal class TypeCache
         return typedItem;
     }
 
+    // TODO [LSViana] Check with Sebastian why this method isn't used anywhere.
+    public void Delete(nint handle)
+    {
+        if (cache.TryGetValue(handle, out var weakRef))
+        {
+            if (weakRef.TryGetTarget(out var item))
+            {
+                item.MarkDisposed();
+            }
+
+            cache.Remove(handle);
+        }
+    }
+
     private void Cleanup()
     {
         List<nint>? keysToDelete = null;
@@ -50,20 +64,6 @@ internal class TypeCache
             {
                 cache.Remove(key);
             }
-        }
-    }
-
-    // TODO [LSViana] Check with Sebastian why this method isn't used anywhere.
-    public void Delete(nint handle)
-    {
-        if (cache.TryGetValue(handle, out var weakRef))
-        {
-            if (weakRef.TryGetTarget(out var item))
-            {
-                item.MarkDisposed();
-            }
-
-            cache.Remove(handle);
         }
     }
 }
