@@ -5,8 +5,6 @@ using YDotNet.Infrastructure;
 using YDotNet.Native.Document.Events;
 using YDotNet.Native.Types.Branches;
 
-#pragma warning disable CA1806 // Do not ignore method results
-
 namespace YDotNet.Document.Types.Branches;
 
 /// <summary>
@@ -28,7 +26,9 @@ public abstract class Branch : TypeBase
             {
                 BranchChannel.ObserveCallback callback = (_, length, ev) =>
                 {
-                    var events = MemoryReader.ReadStructsWithHandles<EventBranchNative>(ev, length).Select(x => new EventBranch(x, doc)).ToArray();
+                    var events = MemoryReader.ReadStructsWithHandles<EventBranchNative>(ev, length)
+                        .Select(x => new EventBranch(x, doc))
+                        .ToArray();
 
                     action(events);
                 };
