@@ -10,8 +10,6 @@ using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
-#pragma warning disable CA1806 // Do not ignore method results
-
 namespace YDotNet.Document;
 
 /// <summary>
@@ -74,7 +72,7 @@ public class Doc : TypeBase, IDisposable
             (doc, action) =>
             {
                 DocChannel.ObserveClearCallback callback =
-                    (_, doc) => action(new ClearEvent(GetDoc(doc, isDeleted: false)));
+                    (_, eventDoc) => action(new ClearEvent(GetDoc(eventDoc, isDeleted: false)));
 
                 return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
             },
@@ -83,7 +81,7 @@ public class Doc : TypeBase, IDisposable
         onUpdateV1 = new EventSubscriber<UpdateEvent>(
             EventManager,
             handle,
-            (doc, action) =>
+            (_, action) =>
             {
                 DocChannel.ObserveUpdatesCallback callback =
                     (_, length, data) => action(new UpdateEvent(UpdateEventNative.From(length, data)));
@@ -95,7 +93,7 @@ public class Doc : TypeBase, IDisposable
         onUpdateV2 = new EventSubscriber<UpdateEvent>(
             EventManager,
             handle,
-            (doc, action) =>
+            (_, action) =>
             {
                 DocChannel.ObserveUpdatesCallback callback =
                     (_, length, data) => action(new UpdateEvent(UpdateEventNative.From(length, data)));
@@ -220,35 +218,12 @@ public class Doc : TypeBase, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private static nint CreateDoc(DocOptions options)
-    {
-        return DocChannel.NewWithOptions(options.ToNative());
-    }
-
     /// <summary>
     ///     Finalizes an instance of the <see cref="Doc" /> class.
     /// </summary>
     ~Doc()
     {
         Dispose(disposing: false);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-
-        MarkDisposed();
-
-        if (disposing)
-        {
-            // Clears all active subscriptions that have not been closed yet.
-            EventManager.Clear();
-        }
-
-        DocChannel.Destroy(Handle);
     }
 
     /// <summary>
@@ -504,7 +479,7 @@ public class Doc : TypeBase, IDisposable
             handle = DocChannel.Clone(handle);
         }
 
-        return GetOrAdd(handle, (h, doc) => new Doc(handle, doc, isDeleted));
+        return GetOrAdd(handle, (_, doc) => new Doc(handle, doc, isDeleted));
     }
 
     internal void NotifyTransactionStarted()
@@ -542,7 +517,8 @@ public class Doc : TypeBase, IDisposable
         return GetOrAdd(handle, (h, doc) => new XmlElement(h, doc, isDeleted));
     }
 
-    private T GetOrAdd<T>(nint handle, Func<nint, Doc, T> factory) where T : ITypeBase
+    private T GetOrAdd<T>(nint handle, Func<nint, Doc, T> factory)
+        where T : ITypeBase
     {
         var doc = GetRootDoc();
 
@@ -560,5 +536,28 @@ public class Doc : TypeBase, IDisposable
     private Doc GetRootDoc()
     {
         return parent?.GetRootDoc() ?? this;
+    }
+
+    private static nint CreateDoc(DocOptions options)
+    {
+        return DocChannel.NewWithOptions(options.ToNative());
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        MarkDisposed();
+
+        if (disposing)
+        {
+            // Clears all active subscriptions that have not been closed yet.
+            EventManager.Clear();
+        }
+
+        DocChannel.Destroy(Handle);
     }
 }
