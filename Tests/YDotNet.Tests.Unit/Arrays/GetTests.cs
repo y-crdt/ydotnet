@@ -36,7 +36,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(output.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]

@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlTexts.Events;
@@ -16,32 +17,29 @@ public class XmlTextEvent : UnmanagedResource
     internal XmlTextEvent(nint handle, Doc doc)
         : base(handle)
     {
-        delta = new Lazy<EventDeltas>(() =>
-        {
-            var deltaHandle = XmlTextChannel.ObserveEventDelta(handle, out var length).Checked();
+        delta = new Lazy<EventDeltas>(
+            () =>
+            {
+                var deltaHandle = XmlTextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, doc);
-        });
+                return new EventDeltas(deltaHandle, length, doc);
+            });
 
-        keys = new Lazy<EventKeys>(() =>
-        {
-            var keysHandle = XmlTextChannel.ObserveEventKeys(handle, out var length).Checked();
+        keys = new Lazy<EventKeys>(
+            () =>
+            {
+                var keysHandle = XmlTextChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc);
-        });
+                return new EventKeys(keysHandle, length, doc);
+            });
 
-        target = new Lazy<XmlText>(() =>
-        {
-            var targetHandle = XmlTextChannel.ObserveEventTarget(handle).Checked();
+        target = new Lazy<XmlText>(
+            () =>
+            {
+                var targetHandle = XmlTextChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetXmlText(handle, false);
-        });
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+                return doc.GetXmlText(handle, isDeleted: false);
+            });
     }
 
     /// <summary>
@@ -61,4 +59,10 @@ public class XmlTextEvent : UnmanagedResource
     /// </summary>
     /// <returns>The target of the event.</returns>
     public XmlText Target => target.Value;
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+    }
 }

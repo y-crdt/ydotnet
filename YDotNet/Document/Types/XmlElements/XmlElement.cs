@@ -6,7 +6,7 @@ using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Cells.Outputs;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -163,7 +163,7 @@ public class XmlElement : Branch
 
         var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
 
-        return Doc.GetXmlText(handle, false);
+        return Doc.GetXmlText(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -182,7 +182,7 @@ public class XmlElement : Branch
 
         var handle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
 
-        return Doc.GetXmlElement(handle, false);
+        return Doc.GetXmlElement(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -285,7 +285,7 @@ public class XmlElement : Branch
 
         var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? Doc.GetXmlElement(handle, false) : null;
+        return handle != nint.Zero ? Doc.GetXmlElement(handle, isDeleted: false) : null;
     }
 
     /// <summary>

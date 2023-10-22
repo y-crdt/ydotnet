@@ -95,7 +95,7 @@ public class GetTests
 
         // Assert
         Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
-        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class GetTests
         Assert.That(value1.Count, Is.EqualTo(expected: 2));
         Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class GetTests
         Assert.That(value1.Keys.Count, Is.EqualTo(expected: 2));
         Assert.That(value1["star-⭐"].Long, Is.EqualTo(expected: 2469));
         Assert.That(value1["moon-🌕"].Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]
@@ -207,7 +207,7 @@ public class GetTests
         // Assert
         Assert.That(value1, Is.Not.Null);
         Assert.That(value1.String(transaction), Is.EqualTo("Lucas"));
-        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]
@@ -257,7 +257,7 @@ public class GetTests
         Assert.That(value1.Length(transaction), Is.EqualTo(expected: 2));
         Assert.That(value1.Get(transaction, "value1-1").Long, Is.EqualTo(expected: 2469L));
         Assert.That(value1.Get(transaction, "value1-2").Long, Is.EqualTo(expected: -420L));
-        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Bool));
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]

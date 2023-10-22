@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts.Events;
@@ -9,45 +10,42 @@ namespace YDotNet.Document.Types.Texts.Events;
 /// </summary>
 public class TextEvent : UnmanagedResource
 {
-    private readonly Lazy<EventPath> path;
     private readonly Lazy<EventDeltas> deltas;
+    private readonly Lazy<EventPath> path;
     private readonly Lazy<Text> target;
 
     internal TextEvent(nint handle, Doc doc)
         : base(handle)
     {
-        path = new Lazy<EventPath>(() =>
-        {
-            ThrowIfDisposed();
+        path = new Lazy<EventPath>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var pathHandle = TextChannel.ObserveEventPath(handle, out var length).Checked();
+                var pathHandle = TextChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length);
-        });
+                return new EventPath(pathHandle, length);
+            });
 
-        deltas = new Lazy<EventDeltas>(() =>
-        {
-            ThrowIfDisposed();
+        deltas = new Lazy<EventDeltas>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var deltaHandle = TextChannel.ObserveEventDelta(handle, out var length).Checked();
+                var deltaHandle = TextChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventDeltas(deltaHandle, length, doc);
-        });
+                return new EventDeltas(deltaHandle, length, doc);
+            });
 
-        target = new Lazy<Text>(() =>
-        {
-            ThrowIfDisposed();
+        target = new Lazy<Text>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var targetHandle = TextChannel.ObserveEventTarget(handle).Checked();
+                var targetHandle = TextChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetText(targetHandle, false);
-        });
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+                return doc.GetText(targetHandle, isDeleted: false);
+            });
     }
 
     /// <summary>
@@ -67,4 +65,10 @@ public class TextEvent : UnmanagedResource
     /// </summary>
     /// <returns>The target of the event.</returns>
     public Text Target => target.Value;
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+    }
 }

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Cells.Outputs;
 using YDotNet.Native.Types.Maps;
 

@@ -4,6 +4,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;

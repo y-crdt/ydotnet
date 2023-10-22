@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
@@ -10,39 +11,36 @@ namespace YDotNet.Document.Types.Maps.Events;
 /// </summary>
 public class MapEvent : UnmanagedResource
 {
-    private readonly Lazy<EventPath> path;
     private readonly Lazy<EventKeys> keys;
+    private readonly Lazy<EventPath> path;
     private readonly Lazy<Map> target;
 
     internal MapEvent(nint handle, Doc doc)
         : base(handle)
     {
-        path = new Lazy<EventPath>(() =>
-        {
-            var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
+        path = new Lazy<EventPath>(
+            () =>
+            {
+                var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length);
-        });
+                return new EventPath(pathHandle, length);
+            });
 
-        keys = new Lazy<EventKeys>(() =>
-        {
-            var keysHandle = MapChannel.ObserveEventKeys(handle, out var length).Checked();
+        keys = new Lazy<EventKeys>(
+            () =>
+            {
+                var keysHandle = MapChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc);
-        });
+                return new EventKeys(keysHandle, length, doc);
+            });
 
-        target = new Lazy<Map>(() =>
-        {
-            var targetHandle = MapChannel.ObserveEventTarget(handle).Checked();
+        target = new Lazy<Map>(
+            () =>
+            {
+                var targetHandle = MapChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetMap(targetHandle, false);
-        });
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+                return doc.GetMap(targetHandle, isDeleted: false);
+            });
     }
 
     /// <summary>
@@ -62,4 +60,10 @@ public class MapEvent : UnmanagedResource
     /// </summary>
     /// <returns>The target of the event.</returns>
     public Map Target => target.Value;
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+    }
 }

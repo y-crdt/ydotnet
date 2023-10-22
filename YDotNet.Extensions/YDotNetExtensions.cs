@@ -1,4 +1,3 @@
-using System.Formats.Asn1;
 using System.Text;
 using System.Text.Json;
 using YDotNet.Document;
@@ -40,9 +39,9 @@ public static class YDotNetExtensions
                 case JsonValueKind.Number:
                     return Input.Double(element.GetDouble());
                 case JsonValueKind.True:
-                    return Input.Boolean(true);
+                    return Input.Boolean(value: true);
                 case JsonValueKind.False:
-                    return Input.Boolean(false);
+                    return Input.Boolean(value: false);
                 case JsonValueKind.Null:
                     return Input.Null();
                 default:
@@ -53,8 +52,8 @@ public static class YDotNetExtensions
 
     public static T To<T>(this Output output, Doc doc)
     {
-        using var transaction = doc.ReadTransaction()
-            ?? throw new InvalidOperationException("Failed to open transaction.");
+        using var transaction =
+            doc.ReadTransaction() ?? throw new InvalidOperationException("Failed to open transaction.");
 
         return output.To<T>(transaction);
     }
@@ -119,7 +118,8 @@ public static class YDotNetExtensions
         {
             jsonWriter.WriteStartArray();
 
-            foreach (var property in map.Iterate(transaction) ?? throw new InvalidOperationException("Failed to iterate array."))
+            foreach (var property in map.Iterate(transaction) ??
+                                     throw new InvalidOperationException("Failed to iterate array."))
             {
                 WriteProperty(property.Key, property.Value, jsonWriter, transaction);
             }
@@ -131,7 +131,8 @@ public static class YDotNetExtensions
         {
             jsonWriter.WriteStartArray();
 
-            foreach (var item in array.Iterate(transaction) ?? throw new InvalidOperationException("Failed to iterate array."))
+            foreach (var item in array.Iterate(transaction) ??
+                                 throw new InvalidOperationException("Failed to iterate array."))
             {
                 WriteValue(item, jsonWriter, transaction);
             }
@@ -150,9 +151,7 @@ public static class YDotNetExtensions
         {
             switch (output.Tag)
             {
-                case OutputTag.NotSet:
-                    break;
-                case OutputTag.Bool:
+                case OutputTag.Boolean:
                     jsonWriter.WriteBooleanValue(output.Boolean);
                     break;
                 case OutputTag.Double:

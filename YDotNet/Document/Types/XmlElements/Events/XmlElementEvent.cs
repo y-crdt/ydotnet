@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements.Events;
@@ -9,47 +10,45 @@ namespace YDotNet.Document.Types.XmlElements.Events;
 /// </summary>
 public class XmlElementEvent : UnmanagedResource
 {
-    private readonly Lazy<EventPath> path;
     private readonly Lazy<EventChanges> delta;
     private readonly Lazy<EventKeys> keys;
+    private readonly Lazy<EventPath> path;
     private readonly Lazy<XmlElement> target;
 
     internal XmlElementEvent(nint handle, Doc doc)
         : base(handle)
     {
-        path = new Lazy<EventPath>(() =>
-        {
-            var pathHandle = XmlElementChannel.ObserveEventPath(handle, out var length).Checked();
+        path = new Lazy<EventPath>(
+            () =>
+            {
+                var pathHandle = XmlElementChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length);
-        });
+                return new EventPath(pathHandle, length);
+            });
 
-        delta = new Lazy<EventChanges>(() =>
-        {
-            var deltaHandle = XmlElementChannel.ObserveEventDelta(handle, out var length).Checked();
+        delta = new Lazy<EventChanges>(
+            () =>
+            {
+                var deltaHandle = XmlElementChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, doc);
-        });
+                return new EventChanges(deltaHandle, length, doc);
+            });
 
-        keys = new Lazy<EventKeys>(() =>
-        {
-            var keysHandle = XmlElementChannel.ObserveEventKeys(handle, out var length).Checked();
+        keys = new Lazy<EventKeys>(
+            () =>
+            {
+                var keysHandle = XmlElementChannel.ObserveEventKeys(handle, out var length).Checked();
 
-            return new EventKeys(keysHandle, length, doc);
-        });
+                return new EventKeys(keysHandle, length, doc);
+            });
 
-        target = new Lazy<XmlElement>(() =>
-        {
-            var targetHandle = XmlElementChannel.ObserveEventTarget(handle).Checked();
+        target = new Lazy<XmlElement>(
+            () =>
+            {
+                var targetHandle = XmlElementChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetXmlElement(targetHandle, false);
-        });
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+                return doc.GetXmlElement(targetHandle, isDeleted: false);
+            });
     }
 
     /// <summary>
@@ -75,4 +74,10 @@ public class XmlElementEvent : UnmanagedResource
     /// </summary>
     /// <returns>The target of the event.</returns>
     public XmlElement Target => target.Value;
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+    }
 }

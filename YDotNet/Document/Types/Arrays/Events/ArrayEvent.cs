@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.Arrays.Events;
@@ -9,45 +10,42 @@ namespace YDotNet.Document.Types.Arrays.Events;
 /// </summary>
 public class ArrayEvent : UnmanagedResource
 {
-    private readonly Lazy<EventPath> path;
     private readonly Lazy<EventChanges> delta;
+    private readonly Lazy<EventPath> path;
     private readonly Lazy<Array> target;
 
     internal ArrayEvent(nint handle, Doc doc)
         : base(handle)
     {
-        path = new Lazy<EventPath>(() =>
-        {
-            ThrowIfDisposed();
+        path = new Lazy<EventPath>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
+                var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
 
-            return new EventPath(pathHandle, length);
-        });
+                return new EventPath(pathHandle, length);
+            });
 
-        delta = new Lazy<EventChanges>(() =>
-        {
-            ThrowIfDisposed();
+        delta = new Lazy<EventChanges>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
+                var deltaHandle = ArrayChannel.ObserveEventDelta(handle, out var length).Checked();
 
-            return new EventChanges(deltaHandle, length, doc);
-        });
+                return new EventChanges(deltaHandle, length, doc);
+            });
 
-        target = new Lazy<Array>(() =>
-        {
-            ThrowIfDisposed();
+        target = new Lazy<Array>(
+            () =>
+            {
+                ThrowIfDisposed();
 
-            var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
+                var targetHandle = ArrayChannel.ObserveEventTarget(handle).Checked();
 
-            return doc.GetArray(targetHandle, false);
-        });
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+                return doc.GetArray(targetHandle, isDeleted: false);
+            });
     }
 
     /// <summary>
@@ -67,4 +65,10 @@ public class ArrayEvent : UnmanagedResource
     /// </summary>
     /// <returns>The target of the event.</returns>
     public Array Target => target.Value;
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, but is released automatically after the event has been completed.
+    }
 }

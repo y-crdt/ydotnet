@@ -6,6 +6,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types;
 
@@ -254,18 +255,22 @@ public class XmlText : Branch
     }
 
     /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing
+    ///     into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
+    /// <returns>
+    ///     The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given
+    ///     <paramref name="associationType" />.
+    /// </returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
         ThrowIfDisposed();
 
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }

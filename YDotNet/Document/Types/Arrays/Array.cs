@@ -5,6 +5,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types;
 
@@ -58,7 +59,7 @@ public class Array : Branch
 
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
-        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint) inputs.Length);
     }
 
     /// <summary>
@@ -81,7 +82,8 @@ public class Array : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to get the item.</param>
     /// <returns>
-    ///     The <see cref="Output" /> value at the given <paramref name="index" /> or <c>null</c> if <paramref name="index" /> is
+    ///     The <see cref="Output" /> value at the given <paramref name="index" /> or <c>null</c> if <paramref name="index" />
+    ///     is
     ///     outside the bounds.
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
@@ -140,18 +142,22 @@ public class Array : Branch
     }
 
     /// <summary>
-    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing into
+    ///     Retrieves a <see cref="StickyIndex" /> corresponding to a given human-readable <paramref name="index" /> pointing
+    ///     into
     ///     the <see cref="Branch" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The numeric index to place the <see cref="StickyIndex" />.</param>
     /// <param name="associationType">The type of the <see cref="StickyIndex" />.</param>
-    /// <returns>The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given <paramref name="associationType" />.</returns>
+    /// <returns>
+    ///     The <see cref="StickyIndex" /> in the <paramref name="index" /> with the given
+    ///     <paramref name="associationType" />.
+    /// </returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
         ThrowIfDisposed();
 
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }

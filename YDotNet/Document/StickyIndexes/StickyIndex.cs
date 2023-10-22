@@ -1,6 +1,7 @@
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.StickyIndex;
 
 namespace YDotNet.Document.StickyIndexes;
@@ -21,15 +22,15 @@ public class StickyIndex : UnmanagedResource
     {
     }
 
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-    }
-
     /// <summary>
     ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
     /// </summary>
-    public StickyAssociationType AssociationType => (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
+    public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+    }
 
     /// <summary>
     ///     Creates a <see cref="StickyIndex" /> from the result of <see cref="Encode" />.
@@ -38,7 +39,7 @@ public class StickyIndex : UnmanagedResource
     /// <returns>The <see cref="StickyIndex" /> represented by the provided <see cref="byte" /> array.</returns>
     public static StickyIndex Decode(byte[] encoded)
     {
-        var handle = StickyIndexChannel.Decode(encoded, (uint)encoded.Length);
+        var handle = StickyIndexChannel.Decode(encoded, (uint) encoded.Length);
 
         return new StickyIndex(handle.Checked());
     }
