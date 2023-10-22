@@ -27,7 +27,7 @@ public class UndoManager : UnmanagedResource
         onAdded = new EventSubscriber<UndoEvent>(
             doc.EventManager,
             Handle,
-            (owner, action) =>
+            (_, action) =>
             {
                 UndoManagerChannel.ObserveAddedCallback callback =
                     (_, undoEvent) => action(new UndoEvent(undoEvent));
@@ -39,7 +39,7 @@ public class UndoManager : UnmanagedResource
         onPopped = new EventSubscriber<UndoEvent>(
             doc.EventManager,
             Handle,
-            (owner, action) =>
+            (_, action) =>
             {
                 UndoManagerChannel.ObservePoppedCallback callback =
                     (_, undoEvent) => action(new UndoEvent(undoEvent));
@@ -49,25 +49,12 @@ public class UndoManager : UnmanagedResource
             (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
     }
 
-    private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
-    {
-        var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
-
-        return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
-    }
-
     /// <summary>
-    /// Finalizes an instance of the <see cref="UndoManager"/> class.
+    ///     Finalizes an instance of the <see cref="UndoManager" /> class.
     /// </summary>
     ~UndoManager()
     {
-        Dispose(false);
-    }
-
-    /// <inheritdoc/>
-    protected internal override void DisposeCore(bool disposing)
-    {
-        UndoManagerChannel.Destroy(Handle);
+        Dispose(disposing: false);
     }
 
     /// <summary>
@@ -173,7 +160,7 @@ public class UndoManager : UnmanagedResource
     /// <param name="origin">The origin to be included in this <see cref="UndoManager" />.</param>
     public void AddOrigin(byte[] origin)
     {
-        UndoManagerChannel.AddOrigin(Handle, (uint)origin.Length, origin);
+        UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
     }
 
     /// <summary>
@@ -186,6 +173,19 @@ public class UndoManager : UnmanagedResource
     /// <param name="origin">The origin to be removed from this <see cref="UndoManager" />.</param>
     public void RemoveOrigin(byte[] origin)
     {
-        UndoManagerChannel.RemoveOrigin(Handle, (uint)origin.Length, origin);
+        UndoManagerChannel.RemoveOrigin(Handle, (uint) origin.Length, origin);
+    }
+
+    /// <inheritdoc />
+    protected internal override void DisposeCore(bool disposing)
+    {
+        UndoManagerChannel.Destroy(Handle);
+    }
+
+    private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
+    {
+        var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
+
+        return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
     }
 }
