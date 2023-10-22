@@ -17,14 +17,14 @@ public class TextChunks : ReadOnlyCollection<TextChunk>
 
     private static IList<TextChunk> ReadItems(nint handle, uint length, Doc doc)
     {
-        var result = new List<TextChunk>((int)length);
+        var result = new List<TextChunk>((int) length);
 
         foreach (var native in MemoryReader.ReadStructsWithHandles<TextChunkNative>(handle, length))
         {
             result.Add(new TextChunk(native, doc));
         }
 
-        // We are done reading and can release the memory.
+        // We are done reading and can destroy the resource.
         ChunksChannel.Destroy(handle, length);
 
         return result;

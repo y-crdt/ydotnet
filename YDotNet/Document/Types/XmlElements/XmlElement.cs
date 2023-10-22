@@ -82,10 +82,10 @@ public class XmlElement : Branch
     {
         ThrowIfDisposed();
 
-        using var unsageName = MemoryWriter.WriteUtf8String(name);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
         using var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, unsageName.Handle, unsafeValue.Handle);
+        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, unsafeName.Handle, unsafeValue.Handle);
     }
 
     /// <summary>

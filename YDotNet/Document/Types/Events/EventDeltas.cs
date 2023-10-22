@@ -17,14 +17,14 @@ public class EventDeltas : ReadOnlyCollection<EventDelta>
 
     private static IList<EventDelta> ReadItems(nint handle, uint length, Doc doc)
     {
-        var result = new List<EventDelta>((int)length);
+        var result = new List<EventDelta>((int) length);
 
         foreach (var native in MemoryReader.ReadStructs<EventDeltaNative>(handle, length))
         {
             result.Add(new EventDelta(native, doc));
         }
 
-        // We are done reading and can release the memory.
+        // We are done reading and can destroy the resource.
         EventChannel.DeltaDestroy(handle, length);
 
         return result;

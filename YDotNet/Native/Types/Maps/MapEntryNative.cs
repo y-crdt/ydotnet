@@ -7,7 +7,7 @@ namespace YDotNet.Native.Types.Maps;
 [StructLayout(LayoutKind.Sequential, Size = Size)]
 internal readonly struct MapEntryNative
 {
-    internal const int Size = 8 + OutputNative.Size;
+    private const int Size = 8 + OutputNative.Size;
 
     internal nint KeyHandle { get; }
 

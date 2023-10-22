@@ -31,7 +31,6 @@ internal static class MemoryWriter
     internal static DisposableHandleArray WriteUtf8StringArray(string[] values)
     {
         var head = Marshal.AllocHGlobal(MemoryConstants.PointerSize * values.Length);
-
         var pointers = new nint[values.Length];
 
         for (var i = 0; i < values.Length; i++)

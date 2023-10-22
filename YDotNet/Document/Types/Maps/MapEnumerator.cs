@@ -6,7 +6,7 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents the iterator to provide instances of key value pairs.
+///     Represents the iterator to provide instances of key-value pairs.
 /// </summary>
 internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 {
@@ -42,7 +42,7 @@ internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
                 native.Key(),
                 new Output(native.ValueHandle(handle), iterator.Doc, isDeleted: false));
 
-            // We are done reading, so we can release the memory.
+            // We are done reading and can destroy the resource.
             MapChannel.EntryDestroy(handle);
 
             return true;

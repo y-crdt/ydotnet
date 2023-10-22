@@ -6,7 +6,7 @@ using YDotNet.Native.Types.Maps;
 namespace YDotNet.Document.Types.Maps;
 
 /// <summary>
-///     Represents an enumerable to read key value pairs from a <see cref="Map" />.
+///     Represents an enumerable to read key-value pairs from a <see cref="Map" />.
 /// </summary>
 /// <remarks>
 ///     Two important details about <see cref="MapIterator" />.

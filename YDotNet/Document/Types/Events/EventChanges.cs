@@ -24,7 +24,7 @@ public class EventChanges : ReadOnlyCollection<EventChange>
             result.Add(new EventChange(native, doc));
         }
 
-        // We are done reading and can release the resource.
+        // We are done reading and can destroy the resource.
         EventChannel.DeltaDestroy(handle, length);
 
         return result;

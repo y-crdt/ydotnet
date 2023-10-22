@@ -5,7 +5,7 @@ using YDotNet.Native.Types;
 namespace YDotNet.Document.Types.XmlElements;
 
 /// <summary>
-///     Represents the iterator to provide instances of key value paris.
+///     Represents the iterator to provide instances of key-value paris.
 /// </summary>
 internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>>
 {
@@ -39,7 +39,7 @@ internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>
 
             Current = new KeyValuePair<string, string>(native.Key(), native.Value());
 
-            // We are done reading, therefore we can release memory.
+            // We are done reading and can destroy the resource.
             XmlAttributeChannel.Destroy(handle);
 
             return true;
