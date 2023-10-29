@@ -23,10 +23,16 @@ Therefore, you must ensure that:
 
 2. Native types are passed to the CLR types via constructors.
 
-3. Native types are responsible to follow pointers,
-e.g. [`UndoEventNative`](https://github.com/SebastianStehle/ydotnet/blob/main/YDotNet/Native/UndoManager/Events/UndoEventNative.cs#L18C5-L27C1)
-and everything around reading memory is part of the native part. These reading operations are provided via methods to
-indicate that it is not a property and not part of the struct itself.
+3. Native types are responsible to follow pointers.
+
+   - For example, types like [`UndoEventNative`](https://github.com/SebastianStehle/ydotnet/blob/main/YDotNet/Native/UndoManager/Events/UndoEventNative.cs#L18C5-L27C1)
+   should be responsible for providing access to memory written by the Rust side.
+   - To decide between using a method or a property, use this rule of thumb:
+
+     - If the data is contained inside the `struct`, use properties (when there's a known number of properties,
+       like `nint`, `byte`, and other primitive types)
+     - If the data is outside the `struct`, use methods (for example, to read the data that's accessible via an 
+       `nint Handle` property and has size of `uint Length`)
 
 Some objects also need the handle and the native `struct`. Therefore a new type has been introduced:
 
