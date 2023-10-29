@@ -5,10 +5,15 @@ namespace YDotNet.Infrastructure;
 /// </summary>
 public abstract class Resource : IDisposable
 {
+    internal Resource(bool isDisposed)
+    {
+        IsDisposed = isDisposed;
+    }
+
     /// <summary>
-    ///     Gets a value indicating whether this instance is disposed.
+    ///     Gets or sets a value indicating whether this instance is disposed.
     /// </summary>
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed { get; protected set; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -16,6 +21,20 @@ public abstract class Resource : IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    /// <summary>
+    ///     Marks the object as disposed to stop all further calls.
+    /// </summary>
+    internal void MarkDisposed()
+    {
+        IsDisposed = true;
+    }
+
+    /// <summary>
+    ///     Releases all unmanaged resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed as well.</param>
+    protected abstract void DisposeCore(bool disposing);
 
     /// <summary>
     ///     Throws an exception if this object or the owner is disposed.
@@ -44,10 +63,4 @@ public abstract class Resource : IDisposable
 
         IsDisposed = true;
     }
-
-    /// <summary>
-    ///     Releases all unmanaged resources.
-    /// </summary>
-    /// <param name="disposing"><c>true</c> if managed resources should be disposed as well.</param>
-    protected internal abstract void DisposeCore(bool disposing);
 }
