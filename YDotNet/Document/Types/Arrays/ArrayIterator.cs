@@ -43,7 +43,7 @@ public class ArrayIterator : UnmanagedResource, IEnumerable<Output>
     }
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         ArrayChannel.IteratorDestroy(Handle);
     }

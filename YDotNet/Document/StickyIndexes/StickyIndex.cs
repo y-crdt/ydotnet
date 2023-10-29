@@ -28,7 +28,7 @@ public class StickyIndex : UnmanagedResource
     public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
     }
 

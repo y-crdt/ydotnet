@@ -5,7 +5,7 @@ namespace YDotNet.Infrastructure;
 /// </summary>
 public abstract class UnmanagedResource : Resource
 {
-    internal UnmanagedResource(nint handle, bool isDisposed)
+    internal UnmanagedResource(nint handle, bool isDisposed = false)
         : base(isDisposed)
     {
         Handle = handle;

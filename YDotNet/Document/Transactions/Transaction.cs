@@ -39,7 +39,7 @@ public class Transaction : UnmanagedResource
     public bool Writeable => TransactionChannel.Writeable(Handle) == 1;
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         if (disposing)
         {

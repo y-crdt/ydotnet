@@ -39,7 +39,7 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     }
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         XmlAttributeChannel.IteratorDestroy(Handle);
     }

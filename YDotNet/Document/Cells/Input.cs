@@ -31,7 +31,7 @@ public sealed class Input : Resource
     }
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         foreach (var memory in allocatedMemory)
         {

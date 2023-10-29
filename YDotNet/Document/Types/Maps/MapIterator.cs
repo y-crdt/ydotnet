@@ -50,7 +50,7 @@ public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, O
     }
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         MapChannel.IteratorDestroy(Handle);
     }

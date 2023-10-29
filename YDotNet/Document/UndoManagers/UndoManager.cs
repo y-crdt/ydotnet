@@ -177,7 +177,7 @@ public class UndoManager : UnmanagedResource
     }
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         UndoManagerChannel.Destroy(Handle);
     }

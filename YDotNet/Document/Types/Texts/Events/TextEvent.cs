@@ -67,7 +67,7 @@ public class TextEvent : UnmanagedResource
     public Text Target => target.Value;
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         // The event has no explicit garbage collection, but is released automatically after the event has been completed.
     }

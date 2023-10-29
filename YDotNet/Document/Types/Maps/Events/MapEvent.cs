@@ -62,7 +62,7 @@ public class MapEvent : UnmanagedResource
     public Map Target => target.Value;
 
     /// <inheritdoc />
-    protected internal override void DisposeCore(bool disposing)
+    protected override void DisposeCore(bool disposing)
     {
         // The event has no explicit garbage collection, it is released automatically after the event has been completed.
     }

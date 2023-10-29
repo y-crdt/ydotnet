@@ -5,7 +5,7 @@ namespace YDotNet.Infrastructure;
 /// </summary>
 public abstract class Resource : IDisposable
 {
-    internal Resource(bool isDisposed)
+    internal Resource(bool isDisposed = false)
     {
         IsDisposed = isDisposed;
     }
