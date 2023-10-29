@@ -68,7 +68,7 @@ This can cause an application crash when:
 
 New base classes have been introduced to ensure that this does not happen.
 
-##  2023-10-16 Not all transaction cases are catched by yrs
+##  2023-10-16 Not all transaction cases are caught by yrs
 
 The application crashes if a new root object is created while a `Transaction` is open.
 
