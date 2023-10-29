@@ -2,10 +2,10 @@ namespace YDotNet.Infrastructure;
 
 internal class TypeCache
 {
-    private readonly Dictionary<nint, WeakReference<ITypeBase>> cache = new();
+    private readonly Dictionary<nint, WeakReference<UnmanagedResource>> cache = new();
 
     public T GetOrAdd<T>(nint handle, Func<nint, T> factory)
-        where T : ITypeBase
+        where T : UnmanagedResource
     {
         if (handle == nint.Zero)
         {
@@ -26,7 +26,7 @@ internal class TypeCache
 
         var typedItem = factory(handle);
 
-        cache[handle] = new WeakReference<ITypeBase>(typedItem);
+        cache[handle] = new WeakReference<UnmanagedResource>(typedItem);
 
         return typedItem;
     }
