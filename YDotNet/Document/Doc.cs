@@ -471,6 +471,10 @@ public class Doc : UnmanagedResource
         return GetOrAdd(handle, (_, doc) => new Doc(handle, doc, isDeleted));
     }
 
+    // TODO This is a temporary solution to track the amount of transactions a document has open.
+    // It's fragile because a cloned instance of the same document won't be synchronized and if a `Transaction`
+    // is opened in the cloned instance, it'll receive `null` from the Rust side and will cause the
+    // `ThrowHelper.PendingTransaction()` to run (which is acceptable since it's a managed exception).
     internal void NotifyTransactionStarted()
     {
         openTransactions++;
