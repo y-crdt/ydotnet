@@ -10,12 +10,12 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-public abstract class Branch : TypeBase
+public abstract class Branch : UnmanagedResource
 {
     private readonly EventSubscriber<EventBranch[]> onDeep;
 
     internal Branch(nint handle, Doc doc, bool isDeleted)
-        : base(isDeleted)
+        : base(handle, isDeleted)
     {
         Doc = doc;
 
@@ -36,13 +36,9 @@ public abstract class Branch : TypeBase
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
             (branch, s) => BranchChannel.UnobserveDeep(branch, s));
-
-        Handle = handle;
     }
 
     internal Doc Doc { get; }
-
-    internal nint Handle { get; }
 
     /// <summary>
     ///     Subscribes a callback function for changes performed within the <see cref="Branch" /> instance
@@ -96,5 +92,12 @@ public abstract class Branch : TypeBase
         }
 
         return new Transaction(handle, Doc);
+    }
+
+    /// <inheritdoc />
+    protected override void DisposeCore(bool disposing)
+    {
+        // Nothing should be done to dispose `Branch` instances (shared types).
+        // They're disposed automatically when their parent `Doc` is disposed.
     }
 }

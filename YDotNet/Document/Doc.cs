@@ -29,7 +29,7 @@ namespace YDotNet.Document;
 ///         to recursively nested types).
 ///     </para>
 /// </remarks>
-public class Doc : TypeBase, IDisposable
+public class Doc : UnmanagedResource
 {
     private readonly EventSubscriber<AfterTransactionEvent> onAfterTransaction;
     private readonly EventSubscriber<ClearEvent> onClear;
@@ -62,7 +62,7 @@ public class Doc : TypeBase, IDisposable
     }
 
     internal Doc(nint handle, Doc? parent, bool isDeleted)
-        : base(isDeleted)
+        : base(handle, isDeleted)
     {
         this.parent = parent;
 
@@ -126,8 +126,6 @@ public class Doc : TypeBase, IDisposable
                 return (DocChannel.ObserveSubDocs(doc, nint.Zero, callback), callback);
             },
             (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
-
-        Handle = handle;
     }
 
     /// <summary>
@@ -207,16 +205,7 @@ public class Doc : TypeBase, IDisposable
         }
     }
 
-    internal nint Handle { get; }
-
     internal EventManager EventManager { get; } = new();
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
 
     /// <summary>
     ///     Finalizes an instance of the <see cref="Doc" /> class.
@@ -517,8 +506,27 @@ public class Doc : TypeBase, IDisposable
         return GetOrAdd(handle, (h, doc) => new XmlElement(h, doc, isDeleted));
     }
 
+    /// <inheritdoc />
+    protected override void DisposeCore(bool disposing)
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        MarkDisposed();
+
+        if (disposing)
+        {
+            // Clears all active subscriptions that have not been closed yet.
+            EventManager.Clear();
+        }
+
+        DocChannel.Destroy(Handle);
+    }
+
     private T GetOrAdd<T>(nint handle, Func<nint, Doc, T> factory)
-        where T : ITypeBase
+        where T : UnmanagedResource
     {
         var doc = GetRootDoc();
 
@@ -541,23 +549,5 @@ public class Doc : TypeBase, IDisposable
     private static nint CreateDoc(DocOptions options)
     {
         return DocChannel.NewWithOptions(options.ToNative());
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-
-        MarkDisposed();
-
-        if (disposing)
-        {
-            // Clears all active subscriptions that have not been closed yet.
-            EventManager.Clear();
-        }
-
-        DocChannel.Destroy(Handle);
     }
 }
