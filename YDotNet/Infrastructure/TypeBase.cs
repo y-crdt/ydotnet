@@ -34,19 +34,3 @@ public abstract class TypeBase : ITypeBase
         IsDisposed = true;
     }
 }
-
-/// <summary>
-/// Base class for all managed types.
-/// </summary>
-public interface ITypeBase
-{
-    /// <summary>
-    /// Marks the object as disposed to stop all further calls.
-    /// </summary>
-    void MarkDisposed();
-
-    /// <summary>
-    /// Gets a value indicating whether the instance is disposed.
-    /// </summary>
-    bool IsDisposed { get; }
-}
