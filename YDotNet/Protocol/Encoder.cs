@@ -1,8 +1,6 @@
 using System.Buffers;
 using System.Text;
 
-#pragma warning disable SA1116 // Split parameters should start on line after declaration
-
 namespace YDotNet.Protocol;
 
 /// <summary>
@@ -20,7 +18,7 @@ public abstract class Encoder
     /// <returns>
     /// The task representing the async operation.
     /// </returns>
-    public async ValueTask WriteVarUintAsync(long value,
+    public async ValueTask WriteVarUintAsync(ulong value,
         CancellationToken ct = default)
     {
         do
@@ -34,7 +32,7 @@ public abstract class Encoder
                 lower7bits |= 128;
             }
 
-            await this.WriteByteAsync(lower7bits, ct);
+            await WriteByteAsync(lower7bits, ct);
         }
         while (value > 0);
     }
@@ -56,8 +54,8 @@ public abstract class Encoder
             throw new ArgumentNullException(nameof(value));
         }
 
-        await this.WriteVarUintAsync(value.Length, ct);
-        await this.WriteBytesAsync(value, ct);
+        await WriteVarUintAsync((ulong)value.Length, ct);
+        await WriteBytesAsync(value, ct);
     }
 
     /// <summary>
@@ -78,7 +76,7 @@ public abstract class Encoder
         }
 
         var length = Encoding.UTF8.GetByteCount(value);
-        if (length > this.stringBuffer.Length)
+        if (length > stringBuffer.Length)
         {
             var buffer = ArrayPool<byte>.Shared.Rent(length);
             try
@@ -92,14 +90,15 @@ public abstract class Encoder
         }
         else
         {
-            await WriteCoreAsync(value, this.stringBuffer, ct);
+            await WriteCoreAsync(value, stringBuffer, ct);
         }
 
         async Task WriteCoreAsync(string value, byte[] buffer, CancellationToken ct)
         {
             var length = Encoding.UTF8.GetBytes(value, buffer);
 
-            await this.WriteBytesAsync(new ArraySegment<byte>(buffer, 0, length), ct);
+            await WriteVarUintAsync((ulong)length, ct);
+            await WriteBytesAsync(new ArraySegment<byte>(buffer, 0, length), ct);
         }
     }
 

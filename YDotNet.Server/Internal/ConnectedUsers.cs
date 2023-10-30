@@ -4,23 +4,23 @@ namespace YDotNet.Server.Internal;
 
 public sealed class ConnectedUsers
 {
-    private readonly ConcurrentDictionary<string, Dictionary<long, ConnectedUser>> users = new();
+    private readonly ConcurrentDictionary<string, Dictionary<ulong, ConnectedUser>> users = new();
 
     public Func<DateTime> Clock = () => DateTime.UtcNow;
 
-    public IReadOnlyDictionary<long, ConnectedUser> GetUsers(string documentName)
+    public IReadOnlyDictionary<ulong, ConnectedUser> GetUsers(string documentName)
     {
-        var documentUsers = users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
+        var documentUsers = users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
 
         lock (documentUsers)
         {
-            return new Dictionary<long, ConnectedUser>(documentUsers);
+            return new Dictionary<ulong, ConnectedUser>(documentUsers);
         }
     }
 
-    public bool AddOrUpdate(string documentName, long clientId, long clock, string? state, out string? existingState)
+    public bool AddOrUpdate(string documentName, ulong clientId, ulong clock, string? state, out string? existingState)
     {
-        var users = this.users.GetOrAdd(documentName, _ => new Dictionary<long, ConnectedUser>());
+        var users = this.users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
 
         // We expect to have relatively few users per document, therefore we use normal lock here.
         lock (users)
@@ -56,7 +56,7 @@ public sealed class ConnectedUsers
         }
     }
 
-    public bool Remove(string documentName, long clientId)
+    public bool Remove(string documentName, ulong clientId)
     {
         if (!users.TryGetValue(documentName, out var documentUsers))
         {
@@ -69,7 +69,7 @@ public sealed class ConnectedUsers
         }
     }
     
-    public IEnumerable<(long ClientId, string DocumentName)> Cleanup(TimeSpan maxAge)
+    public IEnumerable<(ulong ClientId, string DocumentName)> Cleanup(TimeSpan maxAge)
     {
         var olderThan = Clock() - maxAge;
 
@@ -79,13 +79,13 @@ public sealed class ConnectedUsers
             lock (users)
             {
                 // Usually there should be nothing to remove, therefore we save a few allocations for the fast path.
-                List<long>? usersToRemove = null;
+                List<ulong>? usersToRemove = null;
 
                 foreach (var (clientId, user) in users)
                 {
                     if (user.LastActivity < olderThan)
                     {
-                        usersToRemove ??= new List<long>();
+                        usersToRemove ??= new List<ulong>();
                         usersToRemove.Add(clientId);
 
                         yield return (clientId, documentName);

@@ -23,9 +23,9 @@ public sealed class DefaultDocumentManager : IDocumentManager
         ILogger<DefaultDocumentManager> logger)
     {
         this.options = options.Value;
-        this.callback = new CallbackInvoker(callbacks, logger);
+        callback = new CallbackInvoker(callbacks, logger);
 
-        cache = new DocumentCache(documentStorage, this.callback, this, options.Value);
+        cache = new DocumentCache(documentStorage, callback, this, options.Value);
     }
 
     public async Task StartAsync(
@@ -128,7 +128,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }
     }
 
-    public async ValueTask PingAsync(DocumentContext context, long clock, string? state = null,
+    public async ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null,
         CancellationToken ct = default)
     {
         if (users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state, out var newState))
@@ -171,9 +171,9 @@ public sealed class DefaultDocumentManager : IDocumentManager
         cache.RemoveEvictedItems();
     }
 
-    public ValueTask<IReadOnlyDictionary<long, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
+    public ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
         CancellationToken ct = default)
     {
-        return new ValueTask<IReadOnlyDictionary<long, ConnectedUser>>(users.GetUsers(context.DocumentName));
+        return new ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>>(users.GetUsers(context.DocumentName));
     }
 }

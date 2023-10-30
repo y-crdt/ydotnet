@@ -18,23 +18,24 @@ public abstract class Decoder
     /// The decoded integer.
     /// </returns>
     /// <exception cref="IndexOutOfRangeException">The input is in an invalid format.</exception>
-    public async ValueTask<long> ReadVarUintAsync(
+    public async ValueTask<ulong> ReadVarUintAsync(
         CancellationToken ct = default)
     {
-        int value = 0, shift = 0;
+        var resultSum = 0ul;
+        var resultShift = 0;
 
         while (true)
         {
-            var lower7bits = await this.ReadByteAsync(ct);
+            var lower7bits = (ulong)await ReadByteAsync(ct);
 
-            value |= (lower7bits & 0x7f) << shift;
+            resultSum |= (lower7bits & 0x7f) << resultShift;
 
             if ((lower7bits & 128) == 0)
             {
-                return value;
+                return resultSum;
             }
 
-            shift += 7;
+            resultShift += 7;
         }
 
         throw new IndexOutOfRangeException();
@@ -50,10 +51,10 @@ public abstract class Decoder
     public async ValueTask<byte[]> ReadVarUint8ArrayAsync(
         CancellationToken ct = default)
     {
-        var arrayLength = await this.ReadVarUintAsync(ct);
+        var arrayLength = await ReadVarUintAsync(ct);
         var arrayBuffer = new byte[arrayLength];
 
-        await this.ReadBytesAsync(arrayBuffer, ct);
+        await ReadBytesAsync(arrayBuffer, ct);
 
         return arrayBuffer;
     }
@@ -66,10 +67,10 @@ public abstract class Decoder
     /// The decoded string.
     /// </returns>
     public async ValueTask<string> ReadVarStringAsync(
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
-        var length = (int)await this.ReadVarUintAsync(ct);
-        if (length > this.stringBuffer.Length)
+        var length = (int)await ReadVarUintAsync(ct);
+        if (length > stringBuffer.Length)
         {
             var buffer = ArrayPool<byte>.Shared.Rent(length);
             try
@@ -83,13 +84,13 @@ public abstract class Decoder
         }
         else
         {
-            return await ReadCoreAsync(length, this.stringBuffer, ct);
+            return await ReadCoreAsync(length, stringBuffer, ct);
         }
 
         async ValueTask<string> ReadCoreAsync(int length, byte[] buffer, CancellationToken ct)
         {
             var slicedBuffer = buffer.AsMemory(0, length);
-            await this.ReadBytesAsync(slicedBuffer, ct);
+            await ReadBytesAsync(slicedBuffer, ct);
 
             return Encoding.UTF8.GetString(slicedBuffer.Span);
         }

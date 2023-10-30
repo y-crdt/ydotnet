@@ -14,46 +14,12 @@ public static class YDotNetExtensions
     {
         var parsed = JsonSerializer.SerializeToElement(source);
 
-        return ConvertValue(parsed);
-
-        static Input ConvertObject(JsonElement element)
-        {
-            return Input.Object(element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertValue(x.Value)));
-        }
-
-        static Input ConvertArray(JsonElement element)
-        {
-            return Input.Array(element.EnumerateArray().Select(ConvertValue).ToArray());
-        }
-
-        static Input ConvertValue(JsonElement element)
-        {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    return ConvertObject(element);
-                case JsonValueKind.Array:
-                    return ConvertArray(element);
-                case JsonValueKind.String:
-                    return Input.String(element.GetString() ?? string.Empty);
-                case JsonValueKind.Number:
-                    return Input.Double(element.GetDouble());
-                case JsonValueKind.True:
-                    return Input.Boolean(value: true);
-                case JsonValueKind.False:
-                    return Input.Boolean(value: false);
-                case JsonValueKind.Null:
-                    return Input.Null();
-                default:
-                    throw new NotSupportedException();
-            }
-        }
+        return InputFactory.FromJson(parsed);
     }
 
     public static T To<T>(this Output output, Doc doc)
     {
-        using var transaction =
-            doc.ReadTransaction() ?? throw new InvalidOperationException("Failed to open transaction.");
+        using var transaction = doc.ReadTransaction();
 
         return output.To<T>(transaction);
     }
@@ -68,6 +34,13 @@ public static class YDotNetExtensions
         jsonStream.Position = 0;
 
         return JsonSerializer.Deserialize<T>(jsonStream)!;
+    }
+
+    public static string ToJson(this Output output, Doc doc)
+    {
+        using var transaction = doc.ReadTransaction();
+
+        return output.ToJson(transaction);
     }
 
     public static string ToJson(this Output output, Transaction transaction)
@@ -118,8 +91,7 @@ public static class YDotNetExtensions
         {
             jsonWriter.WriteStartArray();
 
-            foreach (var property in map.Iterate(transaction) ??
-                                     throw new InvalidOperationException("Failed to iterate array."))
+            foreach (var property in map.Iterate(transaction))
             {
                 WriteProperty(property.Key, property.Value, jsonWriter, transaction);
             }
@@ -131,8 +103,7 @@ public static class YDotNetExtensions
         {
             jsonWriter.WriteStartArray();
 
-            foreach (var item in array.Iterate(transaction) ??
-                                 throw new InvalidOperationException("Failed to iterate array."))
+            foreach (var item in array.Iterate(transaction))
             {
                 WriteValue(item, jsonWriter, transaction);
             }
@@ -151,7 +122,9 @@ public static class YDotNetExtensions
         {
             switch (output.Tag)
             {
-                case OutputTag.Boolean:
+                case OutputTag.NotSet:
+                    break;
+                case OutputTag.Bool:
                     jsonWriter.WriteBooleanValue(output.Boolean);
                     break;
                 case OutputTag.Double:

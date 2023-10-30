@@ -31,7 +31,7 @@ public sealed class WebSocketEncoder : Encoder, IDisposable
         return new ValueTask(webSocket.SendAsync(bytes, WebSocketMessageType.Binary, false, ct));
     }
 
-    public ValueTask EndMessageAsync(
+    public ValueTask FlushAsync(
         CancellationToken ct = default)
     {
         return new ValueTask(webSocket.SendAsync(Array.Empty<byte>(), WebSocketMessageType.Binary, true, ct));

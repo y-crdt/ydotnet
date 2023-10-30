@@ -32,5 +32,5 @@ public sealed class ClientAwarenessEvent : DocumentEvent
 {
     required public string? ClientState { get; set; }
 
-    required public long ClientClock { get; set; }
+    required public ulong ClientClock { get; set; }
 }
