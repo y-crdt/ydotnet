@@ -17,7 +17,8 @@ internal static class MemoryReader
         return data;
     }
 
-    internal static T[] ReadStructs<T>(nint handle, uint length) where T : struct
+    internal static T[] ReadStructs<T>(nint handle, uint length)
+        where T : struct
     {
         var itemSize = Marshal.SizeOf<T>();
         var itemBuffer = new T[length];
@@ -31,7 +32,8 @@ internal static class MemoryReader
         return itemBuffer;
     }
 
-    internal static nint[] ReadPointers<T>(nint handle, uint length) where T : struct
+    internal static nint[] ReadPointers<T>(nint handle, uint length)
+        where T : struct
     {
         var itemSize = Marshal.SizeOf<T>();
         var itemBuffer = new nint[length];
@@ -45,7 +47,8 @@ internal static class MemoryReader
         return itemBuffer;
     }
 
-    internal static NativeWithHandle<T>[] ReadStructsWithHandles<T>(nint handle, uint length) where T : struct
+    internal static NativeWithHandle<T>[] ReadStructsWithHandles<T>(nint handle, uint length)
+        where T : struct
     {
         var itemSize = Marshal.SizeOf<T>();
         var itemBuffer = new NativeWithHandle<T>[length];
@@ -59,7 +62,8 @@ internal static class MemoryReader
         return itemBuffer;
     }
 
-    internal static T ReadStruct<T>(nint handle) where T : struct
+    internal static T ReadStruct<T>(nint handle)
+        where T : struct
     {
         return Marshal.PtrToStructure<T>(handle.Checked());
     }

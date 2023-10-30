@@ -122,9 +122,7 @@ public static class YDotNetExtensions
         {
             switch (output.Tag)
             {
-                case OutputTag.NotSet:
-                    break;
-                case OutputTag.Bool:
+                case OutputTag.Boolean:
                     jsonWriter.WriteBooleanValue(output.Boolean);
                     break;
                 case OutputTag.Double:

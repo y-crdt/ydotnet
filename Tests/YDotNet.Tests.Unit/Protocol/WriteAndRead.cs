@@ -10,7 +10,7 @@ public class WriteAndRead
     [TestCase(0ul)]
     [TestCase(1ul)]
     [TestCase(3826503548ul)]
-    [TestCase(ClientId.MaxSafeInteger)]
+    [TestCase(ClientIdGenerator.MaxSafeInteger)]
     public async Task EncodeAndDecodeInt(ulong input)
     {
         // Arrange

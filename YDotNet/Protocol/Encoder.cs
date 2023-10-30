@@ -18,8 +18,7 @@ public abstract class Encoder
     /// <returns>
     /// The task representing the async operation.
     /// </returns>
-    public async ValueTask WriteVarUintAsync(ulong value,
-        CancellationToken ct = default)
+    public async ValueTask WriteVarUintAsync(ulong value, CancellationToken ct = default)
     {
         do
         {
@@ -46,8 +45,7 @@ public abstract class Encoder
     /// The task representing the async operation.
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
-    public async ValueTask WriteVarUint8Array(byte[] value,
-        CancellationToken ct = default)
+    public async ValueTask WriteVarUint8Array(byte[] value, CancellationToken ct = default)
     {
         if (value == null)
         {
@@ -67,8 +65,7 @@ public abstract class Encoder
     /// The task representing the async operation.
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
-    public async ValueTask WriteVarStringAsync(string value,
-        CancellationToken ct = default)
+    public async ValueTask WriteVarStringAsync(string value, CancellationToken ct = default)
     {
         if (value == null)
         {
@@ -110,8 +107,7 @@ public abstract class Encoder
     /// <returns>
     /// The task representing the async operation.
     /// </returns>
-    protected abstract ValueTask WriteByteAsync(byte value,
-        CancellationToken ct);
+    protected abstract ValueTask WriteByteAsync(byte value, CancellationToken ct);
 
     /// <summary>
     /// Write a byte array.
@@ -121,6 +117,5 @@ public abstract class Encoder
     /// <returns>
     /// The task representing the async operation.
     /// </returns>
-    protected abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
-        CancellationToken ct);
+    protected abstract ValueTask WriteBytesAsync(ArraySegment<byte> bytes, CancellationToken ct);
 }

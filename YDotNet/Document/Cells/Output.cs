@@ -42,7 +42,7 @@ public sealed class Output
     /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
     public string String => GetValue<string>(OutputTag.String);
 
-#pragma warning disable SA1623 (This property documentation shouldn't start with the standard text)
+#pragma warning disable SA1623 // This property documentation shouldn't start with the standard text
     /// <summary>
     ///     Gets the <see cref="bool" /> value.
     /// </summary>

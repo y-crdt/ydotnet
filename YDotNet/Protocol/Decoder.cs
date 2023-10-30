@@ -114,6 +114,5 @@ public abstract class Decoder
     /// <returns>
     /// The task that completes when everything has been read.
     /// </returns>
-    protected abstract ValueTask ReadBytesAsync(Memory<byte> bytes,
-        CancellationToken ct);
+    protected abstract ValueTask ReadBytesAsync(Memory<byte> bytes, CancellationToken ct);
 }

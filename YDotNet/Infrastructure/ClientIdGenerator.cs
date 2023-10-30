@@ -1,4 +1,4 @@
-﻿namespace YDotNet.Infrastructure;
+namespace YDotNet.Infrastructure;
 
 /// <summary>
 ///     Helper class to deal with client ids.
@@ -8,7 +8,7 @@ public static class ClientIdGenerator
     /// <summary>
     ///     The maximum safe integer from javascript.
     /// </summary>
-    public const long MaxSafeInteger = 2 ^ (53 - 1);
+    public const ulong MaxSafeInteger = 2 ^ (53 - 1);
 
     /// <summary>
     ///     Gets a random client id.

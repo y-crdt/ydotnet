@@ -17,16 +17,14 @@ public sealed class BufferEncoder : Encoder
     }
 
     /// <inheritdoc/>
-    protected override ValueTask WriteByteAsync(byte value,
-        CancellationToken ct)
+    protected override ValueTask WriteByteAsync(byte value, CancellationToken ct)
     {
         buffer.WriteByte(value);
         return default;
     }
 
     /// <inheritdoc/>
-    protected override ValueTask WriteBytesAsync(ArraySegment<byte> bytes,
-        CancellationToken ct)
+    protected override ValueTask WriteBytesAsync(ArraySegment<byte> bytes, CancellationToken ct)
     {
         buffer.Write(bytes);
         return default;
