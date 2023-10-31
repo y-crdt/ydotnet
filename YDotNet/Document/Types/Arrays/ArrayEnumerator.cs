@@ -10,59 +10,45 @@ namespace YDotNet.Document.Types.Arrays;
 /// </summary>
 internal class ArrayEnumerator : IEnumerator<Output>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ArrayEnumerator" /> class.
-    /// </summary>
-    /// <param name="iterator">
-    ///     The <see cref="Iterator" /> instance used by this enumerator.
-    ///     Check <see cref="Iterator" /> for more details.
-    /// </param>
+    private readonly ArrayIterator iterator;
+    private Output? current;
+
     internal ArrayEnumerator(ArrayIterator iterator)
     {
-        Iterator = iterator;
-        Current = null;
+        this.iterator = iterator;
     }
 
-    /// <summary>
-    ///     Gets the <see cref="Iterator" /> instance that holds the
-    ///     <see cref="ArrayIterator.Handle" /> used by this enumerator.
-    /// </summary>
-    private ArrayIterator Iterator { get; }
+    /// <inheritdoc />
+    public Output Current => current!;
 
     /// <inheritdoc />
-    object? IEnumerator.Current => Current;
+    object IEnumerator.Current => current!;
 
     /// <inheritdoc />
-    public Output? Current { get; private set; }
+    public void Dispose()
+    {
+        iterator.Dispose();
+    }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = ArrayChannel.IteratorNext(Iterator.Handle);
+        var handle = ArrayChannel.IteratorNext(iterator.Handle);
 
-        Current = handle != nint.Zero ? new Output(handle) : null;
+        if (handle != nint.Zero)
+        {
+            current = Output.CreateAndRelease(handle, iterator.Doc);
+            return true;
+        }
 
-        return Current != null;
+        current = null!;
+
+        return false;
     }
 
     /// <inheritdoc />
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Iterator.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="ArrayEnumerator" /> class.
-    /// </summary>
-    ~ArrayEnumerator()
-    {
-        Dispose();
     }
 }

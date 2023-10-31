@@ -3,9 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
+    <StartupObject>YDotNet.Tests.Unit.Program</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;8632</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;8632</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\YDotNet.Extensions\YDotNet.Extensions.csproj" />
     <ProjectReference Include="..\..\YDotNet\YDotNet.csproj" />
   </ItemGroup>
 

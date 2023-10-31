@@ -1,5 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps.Events;
@@ -7,58 +8,61 @@ namespace YDotNet.Document.Types.Maps.Events;
 /// <summary>
 ///     Represents the event that's part of an operation within a <see cref="Map" /> instance.
 /// </summary>
-public class MapEvent
+public class MapEvent : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MapEvent" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal MapEvent(nint handle)
+    private readonly Lazy<EventKeys> keys;
+    private readonly Lazy<EventPath> path;
+    private readonly Lazy<Map> target;
+
+    internal MapEvent(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        path = new Lazy<EventPath>(
+            () =>
+            {
+                var pathHandle = MapChannel.ObserveEventPath(handle, out var length).Checked();
+
+                return new EventPath(pathHandle, length);
+            });
+
+        keys = new Lazy<EventKeys>(
+            () =>
+            {
+                var keysHandle = MapChannel.ObserveEventKeys(handle, out var length).Checked();
+
+                return new EventKeys(keysHandle, length, doc);
+            });
+
+        target = new Lazy<Map>(
+            () =>
+            {
+                var targetHandle = MapChannel.ObserveEventTarget(handle).Checked();
+
+                return doc.GetMap(targetHandle, isDeleted: false);
+            });
     }
 
     /// <summary>
     ///     Gets the keys that changed within the <see cref="Map" /> instance and triggered this event.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventKeys" /> for more information.</para>
-    /// </remarks>
-    public EventKeys Keys
-    {
-        get
-        {
-            var handle = MapChannel.ObserveEventKeys(Handle, out var length);
-
-            return new EventKeys(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventKeys Keys => keys.Value;
 
     /// <summary>
     ///     Gets the path from the observed instanced down to the current <see cref="Map" /> instance.
     /// </summary>
-    /// <remarks>
-    ///     <para>This property can only be accessed during the callback that exposes this instance.</para>
-    ///     <para>Check the documentation of <see cref="EventPath" /> for more information.</para>
-    /// </remarks>
-    public EventPath Path
-    {
-        get
-        {
-            var handle = MapChannel.ObserveEventPath(Handle, out var length);
-
-            return new EventPath(handle, length);
-        }
-    }
+    /// <remarks>This property can only be accessed during the callback that exposes this instance.</remarks>
+    public EventPath Path => path.Value;
 
     /// <summary>
     ///     Gets the <see cref="Map" /> instance that is related to this <see cref="MapEvent" /> instance.
     /// </summary>
-    public Map? Target => ReferenceAccessor.Access(new Map(MapChannel.ObserveEventTarget(Handle)));
+    /// <returns>The target of the event.</returns>
+    public Map Target => target.Value;
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    /// <inheritdoc />
+    protected override void DisposeCore(bool disposing)
+    {
+        // The event has no explicit garbage collection, it is released automatically after the event has been completed.
+    }
 }

@@ -1,0 +1,38 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'for-pr'
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  pack-nuget:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+  
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+  
+      - name: Nuget pack
+        run: |
+          dotnet pack -c Release
+  
+      - name: Nuget publish
+        run: |
+          dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }}
+  
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            **/*.nupkg

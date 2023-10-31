@@ -50,12 +50,9 @@ public class ObserveTests
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.First().Length, Is.EqualTo(expected: 3));
         Assert.That(eventChanges.First().Values.ElementAt(index: 0).XmlText, Is.Not.Null);
-        Assert.That(eventChanges.First().Values.ElementAt(index: 0).XmlElement, Is.Null);
-        Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlText, Is.Null);
         Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement, Is.Not.Null);
         Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement.Tag, Is.EqualTo("color"));
         Assert.That(eventChanges.First().Values.ElementAt(index: 2).XmlText, Is.Not.Null);
-        Assert.That(eventChanges.First().Values.ElementAt(index: 2).XmlElement, Is.Null);
     }
 
     [Test]
@@ -106,11 +103,8 @@ public class ObserveTests
         var asChange = keyChanges.Single(x => x.Key == "as");
 
         Assert.That(hrefChange.NewValue.String, Is.EqualTo("https://lsviana.github.io/"));
-        Assert.That(hrefChange.NewValue.Long, Is.Null);
         Assert.That(relChange.NewValue.String, Is.EqualTo("preload"));
-        Assert.That(relChange.NewValue.Long, Is.Null);
         Assert.That(asChange.NewValue.String, Is.EqualTo("document"));
-        Assert.That(asChange.NewValue.Long, Is.Null);
     }
 
     [Test]
@@ -138,9 +132,7 @@ public class ObserveTests
         Assert.That(keyChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventKeyChangeTag.Update));
         Assert.That(keyChanges.ElementAt(index: 0).Key, Is.EqualTo("href"));
         Assert.That(keyChanges.ElementAt(index: 0).NewValue.String, Is.EqualTo("https://github.com/LSViana/y-crdt"));
-        Assert.That(keyChanges.ElementAt(index: 0).NewValue.Long, Is.Null);
         Assert.That(keyChanges.ElementAt(index: 0).OldValue.String, Is.EqualTo("https://lsviana.github.io/"));
-        Assert.That(keyChanges.ElementAt(index: 0).OldValue.Long, Is.Null);
     }
 
     [Test]
@@ -167,9 +159,7 @@ public class ObserveTests
         Assert.That(keyChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(keyChanges.ElementAt(index: 0).Tag, Is.EqualTo(EventKeyChangeTag.Remove));
         Assert.That(keyChanges.ElementAt(index: 0).Key, Is.EqualTo("href"));
-        Assert.That(keyChanges.ElementAt(index: 0).NewValue, Is.Null);
         Assert.That(keyChanges.ElementAt(index: 0).OldValue.String, Is.EqualTo("https://lsviana.github.io/"));
-        Assert.That(keyChanges.ElementAt(index: 0).OldValue.Long, Is.Null);
     }
 
     [Test]

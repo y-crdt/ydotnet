@@ -36,8 +36,7 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
-        Assert.That(output.Boolean, Is.True);
-        Assert.That(output.Long, Is.Null);
+        Assert.That(output.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
     [Test]
@@ -53,8 +52,8 @@ public class GetTests
 
         // Assert
         Assert.That(output, Is.Not.Null);
+        Assert.That(output.Tag, Is.EqualTo(OutputTag.Undefined));
         Assert.That(output.Undefined, Is.True);
-        Assert.That(output.Long, Is.Null);
     }
 
     [Test]
@@ -71,7 +70,6 @@ public class GetTests
         // Assert
         Assert.That(output, Is.Not.Null);
         Assert.That(output.String, Is.EqualTo("Lucas"));
-        Assert.That(output.Long, Is.Null);
     }
 
     [Test]
@@ -89,11 +87,9 @@ public class GetTests
         // Assert
         Assert.That(output1, Is.Not.Null);
         Assert.That(output1.Boolean, Is.True);
-        Assert.That(output1.Long, Is.Null);
 
         Assert.That(output2, Is.Not.Null);
         Assert.That(output2.Boolean, Is.True);
-        Assert.That(output2.Long, Is.Null);
     }
 
     [Test]
@@ -118,12 +114,7 @@ public class GetTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true),
-                Input.Undefined(),
-                Input.String("Lucas")
-            });
+            transaction, index: 0, Input.Boolean(value: true), Input.Undefined(), Input.String("Lucas"));
         transaction.Commit();
 
         return (doc, array);

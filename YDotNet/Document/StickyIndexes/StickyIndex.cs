@@ -1,8 +1,8 @@
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.StickyIndex;
-using YDotNet.Native.Types;
 
 namespace YDotNet.Document.StickyIndexes;
 
@@ -15,15 +15,11 @@ namespace YDotNet.Document.StickyIndexes;
 ///     Also, placing a sticky index at the end of a <see cref="Branch" /> will always point to the end of that
 ///     <see cref="Branch" />.
 /// </remarks>
-public class StickyIndex : IDisposable
+public class StickyIndex : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="StickyIndex" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
     internal StickyIndex(nint handle)
+        : base(handle)
     {
-        Handle = handle;
     }
 
     /// <summary>
@@ -31,24 +27,9 @@ public class StickyIndex : IDisposable
     /// </summary>
     public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
     /// <inheritdoc />
-    public void Dispose()
+    protected override void DisposeCore(bool disposing)
     {
-        StickyIndexChannel.Destroy(Handle);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="StickyIndex" /> class.
-    /// </summary>
-    ~StickyIndex()
-    {
-        Dispose();
     }
 
     /// <summary>
@@ -56,9 +37,11 @@ public class StickyIndex : IDisposable
     /// </summary>
     /// <param name="encoded">The <see cref="byte" /> array received from <see cref="Encode" />.</param>
     /// <returns>The <see cref="StickyIndex" /> represented by the provided <see cref="byte" /> array.</returns>
-    public static StickyIndex? Decode(byte[] encoded)
+    public static StickyIndex Decode(byte[] encoded)
     {
-        return ReferenceAccessor.Access(new StickyIndex(StickyIndexChannel.Decode(encoded, (uint) encoded.Length)));
+        var handle = StickyIndexChannel.Decode(encoded, (uint) encoded.Length);
+
+        return new StickyIndex(handle.Checked());
     }
 
     /// <summary>
@@ -83,10 +66,7 @@ public class StickyIndex : IDisposable
     public byte[] Encode()
     {
         var handle = StickyIndexChannel.Encode(Handle, out var length);
-        var result = MemoryReader.ReadBytes(handle, length);
 
-        BinaryChannel.Destroy(handle, length);
-
-        return result;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 }

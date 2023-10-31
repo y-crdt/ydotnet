@@ -40,7 +40,6 @@ public class FirstChildTests
         transaction.Commit();
 
         // Assert
-        Assert.That(childXmlElement.XmlElement, Is.Null);
         Assert.That(childXmlElement.XmlText, Is.Not.Null);
     }
 
@@ -86,6 +85,5 @@ public class FirstChildTests
 
         // Assert
         Assert.That(grandChildXmlElement.XmlElement, Is.Not.Null);
-        Assert.That(grandChildXmlElement.XmlText, Is.Null);
     }
 }

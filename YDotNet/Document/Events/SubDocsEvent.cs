@@ -1,3 +1,5 @@
+using YDotNet.Native.Document.Events;
+
 namespace YDotNet.Document.Events;
 
 /// <summary>
@@ -5,31 +7,25 @@ namespace YDotNet.Document.Events;
 /// </summary>
 public class SubDocsEvent
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="SubDocsEvent" /> class.
-    /// </summary>
-    /// <param name="added">The initial value for <see cref="Added" />.</param>
-    /// <param name="removed">The initial value for <see cref="Removed" />.</param>
-    /// <param name="loaded">The initial value for <see cref="Loaded" />.</param>
-    public SubDocsEvent(Doc[] added, Doc[] removed, Doc[] loaded)
+    internal SubDocsEvent(SubDocsEventNative native, Doc doc)
     {
-        Added = added;
-        Removed = removed;
-        Loaded = loaded;
+        Added = native.Added().Select(h => doc.GetDoc(h, isDeleted: false)).ToList();
+        Removed = native.Removed().Select(h => doc.GetDoc(h, isDeleted: true)).ToList();
+        Loaded = native.Loaded().Select(h => doc.GetDoc(h, isDeleted: false)).ToList();
     }
 
     /// <summary>
     ///     Gets the sub-documents that were added to the <see cref="Doc" /> instance that emitted this event.
     /// </summary>
-    public Doc[] Added { get; }
+    public IReadOnlyList<Doc> Added { get; }
 
     /// <summary>
     ///     Gets the sub-documents that were removed to the <see cref="Doc" /> instance that emitted this event.
     /// </summary>
-    public Doc[] Removed { get; }
+    public IReadOnlyList<Doc> Removed { get; }
 
     /// <summary>
     ///     Gets the sub-documents that were loaded to the <see cref="Doc" /> instance that emitted this event.
     /// </summary>
-    public Doc[] Loaded { get; }
+    public IReadOnlyList<Doc> Loaded { get; }
 }

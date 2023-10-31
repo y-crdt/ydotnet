@@ -93,18 +93,12 @@ public class UndoTests
         var transaction = doc.WriteTransaction();
         array.InsertRange(
             transaction,
-            index: 0,
-            new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L),
-                Input.String("Lucas")
-            });
+            index: 0, Input.Boolean(value: true), Input.Long(value: 2469L), Input.String("Lucas"));
         transaction.Commit();
 
         // Act (add and undo)
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        array.InsertRange(transaction, index: 3, Input.Undefined());
         transaction.Commit();
         var result = undoManager.Undo();
 
@@ -166,7 +160,6 @@ public class UndoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(value2.String, Is.EqualTo("Lucas"));
-        Assert.That(value2.Undefined, Is.False);
         Assert.That(result, Is.True);
 
         // Act (remove and undo)
@@ -183,7 +176,6 @@ public class UndoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(value1.Long, Is.EqualTo(expected: 2469L));
-        Assert.That(value1.String, Is.Null);
         Assert.That(result, Is.True);
     }
 

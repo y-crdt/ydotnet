@@ -1,10 +1,10 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlTexts.Events;
-using YDotNet.Infrastructure;
+using YDotNet.Native;
+using YDotNet.Native.Document.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -14,36 +14,13 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventBranch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventBranch" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    public EventBranch(nint handle)
-    {
-        Handle = handle;
-        Tag = (EventBranchTag) Marshal.ReadByte(handle);
+    private readonly object? value;
 
-        switch (Tag)
-        {
-            case EventBranchTag.Map:
-                MapEvent = new MapEvent(handle + MemoryConstants.PointerSize);
-                break;
-            case EventBranchTag.Text:
-                TextEvent = new TextEvent(handle + MemoryConstants.PointerSize);
-                break;
-            case EventBranchTag.Array:
-                ArrayEvent = new ArrayEvent(handle + MemoryConstants.PointerSize);
-                break;
-            case EventBranchTag.XmlElement:
-                XmlElementEvent = new XmlElementEvent(handle + MemoryConstants.PointerSize);
-                break;
-            case EventBranchTag.XmlText:
-                XmlTextEvent = new XmlTextEvent(handle + MemoryConstants.PointerSize);
-                break;
-            default:
-                throw new NotSupportedException(
-                    $"The value \"{Tag}\" is not supported by the {nameof(EventBranch)} class.");
-        }
+    internal EventBranch(NativeWithHandle<EventBranchNative> native, Doc doc)
+    {
+        Tag = (EventBranchTag) native.Value.Tag;
+
+        value = BuildValue(native, doc, Tag);
     }
 
     /// <summary>
@@ -52,37 +29,68 @@ public class EventBranch
     public EventBranchTag Tag { get; }
 
     /// <summary>
-    ///     Gets the <see cref="MapEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.Map" />, or <c>null</c>
-    ///     otherwise.
+    ///     Gets the <see cref="MapEvent" /> value.
     /// </summary>
-    public MapEvent? MapEvent { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public MapEvent MapEvent => GetValue<MapEvent>(EventBranchTag.Map);
 
     /// <summary>
-    ///     Gets the <see cref="TextEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.Text" />, or <c>null</c>
-    ///     otherwise.
+    ///     Gets the <see cref="TextEvent" /> value.
     /// </summary>
-    public TextEvent? TextEvent { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public TextEvent TextEvent => GetValue<TextEvent>(EventBranchTag.Text);
 
     /// <summary>
-    ///     Gets the <see cref="ArrayEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.Array" />, or <c>null</c>
-    ///     otherwise.
+    ///     Gets the <see cref="ArrayEvent" /> value.
     /// </summary>
-    public ArrayEvent? ArrayEvent { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public ArrayEvent ArrayEvent => GetValue<ArrayEvent>(EventBranchTag.Array);
 
     /// <summary>
-    ///     Gets the <see cref="XmlElementEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.XmlElement" />,
-    ///     or <c>null</c> otherwise.
+    ///     Gets the <see cref="XmlElementEvent" /> value.
     /// </summary>
-    public XmlElementEvent? XmlElementEvent { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public XmlElementEvent XmlElementEvent => GetValue<XmlElementEvent>(EventBranchTag.XmlElement);
 
     /// <summary>
-    ///     Gets the <see cref="XmlTextEvent" />, if <see cref="Tag" /> is <see cref="EventBranchTag.XmlText" />,
-    ///     or <c>null</c> otherwise.
+    ///     Gets the <see cref="XmlTextEvent" /> value.
     /// </summary>
-    public XmlTextEvent? XmlTextEvent { get; }
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public XmlTextEvent XmlTextEvent => GetValue<XmlTextEvent>(EventBranchTag.XmlText);
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
+    private static object? BuildValue(NativeWithHandle<EventBranchNative> native, Doc doc, EventBranchTag tag)
+    {
+        var handle = native.Value.ValueHandle(native.Handle);
+
+        switch (tag)
+        {
+            case EventBranchTag.Map:
+                return new MapEvent(handle, doc);
+
+            case EventBranchTag.Text:
+                return new TextEvent(handle, doc);
+
+            case EventBranchTag.Array:
+                return new ArrayEvent(handle, doc);
+
+            case EventBranchTag.XmlElement:
+                return new XmlElementEvent(handle, doc);
+
+            case EventBranchTag.XmlText:
+                return new XmlTextEvent(handle, doc);
+
+            default:
+                return null;
+        }
+    }
+
+    private T GetValue<T>(EventBranchTag expectedType)
+    {
+        if (value is not T typed)
+        {
+            throw new YDotNetException($"Expected {expectedType}, got {Tag}.");
+        }
+
+        return typed;
+    }
 }

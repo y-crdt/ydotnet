@@ -58,7 +58,7 @@ public class RedoTests
                     { "bold", Input.Boolean(value: true) }
                 }));
         transaction.Commit();
-        undoManager.Redo();
+        undoManager.Undo();
         result = undoManager.Redo();
 
         transaction = doc.ReadTransaction();
@@ -97,18 +97,12 @@ public class RedoTests
         var transaction = doc.WriteTransaction();
         array.InsertRange(
             transaction,
-            index: 0,
-            new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L),
-                Input.String("Lucas")
-            });
+            index: 0, Input.Boolean(value: true), Input.Long(value: 2469L), Input.String("Lucas"));
         transaction.Commit();
 
         // Act (add, undo, and redo)
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        array.InsertRange(transaction, index: 3, Input.Undefined());
         transaction.Commit();
         undoManager.Undo();
         var result = undoManager.Redo();
@@ -171,8 +165,7 @@ public class RedoTests
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 4));
-        Assert.That(value2.Undefined, Is.True);
-        Assert.That(value2.String, Is.Null);
+        Assert.That(value2.Tag, Is.EqualTo(OutputTag.Undefined));
         Assert.That(result, Is.True);
 
         // Act (remove, undo, and redo)
@@ -223,8 +216,8 @@ public class RedoTests
         // Assert
         Assert.That(text, Is.EqualTo("Luctrueas 0x02040609Viana"));
         Assert.That(attributes.Length, Is.EqualTo(expected: 2));
-        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
-        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(attributes.First(x => x.Key == "bold").Value, Is.EqualTo("true"));
+        Assert.That(attributes.First(x => x.Key == "italic").Value, Is.EqualTo("false"));
         Assert.That(result, Is.True);
 
         // Act (remove text, attribute, and embed, undo, and redo)
@@ -243,7 +236,7 @@ public class RedoTests
         // Assert
         Assert.That(text, Is.EqualTo("0x02040609Viana"));
         Assert.That(attributes.Length, Is.EqualTo(expected: 1));
-        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(attributes.First(x => x.Key == "italic").Value, Is.EqualTo("false"));
         Assert.That(result, Is.True);
     }
 
@@ -277,8 +270,8 @@ public class RedoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 4));
         Assert.That(attributes.Length, Is.EqualTo(expected: 2));
-        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
-        Assert.That(attributes.First(x => x.Name == "italic").Value, Is.EqualTo("false"));
+        Assert.That(attributes.First(x => x.Key == "bold").Value, Is.EqualTo("true"));
+        Assert.That(attributes.First(x => x.Key == "italic").Value, Is.EqualTo("false"));
         Assert.That(result, Is.True);
 
         // Act (remove text, attribute, and element, undo, and redo)
@@ -297,7 +290,7 @@ public class RedoTests
         // Assert
         Assert.That(length, Is.EqualTo(expected: 2));
         Assert.That(attributes.Length, Is.EqualTo(expected: 1));
-        Assert.That(attributes.First(x => x.Name == "bold").Value, Is.EqualTo("true"));
+        Assert.That(attributes.First(x => x.Key == "bold").Value, Is.EqualTo("true"));
         Assert.That(result, Is.True);
     }
 }

@@ -1,29 +1,22 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct UpdateEventNative
+internal readonly struct UpdateEventNative
 {
     public uint Length { get; init; }
 
     public nint Data { get; init; }
 
-    public static UpdateEventNative From(uint length, nint data)
+    public byte[] Bytes()
     {
-        return new UpdateEventNative
-        {
-            Length = length,
-            Data = data
-        };
+        return MemoryReader.ReadBytes(Data, Length);
     }
 
-    public UpdateEvent ToUpdateEvent()
+    public static UpdateEventNative From(uint length, nint data)
     {
-        var result = new byte[Length];
-        Marshal.Copy(Data, result, startIndex: 0, (int) Length);
-
-        return new UpdateEvent(result);
+        return new UpdateEventNative { Length = length, Data = data };
     }
 }

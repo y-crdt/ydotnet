@@ -1,65 +1,32 @@
-using System.Collections;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts;
 
 /// <summary>
 ///     Represents a collection of <see cref="TextChunk" /> instances.
 /// </summary>
-public class TextChunks : IEnumerable<TextChunk>, IDisposable
+public class TextChunks : ReadOnlyCollection<TextChunk>
 {
-    private readonly IEnumerable<TextChunk> collection;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TextChunks" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    /// <param name="length">The length of <see cref="TextChunk" /> instances to be read from <see cref="Handle" />.</param>
-    internal TextChunks(nint handle, uint length)
+    internal TextChunks(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
-        Handle = handle;
-        Length = length;
-
-        collection = MemoryReader.TryReadIntPtrArray(Handle, Length, size: 32)
-            .Select(x => new TextChunk(x))
-            .ToArray();
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
-    ///     Gets the length of the native resource.
-    /// </summary>
-    internal uint Length { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private static IList<TextChunk> ReadItems(nint handle, uint length, Doc doc)
     {
-        ChunksChannel.Destroy(Handle, Length);
-        GC.SuppressFinalize(this);
-    }
+        var result = new List<TextChunk>((int) length);
 
-    /// <inheritdoc />
-    public IEnumerator<TextChunk> GetEnumerator()
-    {
-        return collection.GetEnumerator();
-    }
+        foreach (var native in MemoryReader.ReadStructsWithHandles<TextChunkNative>(handle, length))
+        {
+            result.Add(new TextChunk(native, doc));
+        }
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+        // We are done reading and can destroy the resource.
+        ChunksChannel.Destroy(handle, length);
 
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="TextChunks" /> class.
-    /// </summary>
-    ~TextChunks()
-    {
-        Dispose();
+        return result;
     }
 }

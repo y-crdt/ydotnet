@@ -23,7 +23,7 @@ public class ChunksTests
         var chunks = text.Chunks(transaction);
 
         // Assert
-        Assert.That(chunks.Length, Is.EqualTo(expected: 1));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 1));
         Assert.That(chunks.First().Attributes, Is.Empty);
     }
 
@@ -37,7 +37,7 @@ public class ChunksTests
         var chunks = text.Chunks(transaction);
 
         // Assert
-        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 2));
 
         var firstChunk = chunks.ElementAt(index: 0);
         var firstChunkAttribute = firstChunk.Attributes.First();
@@ -46,7 +46,6 @@ public class ChunksTests
         Assert.That(firstChunk.Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(firstChunkAttribute.Key, Is.EqualTo("bold"));
         Assert.That(firstChunkAttribute.Value.Boolean, Is.True);
-        Assert.That(firstChunkAttribute.Value.String, Is.Null);
 
         var secondChunk = chunks.ElementAt(index: 1);
 
@@ -64,7 +63,7 @@ public class ChunksTests
         var chunks = text.Chunks(transaction);
 
         // Assert
-        Assert.That(chunks.Length, Is.EqualTo(expected: 3));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 3));
 
         var firstChunk = chunks.ElementAt(index: 0);
 
@@ -78,7 +77,6 @@ public class ChunksTests
         Assert.That(secondChunk.Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(secondChunkAttribute.Key, Is.EqualTo("bold"));
         Assert.That(secondChunkAttribute.Value.Boolean, Is.True);
-        Assert.That(secondChunkAttribute.Value.String, Is.Null);
 
         var thirdChunk = chunks.ElementAt(index: 2);
 
@@ -96,7 +94,7 @@ public class ChunksTests
         var chunks = text.Chunks(transaction);
 
         // Assert
-        Assert.That(chunks.Length, Is.EqualTo(expected: 2));
+        Assert.That(chunks.Count, Is.EqualTo(expected: 2));
 
         var firstChunk = chunks.ElementAt(index: 0);
 
@@ -110,7 +108,6 @@ public class ChunksTests
         Assert.That(secondChunk.Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(secondChunkAttribute.Key, Is.EqualTo("bold"));
         Assert.That(secondChunkAttribute.Value.Boolean, Is.True);
-        Assert.That(secondChunkAttribute.Value.String, Is.Null);
     }
 
     private (Text, Transaction) ArrangeText(uint index, uint length)

@@ -1,12 +1,11 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Options;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Transaction;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Branches;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
@@ -20,17 +19,18 @@ namespace YDotNet.Document.Transactions;
 ///         All operations that need to touch or modify the contents of a document need to be executed through a
 ///         transaction.
 ///     </para>
-///     <para>A <see cref="Transaction" /> is automatically committed during <see cref="Dispose" />.</para>
+///     <para>A <see cref="Transaction" /> is automatically committed during <see cref="IDisposable.Dispose" />.</para>
 /// </remarks>
-public class Transaction : IDisposable
+public class Transaction : UnmanagedResource
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Transaction" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal Transaction(nint handle)
+    private readonly Doc doc;
+
+    internal Transaction(nint handle, Doc doc)
+        : base(handle)
     {
-        Handle = handle;
+        this.doc = doc;
+
+        doc.NotifyTransactionStarted();
     }
 
     /// <summary>
@@ -38,15 +38,15 @@ public class Transaction : IDisposable
     /// </summary>
     public bool Writeable => TransactionChannel.Writeable(Handle) == 1;
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
     /// <inheritdoc />
-    public void Dispose()
+    protected override void DisposeCore(bool disposing)
     {
-        Commit();
+        if (disposing)
+        {
+            TransactionChannel.Commit(Handle);
+
+            doc.NotifyTransactionClosed();
+        }
     }
 
     /// <summary>
@@ -58,7 +58,8 @@ public class Transaction : IDisposable
     /// </remarks>
     public void Commit()
     {
-        TransactionChannel.Commit(Handle);
+        // The dispose method has a solution to prevent multiple dipose, so we can just use that.
+        Dispose();
     }
 
     /// <summary>
@@ -68,19 +69,9 @@ public class Transaction : IDisposable
     public Doc[] SubDocs()
     {
         var handle = TransactionChannel.SubDocs(Handle, out var length);
-        var docs = new Doc[length];
+        var handles = MemoryReader.ReadStructs<nint>(handle, length);
 
-        for (var i = 0; i < length; i++)
-        {
-            var doc = new Doc(Marshal.ReadIntPtr(handle, i * nint.Size));
-
-            // Don't finalize this instance because there's another instance responsible for it somewhere else.
-            GC.SuppressFinalize(doc);
-
-            docs[i] = doc;
-        }
-
-        return docs;
+        return handles.Select(h => doc.GetDoc(h, isDeleted: false)).ToArray();
     }
 
     /// <summary>
@@ -99,10 +90,8 @@ public class Transaction : IDisposable
     public byte[] StateVectorV1()
     {
         var handle = TransactionChannel.StateVectorV1(Handle, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -111,7 +100,7 @@ public class Transaction : IDisposable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="stateVector" /> sent to this method can be generated using <see cref="StateVectorV1" />
+    ///         The <paramref name="stateVector" /> sent to this method can be generated using <see cref="StateVectorV1" />
     ///         through a <see cref="Transaction" /> in the remote document.
     ///     </para>
     ///     <para>
@@ -131,12 +120,10 @@ public class Transaction : IDisposable
     /// </returns>
     public byte[] StateDiffV1(byte[]? stateVector)
     {
-        var stateVectorLength = stateVector?.Length ?? 0;
-        var handle = TransactionChannel.StateDiffV1(Handle, stateVector, (uint) stateVectorLength, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
+        var handle = TransactionChannel.StateDiffV1(
+            Handle, stateVector, (uint) (stateVector?.Length ?? 0), out var length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -145,7 +132,7 @@ public class Transaction : IDisposable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="stateVector" /> sent to this method can be generated using <see cref="StateVectorV1" />
+    ///         The <paramref name="stateVector" /> sent to this method can be generated using <see cref="StateVectorV1" />
     ///         through a <see cref="Transaction" /> in the remote document.
     ///     </para>
     ///     <para>
@@ -165,12 +152,13 @@ public class Transaction : IDisposable
     /// </returns>
     public byte[] StateDiffV2(byte[]? stateVector)
     {
-        var stateVectorLength = stateVector?.Length ?? 0;
-        var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVectorLength, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
+        var handle = TransactionChannel.StateDiffV2(
+            Handle,
+            stateVector,
+            (uint) (stateVector?.Length ?? 0),
+            out var length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
 
     /// <summary>
@@ -215,15 +203,13 @@ public class Transaction : IDisposable
     public byte[] Snapshot()
     {
         var handle = TransactionChannel.Snapshot(Handle, out var length);
-        var data = MemoryReader.ReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return MemoryReader.ReadAndDestroyBytes(handle.Checked(), length);
     }
 
     /// <summary>
     ///     Encodes the state of the <see cref="Doc" /> associated to this <see cref="Transaction" /> at a point in time
-    ///     specified by the provided <see cref="snapshot" />.
+    ///     specified by the provided <paramref name="snapshot" />.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -232,7 +218,8 @@ public class Transaction : IDisposable
     ///         <c>null</c> will be returned.
     ///     </para>
     ///     <para>
-    ///         The <see cref="snapshot" /> is generated by <see cref="Snapshot" />. This is useful to generate a past view
+    ///         The <paramref name="snapshot" /> is generated by <see cref="Snapshot" />. This is useful to generate a past
+    ///         view
     ///         of the document.
     ///     </para>
     ///     <para>
@@ -244,7 +231,7 @@ public class Transaction : IDisposable
     /// </param>
     /// <returns>
     ///     The state difference update that can be applied <see cref="ApplyV1" /> to return the document to the state when the
-    ///     <see cref="snapshot" /> was created.
+    ///     <paramref name="snapshot" /> was created.
     /// </returns>
     public byte[]? EncodeStateFromSnapshotV1(byte[] snapshot)
     {
@@ -253,15 +240,13 @@ public class Transaction : IDisposable
             snapshot,
             (uint) snapshot.Length,
             out var length);
-        var data = MemoryReader.TryReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
     }
 
     /// <summary>
     ///     Encodes the state of the <see cref="Doc" /> associated to this <see cref="Transaction" /> at a point in time
-    ///     specified by the provided <see cref="snapshot" />.
+    ///     specified by the provided <paramref name="snapshot" />.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -270,7 +255,8 @@ public class Transaction : IDisposable
     ///         <c>null</c> will be returned.
     ///     </para>
     ///     <para>
-    ///         The <see cref="snapshot" /> is generated by <see cref="Snapshot" />. This is useful to generate a past view
+    ///         The <paramref name="snapshot" /> is generated by <see cref="Snapshot" />. This is useful to generate a past
+    ///         view
     ///         of the document.
     ///     </para>
     ///     <para>
@@ -282,7 +268,7 @@ public class Transaction : IDisposable
     /// </param>
     /// <returns>
     ///     The state difference update that can be applied <see cref="ApplyV2" /> to return the document to the state when the
-    ///     <see cref="snapshot" /> was created.
+    ///     <paramref name="snapshot" /> was created.
     /// </returns>
     public byte[]? EncodeStateFromSnapshotV2(byte[] snapshot)
     {
@@ -291,90 +277,107 @@ public class Transaction : IDisposable
             snapshot,
             (uint) snapshot.Length,
             out var length);
-        var data = MemoryReader.TryReadBytes(handle, length);
-        BinaryChannel.Destroy(handle, length);
 
-        return data;
+        return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
     }
 
     /// <summary>
-    ///     Returns the <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     Returns the <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
     /// <param name="name">The name of the <see cref="Array" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     The <see cref="Array" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
     public Array? GetArray(string name)
     {
-        return ReferenceAccessor.Access(new Array(GetWithKind(name, BranchKind.Array)));
+        var handle = GetWithKind(name, BranchKind.Array);
+
+        return handle != nint.Zero ? doc.GetArray(handle, isDeleted: false) : null;
     }
 
     /// <summary>
-    ///     Returns the <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     Returns the <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
     /// <param name="name">The name of the <see cref="Map" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     The <see cref="Map" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
     public Map? GetMap(string name)
     {
-        return ReferenceAccessor.Access(new Map(GetWithKind(name, BranchKind.Map)));
+        var handle = GetWithKind(name, BranchKind.Map);
+
+        return handle != nint.Zero ? doc.GetMap(handle, isDeleted: false) : null;
     }
 
     /// <summary>
-    ///     Returns the <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     Returns the <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
     /// <param name="name">The name of the <see cref="Text" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     The <see cref="Text" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
     public Text? GetText(string name)
     {
-        return ReferenceAccessor.Access(new Text(GetWithKind(name, BranchKind.Text)));
+        var handle = GetWithKind(name, BranchKind.Text);
+
+        return handle != nint.Zero ? doc.GetText(handle, isDeleted: false) : null;
     }
 
     /// <summary>
-    ///     Returns the <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     Returns the <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />,
+    ///     or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
     /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     The <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
     public XmlElement? GetXmlElement(string name)
     {
-        return ReferenceAccessor.Access(new XmlElement(GetWithKind(name, BranchKind.XmlElement)));
+        var handle = GetWithKind(name, BranchKind.XmlElement);
+
+        return handle != nint.Zero ? doc.GetXmlElement(handle, isDeleted: false) : null;
     }
 
     /// <summary>
-    ///     Returns the <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     Returns the <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
     /// <param name="name">The name of the <see cref="XmlText" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <see cref="name" />, or
-    ///     <c>null</c> if no entry was defined under <see cref="name" /> before.
+    ///     The <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
+    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
     public XmlText? GetXmlText(string name)
     {
-        return ReferenceAccessor.Access(new XmlText(GetWithKind(name, BranchKind.XmlText)));
+        var handle = GetWithKind(name, BranchKind.XmlText);
+
+        return handle != nint.Zero ? doc.GetXmlText(handle, isDeleted: false) : null;
     }
 
-    private nint GetWithKind(string name, BranchKind branchKind)
+    private nint GetWithKind(string name, BranchKind expectedKind)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var handle = TransactionChannel.Get(Handle, nameHandle);
-        var kind = (BranchKind) BranchChannel.Kind(handle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        MemoryWriter.Release(nameHandle);
+        var branchHandle = TransactionChannel.Get(Handle, unsafeName.Handle);
+        if (branchHandle == nint.Zero)
+        {
+            return nint.Zero;
+        }
 
-        return kind != branchKind ? nint.Zero : handle;
+        var branchKind = (BranchKind) BranchChannel.Kind(branchHandle);
+        if (branchKind != expectedKind)
+        {
+            throw new YDotNetException($"Expected '{expectedKind}', got '{branchKind}'.");
+        }
+
+        return branchHandle;
     }
 }

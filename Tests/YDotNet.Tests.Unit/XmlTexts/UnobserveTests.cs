@@ -24,7 +24,7 @@ public class UnobserveTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        xmlText.Unobserve(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 1, " Viana");

@@ -1,4 +1,9 @@
-﻿namespace YDotNet.Document.Options;
+using YDotNet.Document.Types.Texts;
+using YDotNet.Document.Types.XmlTexts;
+using YDotNet.Infrastructure;
+using YDotNet.Native.Document;
+
+namespace YDotNet.Document.Options;
 
 /// <summary>
 ///     Configuration object that, optionally, is used to create <see cref="Doc" /> instances.
@@ -6,14 +11,19 @@
 public class DocOptions
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="DocOptions" /> class.
+    /// </summary>
+    public DocOptions()
+    {
+        Id = ClientIdGenerator.Random();
+        ShouldLoad = true;
+        Encoding = DocEncoding.Utf16;
+    }
+
+    /// <summary>
     ///     Gets the default options value used to initialize <see cref="Doc" /> instances.
     /// </summary>
-    internal static DocOptions Default => new()
-    {
-        Id = (ulong) Random.Shared.NextInt64(),
-        ShouldLoad = true,
-        Encoding = DocEncoding.Utf16
-    };
+    public static DocOptions Default => new();
 
     /// <summary>
     ///     Gets the globally unique 53-bit integer assigned to the <see cref="Doc" /> replica as its identifier.
@@ -28,7 +38,7 @@ public class DocOptions
     ///         contain all of that clients updates that were sent to other peers.
     ///     </para>
     /// </remarks>
-    public ulong? Id { get; init; }
+    public ulong Id { get; init; }
 
     /// <summary>
     ///     Gets the globally unique UUID v4 compatible string identifier of this <see cref="Doc" />.
@@ -57,26 +67,44 @@ public class DocOptions
     ///         Read more about the possible values in <see cref="DocEncoding" />.
     ///     </para>
     /// </remarks>
-    public DocEncoding? Encoding { get; init; }
+    public DocEncoding Encoding { get; init; }
 
     /// <summary>
-    ///     Gets the flag that determines whether deleted blocks should be garbage collected during transaction commits.
+    ///     Gets a value indicating whether deleted blocks should be garbage collected during transaction commits.
     /// </summary>
     /// <remarks>
     ///     Setting this value to <c>false</c> means garbage collection will be performed.
     /// </remarks>
-    public bool? SkipGarbageCollection { get; init; }
+    public bool SkipGarbageCollection { get; init; }
 
     /// <summary>
-    ///     Gets the flag that determines whether sub-documents should be loaded automatically.
+    ///     Gets a value indicating whether sub-documents should be loaded automatically.
     /// </summary>
     /// <remarks>
     ///     If this is a sub-document, remote peers will automatically load the <see cref="Doc" /> as well.
     /// </remarks>
-    public bool? AutoLoad { get; init; }
+    public bool AutoLoad { get; init; }
 
     /// <summary>
-    ///     Gets the flag that determines whether the <see cref="Doc" /> should be synchronized by the provider now.
+    ///     Gets a value indicating whether the <see cref="Doc" /> should be synchronized by the provider now.
     /// </summary>
-    public bool? ShouldLoad { get; init; }
+    public bool ShouldLoad { get; init; }
+
+    internal DocOptionsNative ToNative()
+    {
+        // We can never release the memory because y-crdt just receives a pointer to that.
+        var unsafeGuid = MemoryWriter.WriteUtf8String(Guid);
+        var unsafeCollection = MemoryWriter.WriteUtf8String(CollectionId);
+
+        return new DocOptionsNative
+        {
+            Id = Id,
+            Guid = unsafeGuid.Handle,
+            CollectionId = unsafeCollection.Handle,
+            Encoding = (byte) Encoding,
+            SkipGc = (byte) (SkipGarbageCollection ? 1 : 0),
+            AutoLoad = (byte) (AutoLoad ? 1 : 0),
+            ShouldLoad = (byte) (ShouldLoad ? 1 : 0)
+        };
+    }
 }

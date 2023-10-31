@@ -24,7 +24,7 @@ public class UnobserveTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        map.Unobserve(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         map.Insert(transaction, "value2", Input.Long(value: -420L));

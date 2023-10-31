@@ -43,7 +43,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Add));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Insert.String, Is.EqualTo("Lucas"));
@@ -70,7 +70,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Remove));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 2));
         Assert.That(eventDeltas.First().Insert, Is.Null);
@@ -102,7 +102,7 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Retain));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 2));
         Assert.That(eventDeltas.First().Insert, Is.Null);
@@ -130,13 +130,12 @@ public class ObserveTests
 
         // Assert
         Assert.That(eventDeltas, Is.Not.Null);
-        Assert.That(eventDeltas.Length, Is.EqualTo(expected: 1));
+        Assert.That(eventDeltas.Count, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Tag, Is.EqualTo(EventDeltaTag.Add));
         Assert.That(eventDeltas.First().Length, Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Insert.String, Is.EqualTo("Lucas"));
         Assert.That(eventDeltas.First().Attributes.Count(), Is.EqualTo(expected: 1));
         Assert.That(eventDeltas.First().Attributes.First().Key, Is.EqualTo("bold"));
         Assert.That(eventDeltas.First().Attributes.First().Value.Boolean, Is.True);
-        Assert.That(eventDeltas.First().Attributes.First().Value.Long, Is.Null);
     }
 }

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
@@ -7,6 +6,7 @@ using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -16,14 +16,22 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlElement : Branch
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlElement" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal XmlElement(nint handle)
-        : base(handle)
+    private readonly EventSubscriber<XmlElementEvent> onObserve;
+
+    internal XmlElement(nint handle, Doc doc, bool isDeleted)
+        : base(handle, doc, isDeleted)
     {
-        // Nothing here.
+        onObserve = new EventSubscriber<XmlElementEvent>(
+            doc.EventManager,
+            handle,
+            (xmlElement, action) =>
+            {
+                XmlElementChannel.ObserveCallback callback = (_, eventHandle) =>
+                    action(new XmlElementEvent(eventHandle, Doc));
+
+                return (XmlElementChannel.Observe(xmlElement, nint.Zero, callback), callback);
+            },
+            XmlElementChannel.Unobserve);
     }
 
     /// <summary>
@@ -36,11 +44,11 @@ public class XmlElement : Branch
     {
         get
         {
-            var handle = XmlElementChannel.Tag(Handle);
-            var result = Marshal.PtrToStringAnsi(handle);
-            StringChannel.Destroy(handle);
+            ThrowIfDisposed();
 
-            return result;
+            var handle = XmlElementChannel.Tag(Handle);
+
+            return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
         }
     }
 
@@ -54,31 +62,30 @@ public class XmlElement : Branch
     /// <returns>The string representation of the <see cref="XmlElement" /> instance.</returns>
     public string String(Transaction transaction)
     {
-        var handle = XmlElementChannel.String(Handle, transaction.Handle);
-        var result = MemoryReader.ReadUtf8String(handle);
-        StringChannel.Destroy(handle);
+        ThrowIfDisposed();
 
-        return result;
+        var handle = XmlElementChannel.String(Handle, transaction.Handle);
+
+        return MemoryReader.ReadStringAndDestroy(handle.Checked());
     }
 
     /// <summary>
     ///     Inserts an attribute in this <see cref="XmlElement" /> instance.
     /// </summary>
     /// <remarks>
-    ///     If another attribute with the same <see cref="name" /> already exists, it will be replaced.
+    ///     If another attribute with the same <paramref name="name" /> already exists, it will be replaced.
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be added.</param>
     /// <param name="value">The value of the attribute to be added.</param>
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var valueHandle = MemoryWriter.WriteUtf8String(value);
+        ThrowIfDisposed();
 
-        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, nameHandle, valueHandle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
 
-        MemoryWriter.Release(nameHandle);
-        MemoryWriter.Release(valueHandle);
+        XmlElementChannel.InsertAttribute(Handle, transaction.Handle, unsafeName.Handle, unsafeValue.Handle);
     }
 
     /// <summary>
@@ -88,27 +95,28 @@ public class XmlElement : Branch
     /// <param name="name">The name of the attribute to be removed.</param>
     public void RemoveAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        ThrowIfDisposed();
 
-        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, nameHandle);
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        MemoryWriter.Release(nameHandle);
+        XmlElementChannel.RemoveAttribute(Handle, transaction.Handle, unsafeName.Handle);
     }
 
     /// <summary>
-    ///     Gets an attribute with the given <see cref="name" /> from this <see cref="XmlElement" /> instance.
+    ///     Gets an attribute with the given <paramref name="name" /> from this <see cref="XmlElement" /> instance.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="name">The name of the attribute to be retrieved.</param>
     /// <returns>The value of the attribute or <c>null</c> if it doesn't exist.</returns>
     public string? GetAttribute(Transaction transaction, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
-        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, nameHandle);
-        MemoryReader.TryReadUtf8String(handle, out var result);
-        StringChannel.Destroy(handle);
+        ThrowIfDisposed();
 
-        return result;
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
+
+        var handle = XmlElementChannel.GetAttribute(Handle, transaction.Handle, unsafeName.Handle);
+
+        return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
     }
 
     /// <summary>
@@ -117,10 +125,13 @@ public class XmlElement : Branch
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
-    public XmlAttributeIterator? Iterate(Transaction transaction)
+    public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        return ReferenceAccessor.Access(
-            new XmlAttributeIterator(XmlElementChannel.AttributeIterator(Handle, transaction.Handle)));
+        ThrowIfDisposed();
+
+        var handle = XmlElementChannel.AttributeIterator(Handle, transaction.Handle);
+
+        return new XmlAttributeIterator(handle.Checked());
     }
 
     /// <summary>
@@ -134,65 +145,73 @@ public class XmlElement : Branch
     /// <returns>The number of direct child nodes of this <see cref="XmlElement" />.</returns>
     public uint ChildLength(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         return XmlElementChannel.ChildLength(Handle, transaction.Handle);
     }
 
     /// <summary>
     ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
-    ///     <see cref="index" />.
+    ///     <paramref name="index" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
-    /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
-    public XmlText? InsertText(Transaction transaction, uint index)
+    /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
+    public XmlText InsertText(Transaction transaction, uint index)
     {
-        return ReferenceAccessor.Access(
-            new XmlText(XmlElementChannel.InsertText(Handle, transaction.Handle, index)));
+        ThrowIfDisposed();
+
+        var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
+
+        return Doc.GetXmlText(handle, isDeleted: false);
     }
 
     /// <summary>
     ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
-    ///     <see cref="index" />.
+    ///     <paramref name="index" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <param name="name">The name (or tag) of the <see cref="XmlElement" /> that will be inserted.</param>
-    /// <returns>The inserted <see cref="XmlText" /> at the given <see cref="index" />.</returns>
-    public XmlElement? InsertElement(Transaction transaction, uint index, string name)
+    /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
+    public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
-        var nameHandle = MemoryWriter.WriteUtf8String(name);
+        ThrowIfDisposed();
 
-        var result = ReferenceAccessor.Access(
-            new XmlElement(XmlElementChannel.InsertElement(Handle, transaction.Handle, index, nameHandle)));
+        using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        MemoryWriter.Release(nameHandle);
+        var handle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
 
-        return result;
+        return Doc.GetXmlElement(handle, isDeleted: false);
     }
 
     /// <summary>
-    ///     Removes a consecutive range of direct child nodes starting at the <see cref="index" /> through the
-    ///     <see cref="length" />.
+    ///     Removes a consecutive range of direct child nodes starting at the <paramref name="index" /> through the
+    ///     <paramref name="length" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to start removing the child nodes.</param>
-    /// <param name="length">The amount of child nodes to remove, starting at <see cref="index" />.</param>
+    /// <param name="length">The amount of child nodes to remove, starting at <paramref name="index" />.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowIfDisposed();
+
         XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
     }
 
     /// <summary>
-    ///     Returns an <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.
+    ///     Returns an <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to retrieve the <see cref="Output" /> cell.</param>
-    /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <see cref="index" /> is out of bounds.</returns>
+    /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.</returns>
     public Output? Get(Transaction transaction, uint index)
     {
+        ThrowIfDisposed();
+
         var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -207,9 +226,11 @@ public class XmlElement : Branch
     /// </returns>
     public Output? PreviousSibling(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         var handle = XmlChannel.PreviousSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -224,23 +245,11 @@ public class XmlElement : Branch
     /// </returns>
     public Output? NextSibling(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         var handle = XmlChannel.NextSibling(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
-    }
-
-    /// <summary>
-    ///     Returns the parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
-    ///     <c>null</c> if the current node is root-level node.
-    /// </summary>
-    /// <param name="transaction">The transaction that wraps this operation.</param>
-    /// <returns>
-    ///     The parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
-    ///     <c>null</c> if the current node is root-level node.
-    /// </returns>
-    public XmlElement? Parent(Transaction transaction)
-    {
-        return ReferenceAccessor.Access(new XmlElement(XmlElementChannel.Parent(Handle, transaction.Handle)));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
 
     /// <summary>
@@ -254,9 +263,29 @@ public class XmlElement : Branch
     /// </returns>
     public Output? FirstChild(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
 
-        return ReferenceAccessor.Access(new Output(handle, disposable: true));
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
+    }
+
+    /// <summary>
+    ///     Returns the parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
+    ///     <c>null</c> if the current node is root-level node.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this operation.</param>
+    /// <returns>
+    ///     The parent <see cref="XmlElement" /> of the current <see cref="XmlElement" /> node or
+    ///     <c>null</c> if the current node is root-level node.
+    /// </returns>
+    public XmlElement? Parent(Transaction transaction)
+    {
+        ThrowIfDisposed();
+
+        var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
+
+        return handle != nint.Zero ? Doc.GetXmlElement(handle, isDeleted: false) : null;
     }
 
     /// <summary>
@@ -267,9 +296,13 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlElement" />.</returns>
-    public XmlTreeWalker? TreeWalker(Transaction transaction)
+    public XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        return ReferenceAccessor.Access(new XmlTreeWalker(XmlElementChannel.TreeWalker(Handle, transaction.Handle)));
+        ThrowIfDisposed();
+
+        var handle = XmlElementChannel.TreeWalker(Handle, transaction.Handle);
+
+        return new XmlTreeWalker(handle.Checked(), Doc);
     }
 
     /// <summary>
@@ -280,22 +313,10 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="action">The callback to be executed when a <see cref="Transaction" /> is committed.</param>
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
-    public EventSubscription Observe(Action<XmlElementEvent> action)
+    public IDisposable Observe(Action<XmlElementEvent> action)
     {
-        XmlElementChannel.ObserveCallback callback = (_, eventHandle) => action(new XmlElementEvent(eventHandle));
+        ThrowIfDisposed();
 
-        var subscriptionId = XmlElementChannel.Observe(Handle, nint.Zero, callback);
-
-        return new EventSubscription(subscriptionId, callback);
-    }
-
-    /// <summary>
-    ///     Unsubscribes a callback function, represented by an <see cref="EventSubscription" /> instance, that
-    ///     was subscribed via <see cref="Observe" />.
-    /// </summary>
-    /// <param name="subscription">The subscription that represents the callback function to be unobserved.</param>
-    public void Unobserve(EventSubscription subscription)
-    {
-        XmlElementChannel.Unobserve(Handle, subscription.Id);
+        return onObserve.Subscribe(action);
     }
 }

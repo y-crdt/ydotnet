@@ -1,11 +1,10 @@
 using System.Runtime.InteropServices;
-using YDotNet.Document;
-using YDotNet.Document.Events;
+using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.Events;
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct SubDocsEventNative
+internal readonly struct SubDocsEventNative
 {
     public uint AddedLength { get; }
 
@@ -13,33 +12,39 @@ internal struct SubDocsEventNative
 
     public uint LoadedLength { get; }
 
-    public nint Added { get; }
+    public nint AddedHandle { get; }
 
-    public nint Removed { get; }
+    public nint RemovedHandle { get; }
 
-    public nint Loaded { get; }
+    public nint LoadedHandle { get; }
 
-    public SubDocsEvent ToSubDocsEvent()
+    public nint[] Added()
     {
-        var added = new Doc[AddedLength];
-        var removed = new Doc[RemovedLength];
-        var loaded = new Doc[LoadedLength];
-
-        for (var i = 0; i < AddedLength; i++)
+        if (AddedHandle == nint.Zero || AddedLength == 0)
         {
-            added[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Added, i * nint.Size)));
+            return Array.Empty<nint>();
         }
 
-        for (var i = 0; i < RemovedLength; i++)
+        return MemoryReader.ReadStructs<nint>(AddedHandle, AddedLength);
+    }
+
+    public nint[] Removed()
+    {
+        if (RemovedHandle == nint.Zero || RemovedLength == 0)
         {
-            removed[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Removed, i * nint.Size)));
+            return Array.Empty<nint>();
         }
 
-        for (var i = 0; i < LoadedLength; i++)
+        return MemoryReader.ReadStructs<nint>(RemovedHandle, RemovedLength);
+    }
+
+    public nint[] Loaded()
+    {
+        if (LoadedHandle == nint.Zero || LoadedLength == 0)
         {
-            loaded[i] = new Doc(DocChannel.Clone(Marshal.ReadIntPtr(Loaded, i * nint.Size)));
+            return Array.Empty<nint>();
         }
 
-        return new SubDocsEvent(added, removed, loaded);
+        return MemoryReader.ReadStructs<nint>(LoadedHandle, LoadedLength);
     }
 }

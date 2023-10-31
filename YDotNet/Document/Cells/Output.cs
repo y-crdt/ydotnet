@@ -1,11 +1,10 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Cells.Outputs;
-using YDotNet.Native.Types.Maps;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document.Cells;
@@ -13,198 +12,188 @@ namespace YDotNet.Document.Cells;
 /// <summary>
 ///     Represents a cell used to read information from the storage.
 /// </summary>
-public class Output : IDisposable
+public sealed class Output
 {
-    private readonly bool disposable;
+    private readonly object? value;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Output" /> class.
-    /// </summary>
-    /// <param name="handle">The pointer to the native resource that represents the storage.</param>
-    /// <param name="disposable">
-    ///     The flag determines if the resource associated with <see cref="Handle" /> should be disposed
-    ///     by this <see cref="Output" /> instance.
-    /// </param>
-    internal Output(nint handle, bool disposable = false)
+    internal Output(nint handle, Doc doc, bool isDeleted)
     {
-        this.disposable = disposable;
+        var native = MemoryReader.ReadStruct<OutputNative>(handle);
 
-        Handle = handle;
-        OutputNative = handle == nint.Zero ? null : Marshal.PtrToStructure<OutputNative>(handle);
+        Tag = (OutputTag) native.Tag;
+
+        value = BuildValue(handle, native.Length, doc, isDeleted, Tag);
     }
 
     /// <summary>
-    ///     Gets the <see cref="OutputType" /> value that represents the value stored in this cell.
+    ///     Gets the type of the output.
     /// </summary>
-    public OutputType Type => (OutputType) OutputNative.Value.Tag;
+    public OutputTag Tag { get; }
 
     /// <summary>
-    ///     Gets the <see cref="Doc" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="Doc" /> value.
     /// </summary>
-    public Doc? Doc => ReferenceAccessor.Access(new Doc(OutputChannel.Doc(Handle), disposable: false));
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public Doc Doc => GetValue<Doc>(OutputTag.Doc);
 
     /// <summary>
-    ///     Gets the <see cref="string" /> or <c>null</c> if this output cell contains a different type stored.
+    ///     Gets the <see cref="string" /> value.
     /// </summary>
-    public string? String
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public string String => GetValue<string>(OutputTag.String);
+
+#pragma warning disable SA1623 // This property documentation shouldn't start with the standard text
+    /// <summary>
+    ///     Gets the <see cref="bool" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="string" />.</exception>
+    public bool Boolean => GetValue<bool>(OutputTag.Boolean);
+#pragma warning restore SA1623
+
+    /// <summary>
+    ///     Gets the <see cref="double" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="double" />.</exception>
+    public double Double => GetValue<double>(OutputTag.Double);
+
+    /// <summary>
+    ///     Gets the <see cref="long" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="long" />.</exception>
+    public long Long => GetValue<long>(OutputTag.Long);
+
+    /// <summary>
+    ///     Gets the <see cref="byte" /> array value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="byte" /> array.</exception>
+    public byte[] Bytes => GetValue<byte[]>(OutputTag.Bytes);
+
+    /// <summary>
+    ///     Gets the <see cref="Output" /> collection.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Output" /> collection.</exception>
+    public JsonArray JsonArray => GetValue<JsonArray>(OutputTag.JsonArray);
+
+    /// <summary>
+    ///     Gets the value as json object.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a json object.</exception>
+    public JsonObject JsonObject => GetValue<JsonObject>(OutputTag.JsonObject);
+
+    /// <summary>
+    ///     Gets the <see cref="Array" /> value.
+    /// </summary>
+    /// <returns>The resolved array.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Array" />.</exception>
+    public Array Array => GetValue<Array>(OutputTag.Array);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved map.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Map Map => GetValue<Map>(OutputTag.Map);
+
+    /// <summary>
+    ///     Gets the <see cref="Map" /> value.
+    /// </summary>
+    /// <returns>The resolved text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Map" />.</exception>
+    public Text Text => GetValue<Text>(OutputTag.Text);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlElement" /> value.
+    /// </summary>
+    /// <returns>The resolved xml element.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlElement" />.</exception>
+    public XmlElement XmlElement => GetValue<XmlElement>(OutputTag.XmlElement);
+
+    /// <summary>
+    ///     Gets the <see cref="XmlText" /> value.
+    /// </summary>
+    /// <returns>The resolved xml text.</returns>
+    /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
+    public XmlText XmlText => GetValue<XmlText>(OutputTag.XmlText);
+
+    /// <summary>
+    ///     Gets a value indicating whether this cell contains the value <see cref="OutputTag.Undefined" />.
+    /// </summary>
+    public bool Undefined => Tag == OutputTag.Undefined;
+
+    /// <summary>
+    ///     Gets a value indicating whether this cell contains the value <see cref="OutputTag.Null" />.
+    /// </summary>
+    public bool Null => Tag == OutputTag.Null;
+
+    internal static Output CreateAndRelease(nint handle, Doc doc)
     {
-        get
-        {
-            MemoryReader.TryReadUtf8String(OutputChannel.String(Handle), out var result);
+        var result = new Output(handle, doc, isDeleted: false);
 
-            return result;
-        }
+        // The output reads everything so we can just destroy it.
+        OutputChannel.Destroy(handle);
+
+        return result;
     }
 
-    /// <summary>
-    ///     Gets the <see cref="bool" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public bool? Boolean
+    private static object? BuildValue(nint handle, uint length, Doc doc, bool isDeleted, OutputTag tag)
     {
-        get
+        switch (tag)
         {
-            var value = OutputChannel.Boolean(Handle);
+            case OutputTag.Boolean:
+                return MemoryReader.ReadStruct<byte>(OutputChannel.Boolean(handle).Checked()) == 1;
 
-            return value == nint.Zero ? null : Marshal.PtrToStructure<byte>(value) == 1;
-        }
-    }
+            case OutputTag.Double:
+                return MemoryReader.ReadStruct<double>(OutputChannel.Double(handle).Checked());
 
-    /// <summary>
-    ///     Gets the <see cref="double" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public double? Double
-    {
-        get
-        {
-            var value = OutputChannel.Double(Handle);
+            case OutputTag.Long:
+                return MemoryReader.ReadStruct<long>(OutputChannel.Long(handle).Checked());
 
-            return value == nint.Zero ? null : Marshal.PtrToStructure<double>(value);
-        }
-    }
+            case OutputTag.String:
+                return MemoryReader.ReadUtf8String(OutputChannel.String(handle).Checked());
 
-    /// <summary>
-    ///     Gets the <see cref="long" /> or <c>null</c> if this output cell contains a different type stored.
-    /// </summary>
-    public long? Long
-    {
-        get
-        {
-            var value = OutputChannel.Long(Handle);
+            case OutputTag.Bytes:
+                return MemoryReader.ReadBytes(OutputChannel.Bytes(handle).Checked(), length);
 
-            return value == nint.Zero ? null : Marshal.PtrToStructure<long>(value);
-        }
-    }
+            case OutputTag.JsonArray:
+                return new JsonArray(handle, length, doc, isDeleted);
 
-    /// <summary>
-    ///     Gets the <see cref="byte" /> array or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public byte[]? Bytes => MemoryReader.TryReadBytes(OutputChannel.Bytes(Handle), OutputNative.Value.Length);
+            case OutputTag.JsonObject:
+                return new JsonObject(handle, length, doc, isDeleted);
 
-    /// <summary>
-    ///     Gets the <see cref="Input" /> collection or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public Output[]? Collection =>
-        MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Collection(Handle), OutputNative.Value.Length, Marshal.SizeOf<OutputNative>())
-            ?.Select(x => new Output(x))
-            .ToArray();
+            case OutputTag.Array:
+                return doc.GetArray(OutputChannel.Array(handle), isDeleted);
 
-    /// <summary>
-    ///     Gets the <see cref="Input" /> dictionary or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public IDictionary<string, Output>? Object
-    {
-        get
-        {
-            var handles = MemoryReader.TryReadIntPtrArray(
-                OutputChannel.Object(Handle), OutputNative.Value.Length, Marshal.SizeOf<MapEntryNative>());
+            case OutputTag.Map:
+                return doc.GetMap(OutputChannel.Map(handle), isDeleted);
 
-            if (handles == null)
-            {
+            case OutputTag.Text:
+                return doc.GetText(OutputChannel.Text(handle), isDeleted);
+
+            case OutputTag.XmlElement:
+                return doc.GetXmlElement(OutputChannel.XmlElement(handle), isDeleted);
+
+            case OutputTag.XmlText:
+                return doc.GetXmlText(OutputChannel.XmlText(handle), isDeleted);
+
+            case OutputTag.Doc:
+                return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
+
+            case OutputTag.Null:
+            case OutputTag.Undefined:
                 return null;
-            }
 
-            var result = new Dictionary<string, Output>();
-
-            foreach (var handle in handles)
-            {
-                var (mapEntry, outputHandle) = MemoryReader.ReadMapEntryAndOutputHandle(handle);
-                var mapEntryKey = MemoryReader.ReadUtf8String(mapEntry.Field);
-
-                result[mapEntryKey] = new Output(outputHandle);
-            }
-
-            return result;
+            default:
+                throw new YDotNetException($"Unsupported OutputTag value: {tag}");
         }
     }
 
-    /// <summary>
-    ///     Gets a value indicating whether this output cell contains a <c>null</c> value.
-    /// </summary>
-    public bool Null => OutputChannel.Null(Handle) == 1;
-
-    /// <summary>
-    ///     Gets a value indicating whether this output cell contains an <c>undefined</c> value.
-    /// </summary>
-    public bool Undefined => OutputChannel.Undefined(Handle) == 1;
-
-    /// <summary>
-    ///     Gets the <see cref="Array" /> or <c>null</c> if this output cells contains a different type stored.
-    /// </summary>
-    public Array? Array => ReferenceAccessor.Access(new Array(OutputChannel.Array(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Maps.Map" /> or <c>null</c> if this output cells contains a different
-    ///     type stored.
-    /// </summary>
-    public Map? Map => ReferenceAccessor.Access(new Map(OutputChannel.Map(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.Texts.Text" /> or <c>null</c> if this output cells contains a different
-    ///     type
-    ///     stored.
-    /// </summary>
-    public Text? Text => ReferenceAccessor.Access(new Text(OutputChannel.Text(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlElements.XmlElement" /> or <c>null</c> if this output cells contains
-    ///     a different type stored.
-    /// </summary>
-    public XmlElement? XmlElement => ReferenceAccessor.Access(new XmlElement(OutputChannel.XmlElement(Handle)));
-
-    /// <summary>
-    ///     Gets the <see cref="YDotNet.Document.Types.XmlTexts.XmlText" /> or <c>null</c> if this output cells contains a
-    ///     different type stored.
-    /// </summary>
-    public XmlText? XmlText => ReferenceAccessor.Access(new XmlText(OutputChannel.XmlText(Handle)));
-
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
-    ///     Gets the native output cell represented by this cell.
-    /// </summary>
-    private OutputNative? OutputNative { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private T GetValue<T>(OutputTag expectedType)
     {
-        if (!disposable)
+        if (value is not T typed)
         {
-            return;
+            throw new YDotNetException($"Expected {expectedType}, got {Tag}.");
         }
 
-        OutputChannel.Destroy(Handle);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="Output" /> class.
-    /// </summary>
-    ~Output()
-    {
-        Dispose();
+        return typed;
     }
 }

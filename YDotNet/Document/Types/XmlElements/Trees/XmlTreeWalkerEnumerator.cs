@@ -10,50 +10,51 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </summary>
 internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
 {
+    private readonly XmlTreeWalker treeWalker;
+    private Output? current;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
     /// </summary>
     /// <param name="treeWalker">
-    ///     The <see cref="TreeWalker" /> instance used by this enumerator.
-    ///     Check <see cref="TreeWalker" /> for more details.
+    ///     The <see cref="XmlTreeWalker" /> instance used by this enumerator.
+    ///     Check <see cref="XmlTreeWalker" /> for more details.
     /// </param>
     public XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker)
     {
-        TreeWalker = treeWalker;
-        Current = null;
+        this.treeWalker = treeWalker;
     }
 
-    /// <summary>
-    ///     Gets the <see cref="TreeWalker" /> instance that holds the
-    ///     <see cref="XmlTreeWalker.Handle" /> used by this enumerator.
-    /// </summary>
-    private XmlTreeWalker TreeWalker { get; }
+    /// <inheritdoc />
+    public Output Current => current!;
 
     /// <inheritdoc />
-    public Output? Current { get; private set; }
+    object IEnumerator.Current => current!;
 
     /// <inheritdoc />
-    object? IEnumerator.Current => Current;
+    public void Dispose()
+    {
+        treeWalker.Dispose();
+    }
 
     /// <inheritdoc />
     public bool MoveNext()
     {
-        var handle = XmlElementChannel.TreeWalkerNext(TreeWalker.Handle);
+        var handle = XmlElementChannel.TreeWalkerNext(treeWalker.Handle);
 
-        Current = handle != nint.Zero ? new Output(handle) : null;
+        if (handle != nint.Zero)
+        {
+            current = Output.CreateAndRelease(handle, treeWalker.Doc);
+            return true;
+        }
 
-        return Current != null;
+        current = null!;
+        return false;
     }
 
     /// <inheritdoc />
     public void Reset()
     {
         throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        TreeWalker.Dispose();
     }
 }

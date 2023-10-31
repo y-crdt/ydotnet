@@ -5,15 +5,21 @@ namespace YDotNet.Native.Transaction;
 internal static class TransactionChannel
 {
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_commit")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_commit")]
     public static extern nint Commit(nint transaction);
 
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_subdocs")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_subdocs")]
     public static extern nint SubDocs(nint transaction, out uint length);
 
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_writeable")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_writeable")]
     public static extern byte Writeable(nint transaction);
 
     [DllImport(
@@ -43,21 +49,27 @@ internal static class TransactionChannel
         out uint length);
 
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_apply")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_apply")]
     public static extern byte ApplyV1(
         nint transaction,
         byte[] stateDiff,
         uint stateDiffLength);
 
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_apply_v2")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_apply_v2")]
     public static extern byte ApplyV2(
         nint transaction,
         byte[] stateDiff,
         uint stateDiffLength);
 
     [DllImport(
-        ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytransaction_snapshot")]
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_snapshot")]
     public static extern nint Snapshot(nint transaction, out uint length);
 
     [DllImport(
@@ -80,6 +92,9 @@ internal static class TransactionChannel
         uint snapshotLength,
         out uint length);
 
-    [DllImport(ChannelSettings.NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ytype_get")]
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytype_get")]
     public static extern nint Get(nint transaction, nint name);
 }

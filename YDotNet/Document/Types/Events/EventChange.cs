@@ -1,4 +1,5 @@
 using YDotNet.Document.Cells;
+using YDotNet.Native.Types.Events;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -7,20 +8,19 @@ namespace YDotNet.Document.Types.Events;
 /// </summary>
 public class EventChange
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventChange" /> class.
-    /// </summary>
-    /// <param name="tag">The type of change represented by this instance.</param>
-    /// <param name="length">The amount of elements affected by the current change.</param>
-    /// <param name="values">
-    ///     Optional, the values affected by the current change if <see cref="Tag" /> is
-    ///     <see cref="EventChangeTag.Add" />.
-    /// </param>
-    public EventChange(EventChangeTag tag, uint length, IEnumerable<Output>? values)
+    internal EventChange(EventChangeNative native, Doc doc)
     {
-        Tag = tag;
-        Length = length;
-        Values = values;
+        Length = native.Length;
+
+        Tag = native.TagNative switch
+        {
+            EventChangeTagNative.Add => EventChangeTag.Add,
+            EventChangeTagNative.Remove => EventChangeTag.Remove,
+            EventChangeTagNative.Retain => EventChangeTag.Retain,
+            _ => throw new NotSupportedException($"The value \"{native.TagNative}\" for {nameof(EventChangeTagNative)} is not supported."),
+        };
+
+        Values = native.ValuesHandles.Select(x => new Output(x, doc, false)).ToList();
     }
 
     /// <summary>
@@ -36,5 +36,5 @@ public class EventChange
     /// <summary>
     ///     Gets the values that were affected by this change.
     /// </summary>
-    public IEnumerable<Output>? Values { get; }
+    public IReadOnlyList<Output> Values { get; }
 }

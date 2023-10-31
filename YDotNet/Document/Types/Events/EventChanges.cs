@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 using YDotNet.Native.Types.Events;
@@ -9,51 +8,25 @@ namespace YDotNet.Document.Types.Events;
 /// <summary>
 ///     Represents a collection of <see cref="EventChange" /> instances.
 /// </summary>
-public class EventChanges : IEnumerable<EventChange>, IDisposable
+public class EventChanges : ReadOnlyCollection<EventChange>
 {
-    private readonly IEnumerable<EventChange> collection;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="EventChanges" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    /// <param name="length">The length of the array of <see cref="EventChange" /> to read from <see cref="Handle" />.</param>
-    public EventChanges(nint handle, uint length)
+    internal EventChanges(nint handle, uint length, Doc doc)
+        : base(ReadItems(handle, length, doc))
     {
-        Handle = handle;
-        Length = length;
-
-        collection = MemoryReader.TryReadIntPtrArray(Handle, Length, Marshal.SizeOf<EventChangeNative>())!
-            .Select(Marshal.PtrToStructure<EventChangeNative>)
-            .Select(x => x.ToEventChange())
-            .ToArray();
     }
 
-    /// <summary>
-    ///     Gets the handle to the native resource.
-    /// </summary>
-    internal nint Handle { get; }
-
-    /// <summary>
-    ///     Gets the length of the native resource.
-    /// </summary>
-    internal uint Length { get; }
-
-    /// <inheritdoc />
-    public void Dispose()
+    private static IList<EventChange> ReadItems(nint handle, uint length, Doc doc)
     {
-        EventChannel.DeltaDestroy(Handle, Length);
-    }
+        var result = new List<EventChange>();
 
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+        foreach (var native in MemoryReader.ReadStructs<EventChangeNative>(handle, length))
+        {
+            result.Add(new EventChange(native, doc));
+        }
 
-    /// <inheritdoc />
-    public IEnumerator<EventChange> GetEnumerator()
-    {
-        return collection.GetEnumerator();
+        // We are done reading and can destroy the resource.
+        EventChannel.DeltaDestroy(handle, length);
+
+        return result;
     }
 }

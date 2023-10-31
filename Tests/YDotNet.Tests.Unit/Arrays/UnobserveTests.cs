@@ -24,7 +24,7 @@ public class UnobserveTests
         Assert.That(called, Is.EqualTo(expected: 1));
 
         // Act
-        array.Unobserve(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         array.InsertRange(transaction, index: 0, new[] { Input.Long(value: -420L) });

@@ -1,3 +1,5 @@
+using YDotNet.Native.Document.State;
+
 namespace YDotNet.Document.State;
 
 /// <summary>
@@ -5,17 +7,23 @@ namespace YDotNet.Document.State;
 /// </summary>
 public class DeleteSet
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DeleteSet" /> class.
-    /// </summary>
-    /// <param name="ranges">The initial value for <see cref="Ranges" />.</param>
-    public DeleteSet(Dictionary<ulong, IdRange[]> ranges)
+    internal DeleteSet(DeleteSetNative native)
     {
+        var allClients = native.Clients();
+        var allRanges = native.Ranges();
+
+        var ranges = new Dictionary<ulong, IdRange[]>();
+
+        for (var i = 0; i < native.EntriesCount; i++)
+        {
+            ranges.Add(allClients[i], allRanges[i].Sequence().Select(IdRange.Create).ToArray());
+        }
+
         Ranges = ranges;
     }
 
     /// <summary>
     ///     Gets dictionary of unique client identifiers (keys) by their deleted ID ranges (values).
     /// </summary>
-    public Dictionary<ulong, IdRange[]> Ranges { get; }
+    public IReadOnlyDictionary<ulong, IdRange[]> Ranges { get; }
 }

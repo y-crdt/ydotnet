@@ -1,0 +1,58 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'for-pr'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          # Windows
+          - build: win-x64
+            os: windows-latest
+            
+            # Linux
+          - build: linux-x64
+            os: ubuntu-latest
+
+          - build: linux-x64-musl
+            os: ubuntu-latest
+
+          # macOS
+          - build: macos
+            os: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          path: ./output
+          workflow: build-binaries.yml
+          workflow_conclusion: success
+          name: ${{ matrix.build }}
+          name_is_regexp: true
+
+      - name: Copy binaries
+        run: |
+          cp output/${{ matrix.build }}/*.* YDotNet
+
+      - name: Build tests
+        run: |
+          cd Tests/YDotNet.Tests.Unit
+          dotnet build
+
+      - name: Run tests
+        run: |
+          dotnet test
+        env:
+          RUST_BACKTRACE: 1

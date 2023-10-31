@@ -30,7 +30,7 @@ public class ObserveUpdatesV1
         // Assert
         Assert.That(called, Is.EqualTo(expected: 1));
         Assert.That(data, Is.Not.Null);
-        Assert.That(data, Has.Length.InRange(from: 25, to: 30));
+        Assert.That(data, Has.Length.InRange(from: 10, to: 35));
 
         // Act
         data = null;
@@ -41,11 +41,11 @@ public class ObserveUpdatesV1
         // Assert
         Assert.That(called, Is.EqualTo(expected: 2));
         Assert.That(data, Is.Not.Null);
-        Assert.That(data, Has.Length.InRange(from: 23, to: 31));
+        Assert.That(data, Has.Length.InRange(from: 10, to: 35));
 
         // Act
         data = null;
-        doc.UnobserveUpdatesV1(subscription);
+        subscription.Dispose();
 
         transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "The ");

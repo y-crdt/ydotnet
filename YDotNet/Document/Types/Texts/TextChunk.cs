@@ -1,9 +1,6 @@
-using System.Runtime.InteropServices;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Types.Maps;
-using YDotNet.Infrastructure;
-using YDotNet.Native.Cells.Outputs;
-using YDotNet.Native.Types.Maps;
+using YDotNet.Native;
+using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.Texts;
 
@@ -12,33 +9,27 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class TextChunk
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TextChunk" /> class.
-    /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
-    internal TextChunk(nint handle)
+    internal TextChunk(NativeWithHandle<TextChunkNative> native, Doc doc)
     {
-        Data = new Output(handle);
+        // `Handle` is used because the `OutputNative` is located at the head of `TextChunkNative`.
+        Data = new Output(native.Handle, doc, isDeleted: false);
 
-        var offset = Marshal.SizeOf<OutputNative>();
-        var attributesLength = (uint) Marshal.ReadInt32(handle + offset);
-        var attributesHandle = Marshal.ReadIntPtr(handle + offset + MemoryConstants.PointerSize);
-
-        Attributes = MemoryReader.TryReadIntPtrArray(
-                             attributesHandle, attributesLength, Marshal.SizeOf<MapEntryNative>())
-                         ?.Select(x => new MapEntry(x))
-                         .ToArray() ??
-                     Enumerable.Empty<MapEntry>();
+        Attributes = native.Value.Attributes()
+            .ToDictionary(
+                x => x.Value.Key(),
+                x => new Output(x.Value.ValueHandle(x.Handle), doc, isDeleted: false));
     }
 
     /// <summary>
     ///     Gets the piece of <see cref="Text" /> formatted using the same attributes.
-    ///     It can be a string, embedded object or another shared type.
     /// </summary>
+    /// <remarks>
+    ///     It can be a string, embedded object or another shared type.
+    /// </remarks>
     public Output Data { get; }
 
     /// <summary>
     ///     Gets the formatting attributes applied to the <see cref="Data" />.
     /// </summary>
-    public IEnumerable<MapEntry> Attributes { get; }
+    public IReadOnlyDictionary<string, Output> Attributes { get; }
 }

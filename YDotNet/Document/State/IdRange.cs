@@ -1,28 +1,14 @@
+using YDotNet.Native.Document.State;
+
 namespace YDotNet.Document.State;
 
 /// <summary>
 ///     Represents a single space of clock values, belonging to the same client.
 /// </summary>
-public class IdRange
+public sealed record IdRange(uint Start, uint End)
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="IdRange" /> class.
-    /// </summary>
-    /// <param name="start">The value for <see cref="Start" />.</param>
-    /// <param name="end">The value for <see cref="End" />.</param>
-    public IdRange(uint start, uint end)
+    internal static IdRange Create(IdRangeNative native)
     {
-        Start = start;
-        End = end;
+        return new IdRange(native.Start, native.End);
     }
-
-    /// <summary>
-    ///     The start of the <see cref="IdRange" />.
-    /// </summary>
-    public uint Start { get; }
-
-    /// <summary>
-    ///     The end of the <see cref="IdRange" />.
-    /// </summary>
-    public uint End { get; }
 }
