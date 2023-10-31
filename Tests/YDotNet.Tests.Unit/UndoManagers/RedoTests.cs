@@ -58,7 +58,7 @@ public class RedoTests
                     { "bold", Input.Boolean(value: true) }
                 }));
         transaction.Commit();
-        undoManager.Redo();
+        undoManager.Undo();
         result = undoManager.Redo();
 
         transaction = doc.ReadTransaction();
@@ -67,7 +67,7 @@ public class RedoTests
 
         // Assert
         Assert.That(chunks.Length, Is.EqualTo(expected: 3));
-        Assert.That(result, Is.False);
+        Assert.That(result, Is.True);
 
         // Act (remove, undo, and redo)
         transaction = doc.WriteTransaction();
@@ -97,18 +97,12 @@ public class RedoTests
         var transaction = doc.WriteTransaction();
         array.InsertRange(
             transaction,
-            index: 0,
-            new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L),
-                Input.String("Lucas")
-            });
+            index: 0, Input.Boolean(value: true), Input.Long(value: 2469L), Input.String("Lucas"));
         transaction.Commit();
 
         // Act (add, undo, and redo)
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        array.InsertRange(transaction, index: 3, Input.Undefined());
         transaction.Commit();
         undoManager.Undo();
         var result = undoManager.Redo();

@@ -8,6 +8,7 @@ namespace YDotNet.Tests.Unit.UndoManagers;
 public class UndoTests
 {
     [Test]
+    [Ignore("Waiting for fix on yffi.")]
     public void ReturnsFalseWhenNoChangesApplied()
     {
         // Arrange
@@ -82,7 +83,7 @@ public class UndoTests
     }
 
     [Test]
-    [Ignore("There seems to be a bug in y-crdt.")]
+    [Ignore("Waiting for fix on yffi.")]
     public void UndoAddingAndUpdatingAndRemovingContentOnArray()
     {
         // Arrange
@@ -92,18 +93,12 @@ public class UndoTests
         var transaction = doc.WriteTransaction();
         array.InsertRange(
             transaction,
-            index: 0,
-            new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L),
-                Input.String("Lucas")
-            });
+            index: 0, Input.Boolean(value: true), Input.Long(value: 2469L), Input.String("Lucas"));
         transaction.Commit();
 
         // Act (add and undo)
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 3, new[] { Input.Undefined() });
+        array.InsertRange(transaction, index: 3, Input.Undefined());
         transaction.Commit();
         var result = undoManager.Undo();
 
