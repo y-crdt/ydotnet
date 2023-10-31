@@ -152,7 +152,11 @@ public class Transaction : UnmanagedResource
     /// </returns>
     public byte[] StateDiffV2(byte[] stateVector)
     {
-        var handle = TransactionChannel.StateDiffV2(Handle, stateVector, (uint) stateVector.Length, out var length);
+        var handle = TransactionChannel.StateDiffV2(
+            Handle,
+            stateVector,
+            (uint) (stateVector != null ? stateVector.Length : 0),
+            out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
