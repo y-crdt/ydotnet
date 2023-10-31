@@ -115,6 +115,16 @@ public sealed class Output
     /// <exception cref="YDotNetException">Value is not a <see cref="XmlText" />.</exception>
     public XmlText XmlText => GetValue<XmlText>(OutputTag.XmlText);
 
+    /// <summary>
+    ///     Gets a value indicating whether this cell contains the value <see cref="OutputTag.Undefined" />.
+    /// </summary>
+    public bool Undefined => Tag == OutputTag.Undefined;
+
+    /// <summary>
+    ///     Gets a value indicating whether this cell contains the value <see cref="OutputTag.Null" />.
+    /// </summary>
+    public bool Null => Tag == OutputTag.Null;
+
     internal static Output CreateAndRelease(nint handle, Doc doc)
     {
         var result = new Output(handle, doc, isDeleted: false);
