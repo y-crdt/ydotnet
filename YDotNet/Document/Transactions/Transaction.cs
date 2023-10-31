@@ -112,16 +112,16 @@ public class Transaction : UnmanagedResource
     ///     </para>
     /// </remarks>
     /// <param name="stateVector">
-    ///     The state vector to be used as base for comparison and generation of the difference.
+    ///     The optional state vector to be used as base for comparison and generation of the difference.
     /// </param>
     /// <returns>
     ///     The lib0 v1 encoded state difference between the <see cref="Doc" /> of this <see cref="Transaction" /> and the
     ///     remote <see cref="Doc" />.
     /// </returns>
-    public byte[] StateDiffV1(byte[] stateVector)
+    public byte[] StateDiffV1(byte[]? stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(
-            Handle, stateVector, (uint) (stateVector != null ? stateVector.Length : 0), out var length);
+            Handle, stateVector, (uint) (stateVector?.Length ?? 0), out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
@@ -144,18 +144,18 @@ public class Transaction : UnmanagedResource
     ///     </para>
     /// </remarks>
     /// <param name="stateVector">
-    ///     The state vector to be used as base for comparison and generation of the difference.
+    ///     The optional state vector to be used as base for comparison and generation of the difference.
     /// </param>
     /// <returns>
     ///     The lib0 v2 encoded state difference between the <see cref="Doc" /> of this <see cref="Transaction" /> and the
     ///     remote <see cref="Doc" />.
     /// </returns>
-    public byte[] StateDiffV2(byte[] stateVector)
+    public byte[] StateDiffV2(byte[]? stateVector)
     {
         var handle = TransactionChannel.StateDiffV2(
             Handle,
             stateVector,
-            (uint) (stateVector != null ? stateVector.Length : 0),
+            (uint) (stateVector?.Length ?? 0),
             out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
