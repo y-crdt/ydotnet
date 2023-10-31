@@ -1,7 +1,6 @@
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
-using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps.Events;
@@ -21,7 +20,7 @@ public class MapEvent : UnmanagedResource
         path = new Lazy<EventPath>(
             () =>
             {
-                var pathHandle = ArrayChannel.ObserveEventPath(handle, out var length).Checked();
+                var pathHandle = MapChannel.ObserveEventPath(handle, out var length).Checked();
 
                 return new EventPath(pathHandle, length);
             });
