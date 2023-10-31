@@ -11,7 +11,8 @@ public class TextChunk
 {
     internal TextChunk(NativeWithHandle<TextChunkNative> native, Doc doc)
     {
-        Data = new Output(native.Value.Data, doc, isDeleted: false);
+        // `Handle` is used because the `OutputNative` is located at the head of `TextChunkNative`.
+        Data = new Output(native.Handle, doc, isDeleted: false);
 
         Attributes = native.Value.Attributes()
             .ToDictionary(
