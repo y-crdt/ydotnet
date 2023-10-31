@@ -53,6 +53,7 @@ public class GetTests
         // Assert
         Assert.That(output, Is.Not.Null);
         Assert.That(output.Tag, Is.EqualTo(OutputTag.Undefined));
+        Assert.That(output.Undefined, Is.True);
     }
 
     [Test]
@@ -113,12 +114,7 @@ public class GetTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true),
-                Input.Undefined(),
-                Input.String("Lucas")
-            });
+            transaction, index: 0, Input.Boolean(value: true), Input.Undefined(), Input.String("Lucas"));
         transaction.Commit();
 
         return (doc, array);
