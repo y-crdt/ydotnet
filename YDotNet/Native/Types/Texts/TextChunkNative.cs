@@ -10,8 +10,8 @@ internal readonly struct TextChunkNative
 {
     public const int Size = OutputNative.Size + 8 + 8;
 
-    [field: FieldOffset(0)]
-    public nint Data { get; }
+    [field: FieldOffset(offset: 0)]
+    public OutputNative Data { get; }
 
     [field: FieldOffset(OutputNative.Size)]
     public uint AttributesLength { get; }
