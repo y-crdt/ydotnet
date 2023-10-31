@@ -168,6 +168,10 @@ public sealed class Output
             case OutputTag.Doc:
                 return doc.GetDoc(OutputChannel.Doc(handle), isDeleted);
 
+            case OutputTag.Null:
+            case OutputTag.Undefined:
+                return null;
+
             default:
                 throw new YDotNetException($"Unsupported OutputTag value: {tag}");
         }
