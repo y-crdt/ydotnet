@@ -1,3 +1,9 @@
+# Authors:
+#
+# Sam Gold <https://github.com/goldsam>
+# Sebastian Stehle <https://github.com/SebastianStehle>
+# Lucas Viana <https://github.com/LSViana>
+
 name: Test
 
 on:
