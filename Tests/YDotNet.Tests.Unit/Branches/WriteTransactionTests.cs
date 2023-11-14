@@ -81,7 +81,6 @@ public class WriteTransactionTests
     }
 
     [Test]
-    [Ignore("Still buggy in y-crdt")]
     public void GetRootMapWithOpenBranchTransactionNotAllowed()
     {
         // Arrange
