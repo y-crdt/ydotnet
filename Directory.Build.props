@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Authors>lsviana, sebastianstehle, goldsam</Authors>
     <Copyright>MIT</Copyright>
-    <Description>YDotNet provides cross=platform .Net bindings for the Yrs Rust port of Yjs.</Description>
+    <Description>YDotNet provides cross-platform .NET bindings for Yrs (Rust port of Yjs).</Description>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
