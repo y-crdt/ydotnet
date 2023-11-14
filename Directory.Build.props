@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Authors>lsvviana, sebastianstehle</Authors>
+    <Authors>lsviana, sebastianstehle</Authors>
     <Copyright>MIT</Copyright>
     <Description>YDotNet provides cross=platform .Net bindings for the Yrs Rust port of Yjs.</Description>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
