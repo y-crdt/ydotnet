@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Authors>lsviana, sebastianstehle</Authors>
+    <Authors>lsviana, sebastianstehle, goldsam</Authors>
     <Copyright>MIT</Copyright>
     <Description>YDotNet provides cross=platform .Net bindings for the Yrs Rust port of Yjs.</Description>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -14,5 +14,5 @@
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup> 
+  </PropertyGroup>
 </Project>
