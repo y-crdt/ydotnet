@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/LSViana/YDotNet</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>0.2.9</Version>
   </PropertyGroup>
 
