@@ -36,10 +36,9 @@ public class Chunks : ITask
                 transaction.Commit();
 
                 transaction = doc.ReadTransaction();
-                var chunks = text.Chunks(transaction);
+                text.Chunks(transaction);
                 transaction.Commit();
 
-                chunks.Dispose();
                 doc.Dispose();
 
                 count++;

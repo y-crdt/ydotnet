@@ -35,10 +35,10 @@ public class Observe : ITask
                 var subscription = array.Observe(_ => { });
 
                 var transaction = doc.WriteTransaction();
-                array.InsertRange(transaction, index: 0, new[] { Input.Long(value: 2469L) });
+                array.InsertRange(transaction, index: 0, Input.Long(value: 2469L));
                 transaction.Commit();
 
-                array.Unobserve(subscription);
+                subscription.Dispose();
                 doc.Dispose();
                 count++;
             }

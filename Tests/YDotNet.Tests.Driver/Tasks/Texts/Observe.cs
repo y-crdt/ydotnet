@@ -36,7 +36,7 @@ public class Observe : ITask
                 text.Insert(transaction, index: 0, "YDotNet");
                 transaction.Commit();
 
-                text.Unobserve(subscription);
+                subscription.Dispose();
                 doc.Dispose();
 
                 count++;
