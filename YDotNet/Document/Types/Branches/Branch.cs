@@ -14,11 +14,12 @@ public abstract class Branch : UnmanagedResource
 {
     private readonly EventSubscriber<EventBranch[]> onDeep;
 
-    internal Branch(nint handle, Doc doc, bool isDeleted)
+    internal protected Branch(nint handle, Doc doc, bool isDeleted)
         : base(handle, isDeleted)
     {
         Doc = doc;
 
+#pragma warning disable CA1806 // Do not ignore method results
         onDeep = new EventSubscriber<EventBranch[]>(
             doc.EventManager,
             handle,
@@ -36,6 +37,7 @@ public abstract class Branch : UnmanagedResource
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
             (branch, s) => BranchChannel.UnobserveDeep(branch, s));
+#pragma warning restore CA1806 // Do not ignore method results
     }
 
     internal Doc Doc { get; }

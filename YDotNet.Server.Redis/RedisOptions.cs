@@ -12,12 +12,12 @@ public sealed class RedisOptions
     {
         if (ConnectionFactory != null)
         {
-            return await ConnectionFactory(log);
+            return await ConnectionFactory(log).ConfigureAwait(false);
         }
 
         if (Configuration != null)
         {
-            return await ConnectionMultiplexer.ConnectAsync(Configuration, log);
+            return await ConnectionMultiplexer.ConnectAsync(Configuration, log).ConfigureAwait(false);
         }
 
         throw new InvalidOperationException("Either configuration or connection factory must be set.");

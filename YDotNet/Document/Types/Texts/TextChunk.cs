@@ -17,7 +17,8 @@ public class TextChunk
         Attributes = native.Value.Attributes()
             .ToDictionary(
                 x => x.Value.Key(),
-                x => new Output(x.Value.ValueHandle(x.Handle), doc, isDeleted: false));
+                x => new Output(x.Value.ValueHandle(x.Handle), doc, isDeleted: false),
+                StringComparer.Ordinal);
     }
 
     /// <summary>

@@ -10,8 +10,6 @@ internal sealed class DelayedWriter
     private DateTime lastWrite;
     private Task? writeTask;
 
-    public Func<DateTime> Clock = () => DateTime.UtcNow;
-
     public DelayedWriter(TimeSpan delay, TimeSpan delayMax, Func<Task> action)
     {
         this.delay = delay;
@@ -21,13 +19,15 @@ internal sealed class DelayedWriter
         writeTimer = new Timer(_ => Write(), null, Timeout.Infinite, Timeout.Infinite);
     }
 
+    public Func<DateTime> Clock = () => DateTime.UtcNow;
+
     public async Task FlushAsync()
     {
         writeTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
         if (writeTask != null)
         {
-            await writeTask;
+            await writeTask.ConfigureAwait(false);
         }
 
         if (pendingWrites > 0)
@@ -37,7 +37,7 @@ internal sealed class DelayedWriter
 
         if (writeTask != null)
         {
-            await writeTask;
+            await writeTask.ConfigureAwait(false);
         }
     }
 
@@ -85,7 +85,7 @@ internal sealed class DelayedWriter
         try
         {
             writeTask = task;
-            await task;
+            await task.ConfigureAwait(false);
         }
         finally
         {

@@ -19,7 +19,7 @@ public sealed class RedisDocumentStorage : IDocumentStorage
     private async Task InitializeAsync(RedisConnection redisConnection)
     {
         // Use a single task, so that the ordering of registrations does not matter.
-        var connection = await redisConnection.Instance;
+        var connection = await redisConnection.Instance.ConfigureAwait(false);
 
         database = connection.GetDatabase(redisOptions.Database);
     }
@@ -32,7 +32,7 @@ public sealed class RedisDocumentStorage : IDocumentStorage
             return null;
         }
 
-        var item = await database.StringGetAsync(Key(name));
+        var item = await database.StringGetAsync(Key(name)).ConfigureAwait(false);
 
         if (item == RedisValue.Null)
         {
@@ -50,7 +50,7 @@ public sealed class RedisDocumentStorage : IDocumentStorage
             return;
         }
 
-        await database.StringSetAsync(Key(name), doc, redisOptions.Expiration?.Invoke(name));
+        await database.StringSetAsync(Key(name), doc, redisOptions.Expiration?.Invoke(name)).ConfigureAwait(false);
     }
 
     private string Key(string name)

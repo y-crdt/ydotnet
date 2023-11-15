@@ -22,10 +22,10 @@ public sealed class ClientState : IDisposable
 
     public async Task WriteLockedAsync<T>(T state, Func<WebSocketEncoder, T, ClientState, CancellationToken, Task> action, CancellationToken ct)
     {
-        await slimLock.WaitAsync(ct);
+        await slimLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            await action(Encoder, state, this, ct);
+            await action(Encoder, state, this, ct).ConfigureAwait(false);
         }
         finally
         {
@@ -38,6 +38,6 @@ public sealed class ClientState : IDisposable
         WebSocket.Dispose();
 
         Encoder.Dispose();
-        Decoder.Dispose();  
+        Decoder.Dispose();
     }
 }

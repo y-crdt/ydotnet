@@ -18,6 +18,16 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     {
     }
 
+    /// <summary>
+    ///     Finalizes an instance of the <see cref="XmlAttributeIterator" /> class.
+    /// </summary>
+#pragma warning disable MA0055 // Do not use finalizer
+    ~XmlAttributeIterator()
+#pragma warning restore MA0055 // Do not use finalizer
+    {
+        Dispose(disposing: false);
+    }
+
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
     {
@@ -28,14 +38,6 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="XmlAttributeIterator" /> class.
-    /// </summary>
-    ~XmlAttributeIterator()
-    {
-        Dispose(disposing: false);
     }
 
     /// <inheritdoc />

@@ -31,7 +31,7 @@ public abstract class Encoder
                 lower7bits |= 128;
             }
 
-            await WriteByteAsync(lower7bits, ct);
+            await WriteByteAsync(lower7bits, ct).ConfigureAwait(false);
         }
         while (value > 0);
     }
@@ -52,8 +52,8 @@ public abstract class Encoder
             throw new ArgumentNullException(nameof(value));
         }
 
-        await WriteVarUintAsync((ulong)value.Length, ct);
-        await WriteBytesAsync(value, ct);
+        await WriteVarUintAsync((ulong)value.Length, ct).ConfigureAwait(false);
+        await WriteBytesAsync(value, ct).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public abstract class Encoder
             var buffer = ArrayPool<byte>.Shared.Rent(length);
             try
             {
-                await WriteCoreAsync(value, buffer, ct);
+                await WriteCoreAsync(value, buffer, ct).ConfigureAwait(false);
             }
             finally
             {
@@ -87,15 +87,15 @@ public abstract class Encoder
         }
         else
         {
-            await WriteCoreAsync(value, stringBuffer, ct);
+            await WriteCoreAsync(value, stringBuffer, ct).ConfigureAwait(false);
         }
 
         async Task WriteCoreAsync(string value, byte[] buffer, CancellationToken ct)
         {
             var length = Encoding.UTF8.GetBytes(value, buffer);
 
-            await WriteVarUintAsync((ulong)length, ct);
-            await WriteBytesAsync(new ArraySegment<byte>(buffer, 0, length), ct);
+            await WriteVarUintAsync((ulong)length, ct).ConfigureAwait(false);
+            await WriteBytesAsync(new ArraySegment<byte>(buffer, 0, length), ct).ConfigureAwait(false);
         }
     }
 

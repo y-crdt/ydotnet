@@ -59,7 +59,7 @@ public class Array : Branch
 
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
-        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint) inputs.Length);
+        ArrayChannel.InsertRange(Handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public class Array : Branch
     {
         ThrowIfDisposed();
 
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType);
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }

@@ -26,7 +26,7 @@ public abstract class Decoder
 
         while (true)
         {
-            var lower7bits = (ulong)await ReadByteAsync(ct);
+            var lower7bits = (ulong)await ReadByteAsync(ct).ConfigureAwait(false);
 
             resultSum |= (lower7bits & 0x7f) << resultShift;
 
@@ -38,7 +38,9 @@ public abstract class Decoder
             resultShift += 7;
         }
 
+#pragma warning disable MA0012 // Do not raise reserved exception type
         throw new IndexOutOfRangeException();
+#pragma warning restore MA0012 // Do not raise reserved exception type
     }
 
     /// <summary>
@@ -51,10 +53,10 @@ public abstract class Decoder
     public async ValueTask<byte[]> ReadVarUint8ArrayAsync(
         CancellationToken ct = default)
     {
-        var arrayLength = await ReadVarUintAsync(ct);
+        var arrayLength = await ReadVarUintAsync(ct).ConfigureAwait(false);
         var arrayBuffer = new byte[arrayLength];
 
-        await ReadBytesAsync(arrayBuffer, ct);
+        await ReadBytesAsync(arrayBuffer, ct).ConfigureAwait(false);
 
         return arrayBuffer;
     }
@@ -69,13 +71,13 @@ public abstract class Decoder
     public async ValueTask<string> ReadVarStringAsync(
         CancellationToken ct = default)
     {
-        var length = (int)await ReadVarUintAsync(ct);
+        var length = (int)await ReadVarUintAsync(ct).ConfigureAwait(false);
         if (length > stringBuffer.Length)
         {
             var buffer = ArrayPool<byte>.Shared.Rent(length);
             try
             {
-                return await ReadCoreAsync(length, buffer, ct);
+                return await ReadCoreAsync(length, buffer, ct).ConfigureAwait(false);
             }
             finally
             {
@@ -84,13 +86,13 @@ public abstract class Decoder
         }
         else
         {
-            return await ReadCoreAsync(length, stringBuffer, ct);
+            return await ReadCoreAsync(length, stringBuffer, ct).ConfigureAwait(false);
         }
 
         async ValueTask<string> ReadCoreAsync(int length, byte[] buffer, CancellationToken ct)
         {
             var slicedBuffer = buffer.AsMemory(0, length);
-            await ReadBytesAsync(slicedBuffer, ct);
+            await ReadBytesAsync(slicedBuffer, ct).ConfigureAwait(false);
 
             return Encoding.UTF8.GetString(slicedBuffer.Span);
         }

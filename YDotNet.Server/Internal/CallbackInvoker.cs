@@ -44,7 +44,7 @@ public sealed class CallbackInvoker : IDocumentCallback
         {
             try
             {
-                await action(callback, @event);
+                await action(callback, @event).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
