@@ -10,4 +10,9 @@
     <ProjectReference Include="..\YDotNet\YDotNet.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\assets\logo-dotnet.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>
