@@ -27,4 +27,9 @@
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\assets\logo-dotnet.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>

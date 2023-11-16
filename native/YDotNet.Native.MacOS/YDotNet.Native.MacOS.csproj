@@ -10,4 +10,9 @@
     <Content Include="..\..\output\macos\libyrs.dylib" Pack="True" PackagePath="runtimes\osx\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo-dotnet.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>

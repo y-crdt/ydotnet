@@ -15,4 +15,9 @@
     <Content Include="..\..\output\linux-x64\libyrs.so" Pack="True" PackagePath="runtimes\linux-x64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo-dotnet.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>

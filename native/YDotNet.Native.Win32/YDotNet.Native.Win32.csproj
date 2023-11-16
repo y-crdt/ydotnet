@@ -10,4 +10,9 @@
     <Content Include="..\..\output\win-x64\yrs.dll" Pack="True" PackagePath="runtimes\win-x64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo-dotnet.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>
