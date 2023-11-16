@@ -325,7 +325,7 @@ public class Doc : UnmanagedResource
     {
         ThrowIfDisposed();
 
-        var handle = DocChannel.WriteTransaction(Handle, (uint) (origin?.Length ?? 0), origin);
+        var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
 
         if (handle == nint.Zero)
         {

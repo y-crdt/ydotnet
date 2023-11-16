@@ -16,7 +16,7 @@ public static class ClientIdGenerator
     /// <returns>The random client id.</returns>
     public static ulong Random()
     {
-        var value = (ulong) System.Random.Shared.Next() & MaxSafeInteger;
+        var value = (ulong)System.Random.Shared.Next() & MaxSafeInteger;
 
         return value;
     }

@@ -52,6 +52,6 @@ internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }

@@ -55,6 +55,6 @@ internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }

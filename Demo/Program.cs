@@ -12,8 +12,8 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddRazorPages();
-        
-        var yDotNet = 
+
+        var yDotNet =
             builder.Services.AddYDotNet()
                 .AddCallback<Callback>()
                 .AddWebSockets();

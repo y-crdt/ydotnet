@@ -10,7 +10,7 @@ public static class ServiceExtensions
     {
         registration.Services.Configure(configure ?? (x => { }));
         registration.Services.AddSingleton<MongoDocumentStorage>();
-        
+
         registration.Services.AddSingleton<IDocumentStorage>(
             c => c.GetRequiredService<MongoDocumentStorage>());
 

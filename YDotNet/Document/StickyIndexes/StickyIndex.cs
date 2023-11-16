@@ -25,7 +25,7 @@ public class StickyIndex : UnmanagedResource
     /// <summary>
     ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
     /// </summary>
-    public StickyAssociationType AssociationType => (StickyAssociationType) StickyIndexChannel.AssociationType(Handle);
+    public StickyAssociationType AssociationType => (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
 
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
@@ -39,7 +39,7 @@ public class StickyIndex : UnmanagedResource
     /// <returns>The <see cref="StickyIndex" /> represented by the provided <see cref="byte" /> array.</returns>
     public static StickyIndex Decode(byte[] encoded)
     {
-        var handle = StickyIndexChannel.Decode(encoded, (uint) encoded.Length);
+        var handle = StickyIndexChannel.Decode(encoded, (uint)encoded.Length);
 
         return new StickyIndex(handle.Checked());
     }

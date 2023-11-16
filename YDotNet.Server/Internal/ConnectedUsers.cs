@@ -20,12 +20,12 @@ public sealed class ConnectedUsers
 
     public bool AddOrUpdate(string documentName, ulong clientId, ulong clock, string? state, out string? existingState)
     {
-        var users = this.users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
+        var newUsers = this.users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
 
         // We expect to have relatively few users per document, therefore we use normal lock here.
-        lock (users)
+        lock (newUsers)
         {
-            if (users.TryGetValue(clientId, out var user))
+            if (newUsers.TryGetValue(clientId, out var user))
             {
                 var isChanged = false;
 
@@ -44,7 +44,7 @@ public sealed class ConnectedUsers
                 return isChanged;
             }
 
-            users.Add(clientId, new ConnectedUser
+            newUsers.Add(clientId, new ConnectedUser
             {
                 ClientClock = clock,
                 ClientState = state,
@@ -68,7 +68,7 @@ public sealed class ConnectedUsers
             return documentUsers.Remove(clientId);
         }
     }
-    
+
     public IEnumerable<(ulong ClientId, string DocumentName)> Cleanup(TimeSpan maxAge)
     {
         var olderThan = Clock() - maxAge;

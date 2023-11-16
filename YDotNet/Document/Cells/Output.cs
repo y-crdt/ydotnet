@@ -20,7 +20,7 @@ public sealed class Output
     {
         var native = MemoryReader.ReadStruct<OutputNative>(handle);
 
-        Tag = (OutputTag) native.Tag;
+        Tag = (OutputTag)native.Tag;
 
         value = BuildValue(handle, native.Length, doc, isDeleted, Tag);
     }

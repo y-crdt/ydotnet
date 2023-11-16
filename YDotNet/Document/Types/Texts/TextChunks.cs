@@ -17,7 +17,7 @@ public class TextChunks : ReadOnlyCollection<TextChunk>
 
     private static IList<TextChunk> ReadItems(nint handle, uint length, Doc doc)
     {
-        var result = new List<TextChunk>((int) length);
+        var result = new List<TextChunk>((int)length);
 
         foreach (var native in MemoryReader.ReadStructsWithHandles<TextChunkNative>(handle, length))
         {

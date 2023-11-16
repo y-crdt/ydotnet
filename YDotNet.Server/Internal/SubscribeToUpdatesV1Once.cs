@@ -6,8 +6,6 @@ internal sealed class SubscribeToUpdatesV1Once : IDisposable
 {
     private readonly IDisposable unsubscribe;
 
-    public byte[]? Update { get; private set; }
-
     public SubscribeToUpdatesV1Once(Doc doc)
     {
         unsubscribe = doc.ObserveUpdatesV1(@event =>
@@ -15,6 +13,8 @@ internal sealed class SubscribeToUpdatesV1Once : IDisposable
             Update = @event.Update;
         });
     }
+
+    public byte[]? Update { get; private set; }
 
     public void Dispose()
     {

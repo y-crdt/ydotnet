@@ -7,12 +7,12 @@ namespace YDotNet.Server.Redis;
 
 public sealed class RedisConnection : IDisposable
 {
-    public Task<IConnectionMultiplexer> Instance { get; }
-
     public RedisConnection(IOptions<RedisOptions> options, ILogger<RedisConnection> logger)
     {
         Instance = options.Value.ConnectAsync(new LoggerTextWriter(logger));
     }
+
+    public Task<IConnectionMultiplexer> Instance { get; }
 
     public void Dispose()
     {

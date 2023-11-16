@@ -13,7 +13,7 @@ internal sealed class DocumentContainer
     private readonly DelayedWriter writer;
     private Doc? doc;
 
-    public DocumentContainer(string documentName, 
+    public DocumentContainer(string documentName,
         IDocumentStorage documentStorage,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,
@@ -35,14 +35,14 @@ internal sealed class DocumentContainer
 
     private async Task<Doc> LoadInternalAsync(IDocumentCallback documentCallback, IDocumentManager documentManager)
     {
-        doc = await LoadCoreAsync();
+        doc = await LoadCoreAsync().ConfigureAwait(false);
 
         await documentCallback.OnDocumentLoadedAsync(new DocumentLoadEvent
         {
             Document = doc,
             Context = new DocumentContext(documentName, 0),
             Source = documentManager,
-        });
+        }).ConfigureAwait(false);
 
         doc.ObserveUpdatesV1(e =>
         {
@@ -54,7 +54,7 @@ internal sealed class DocumentContainer
 
     private async Task<Doc> LoadCoreAsync()
     {
-        var documentData = await documentStorage.GetDocAsync(documentName);
+        var documentData = await documentStorage.GetDocAsync(documentName).ConfigureAwait(false);
 
         if (documentData != null)
         {
@@ -85,7 +85,7 @@ internal sealed class DocumentContainer
 
     public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action)
     {
-        var document = await loadingTask;
+        var document = await loadingTask.ConfigureAwait(false);
 
         slimLock.Wait();
         try
@@ -123,6 +123,6 @@ internal sealed class DocumentContainer
             slimLock.Release();
         }
 
-        await documentStorage.StoreDocAsync(documentName, state);
+        await documentStorage.StoreDocAsync(documentName, state).ConfigureAwait(false);
     }
 }

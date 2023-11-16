@@ -24,6 +24,7 @@ public class UndoManager : UnmanagedResource
     public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
         : base(Create(doc, branch, options))
     {
+#pragma warning disable CA1806 // Do not ignore method results
         onAdded = new EventSubscriber<UndoEvent>(
             doc.EventManager,
             Handle,
@@ -47,12 +48,15 @@ public class UndoManager : UnmanagedResource
                 return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
             },
             (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
+#pragma warning restore CA1806 // Do not ignore method results
     }
 
     /// <summary>
     ///     Finalizes an instance of the <see cref="UndoManager" /> class.
     /// </summary>
+#pragma warning disable MA0055 // Do not use finalizer
     ~UndoManager()
+#pragma warning restore MA0055 // Do not use finalizer
     {
         Dispose(disposing: false);
     }
@@ -160,7 +164,7 @@ public class UndoManager : UnmanagedResource
     /// <param name="origin">The origin to be included in this <see cref="UndoManager" />.</param>
     public void AddOrigin(byte[] origin)
     {
-        UndoManagerChannel.AddOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.AddOrigin(Handle, (uint)origin.Length, origin);
     }
 
     /// <summary>
@@ -173,7 +177,7 @@ public class UndoManager : UnmanagedResource
     /// <param name="origin">The origin to be removed from this <see cref="UndoManager" />.</param>
     public void RemoveOrigin(byte[] origin)
     {
-        UndoManagerChannel.RemoveOrigin(Handle, (uint) origin.Length, origin);
+        UndoManagerChannel.RemoveOrigin(Handle, (uint)origin.Length, origin);
     }
 
     /// <inheritdoc />

@@ -29,7 +29,11 @@ public static class ServiceExtensions
     }
 }
 
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1402 // File may only contain a single type
 public sealed class YDotnetRegistration
+#pragma warning restore SA1402 // File may only contain a single type
+#pragma warning restore MA0048 // File name must match type name
 {
     required public IServiceCollection Services { get; init; }
 }

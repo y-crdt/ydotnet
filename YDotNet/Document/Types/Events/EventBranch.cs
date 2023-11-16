@@ -18,7 +18,7 @@ public class EventBranch
 
     internal EventBranch(NativeWithHandle<EventBranchNative> native, Doc doc)
     {
-        Tag = (EventBranchTag) native.Value.Tag;
+        Tag = (EventBranchTag)native.Value.Tag;
 
         value = BuildValue(native, doc, Tag);
     }

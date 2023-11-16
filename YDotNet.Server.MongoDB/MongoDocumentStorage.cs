@@ -7,7 +7,7 @@ namespace YDotNet.Server.MongoDB;
 
 public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
 {
-    private readonly UpdateOptions Upsert = new() { IsUpsert = true };
+    private readonly UpdateOptions upsert = new() { IsUpsert = true };
     private readonly MongoDocumentStorageOptions options;
     private readonly IMongoClient mongoClient;
     private IMongoCollection<DocumentEntity>? collection;
@@ -34,7 +34,7 @@ public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
                 {
                     ExpireAfter = TimeSpan.Zero
                 }),
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     public Task StopAsync(
@@ -43,33 +43,32 @@ public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
         return Task.CompletedTask;
     }
 
-    public async ValueTask<byte[]?> GetDocAsync(string name,
-        CancellationToken ct = default)
+    public async ValueTask<byte[]?> GetDocAsync(string name, CancellationToken ct = default)
     {
         if (collection == null)
         {
             return null;
         }
 
-        var document = await collection.Find(x => x.Id == name).FirstOrDefaultAsync(ct);
+        var document = await collection.Find(x => x.Id == name).FirstOrDefaultAsync(ct).ConfigureAwait(false);
 
         return document?.Data;
     }
 
-    public async ValueTask StoreDocAsync(string name, byte[] doc,
-        CancellationToken ct = default)
+    public async ValueTask StoreDocAsync(string name, byte[] doc, CancellationToken ct = default)
     {
         if (collection == null)
         {
             return;
         }
 
-        await collection.UpdateOneAsync(x => x.Id == name,
+        await collection.UpdateOneAsync(
+            x => x.Id == name,
             Builders<DocumentEntity>.Update
                 .Set(x => x.Data, doc)
                 .Set(x => x.Expiration, GetExpiration(name)),
-            Upsert,
-            ct);
+            upsert,
+            ct).ConfigureAwait(false);
     }
 
     private DateTime? GetExpiration(string name)
