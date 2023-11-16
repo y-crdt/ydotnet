@@ -121,7 +121,7 @@ public class Transaction : UnmanagedResource
     public byte[] StateDiffV1(byte[]? stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(
-            Handle, stateVector, (uint) (stateVector?.Length ?? 0), out var length);
+            Handle, stateVector, (uint)(stateVector?.Length ?? 0), out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
@@ -155,7 +155,7 @@ public class Transaction : UnmanagedResource
         var handle = TransactionChannel.StateDiffV2(
             Handle,
             stateVector,
-            (uint) (stateVector?.Length ?? 0),
+            (uint)(stateVector?.Length ?? 0),
             out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
@@ -172,7 +172,7 @@ public class Transaction : UnmanagedResource
     /// <returns>The result of the update operation.</returns>
     public TransactionUpdateResult ApplyV1(byte[] stateDiff)
     {
-        return (TransactionUpdateResult) TransactionChannel.ApplyV1(Handle, stateDiff, (uint) stateDiff.Length);
+        return (TransactionUpdateResult)TransactionChannel.ApplyV1(Handle, stateDiff, (uint)stateDiff.Length);
     }
 
     /// <summary>
@@ -186,7 +186,7 @@ public class Transaction : UnmanagedResource
     /// <returns>The result of the update operation.</returns>
     public TransactionUpdateResult ApplyV2(byte[] stateDiff)
     {
-        return (TransactionUpdateResult) TransactionChannel.ApplyV2(Handle, stateDiff, (uint) stateDiff.Length);
+        return (TransactionUpdateResult)TransactionChannel.ApplyV2(Handle, stateDiff, (uint)stateDiff.Length);
     }
 
     /// <summary>
@@ -238,7 +238,7 @@ public class Transaction : UnmanagedResource
         var handle = TransactionChannel.EncodeStateFromSnapshotV1(
             Handle,
             snapshot,
-            (uint) snapshot.Length,
+            (uint)snapshot.Length,
             out var length);
 
         return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
@@ -275,7 +275,7 @@ public class Transaction : UnmanagedResource
         var handle = TransactionChannel.EncodeStateFromSnapshotV2(
             Handle,
             snapshot,
-            (uint) snapshot.Length,
+            (uint)snapshot.Length,
             out var length);
 
         return handle != nint.Zero ? MemoryReader.ReadAndDestroyBytes(handle, length) : null;
@@ -372,7 +372,7 @@ public class Transaction : UnmanagedResource
             return nint.Zero;
         }
 
-        var branchKind = (BranchKind) BranchChannel.Kind(branchHandle);
+        var branchKind = (BranchKind)BranchChannel.Kind(branchHandle);
         if (branchKind != expectedKind)
         {
             throw new YDotNetException($"Expected '{expectedKind}', got '{branchKind}'.");

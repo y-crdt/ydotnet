@@ -74,7 +74,7 @@ public class WriteAndRead
     public async Task DecodeJsSample()
     {
         // Arrange
-        var buffer = new byte[] 
+        var buffer = new byte[]
         {
             1,
             252,

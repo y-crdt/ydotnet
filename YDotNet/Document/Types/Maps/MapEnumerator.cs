@@ -55,6 +55,6 @@ internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }

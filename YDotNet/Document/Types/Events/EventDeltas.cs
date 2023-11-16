@@ -17,7 +17,7 @@ public class EventDeltas : ReadOnlyCollection<EventDelta>
 
     private static IList<EventDelta> ReadItems(nint handle, uint length, Doc doc)
     {
-        var result = new List<EventDelta>((int) length);
+        var result = new List<EventDelta>((int)length);
 
         foreach (var native in MemoryReader.ReadStructs<EventDeltaNative>(handle, length))
         {

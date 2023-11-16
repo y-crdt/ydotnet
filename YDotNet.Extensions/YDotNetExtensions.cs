@@ -55,7 +55,9 @@ public static class YDotNetExtensions
         return Encoding.UTF8.GetString(jsonStream.ToArray());
     }
 
+#pragma warning disable MA0051 // Method is too long
     public static void ToJson(this Output output, Stream stream, Transaction transaction)
+#pragma warning restore MA0051 // Method is too long
     {
         var jsonWriter = new Utf8JsonWriter(stream);
 

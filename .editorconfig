@@ -40,7 +40,7 @@ dotnet_diagnostic.SA1413.severity = suggestion # Use trailing comma in multi-lin
 dotnet_diagnostic.SA1500.severity = suggestion # Braces for multi-line statements should not share line
 
 # Documentation rules
-dotnet_diagnostic.SA1600.severity = suggestion # Elements should be documented
+dotnet_diagnostic.SA1600.severity = none # Elements should be documented
 dotnet_diagnostic.SA1601.severity = suggestion # Partial elements should be documented
 dotnet_diagnostic.SA1602.severity = suggestion # Enumeration items should be documented
 dotnet_diagnostic.SA1633.severity = none # File should have header

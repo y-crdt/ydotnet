@@ -22,7 +22,8 @@ public class EventDelta
 
         Attributes = native.Attributes.ToDictionary(
             x => x.Value.Key(),
-            x => new Output(x.Value.ValueHandle(x.Handle), doc, false));
+            x => new Output(x.Value.ValueHandle(x.Handle), doc, isDeleted: false),
+            StringComparer.Ordinal);
 
         if (native.InsertHandle != nint.Zero)
         {

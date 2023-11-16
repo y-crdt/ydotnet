@@ -98,7 +98,7 @@ public sealed class Input : Resource
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Bytes(byte[] value)
     {
-        return new Input(InputChannel.Bytes(value, (uint) value.Length));
+        return new Input(InputChannel.Bytes(value, (uint)value.Length));
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint) value.Length), unsafeMemory);
+        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public sealed class Input : Resource
         var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
         return new Input(
-            InputChannel.Object(unsafeKeys.Head, unsafeValues.Handle, (uint) value.Count),
+            InputChannel.Object(unsafeKeys.Head, unsafeValues.Handle, (uint)value.Count),
             unsafeKeys,
             unsafeValues);
     }
@@ -156,7 +156,7 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint) value.Length), unsafeMemory);
+        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ public sealed class Input : Resource
         var unsafeValues = MemoryWriter.WriteStructArray(value.Values.Select(x => x.InputNative).ToArray());
 
         return new Input(
-            InputChannel.Map(unsafeKeys.Head, unsafeValues.Handle, (uint) value.Count),
+            InputChannel.Map(unsafeKeys.Head, unsafeValues.Handle, (uint)value.Count),
             unsafeKeys,
             unsafeValues);
     }

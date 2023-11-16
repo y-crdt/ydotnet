@@ -84,7 +84,7 @@ public sealed class Callback : IDocumentCallback
                 }
             });
         });
-       
+
 
         return default;
     }

@@ -31,13 +31,13 @@ public sealed class DefaultDocumentManager : IDocumentManager
     public async Task StartAsync(
         CancellationToken cancellationToken)
     {
-        await callback.OnInitializedAsync(this);
+        await callback.OnInitializedAsync(this).ConfigureAwait(false);
     }
 
     public async Task StopAsync(
         CancellationToken cancellationToken)
     {
-        await cache.DisposeAsync();
+        await cache.DisposeAsync().ConfigureAwait(false);
     }
 
     public async ValueTask<byte[]> GetStateVectorAsync(DocumentContext context,
@@ -51,7 +51,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 return transaction.StateVectorV1();
             }
-        });
+        }).ConfigureAwait(false);
     }
 
     public async ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector,
@@ -65,7 +65,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 return transaction.StateDiffV1(stateVector);
             }
-        });
+        }).ConfigureAwait(false);
     }
 
     public async ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,
@@ -86,7 +86,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             }
 
             return (result, doc);
-        });
+        }).ConfigureAwait(false);
 
         if (result.Diff != null)
         {
@@ -96,7 +96,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 Diff = result.Diff,
                 Document = doc,
                 Source = this,
-            });
+            }).ConfigureAwait(false);
         }
 
         return result;
@@ -114,7 +114,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             action(doc);
 
             return (subscribeOnce.Update, doc);
-        });
+        }).ConfigureAwait(false);
 
         if (diff != null)
         {
@@ -124,7 +124,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 Diff = diff,
                 Document = doc,
                 Source = this,
-            });
+            }).ConfigureAwait(false);
         }
     }
 
@@ -139,7 +139,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 ClientClock = clock,
                 ClientState = newState,
                 Source = this,
-            });
+            }).ConfigureAwait(false);
         }
     }
 
@@ -152,7 +152,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 Context = context,
                 Source = this,
-            });
+            }).ConfigureAwait(false);
         }
     }
 
@@ -165,7 +165,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 Context = new DocumentContext(documentName, clientId),
                 Source = this,
-            });
+            }).ConfigureAwait(false);
         }
 
         cache.RemoveEvictedItems();

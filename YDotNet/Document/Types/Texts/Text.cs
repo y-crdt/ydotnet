@@ -183,7 +183,7 @@ public class Text : Branch
     {
         ThrowIfDisposed();
 
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType);
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }

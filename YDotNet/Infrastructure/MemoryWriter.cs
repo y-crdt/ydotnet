@@ -23,7 +23,7 @@ internal static class MemoryWriter
         var memory = new Span<byte>(bufferPointer.ToPointer(), bufferLength);
 
         Encoding.UTF8.GetBytes(value, memory);
-        memory[bufferLength - 1] = (byte) '\0';
+        memory[bufferLength - 1] = (byte)'\0';
 
         return bufferPointer;
     }

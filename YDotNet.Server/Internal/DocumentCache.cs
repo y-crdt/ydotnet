@@ -11,7 +11,7 @@ internal sealed class DocumentCache : IAsyncDisposable
     private readonly IDocumentManager documentManager;
     private readonly DocumentManagerOptions options;
     private readonly MemoryCache memoryCache = new(Options.Create(new MemoryCacheOptions()));
-    private readonly Dictionary<string, DocumentContainer> livingContainers = new();
+    private readonly Dictionary<string, DocumentContainer> livingContainers = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim slimLock = new(1);
 
     public DocumentCache(
@@ -28,12 +28,12 @@ internal sealed class DocumentCache : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await slimLock.WaitAsync();
+        await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
             foreach (var (_, container) in livingContainers)
             {
-                await container.FlushAsync();
+                await container.FlushAsync().ConfigureAwait(false);
             }
         }
         finally
@@ -63,8 +63,8 @@ internal sealed class DocumentCache : IAsyncDisposable
                 else
                 {
                     container = new DocumentContainer(
-                        name, 
-                        documentStorage, 
+                        name,
+                        documentStorage,
                         documentCallback,
                         documentManager,
                         options);
@@ -74,7 +74,7 @@ internal sealed class DocumentCache : IAsyncDisposable
                 entry.SlidingExpiration = options.CacheDuration;
                 entry.RegisterPostEvictionCallback((_, _, _, _) =>
                 {
-                    // There is no background thread for eviction. It is just done from 
+                    // There is no background thread for eviction. It is just done from
                     _ = CleanupAsync(name, container);
                 });
 
@@ -91,9 +91,11 @@ internal sealed class DocumentCache : IAsyncDisposable
     private async Task CleanupAsync(string name, DocumentContainer context)
     {
         // Flush all pending changes to the storage and then remove the context from the list of living entries.
-        await context.FlushAsync();
+        await context.FlushAsync().ConfigureAwait(false);
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
         slimLock.Wait();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         try
         {
             livingContainers.Remove(name);

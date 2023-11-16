@@ -101,10 +101,10 @@ public class DocOptions
             Id = Id,
             Guid = unsafeGuid.Handle,
             CollectionId = unsafeCollection.Handle,
-            Encoding = (byte) Encoding,
-            SkipGc = (byte) (SkipGarbageCollection ? 1 : 0),
-            AutoLoad = (byte) (AutoLoad ? 1 : 0),
-            ShouldLoad = (byte) (ShouldLoad ? 1 : 0)
+            Encoding = (byte)Encoding,
+            SkipGc = (byte)(SkipGarbageCollection ? 1 : 0),
+            AutoLoad = (byte)(AutoLoad ? 1 : 0),
+            ShouldLoad = (byte)(ShouldLoad ? 1 : 0)
         };
     }
 }
