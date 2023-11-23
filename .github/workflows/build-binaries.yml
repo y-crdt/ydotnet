@@ -9,7 +9,7 @@ name: Build binaries
 on:
   push:
     tags:
-      - 'binaries'
+      - 'binaries[0-9]'
 
 env:
   YRS_REPO: https://github.com/y-crdt/y-crdt
