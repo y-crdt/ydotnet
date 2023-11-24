@@ -89,6 +89,14 @@ jobs:
         with:
           tool: cross
 
+      - name: Replace build target
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "[\"staticlib\"]"
+          replace: "[\"staticlib\", \"cdylib\"]"
+          include: yffi/Cargo.toml
+          regex: false
+
       - name: Install musl tools
         run: sudo apt install -y musl musl-dev musl-tools
         if: endsWith(matrix.build, '-musl')
