@@ -90,12 +90,11 @@ jobs:
           tool: cross
 
       - name: Replace build target
-        uses: jacobtomlinson/gha-find-replace@v3
+        uses: MathieuSoysal/replace-string-in-file@v1.0.
         with:
-          find: "[\"staticlib\"]"
-          replace: "[\"staticlib\", \"cdylib\"]"
-          include: yffi/Cargo.toml
-          regex: false
+          old-string: "[\"staticlib\"]"
+          new-string: "[\"staticlib\", \"cdylib\"]"
+          file: yffi/Cargo.toml
 
       - name: Install musl tools
         run: sudo apt install -y musl musl-dev musl-tools
