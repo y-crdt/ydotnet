@@ -2,6 +2,8 @@
   <img width="128" height="128" src="https://github.com/LSViana/ydotnet/assets/21217790/51be1008-7bac-4bb0-b5bb-d4c9f5ab6d7d" />
 </p>
 
+# YDotNet
+
 YDotNet is a .NET binding for [`y-crdt`](https://github.com/y-crdt/ypy). It provides distributed data types that enable
 real-time collaboration between devices. The library is a thin wrapper around Yrs, taking advantage of the safety and performance of Rust.
 
