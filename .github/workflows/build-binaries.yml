@@ -7,9 +7,7 @@
 name: Build binaries
 
 on:
-  push:
-    tags:
-      - 'binaries[0-9]'
+  workflow_dispatch:
 
 env:
   YRS_REPO: https://github.com/y-crdt/y-crdt
