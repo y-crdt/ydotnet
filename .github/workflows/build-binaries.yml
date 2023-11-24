@@ -87,13 +87,6 @@ jobs:
         with:
           tool: cross
 
-      - name: Replace build target
-        uses: MathieuSoysal/replace-string-in-file@v1.0.0
-        with:
-          old-string: "[\"staticlib\"]"
-          new-string: "[\"staticlib\", \"cdylib\"]"
-          file: yffi/Cargo.toml
-
       - name: Install musl tools
         run: sudo apt install -y musl musl-dev musl-tools
         if: endsWith(matrix.build, '-musl')
@@ -115,6 +108,13 @@ jobs:
         run: |
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
+
+      - name: Replace build target
+        uses: MathieuSoysal/replace-string-in-file@v1.0.0
+        with:
+          old-string: "[\"staticlib\"]"
+          new-string: "[\"staticlib\", \"cdylib\"]"
+          file: yrs/yffi/Cargo.toml
 
       - name: Build (Cargo)
         if: "!matrix.cross"
