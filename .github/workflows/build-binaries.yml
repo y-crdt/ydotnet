@@ -112,7 +112,7 @@ jobs:
       - name: Patch Build
         run: |
           cd yrs
-          git apply ../nativ/build.patch
+          git apply ../native/build.patch
         shell: bash
 
       - name: Build (Cargo)
