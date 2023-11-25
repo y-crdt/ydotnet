@@ -109,12 +109,11 @@ jobs:
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
 
-      - name: Replace build target
-        uses: MathieuSoysal/replace-string-in-file@v1.0.0
-        with:
-          old-string: "[\"staticlib\"]"
-          new-string: "[\"staticlib\", \"cdylib\"]"
-          file: yrs/yffi/Cargo.toml
+      - name: Patch Build
+        run: |
+          cd yrs
+          git patch ../nativ/build.patch
+        shell: bash
 
       - name: Build (Cargo)
         if: "!matrix.cross"
