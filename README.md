@@ -19,6 +19,7 @@ https://github.com/LSViana/ydotnet/assets/21217790/cdb6023d-25d1-4951-82ae-b079d
 # Installation
 
 For every scenario, you must start by installing the core of the library.
+
 To do so, in the project directory (where you `.csproj` lives), execute:
 
 ```shell
