@@ -86,10 +86,22 @@ var text = remoteText.String(remoteTransaction);
 
 # Development Setup
 
-> This section is a WIP, but you should be able to run the project through the unit tests after
-> building a dynamic library for your operating system by adding `cdylib` to the `crate-type` in
-> the [`Cargo.toml`](https://github.com/y-crdt/y-crdt/blob/main/yffi/Cargo.toml#L19) file of the
-> yffi` library.
+To contribute with this library, you'll need to install the following tools:
+
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet/)
+- [Rust](https://www.rust-lang.org/tools/install)
+
+Then you should clone the [`y-crdt`](https://github.com/y-crdt/y-crdt) repository. With the repository
+cloned and the tools installed, you'll be able to:
+
+1. Make changes to the Rust or C# library;
+2. Re-build the Rust and C# binaries;
+    - Be aware that you'll need to use
+      [`crate-type=cdylib`](https://github.com/y-crdt/y-crdt/blob/main/yffi/Cargo.toml#L19)
+      on the `Cargo.toml` file to get a dynamic library that's callable by C#.
+3. Test your changes and repeat.
+
+Then you're ready to go! Feel free to contribute, open issues, and ask questions.
 
 # Tests
 
