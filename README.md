@@ -18,7 +18,30 @@ https://github.com/LSViana/ydotnet/assets/21217790/cdb6023d-25d1-4951-82ae-b079d
 
 # Installation
 
-> This section is a WIP, the project has not yet been published to [NuGet](https://www.nuget.org/).
+For every scenario, you must start by installing the core of the library.
+To do so, in the project directory (where you `.csproj` lives), execute:
+
+```shell
+dotnet add package YDotNet
+```
+
+Then, install the platform-specific package in order to get the binaries.
+
+| Package                                                                     | Platform |
+|-----------------------------------------------------------------------------|----------|
+| [YDotNet.Native.Win32](https://www.nuget.org/packages/YDotNet.Native.Win32) | Windows  |
+| [YDotNet.Native.Linux](https://www.nuget.org/packages/YDotNet.Native.Linux) | Linux    |
+| [YDotNet.Native.MacOS](https://www.nuget.org/packages/YDotNet.Native.MacOS) | macOS    |
+
+And you may also install the following packages to get extra features.
+
+| Package                                                                               | Description                                                  |
+|---------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [YDotNet.Extensions](https://www.nuget.org/packages/YDotNet.Extensions)               | Extension methods to make some operations easier.            |
+| [YDotNet.Server](https://www.nuget.org/packages/YDotNet.Server)                       | (to be added)                                                |
+| [YDotNet.Server.WebSockets](https://www.nuget.org/packages/YDotNet.Server.WebSockets) | Use WebSockets as the communication channel between clients. |
+| [YDotNet.Server.MongoDB](https://www.nuget.org/packages/YDotNet.Server.MongoDB)       | Use MongoDB as a persistence layer.                          |
+| [YDotNet.Server.Redis](https://www.nuget.org/packages/YDotNet.Server.Redis)           | Use Redis as a persistence layer.                            |
 
 # Getting Started
 
