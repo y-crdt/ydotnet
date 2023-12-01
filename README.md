@@ -36,13 +36,13 @@ Then, install the platform-specific package in order to get the binaries.
 
 And you may also install the following packages to get extra features.
 
-| Package                                                                               | Description                                                                        |
-|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [YDotNet.Extensions](https://www.nuget.org/packages/YDotNet.Extensions)               | Extension methods to make some operations easier.                                  |
-| [YDotNet.Server](https://www.nuget.org/packages/YDotNet.Server)                       | Provides the hosting infrastructure for all communication channels like websocket. |
-| [YDotNet.Server.WebSockets](https://www.nuget.org/packages/YDotNet.Server.WebSockets) | Use WebSockets as the communication channel between clients.                       |
-| [YDotNet.Server.MongoDB](https://www.nuget.org/packages/YDotNet.Server.MongoDB)       | Use MongoDB as a persistence layer.                                                |
-| [YDotNet.Server.Redis](https://www.nuget.org/packages/YDotNet.Server.Redis)           | Use Redis as a persistence layer.                                                  |
+| Package                                                                               | Description                                                                         |
+|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [YDotNet.Extensions](https://www.nuget.org/packages/YDotNet.Extensions)               | Extension methods to make some operations easier.                                   |
+| [YDotNet.Server](https://www.nuget.org/packages/YDotNet.Server)                       | Provides the hosting infrastructure for all communication channels, like WebSocket. |
+| [YDotNet.Server.WebSockets](https://www.nuget.org/packages/YDotNet.Server.WebSockets) | Use WebSockets as the communication channel between clients.                        |
+| [YDotNet.Server.MongoDB](https://www.nuget.org/packages/YDotNet.Server.MongoDB)       | Use MongoDB as a persistence layer.                                                 |
+| [YDotNet.Server.Redis](https://www.nuget.org/packages/YDotNet.Server.Redis)           | Use Redis as a persistence layer.                                                   |
 
 # Getting Started
 
