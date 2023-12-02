@@ -8,9 +8,6 @@ name: Publish
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'for-pr'
     tags:
       - 'v*.*.*'
 
