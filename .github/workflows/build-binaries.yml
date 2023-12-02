@@ -109,7 +109,8 @@ jobs:
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
 
-      - name: Patch Build
+      - name: Patch build (Git)
+        if: ${{ false }}
         run: |
           cd yrs
           git apply ../native/build.patch
