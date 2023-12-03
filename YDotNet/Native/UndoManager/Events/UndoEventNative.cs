@@ -17,7 +17,7 @@ internal struct UndoEventNative
 
     public byte[]? Origin()
     {
-        if (OriginHandle == nint.Zero || OriginLength == 0)
+        if (OriginHandle == nint.Zero || OriginLength <= 0)
         {
             return null;
         }
