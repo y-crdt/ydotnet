@@ -8,11 +8,11 @@ namespace YDotNet.Infrastructure;
 
 internal static class MemoryReader
 {
-    internal static unsafe byte[] ReadBytes(nint handle, uint length)
+    internal static byte[] ReadBytes(nint handle, uint length)
     {
         var data = new byte[length];
 
-        Marshal.Copy(handle, data, 0, (int)length);
+        Marshal.Copy(handle, data, startIndex: 0, (int) length);
 
         return data;
     }
