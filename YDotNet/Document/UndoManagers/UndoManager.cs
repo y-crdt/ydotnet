@@ -4,6 +4,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.UndoManager;
+using YDotNet.Native.UndoManager.Events;
 
 namespace YDotNet.Document.UndoManagers;
 
@@ -31,7 +32,7 @@ public class UndoManager : UnmanagedResource
             (_, action) =>
             {
                 UndoManagerChannel.ObserveAddedCallback callback =
-                    (_, undoEvent) => action(new UndoEvent(undoEvent));
+                    (_, handle) => action(new UndoEvent(MemoryReader.ReadStruct<UndoEventNative>(handle)));
 
                 return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
             },
@@ -43,7 +44,7 @@ public class UndoManager : UnmanagedResource
             (_, action) =>
             {
                 UndoManagerChannel.ObservePoppedCallback callback =
-                    (_, undoEvent) => action(new UndoEvent(undoEvent));
+                    (_, handle) => action(new UndoEvent(MemoryReader.ReadStruct<UndoEventNative>(handle)));
 
                 return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
             },

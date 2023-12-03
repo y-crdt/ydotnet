@@ -1,13 +1,12 @@
 using System.Runtime.InteropServices;
-using YDotNet.Native.UndoManager.Events;
 
 namespace YDotNet.Native.UndoManager;
 
 internal static class UndoManagerChannel
 {
-    public delegate void ObserveAddedCallback(nint state, UndoEventNative undoEvent);
+    public delegate void ObserveAddedCallback(nint state, nint eventHandle);
 
-    public delegate void ObservePoppedCallback(nint state, UndoEventNative undoEvent);
+    public delegate void ObservePoppedCallback(nint state, nint eventHandle);
 
     [DllImport(
         ChannelSettings.NativeLib,
