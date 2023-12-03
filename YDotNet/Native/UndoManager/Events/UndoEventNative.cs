@@ -1,8 +1,10 @@
+using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document.State;
 
 namespace YDotNet.Native.UndoManager.Events;
 
+[StructLayout(LayoutKind.Sequential)]
 internal struct UndoEventNative
 {
     public UndoEventKindNative KindNative { get; set; }
