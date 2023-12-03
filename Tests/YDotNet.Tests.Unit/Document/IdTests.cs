@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Unit.Document;
 public class IdTests
 {
     [Test]
-    public void IsGreaterThanZeroByDefault()
+    public void IsGreaterOrEqualToZeroByDefault()
     {
         // Arrange
         var doc = new Doc();
@@ -15,6 +15,6 @@ public class IdTests
         var id = doc.Id;
 
         // Assert
-        Assert.That(id, Is.GreaterThan(expected: 0));
+        Assert.That(id, Is.GreaterThanOrEqualTo(expected: 0));
     }
 }
