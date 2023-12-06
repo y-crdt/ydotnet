@@ -20,7 +20,7 @@ public sealed class JsonObject : ReadOnlyDictionary<string, Output>
     {
         var entriesHandle = OutputChannel.Object(handle).Checked();
 
-        var result = new Dictionary<string, Output>();
+        var result = new Dictionary<string, Output>(StringComparer.Ordinal);
 
         foreach (var (native, itemHandle) in MemoryReader.ReadStructsWithHandles<MapEntryNative>(entriesHandle, length))
         {

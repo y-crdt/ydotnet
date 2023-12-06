@@ -13,7 +13,8 @@ internal sealed class DocumentContainer
     private readonly DelayedWriter writer;
     private Doc? doc;
 
-    public DocumentContainer(string documentName,
+    public DocumentContainer(
+        string documentName,
         IDocumentStorage documentStorage,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,
