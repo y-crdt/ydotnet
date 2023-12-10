@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  YRS_REPO: https://github.com/LSViana/y-crdt
+  YRS_REPO: https://github.com/y-crdt/y-crdt
   YRS_BRANCH: main
   CARGO_TERM_COLOR: always
 
