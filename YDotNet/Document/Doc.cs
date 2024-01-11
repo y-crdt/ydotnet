@@ -209,18 +209,20 @@ public class Doc : UnmanagedResource
         {
             ThrowIfDisposed();
 
-            var stringHandle = DocChannel.Guid(Handle);
+            var stringHandle = DocChannel.CollectionId(Handle);
+
+            if (stringHandle == nint.Zero)
+            {
+                return null;
+            }
+
             try
             {
-                MemoryReader.TryReadUtf8String(stringHandle, out var result);
-                return result;
+                return MemoryReader.ReadUtf8String(stringHandle);
             }
             finally
             {
-                if (stringHandle != nint.Zero)
-                {
-                    StringChannel.Destroy(stringHandle);
-                }
+                StringChannel.Destroy(stringHandle);
             }
         }
     }

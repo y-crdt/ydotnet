@@ -106,17 +106,4 @@ internal static class MemoryReader
         StringChannel.Destroy(handle);
         return result;
     }
-
-    internal static bool TryReadUtf8String(nint handle, out string? result)
-    {
-        if (handle == nint.Zero)
-        {
-            result = null;
-            return false;
-        }
-
-        result = ReadUtf8String(handle);
-
-        return true;
-    }
 }
