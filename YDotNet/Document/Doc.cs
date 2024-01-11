@@ -151,14 +151,14 @@ public class Doc : UnmanagedResource
         {
             ThrowIfDisposed();
 
-            var guidHandle = DocChannel.Guid(Handle);
+            var stringHandle = DocChannel.Guid(Handle);
             try
             {
-                return MemoryReader.ReadUtf8String(guidHandle);
+                return MemoryReader.ReadUtf8String(stringHandle);
             }
             finally
             {
-                StringChannel.Destroy(guidHandle);
+                StringChannel.Destroy(stringHandle);
             }
         }
     }
@@ -209,8 +209,19 @@ public class Doc : UnmanagedResource
         {
             ThrowIfDisposed();
 
-            MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
-            return result;
+            var stringHandle = DocChannel.Guid(Handle);
+            try
+            {
+                MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
+                return result;
+            }
+            finally
+            {
+                if (stringHandle != nint.Zero)
+                {
+                    StringChannel.Destroy(stringHandle);
+                }
+            }
         }
     }
 
