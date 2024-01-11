@@ -212,7 +212,7 @@ public class Doc : UnmanagedResource
             var stringHandle = DocChannel.Guid(Handle);
             try
             {
-                MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
+                MemoryReader.TryReadUtf8String(stringHandle, out var result);
                 return result;
             }
             finally
