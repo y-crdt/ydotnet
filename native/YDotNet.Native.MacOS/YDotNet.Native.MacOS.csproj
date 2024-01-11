@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\output\macos\libyrs.dylib" Pack="True" PackagePath="runtimes\osx\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\macos-x86_64\libyrs.dylib" Pack="True" PackagePath="runtimes\osx-x64\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\macos-aarch64\libyrs.dylib" Pack="True" PackagePath="runtimes\osx-arm64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
