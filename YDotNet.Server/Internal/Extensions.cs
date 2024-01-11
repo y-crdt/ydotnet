@@ -37,7 +37,8 @@ internal static class Extensions
             return new ValueTask<byte>(source[position++]);
         }
 
-        protected override ValueTask ReadBytesAsync(Memory<byte> bytes,
+        protected override ValueTask ReadBytesAsync(
+            Memory<byte> bytes,
             CancellationToken ct)
         {
             if (position + bytes.Length >= source.Length)

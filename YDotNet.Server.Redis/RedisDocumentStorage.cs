@@ -24,7 +24,8 @@ public sealed class RedisDocumentStorage : IDocumentStorage
         database = connection.GetDatabase(redisOptions.Database);
     }
 
-    public async ValueTask<byte[]?> GetDocAsync(string name,
+    public async ValueTask<byte[]?> GetDocAsync(
+        string name,
         CancellationToken ct = default)
     {
         if (database == null)

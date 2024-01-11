@@ -11,6 +11,18 @@ public abstract class Encoder
     private readonly byte[] stringBuffer = new byte[128];
 
     /// <summary>
+    /// Writes all pending data to the output stream.
+    /// </summary>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>
+    /// The task representing the async operation.
+    /// </returns>
+    public virtual ValueTask FlushAsync(CancellationToken ct = default)
+    {
+        return default;
+    }
+
+    /// <summary>
     /// Writes a number with variable length encoding.
     /// </summary>
     /// <param name="value">The number to write.</param>

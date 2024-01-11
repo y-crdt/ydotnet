@@ -40,7 +40,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
         await cache.DisposeAsync().ConfigureAwait(false);
     }
 
-    public async ValueTask<byte[]> GetStateVectorAsync(DocumentContext context,
+    public async ValueTask<byte[]> GetStateVectorAsync(
+        DocumentContext context,
         CancellationToken ct = default)
     {
         var container = cache.GetContext(context.DocumentName);
@@ -143,7 +144,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }
     }
 
-    public async ValueTask DisconnectAsync(DocumentContext context,
+    public async ValueTask DisconnectAsync(
+        DocumentContext context,
         CancellationToken ct = default)
     {
         if (users.Remove(context.DocumentName, context.ClientId))
@@ -171,7 +173,8 @@ public sealed class DefaultDocumentManager : IDocumentManager
         cache.RemoveEvictedItems();
     }
 
-    public ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
+    public ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(
+        DocumentContext context,
         CancellationToken ct = default)
     {
         return new ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>>(users.GetUsers(context.DocumentName));
