@@ -23,7 +23,7 @@ public record UnknownMessage(ulong Identifier) : BaseMessage;
 /// <remarks>
 /// See: https://github.com/yjs/y-protocols/blob/master/awareness.js.
 /// </remarks>
-public record QueryAwarnessMessage : BaseMessage
+public record QueryAwarenessMessage : BaseMessage
 {
     /// <summary>
     /// Identifier for the this message.

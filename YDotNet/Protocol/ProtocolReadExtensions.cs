@@ -22,7 +22,7 @@ public static class ProtocolReadExtensions
             case SyncMessage.BaseIdentifier:
                 return await ReadSyncMessageAsync(decoder, ct).ConfigureAwait(false);
 
-            case QueryAwarnessMessage.Identifier:
+            case QueryAwarenessMessage.Identifier:
                 return await ReadAwarenessMessageAsync(decoder, ct).ConfigureAwait(false);
 
             default:

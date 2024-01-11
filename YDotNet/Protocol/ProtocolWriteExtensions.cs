@@ -95,11 +95,11 @@ public static class ProtocolWriteExtensions
     /// The task representing the async operation.
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="message"/> is null.</exception>
-    public static async Task WriteAsync(this Encoder encoder, QueryAwarnessMessage message, CancellationToken ct)
+    public static async Task WriteAsync(this Encoder encoder, QueryAwarenessMessage message, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        await encoder.WriteVarUintAsync(QueryAwarnessMessage.Identifier, ct).ConfigureAwait(false);
+        await encoder.WriteVarUintAsync(QueryAwarenessMessage.Identifier, ct).ConfigureAwait(false);
     }
 
     /// <summary>
