@@ -8,6 +8,7 @@ using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
 namespace YDotNet.Document;
@@ -150,7 +151,15 @@ public class Doc : UnmanagedResource
         {
             ThrowIfDisposed();
 
-            return MemoryReader.ReadUtf8String(DocChannel.Guid(Handle));
+            var stringHandle = DocChannel.Guid(Handle);
+            try
+            {
+                return MemoryReader.ReadUtf8String(stringHandle);
+            }
+            finally
+            {
+                StringChannel.Destroy(stringHandle);
+            }
         }
     }
 
@@ -200,8 +209,21 @@ public class Doc : UnmanagedResource
         {
             ThrowIfDisposed();
 
-            MemoryReader.TryReadUtf8String(DocChannel.CollectionId(Handle), out var result);
-            return result;
+            var stringHandle = DocChannel.CollectionId(Handle);
+
+            if (stringHandle == nint.Zero)
+            {
+                return null;
+            }
+
+            try
+            {
+                return MemoryReader.ReadUtf8String(stringHandle);
+            }
+            finally
+            {
+                StringChannel.Destroy(stringHandle);
+            }
         }
     }
 

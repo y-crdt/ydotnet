@@ -91,19 +91,6 @@ internal static class MemoryReader
         return Encoding.UTF8.GetString(readOnlySpan);
     }
 
-    internal static bool TryReadUtf8String(nint handle, out string? result)
-    {
-        if (handle == nint.Zero)
-        {
-            result = null;
-            return false;
-        }
-
-        result = ReadUtf8String(handle);
-
-        return true;
-    }
-
     public static byte[] ReadAndDestroyBytes(nint handle, uint length)
     {
         var data = ReadBytes(handle, length);
