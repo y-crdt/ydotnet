@@ -19,7 +19,7 @@ internal sealed class DelayedWriter
         writeTimer = new Timer(_ => Write(), null, Timeout.Infinite, Timeout.Infinite);
     }
 
-    public Func<DateTime> Clock = () => DateTime.UtcNow;
+    public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
 
     public async Task FlushAsync()
     {

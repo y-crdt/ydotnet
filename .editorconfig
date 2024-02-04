@@ -30,6 +30,8 @@ dotnet_diagnostic.SA1101.severity = none # Prefix local calls with this
 
 # Ordering rules
 dotnet_diagnostic.SA1200.severity = suggestion # Using directives should be placed correctly
+dotnet_diagnostic.SA1201.severity = none       # SA1201: Elements should appear in the correct order
+dotnet_diagnostic.SA1202.severity = none       # SA1202: Elements should be ordered by access
 dotnet_diagnostic.SA1204.severity = suggestion # Static elements should appear before instance elements
 
 # Maintainability rules
@@ -45,3 +47,8 @@ dotnet_diagnostic.SA1601.severity = suggestion # Partial elements should be docu
 dotnet_diagnostic.SA1602.severity = suggestion # Enumeration items should be documented
 dotnet_diagnostic.SA1633.severity = none # File should have header
 
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# MA0055: Do not use finalizer
+dotnet_diagnostic.MA0055.severity = none

@@ -43,8 +43,7 @@ public sealed class RedisDocumentStorage : IDocumentStorage
         return item;
     }
 
-    public async ValueTask StoreDocAsync(string name, byte[] doc,
-        CancellationToken ct = default)
+    public async ValueTask StoreDocAsync(string name, byte[] doc, CancellationToken ct = default)
     {
         if (database == null)
         {

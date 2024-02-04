@@ -101,19 +101,19 @@ internal sealed class DocumentContainer
 
     private async Task WriteAsync()
     {
-        var doc = this.doc;
+        var curentDoc = this.doc;
 
-        if (doc == null)
+        if (curentDoc == null)
         {
             return;
         }
 
         byte[] state;
 
-        slimLock.Wait();
+        await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            using var transaction = doc.ReadTransactionOrThrow();
+            using var transaction = curentDoc.ReadTransactionOrThrow();
 
             var snapshot = transaction!.Snapshot()!;
 

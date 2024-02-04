@@ -334,9 +334,9 @@ public class GetTests
         var map = doc.Map("map");
         var transaction = doc.WriteTransaction();
 
-        foreach (var value in values)
+        foreach (var (kez, value) in values)
         {
-            map.Insert(transaction, value.Key, value.Value);
+            map.Insert(transaction, kez, value);
         }
 
         return (map, transaction);

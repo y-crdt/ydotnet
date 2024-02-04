@@ -258,7 +258,7 @@ public sealed class YDotNetSocketMiddleware : IDocumentCallback
         }
     }
 
-    private async Task SendPendingUpdatesAsync(WebSocketEncoder encoder, ClientState state, CancellationToken ct)
+    private static async Task SendPendingUpdatesAsync(WebSocketEncoder encoder, ClientState state, CancellationToken ct)
     {
         while (state.PendingUpdates.TryDequeue(out var pendingDiff))
         {

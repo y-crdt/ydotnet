@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Logging;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace YDotNet.Server.Redis.Internal;
 

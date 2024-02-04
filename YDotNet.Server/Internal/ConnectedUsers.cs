@@ -4,9 +4,9 @@ namespace YDotNet.Server.Internal;
 
 public sealed class ConnectedUsers
 {
-    private readonly ConcurrentDictionary<string, Dictionary<ulong, ConnectedUser>> users = new();
+    private readonly ConcurrentDictionary<string, Dictionary<ulong, ConnectedUser>> users = new(StringComparer.Ordinal);
 
-    public Func<DateTime> Clock = () => DateTime.UtcNow;
+    public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
 
     public IReadOnlyDictionary<ulong, ConnectedUser> GetUsers(string documentName)
     {

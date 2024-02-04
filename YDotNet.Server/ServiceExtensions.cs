@@ -22,7 +22,8 @@ public static class ServiceExtensions
         };
     }
 
-    public static YDotnetRegistration AddCallback<T>(this YDotnetRegistration registration) where T : class, IDocumentCallback
+    public static YDotnetRegistration AddCallback<T>(this YDotnetRegistration registration)
+        where T : class, IDocumentCallback
     {
         registration.Services.AddSingleton<IDocumentCallback, T>();
         return registration;

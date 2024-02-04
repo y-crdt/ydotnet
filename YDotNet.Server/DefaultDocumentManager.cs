@@ -55,8 +55,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }).ConfigureAwait(false);
     }
 
-    public async ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector,
-        CancellationToken ct = default)
+    public async ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector, CancellationToken ct = default)
     {
         var container = cache.GetContext(context.DocumentName);
 
@@ -69,8 +68,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }).ConfigureAwait(false);
     }
 
-    public async ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,
-        CancellationToken ct = default)
+    public async ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff, CancellationToken ct = default)
     {
         var container = cache.GetContext(context.DocumentName);
 
@@ -103,8 +101,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         return result;
     }
 
-    public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action,
-        CancellationToken ct = default)
+    public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action, CancellationToken ct = default)
     {
         var container = cache.GetContext(context.DocumentName);
 
@@ -129,8 +126,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         }
     }
 
-    public async ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null,
-        CancellationToken ct = default)
+    public async ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null, CancellationToken ct = default)
     {
         if (users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state, out var newState))
         {

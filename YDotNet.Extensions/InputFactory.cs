@@ -19,7 +19,7 @@ public static class InputFactory
 
         static Input ConvertObject(JsonElement element)
         {
-            return Input.Object(element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertValue(x.Value)));
+            return Input.Object(element.EnumerateObject().ToDictionary(x => x.Name, x => ConvertValue(x.Value), StringComparer.Ordinal));
         }
 
         static Input ConvertArray(JsonElement element)
