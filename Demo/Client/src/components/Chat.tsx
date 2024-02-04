@@ -67,7 +67,7 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
                     <Col>
                         <Input value={text} onChange={_setText}></Input>
                     </Col>
-                    <Col xs='auto' className='pl-2'>
+                    <Col xs='auto' className='ps-2'>
                         <Button onClick={_comment}>Comment</Button>
                     </Col>
                 </Row>

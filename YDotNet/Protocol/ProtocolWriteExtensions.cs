@@ -40,7 +40,7 @@ public static class ProtocolWriteExtensions
         ArgumentNullException.ThrowIfNull(message);
 
         await encoder.WriteVarUintAsync(SyncMessage.BaseIdentifier, ct).ConfigureAwait(false);
-        await encoder.WriteVarUintAsync(SyncStep1Message.Identifier, ct).ConfigureAwait(false);
+        await encoder.WriteVarUintAsync(SyncStep2Message.Identifier, ct).ConfigureAwait(false);
         await encoder.WriteVarUint8Array(message.Update, ct).ConfigureAwait(false);
         await encoder.FlushAsync(ct).ConfigureAwait(false);
     }

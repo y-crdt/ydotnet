@@ -31,7 +31,7 @@ jobs:
             os: ubuntu-latest
 
           # macOS
-          - build: macos
+          - build:  macos-x86_64
             os: macos-latest
 
     steps:
