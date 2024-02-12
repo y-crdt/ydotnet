@@ -91,14 +91,14 @@ public static class YDotNetExtensions
 
         static void WriteMap(Map map, Utf8JsonWriter jsonWriter, Transaction transaction)
         {
-            jsonWriter.WriteStartArray();
+            jsonWriter.WriteStartObject();
 
             foreach (var property in map.Iterate(transaction))
             {
                 WriteProperty(property.Key, property.Value, jsonWriter, transaction);
             }
 
-            jsonWriter.WriteEndArray();
+            jsonWriter.WriteEndObject();
         }
 
         static void WriteArray(Array array, Utf8JsonWriter jsonWriter, Transaction transaction)
