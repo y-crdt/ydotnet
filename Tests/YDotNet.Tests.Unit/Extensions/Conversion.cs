@@ -43,6 +43,34 @@ internal class Conversion
     }
 
     [Test]
+    public void CanParseMapsToObject()
+    {
+        // Arrange
+        var doc = new Doc();
+        var items = doc.Array("items");
+
+        using (var transaction = doc.WriteTransaction())
+        {
+            var map = Input.Map(new Dictionary<string, Input>()
+            {
+                ["value"] = Input.String("Hello YDotNet"),
+            });
+            items.InsertRange(transaction, 0, map);
+        }
+
+        using (var transaction = doc.ReadTransaction())
+        {
+            var map = items.Get(transaction, 0);
+            
+            // Act
+            var parsed = map.To<Expected>(transaction);
+            
+            // Assert
+            Assert.That(parsed.Value, Is.EqualTo("Hello YDotNet"));
+        }
+    }
+
+    [Test]
     public void ConvertToJson()
     {
         // Arrange
