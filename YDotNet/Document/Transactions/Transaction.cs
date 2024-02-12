@@ -373,6 +373,12 @@ public class Transaction : UnmanagedResource
         }
 
         var branchKind = (BranchKind)BranchChannel.Kind(branchHandle);
+
+        if (branchKind == BranchKind.Null)
+        {
+            return nint.Zero;
+        }
+
         if (branchKind != expectedKind)
         {
             throw new YDotNetException($"Expected '{expectedKind}', got '{branchKind}'.");
