@@ -14,6 +14,18 @@ public sealed class Callback : IDocumentCallback
         this.log = log;
     }
 
+    public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
+    {
+        log.LogInformation("Client {clientId} awareness changed.", @event.Context.ClientId);
+        return default;
+    }
+
+    public ValueTask OnClientDisconnectedAsync(ClientDisconnectedEvent @event)
+    {
+        log.LogInformation("Client {clientId} disconnected.", @event.Context.ClientId);
+        return default;
+    }
+
     public ValueTask OnDocumentLoadedAsync(DocumentLoadEvent @event)
     {
         if (@event.Context.DocumentName == "notifications")
@@ -69,6 +81,7 @@ public sealed class Callback : IDocumentCallback
             {
                 List<Notification> notifications;
 
+                // Keep the transaction open as short as possible.
                 using (var transaction = @event.Document.ReadTransaction())
                 {
                     notifications = newNotificationsRaw.Select(x => x.To<Notification>(transaction)).ToList();
@@ -78,7 +91,8 @@ public sealed class Callback : IDocumentCallback
 
                 notifications = notifications.Select(x => new Notification { Text = $"You got the follow message: {x.Text}" }).ToList();
 
-                using (var transaction = doc.WriteTransaction() ?? throw new InvalidOperationException("Failed to open transaction."))
+                // Keep the transaction open as short as possible.
+                using (var transaction = doc.WriteTransaction())
                 {
                     array.InsertRange(transaction, array.Length, notifications.Select(x => x.ToInput()).ToArray());
                 }

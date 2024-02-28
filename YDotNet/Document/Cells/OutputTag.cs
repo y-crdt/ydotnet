@@ -84,5 +84,5 @@ public enum OutputTag
     /// <summary>
     ///     Represents a cell with an <see cref="YDotNet.Document.Doc" /> value.
     /// </summary>
-    Doc = 7
+    Doc = 7,
 }

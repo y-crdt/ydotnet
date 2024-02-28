@@ -29,6 +29,6 @@ export const Awareness = () => {
     }, [awareness]);
 
     return (
-        <Input type='textarea' value={JSON.stringify(state, undefined, 2)} />
+        <Input type='textarea' readOnly value={JSON.stringify(state, undefined, 2)} />
     );
 };

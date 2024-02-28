@@ -9,7 +9,7 @@ export const Increment = () => {
 
     React.useEffect(() => {
         const handler = () => {
-            setState(map.get('value') || 0);
+            setState(map.get('value') as number || 0);
         };
 
         handler();
@@ -35,7 +35,7 @@ export const Increment = () => {
     };
 
     return (
-        <Row noGutters>
+        <Row className='gap-0'>
             <Col xs='auto'>
                 <Button onClick={_decrement}>-1</Button>
             </Col>

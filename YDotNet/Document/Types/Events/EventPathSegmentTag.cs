@@ -13,5 +13,5 @@ public enum EventPathSegmentTag : sbyte
     /// <summary>
     ///     The <see cref="EventPathSegment" /> contains an <see cref="int" /> value.
     /// </summary>
-    Index = 2
+    Index = 2,
 }

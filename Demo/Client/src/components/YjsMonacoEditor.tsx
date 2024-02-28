@@ -21,9 +21,7 @@ export const YjsMonacoEditor = () => {
 
     return (
         <div>
-            <MonacoEditor
-                editorDidMount={(e) => _onEditorDidMount(e)}
-            />
+            <MonacoEditor editorDidMount={(e) => _onEditorDidMount(e)} />
         </div>
     );
 };

@@ -18,5 +18,5 @@ public enum EventKeyChangeTag
     /// <summary>
     ///     Represents that the value under this key was updated.
     /// </summary>
-    Update
+    Update,
 }

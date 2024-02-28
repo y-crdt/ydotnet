@@ -32,7 +32,7 @@ public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
                 Builders<DocumentEntity>.IndexKeys.Ascending(x => x.Expiration),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.Zero
+                    ExpireAfter = TimeSpan.Zero,
                 }),
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }

@@ -19,7 +19,7 @@ public class UndoManagerOptions
     {
         return new UndoManagerOptionsNative
         {
-            CaptureTimeoutMilliseconds = CaptureTimeoutMilliseconds
+            CaptureTimeoutMilliseconds = CaptureTimeoutMilliseconds,
         };
     }
 }

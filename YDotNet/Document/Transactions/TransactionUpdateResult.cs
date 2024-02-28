@@ -33,5 +33,5 @@ public enum TransactionUpdateResult
     /// <summary>
     ///     Failure when trying to decode JSON content.
     /// </summary>
-    Other = 5
+    Other = 5,
 }

@@ -21,5 +21,5 @@ public enum DocEncoding
     /// <summary>
     ///     Compute editable strings length and offset using UTF-32 (Unicode) code points number.
     /// </summary>
-    Utf32 = 2
+    Utf32 = 2,
 }

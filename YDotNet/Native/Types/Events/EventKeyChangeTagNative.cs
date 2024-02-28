@@ -4,5 +4,5 @@ internal enum EventKeyChangeTagNative : byte
 {
     Add = 4,
     Remove = 5,
-    Update = 6
+    Update = 6,
 }

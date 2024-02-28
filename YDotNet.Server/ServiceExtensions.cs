@@ -18,7 +18,7 @@ public static class ServiceExtensions
 
         return new YDotnetRegistration
         {
-            Services = services
+            Services = services,
         };
     }
 
@@ -26,6 +26,13 @@ public static class ServiceExtensions
         where T : class, IDocumentCallback
     {
         registration.Services.AddSingleton<IDocumentCallback, T>();
+        return registration;
+    }
+
+    public static YDotnetRegistration AutoCleanup(this YDotnetRegistration registration, Action<CleanupOptions>? configure = null)
+    {
+        registration.Services.Configure(configure ?? (x => { }));
+        registration.Services.AddSingleton<IHostedService, DefaultDocumentCleaner>();
         return registration;
     }
 }

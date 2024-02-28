@@ -15,6 +15,7 @@ public class Program
 
         var yDotNet =
             builder.Services.AddYDotNet()
+                .AutoCleanup()
                 .AddCallback<Callback>()
                 .AddWebSockets();
 

@@ -13,5 +13,5 @@ public enum UndoEventKind
     /// <summary>
     ///     Represents a redo operation.
     /// </summary>
-    Redo = 1
+    Redo = 1,
 }

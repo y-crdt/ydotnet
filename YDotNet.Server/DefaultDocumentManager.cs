@@ -76,7 +76,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         {
             var result = new UpdateResult
             {
-                Diff = stateDiff
+                Diff = stateDiff,
             };
 
             using (var transaction = doc.WriteTransactionOrThrow())
@@ -150,6 +150,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 Context = context,
                 Source = this,
+                Reason = DisconnectReason.Disconnect,
             }).ConfigureAwait(false);
         }
     }
@@ -163,16 +164,19 @@ public sealed class DefaultDocumentManager : IDocumentManager
             {
                 Context = new DocumentContext(documentName, clientId),
                 Source = this,
+                Reason = DisconnectReason.Cleanup,
             }).ConfigureAwait(false);
         }
 
         cache.RemoveEvictedItems();
     }
 
-    public ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(
+    public async ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(
         DocumentContext context,
         CancellationToken ct = default)
     {
-        return new ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>>(users.GetUsers(context.DocumentName));
+        await CleanupAsync(default).ConfigureAwait(false);
+
+        return users.GetUsers(context.DocumentName);
     }
 }

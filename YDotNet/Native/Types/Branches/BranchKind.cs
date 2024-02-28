@@ -7,5 +7,5 @@ internal enum BranchKind
     Map = 2,
     Text = 3,
     XmlElement = 4,
-    XmlText = 5
+    XmlText = 5,
 }

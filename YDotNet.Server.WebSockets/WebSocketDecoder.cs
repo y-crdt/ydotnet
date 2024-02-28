@@ -16,7 +16,7 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
         this.webSocket = webSocket;
     }
 
-    public bool CanRead { get; set; } = true;
+    public bool CanRead { get; private set; } = true;
 
     public bool HasMore => bufferIndex < bufferLength;
 
@@ -61,7 +61,7 @@ public sealed class WebSocketDecoder : Decoder, IDisposable
             if (received.CloseStatus != null)
             {
                 CanRead = false;
-                throw new InvalidOperationException("Socket is already closed.");
+                throw new WebSocketException("Socket is already closed.");
             }
 
             bufferLength = received.Count;

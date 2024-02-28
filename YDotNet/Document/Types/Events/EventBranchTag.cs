@@ -34,5 +34,5 @@ public enum EventBranchTag : sbyte
     /// <summary>
     ///     This event holds an <see cref="XmlTextEvent" /> instance.
     /// </summary>
-    XmlText = 5
+    XmlText = 5,
 }

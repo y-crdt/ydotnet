@@ -104,7 +104,7 @@ public class DocOptions
             Encoding = (byte)Encoding,
             SkipGc = (byte)(SkipGarbageCollection ? 1 : 0),
             AutoLoad = (byte)(AutoLoad ? 1 : 0),
-            ShouldLoad = (byte)(ShouldLoad ? 1 : 0)
+            ShouldLoad = (byte)(ShouldLoad ? 1 : 0),
         };
     }
 }

@@ -24,5 +24,5 @@ public enum StickyAssociationType : sbyte
     /// <summary>
     ///     The corresponding <see cref="StickyIndex" /> points to space before the referenced element.
     /// </summary>
-    Before = -1
+    Before = -1,
 }

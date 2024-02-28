@@ -4,5 +4,5 @@ internal enum EventDeltaTagNative : sbyte
 {
     Add = 1,
     Remove = 2,
-    Retain = 3
+    Retain = 3,
 }

@@ -30,6 +30,7 @@ public sealed class DocumentChangedEvent : DocumentChangeEvent
 
 public sealed class ClientDisconnectedEvent : DocumentEvent
 {
+    required public DisconnectReason Reason { get; init; }
 }
 
 public sealed class ClientAwarenessEvent : DocumentEvent
@@ -37,4 +38,10 @@ public sealed class ClientAwarenessEvent : DocumentEvent
     required public string? ClientState { get; set; }
 
     required public ulong ClientClock { get; set; }
+}
+
+public enum DisconnectReason
+{
+    Disconnect,
+    Cleanup,
 }

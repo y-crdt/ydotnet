@@ -63,7 +63,7 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
             </div>
 
             {!isReadonly &&
-                <Row noGutters>
+                <Row className='gap-0'>
                     <Col>
                         <Input value={text} onChange={_setText}></Input>
                     </Col>

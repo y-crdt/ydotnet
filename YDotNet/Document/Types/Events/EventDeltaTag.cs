@@ -21,5 +21,5 @@ public enum EventDeltaTag
     /// <summary>
     ///     Represents the update of content.
     /// </summary>
-    Retain
+    Retain,
 }
