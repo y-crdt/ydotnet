@@ -57,13 +57,20 @@ internal sealed class DocumentCache : IAsyncDisposable
 
     public async Task RemoveEvictedItemsAsync()
     {
-        foreach (var document in RemoveItems())
+        // Keep the lock as short as possible.
+        var toCleanup = GetItemsToRemove();
+
+        foreach (var document in toCleanup)
         {
+            // This is thread safe and will block all pending updates.
             await document.DisposeAsync().ConfigureAwait(false);
 
             await slimLock.WaitAsync().ConfigureAwait(false);
             try
             {
+                // Remove the item after it has been removed.
+                // If another request is making an update while the cleanup is running it will wait and then
+                // abort with ObjectDisposedException.
                 documents.Remove(document.Name);
             }
             finally
@@ -73,25 +80,19 @@ internal sealed class DocumentCache : IAsyncDisposable
         }
     }
 
-    private IEnumerable<DocumentContainer> RemoveItems()
+    private List<DocumentContainer> GetItemsToRemove()
     {
-        List<DocumentContainer>? removed = null;
+        var removed = new List<DocumentContainer>();
 
         slimLock.Wait();
         try
         {
-            if (documents.Count == 0)
-            {
-                return Enumerable.Empty<DocumentContainer>();
-            }
-
             var now = Clock();
 
-            foreach (var (key, item) in documents)
+            foreach (var (_, item) in documents)
             {
                 if (item.ValidUntil < now)
                 {
-                    removed ??= new();
                     removed.Add(item.Document);
                 }
             }
@@ -101,28 +102,29 @@ internal sealed class DocumentCache : IAsyncDisposable
             slimLock.Release();
         }
 
-        return removed ?? Enumerable.Empty<DocumentContainer>();
+        return removed;
     }
 
     public async ValueTask<T> ApplyUpdateReturnAsync<T>(string name, Func<Doc, Task<T>> action)
     {
         try
         {
-            var container = GetContext(name);
+            var container = GetContainer(name);
 
             return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
         }
         catch (ObjectDisposedException)
         {
-            var container = GetContext(name);
+            // This happens when the document has been disposed while we are waiting to get the lock.
+            // Just get a new document from the cache and try it again.
+            var container = GetContainer(name);
 
             return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
         }
     }
 
-    private DocumentContainer GetContext(string name)
+    private DocumentContainer GetContainer(string name)
     {
-        // The memory cache does not guarantees that the callback is called in parallel. Therefore we need the lock here.
         slimLock.Wait();
         try
         {
