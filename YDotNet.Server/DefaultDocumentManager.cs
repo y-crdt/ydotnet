@@ -25,7 +25,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         this.options = options.Value;
         callback = new CallbackInvoker(callbacks, logger);
 
-        cache = new DocumentCache(documentStorage, callback, this, options.Value);
+        cache = new DocumentCache(documentStorage, callback, this, options.Value, logger);
     }
 
     public async Task StartAsync(
