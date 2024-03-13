@@ -1,46 +1,36 @@
 using Microsoft.Extensions.Logging;
 using YDotNet.Document;
-using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
 
 internal sealed class DocumentContainer
 {
-    private readonly IDocumentStorage documentStorage;
+    private readonly DocumentWriter documentWriter;
     private readonly DocumentManagerOptions options;
-    private readonly ILogger logger;
     private readonly string documentName;
     private readonly Task<Doc> loadingTask;
     private readonly SemaphoreSlim slimLock = new(1);
-    private readonly DelayedWriter writer;
-    private Doc? doc;
+
+    public string Name => documentName;
 
     public DocumentContainer(
         string documentName,
-        IDocumentStorage documentStorage,
+        DocumentWriter documentWriter,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,
         DocumentManagerOptions options,
         ILogger logger)
     {
         this.documentName = documentName;
-        this.documentStorage = documentStorage;
+        this.documentWriter = documentWriter;
         this.options = options;
-        this.logger = logger;
 
-        writer = new DelayedWriter(options.StoreDebounce, options.MaxWriteTimeInterval, WriteAsync);
-
-        loadingTask = LoadInternalAsync(documentCallback, documentManager);
+        loadingTask = LoadInternalAsync(documentCallback, documentManager, logger);
     }
 
-    public Task FlushAsync()
+    private async Task<Doc> LoadInternalAsync(IDocumentCallback documentCallback, IDocumentManager documentManager, ILogger logger)
     {
-        return writer.FlushAsync();
-    }
-
-    private async Task<Doc> LoadInternalAsync(IDocumentCallback documentCallback, IDocumentManager documentManager)
-    {
-        doc = await LoadCoreAsync().ConfigureAwait(false);
+        var doc = await LoadCoreAsync().ConfigureAwait(false);
 
         await documentCallback.OnDocumentLoadedAsync(new DocumentLoadEvent
         {
@@ -51,7 +41,9 @@ internal sealed class DocumentContainer
 
         doc.ObserveUpdatesV1(e =>
         {
-            writer.Ping();
+            logger.LogDebug("Document {name} updated.", documentName);
+
+            _ = documentWriter.WriteAsync(documentName, this);
         });
 
         return doc;
@@ -59,7 +51,7 @@ internal sealed class DocumentContainer
 
     private async Task<Doc> LoadCoreAsync()
     {
-        var documentData = await documentStorage.GetDocAsync(documentName).ConfigureAwait(false);
+        var documentData = await documentWriter.GetDocAsync(documentName).ConfigureAwait(false);
 
         if (documentData != null)
         {
@@ -86,14 +78,25 @@ internal sealed class DocumentContainer
         throw new InvalidOperationException("Document does not exist yet.");
     }
 
-    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, T> action)
+    public async Task DisposeAsync()
     {
         var document = await loadingTask.ConfigureAwait(false);
 
         await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            return action(document);
+            try
+            {
+                using var transaction = document.WriteTransaction();
+
+                var snapshot = transaction.Snapshot();
+
+                await documentWriter.WriteAsync(documentName, transaction.StateDiffV1(snapshot)).ConfigureAwait(false);
+            }
+            finally
+            {
+                document?.Dispose();
+            }
         }
         finally
         {
@@ -101,41 +104,37 @@ internal sealed class DocumentContainer
         }
     }
 
-    private async Task WriteAsync()
+    public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, Task<T>> action)
     {
-        var curentDoc = doc;
+        var document = await loadingTask.ConfigureAwait(false);
 
-        if (curentDoc == null)
-        {
-            return;
-        }
-
-        byte[] state;
-
-        logger.LogDebug("Document {documentName} will be written to stroage {storage}", documentName, documentStorage);
+        await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            await slimLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                using var transaction = curentDoc.ReadTransactionOrThrow();
-
-                var snapshot = transaction!.Snapshot()!;
-
-                state = transaction.StateDiffV1(snapshot)!;
-            }
-            finally
-            {
-                slimLock.Release();
-            }
-
-            await documentStorage.StoreDocAsync(documentName, state).ConfigureAwait(false);
-
-            logger.LogDebug("Document {documentName} has been written to storage {storage}", documentName, documentStorage);
+            return await action(document).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        finally
         {
-            logger.LogError(ex, "Document {documentName} failed to write to storage {storage}", documentName, documentStorage);
+            slimLock.Release();
+        }
+    }
+
+    internal async Task<byte[]> GetStateAsync()
+    {
+        var document = await loadingTask.ConfigureAwait(false);
+
+        await slimLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            using var transaction = document.ReadTransaction();
+
+            var snapshot = transaction.Snapshot()!;
+
+            return transaction.StateDiffV1(snapshot)!;
+        }
+        finally
+        {
+            slimLock.Release();
         }
     }
 }

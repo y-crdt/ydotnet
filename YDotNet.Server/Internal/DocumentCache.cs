@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using YDotNet.Document;
 using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
@@ -7,10 +7,10 @@ namespace YDotNet.Server.Internal;
 internal sealed class DocumentCache : IAsyncDisposable
 {
     private readonly ILogger logger;
-    private readonly IDocumentStorage documentStorage;
     private readonly IDocumentCallback documentCallback;
     private readonly IDocumentManager documentManager;
     private readonly DocumentManagerOptions options;
+    private readonly DocumentWriter documentWriter;
     private readonly Dictionary<string, Item> documents = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim slimLock = new(1);
 
@@ -30,9 +30,9 @@ internal sealed class DocumentCache : IAsyncDisposable
         DocumentManagerOptions options,
         ILogger logger)
     {
-        this.documentStorage = documentStorage;
         this.documentCallback = documentCallback;
         this.documentManager = documentManager;
+        this.documentWriter = new DocumentWriter(documentStorage, options.StoreDebounce, options.MaxWriteTimeInterval, logger);
         this.options = options;
         this.logger = logger;
     }
@@ -44,7 +44,7 @@ internal sealed class DocumentCache : IAsyncDisposable
         {
             foreach (var (_, item) in documents)
             {
-                await item.Document.FlushAsync().ConfigureAwait(false);
+                await item.Document.DisposeAsync().ConfigureAwait(false);
             }
 
             documents.Clear();
@@ -55,17 +55,27 @@ internal sealed class DocumentCache : IAsyncDisposable
         }
     }
 
-    public async Task RemoveEvictedItems()
+    public async Task RemoveEvictedItemsAsync()
     {
         foreach (var document in RemoveItems())
         {
-            await document.FlushAsync().ConfigureAwait(false);
+            await document.DisposeAsync().ConfigureAwait(false);
+
+            await slimLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                documents.Remove(document.Name);
+            }
+            finally
+            {
+                slimLock.Release();
+            }
         }
     }
 
     private IEnumerable<DocumentContainer> RemoveItems()
     {
-        List<(string, DocumentContainer)>? removed = null;
+        List<DocumentContainer>? removed = null;
 
         slimLock.Wait();
         try
@@ -82,15 +92,7 @@ internal sealed class DocumentCache : IAsyncDisposable
                 if (item.ValidUntil < now)
                 {
                     removed ??= new();
-                    removed.Add((key, item.Document));
-                }
-            }
-
-            if (removed != null)
-            {
-                foreach (var (key, _) in removed)
-                {
-                    documents.Remove(key);
+                    removed.Add(item.Document);
                 }
             }
         }
@@ -99,10 +101,26 @@ internal sealed class DocumentCache : IAsyncDisposable
             slimLock.Release();
         }
 
-        return removed?.Select(x => x.Item2) ?? Enumerable.Empty<DocumentContainer>();
+        return removed ?? Enumerable.Empty<DocumentContainer>();
     }
 
-    public DocumentContainer GetContext(string name)
+    public async ValueTask<T> ApplyUpdateReturnAsync<T>(string name, Func<Doc, Task<T>> action)
+    {
+        try
+        {
+            var container = GetContext(name);
+
+            return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
+        }
+        catch (ObjectDisposedException)
+        {
+            var container = GetContext(name);
+
+            return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
+        }
+    }
+
+    private DocumentContainer GetContext(string name)
     {
         // The memory cache does not guarantees that the callback is called in parallel. Therefore we need the lock here.
         slimLock.Wait();
@@ -112,7 +130,7 @@ internal sealed class DocumentCache : IAsyncDisposable
             {
                 var document = new DocumentContainer(
                     name,
-                    documentStorage,
+                    documentWriter,
                     documentCallback,
                     documentManager,
                     options,
@@ -122,49 +140,12 @@ internal sealed class DocumentCache : IAsyncDisposable
                 {
                     Document = document,
                 };
+
+                documents[name] = item;
             }
 
-            return memoryCache.GetOrCreate(name, entry =>
-            {
-                // Check if there are any pending flushes. If the flush is still running we wait for the flush.
-                if (documents.TryGetValue(name, out var container))
-                {
-                    documents.Remove(name);
-                }
-                else
-                {
-                    
-                }
-
-                // For each access we extend the lifetime of the cache entry.
-                entry.SlidingExpiration = options.CacheDuration;
-                entry.RegisterPostEvictionCallback((_, _, _, _) =>
-                {
-                    // There is no background thread for eviction. It is just done from sync code.
-                    _ = CleanupAsync(name, container);
-                });
-
-                documents.Add(name, container);
-                return container;
-            })!;
-        }
-        finally
-        {
-            slimLock.Release();
-        }
-    }
-
-    private async Task CleanupAsync(string name, DocumentContainer context)
-    {
-        logger.LogDebug("Cleanup document {document}", name);
-
-        // Flush all pending changes to the storage and then remove the context from the list of living entries.
-        await context.FlushAsync().ConfigureAwait(false);
-
-        await slimLock.WaitAsync().ConfigureAwait(false);
-        try
-        {
-            documents.Remove(name);
+            item.ValidUntil = Clock() + options.CacheDuration;
+            return item.Document;
         }
         finally
         {
