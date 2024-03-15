@@ -15,7 +15,7 @@ public abstract class Branch : UnmanagedResource
 {
     private readonly EventSubscriber<EventBranch[]> onDeep;
 
-    internal protected Branch(nint handle, Doc doc, bool isDeleted)
+    protected internal Branch(nint handle, Doc doc, bool isDeleted)
         : base(handle, isDeleted)
     {
         Doc = doc;
