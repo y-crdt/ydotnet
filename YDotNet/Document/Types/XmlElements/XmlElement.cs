@@ -31,7 +31,7 @@ public class XmlElement : Branch
 
                 return (XmlElementChannel.Observe(xmlElement, nint.Zero, callback), callback);
             },
-            XmlElementChannel.Unobserve);
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
