@@ -32,7 +32,7 @@ public class XmlText : Branch
 
                 return (XmlTextChannel.Observe(xmlText, nint.Zero, callback), callback);
             },
-            XmlTextChannel.Unobserve);
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ public class XmlText : Branch
     {
         ThrowIfDisposed();
 
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte) associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
