@@ -31,7 +31,7 @@ public class Array : Branch
 
                 return (ArrayChannel.Observe(array, nint.Zero, callback), callback);
             },
-            ArrayChannel.Unobserve);
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
