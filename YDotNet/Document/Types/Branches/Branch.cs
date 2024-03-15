@@ -3,6 +3,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
@@ -36,7 +37,7 @@ public abstract class Branch : UnmanagedResource
 
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
-            (branch, s) => BranchChannel.UnobserveDeep(branch, s));
+            SubscriptionChannel.Unobserve);
 #pragma warning restore CA1806 // Do not ignore method results
     }
 
