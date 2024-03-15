@@ -198,7 +198,7 @@ public class XmlText : Branch
     {
         ThrowIfDisposed();
 
-        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
         XmlTextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
     }
