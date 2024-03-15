@@ -5,6 +5,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Maps;
 
 namespace YDotNet.Document.Types.Maps;
@@ -29,7 +30,7 @@ public class Map : Branch
 
                 return (MapChannel.Observe(map, nint.Zero, callback), callback);
             },
-            MapChannel.Unobserve);
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
