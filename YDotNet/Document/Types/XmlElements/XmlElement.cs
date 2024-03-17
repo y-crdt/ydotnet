@@ -1,9 +1,9 @@
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.Transactions;
-using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.XmlElements.Events;
 using YDotNet.Document.Types.XmlElements.Trees;
+using YDotNet.Document.Types.XmlFragments;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
@@ -14,7 +14,7 @@ namespace YDotNet.Document.Types.XmlElements;
 /// <summary>
 ///     A shared data type that represents an XML element.
 /// </summary>
-public class XmlElement : Branch
+public class XmlElement : XmlFragment
 {
     private readonly EventSubscriber<XmlElementEvent> onObserve;
 
@@ -143,11 +143,9 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>The number of direct child nodes of this <see cref="XmlElement" />.</returns>
-    public uint ChildLength(Transaction transaction)
+    public new uint ChildLength(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        return XmlElementChannel.ChildLength(Handle, transaction.Handle);
+        return base.ChildLength(transaction);
     }
 
     /// <summary>
@@ -157,32 +155,22 @@ public class XmlElement : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
-    public XmlText InsertText(Transaction transaction, uint index)
+    public new XmlText InsertText(Transaction transaction, uint index)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
-
-        return Doc.GetXmlText(handle, isDeleted: false);
+        return base.InsertText(transaction, index);
     }
 
     /// <summary>
-    ///     Inserts an <see cref="XmlText" /> as a child of this <see cref="XmlElement" /> at the given
+    ///     Inserts an <see cref="XmlElement" /> as a child of this <see cref="XmlElement" /> at the given
     ///     <paramref name="index" />.
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index that the <see cref="XmlText" /> will be inserted.</param>
     /// <param name="name">The name (or tag) of the <see cref="XmlElement" /> that will be inserted.</param>
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
-    public XmlElement InsertElement(Transaction transaction, uint index, string name)
+    public new XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
-        ThrowIfDisposed();
-
-        using var unsafeName = MemoryWriter.WriteUtf8String(name);
-
-        var handle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
-
-        return Doc.GetXmlElement(handle, isDeleted: false);
+        return base.InsertElement(transaction, index, name);
     }
 
     /// <summary>
@@ -192,11 +180,9 @@ public class XmlElement : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to start removing the child nodes.</param>
     /// <param name="length">The amount of child nodes to remove, starting at <paramref name="index" />.</param>
-    public void RemoveRange(Transaction transaction, uint index, uint length)
+    public new void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        ThrowIfDisposed();
-
-        XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
+        base.RemoveRange(transaction, index, length);
     }
 
     /// <summary>
@@ -205,13 +191,9 @@ public class XmlElement : Branch
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="index">The index to retrieve the <see cref="Output" /> cell.</param>
     /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.</returns>
-    public Output? Get(Transaction transaction, uint index)
+    public new Output? Get(Transaction transaction, uint index)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
-
-        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
+        return base.Get(transaction, index);
     }
 
     /// <summary>
@@ -261,13 +243,9 @@ public class XmlElement : Branch
     ///     The first child of the current <see cref="XmlElement" /> node which can be an
     ///     <see cref="XmlElement" /> or an <see cref="XmlText" /> or <c>null</c> if this node is empty.
     /// </returns>
-    public Output? FirstChild(Transaction transaction)
+    public new Output? FirstChild(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
-
-        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
+        return base.FirstChild(transaction);
     }
 
     /// <summary>
@@ -296,13 +274,9 @@ public class XmlElement : Branch
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlElement" />.</returns>
-    public XmlTreeWalker TreeWalker(Transaction transaction)
+    public new XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.TreeWalker(Handle, transaction.Handle);
-
-        return new XmlTreeWalker(handle.Checked(), Doc);
+        return base.TreeWalker(transaction);
     }
 
     /// <summary>
