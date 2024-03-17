@@ -13,13 +13,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         XmlText? target = null;
         var subscription = xmlText.Observe(e => target = e.Target);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 
@@ -33,13 +37,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         IEnumerable<EventDelta>? deltas = null;
         xmlText.Observe(e => deltas = e.Delta.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         xmlText.InsertEmbed(
             transaction, index: 3, Input.Boolean(value: true), Input.Object(
@@ -78,13 +86,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         IEnumerable<EventDelta>? deltas = null;
         xmlText.Observe(e => deltas = e.Delta.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "color", "red");
         transaction.Commit();
 
@@ -98,13 +110,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         IEnumerable<EventKeyChange>? deltas = null;
         xmlText.Observe(e => deltas = e.Keys.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "color", "red");
         xmlText.InsertAttribute(transaction, "width", "16");
         transaction.Commit();
@@ -123,9 +139,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "color", "red");
         transaction.Commit();
 
@@ -150,9 +170,13 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        transaction = doc.WriteTransaction();
         xmlText.InsertAttribute(transaction, "color", "red");
         transaction.Commit();
 
@@ -177,13 +201,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         IEnumerable<EventKeyChange>? keyChanges = null;
         xmlText.Observe(e => keyChanges = e.Keys.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         xmlText.InsertEmbed(transaction, index: 3, Input.Boolean(value: true));
         transaction.Commit();

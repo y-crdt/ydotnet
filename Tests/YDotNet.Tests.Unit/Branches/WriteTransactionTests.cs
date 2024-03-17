@@ -123,7 +123,7 @@ public class WriteTransactionTests
     }
 
     [Test]
-    public void GetRootXmlTextWithOpenTransactionNotAllowed()
+    public void GetRootXmlFragmentWithOpenTransactionNotAllowed()
     {
         // Arrange
         var doc = new Doc();
@@ -133,20 +133,6 @@ public class WriteTransactionTests
         map.Length(map.WriteTransaction());
 
         // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlText("XmlText"));
-    }
-
-    [Test]
-    public void GetRootXmlElementWithOpenTransactionNotAllowed()
-    {
-        // Arrange
-        var doc = new Doc();
-        var map = doc.Map("Map");
-
-        // Keep the transaction open.
-        map.Length(map.WriteTransaction());
-
-        // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlElement("XmlElement"));
+        Assert.Throws<YDotNetException>(() => doc.XmlFragment("xml-fragment"));
     }
 }

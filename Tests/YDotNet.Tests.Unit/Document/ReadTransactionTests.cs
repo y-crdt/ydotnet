@@ -75,7 +75,7 @@ public class ReadTransactionTests
     }
 
     [Test]
-    public void GetRootXmlTextWithOpenTransactionNotAllowed()
+    public void GetRootXmlFragmentWithOpenTransactionNotAllowed()
     {
         // Arrange
         var doc = new Doc();
@@ -85,20 +85,6 @@ public class ReadTransactionTests
         map.Length(doc.ReadTransaction());
 
         // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlText("XmlText"));
-    }
-
-    [Test]
-    public void GetRootXmlElementWithOpenTransactionNotAllowed()
-    {
-        // Arrange
-        var doc = new Doc();
-        var map = doc.Map("Map");
-
-        // Keep the transaction open.
-        map.Length(doc.ReadTransaction());
-
-        // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlElement("XmlElement"));
+        Assert.Throws<YDotNetException>(() => doc.XmlFragment("xml-fragment"));
     }
 }

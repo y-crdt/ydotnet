@@ -10,9 +10,12 @@ public class CreateTests
     {
         // Arrange
         var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         // Act
-        var xmlText = doc.XmlText("xml-text");
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Assert
         Assert.That(xmlText.Handle, Is.GreaterThan(nint.Zero));

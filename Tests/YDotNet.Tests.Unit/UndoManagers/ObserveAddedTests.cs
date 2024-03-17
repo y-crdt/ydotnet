@@ -92,12 +92,7 @@ public class ObserveAddedTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Long(value: 2469L),
-                Input.Boolean(value: false),
-                Input.String("Lucas")
-            });
+            transaction, index: 0, Input.Long(value: 2469L), Input.Boolean(value: false), Input.String("Lucas"));
         transaction.Commit();
 
         // Assert
@@ -111,11 +106,7 @@ public class ObserveAddedTests
         undoEvent = null;
         transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 2, new[]
-            {
-                Input.Bytes(new byte[] { 2, 4, 6, 9 }),
-                Input.XmlText("Lucas")
-            });
+            transaction, index: 2, Input.Bytes(new byte[] { 2, 4, 6, 9 }), Input.XmlText("Lucas"));
         transaction.Commit();
 
         // Assert
@@ -204,7 +195,12 @@ public class ObserveAddedTests
     {
         // Arrange
         var doc = new Doc(new DocOptions { Id = 7853 });
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
         var undoManager = new UndoManager(
             doc, xmlText, new UndoManagerOptions
             {
@@ -215,7 +211,7 @@ public class ObserveAddedTests
         undoManager.ObserveAdded(e => undoEvent = e);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 
@@ -272,7 +268,12 @@ public class ObserveAddedTests
     {
         // Arrange
         var doc = new Doc(new DocOptions { Id = 8137 });
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
         var undoManager = new UndoManager(
             doc, xmlElement, new UndoManagerOptions
             {
@@ -283,7 +284,7 @@ public class ObserveAddedTests
         undoManager.ObserveAdded(e => undoEvent = e);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         var xmlText = xmlElement.InsertText(transaction, index: 0);
         transaction.Commit();
 
