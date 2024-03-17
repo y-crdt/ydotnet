@@ -2,6 +2,7 @@ using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Document.Types.XmlElements.Events;
+using YDotNet.Document.Types.XmlFragments.Events;
 using YDotNet.Document.Types.XmlTexts.Events;
 using YDotNet.Native;
 using YDotNet.Native.Document.Events;
@@ -18,7 +19,7 @@ public class EventBranch
 
     internal EventBranch(NativeWithHandle<EventBranchNative> native, Doc doc)
     {
-        Tag = (EventBranchTag)native.Value.Tag;
+        Tag = (EventBranchTag) native.Value.Tag;
 
         value = BuildValue(native, doc, Tag);
     }
@@ -58,30 +59,26 @@ public class EventBranch
     /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
     public XmlTextEvent XmlTextEvent => GetValue<XmlTextEvent>(EventBranchTag.XmlText);
 
+    /// <summary>
+    ///     Gets the <see cref="XmlFragmentEvent" /> value.
+    /// </summary>
+    /// <exception cref="YDotNetException">Value is not a <see cref="Doc" />.</exception>
+    public XmlFragmentEvent XmlFragmentEvent => GetValue<XmlFragmentEvent>(EventBranchTag.XmlFragment);
+
     private static object? BuildValue(NativeWithHandle<EventBranchNative> native, Doc doc, EventBranchTag tag)
     {
         var handle = native.Value.ValueHandle(native.Handle);
 
-        switch (tag)
+        return tag switch
         {
-            case EventBranchTag.Map:
-                return new MapEvent(handle, doc);
-
-            case EventBranchTag.Text:
-                return new TextEvent(handle, doc);
-
-            case EventBranchTag.Array:
-                return new ArrayEvent(handle, doc);
-
-            case EventBranchTag.XmlElement:
-                return new XmlElementEvent(handle, doc);
-
-            case EventBranchTag.XmlText:
-                return new XmlTextEvent(handle, doc);
-
-            default:
-                return null;
-        }
+            EventBranchTag.Map => new MapEvent(handle, doc),
+            EventBranchTag.Text => new TextEvent(handle, doc),
+            EventBranchTag.Array => new ArrayEvent(handle, doc),
+            EventBranchTag.XmlElement => new XmlElementEvent(handle, doc),
+            EventBranchTag.XmlText => new XmlTextEvent(handle, doc),
+            EventBranchTag.XmlFragment => new XmlFragmentEvent(handle, doc),
+            _ => null
+        };
     }
 
     private T GetValue<T>(EventBranchTag expectedType)
