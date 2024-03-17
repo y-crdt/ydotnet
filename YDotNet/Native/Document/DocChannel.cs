@@ -81,14 +81,8 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yxmlelem")]
-    public static extern nint XmlElement(nint doc, nint name);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yxmltext")]
-    public static extern nint XmlText(nint doc, nint name);
+        EntryPoint = "yxmlfragment")]
+    public static extern nint XmlFragment(nint doc, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib,
