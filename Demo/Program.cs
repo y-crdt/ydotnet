@@ -41,7 +41,7 @@ public class Program
                     {
                         options.Configuration =
                             ConfigurationOptions.Parse(
-                                builder.Configuration["Clustering:Redis:ConnectionString"]!);
+                                builder.Configuration["Storage:Redis:ConnectionString"]!);
                     });
 
                     break;
