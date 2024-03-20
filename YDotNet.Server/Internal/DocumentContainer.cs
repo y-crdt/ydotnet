@@ -55,7 +55,10 @@ internal sealed class DocumentContainer
 
         if (documentData != null)
         {
-            var document = new Doc();
+            var document = new Doc(new()
+            {
+                SkipGarbageCollection = true,
+            });
 
             using (var transaction = document.WriteTransaction())
             {
@@ -72,7 +75,10 @@ internal sealed class DocumentContainer
 
         if (options.AutoCreateDocument)
         {
-            return new Doc();
+            return new(new()
+            {
+                SkipGarbageCollection = true,
+            });
         }
 
         throw new InvalidOperationException("Document does not exist yet.");
@@ -89,9 +95,7 @@ internal sealed class DocumentContainer
             {
                 using var transaction = document.WriteTransaction();
 
-                var snapshot = transaction.Snapshot();
-
-                await documentWriter.WriteAsync(documentName, transaction.StateDiffV1(snapshot)).ConfigureAwait(false);
+                await documentWriter.WriteAsync(documentName, transaction.StateDiffV1(stateVector: null)).ConfigureAwait(false);
             }
             finally
             {
@@ -130,7 +134,7 @@ internal sealed class DocumentContainer
 
             var snapshot = transaction.Snapshot()!;
 
-            return transaction.StateDiffV1(snapshot)!;
+            return transaction.EncodeStateFromSnapshotV2(snapshot)!;
         }
         finally
         {
