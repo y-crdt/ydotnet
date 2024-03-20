@@ -83,11 +83,11 @@ public class EventBranch
 
     private T GetValue<T>(EventBranchTag expectedType)
     {
-        if (value is not T typed)
+        if (value?.GetType() != typeof(T))
         {
             throw new YDotNetException($"Expected {expectedType}, got {Tag}.");
         }
 
-        return typed;
+        return (T) value;
     }
 }
