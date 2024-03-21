@@ -8,6 +8,7 @@ using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.XmlElements;
 
@@ -263,7 +264,14 @@ public class XmlElement : XmlFragment
 
         var handle = XmlElementChannel.Parent(Handle, transaction.Handle);
 
-        return handle != nint.Zero ? Doc.GetXmlElement(handle, isDeleted: false) : null;
+        if (handle == nint.Zero)
+        {
+            return null;
+        }
+
+        var kind = (BranchKind) BranchChannel.Kind(handle);
+
+        return kind == BranchKind.XmlElement ? Doc.GetXmlElement(handle, isDeleted: false) : null;
     }
 
     /// <summary>
