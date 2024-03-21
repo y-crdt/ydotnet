@@ -17,7 +17,7 @@ public class XmlFragmentObserveDeepTests
         IEnumerable<EventPathSegment>? pathSegments = null;
 
         var subscription =
-            xmlFragment.ObserveDeep(events => pathSegments = events.First().XmlFragmentEvent.Path.ToArray());
+            xmlFragment.ObserveDeep(events => pathSegments = events.First().XmlElementEvent.Path.ToArray());
 
         // Act
         var transaction = doc.WriteTransaction();
@@ -57,7 +57,7 @@ public class XmlFragmentObserveDeepTests
         IEnumerable<EventPathSegment>? pathSegments = null;
 
         var subscription =
-            xmlFragment.ObserveDeep(events => pathSegments = events.First().XmlFragmentEvent.Path.ToArray());
+            xmlFragment.ObserveDeep(events => pathSegments = events.First().XmlElementEvent.Path.ToArray());
 
         // Act
         var transaction = doc.WriteTransaction();
