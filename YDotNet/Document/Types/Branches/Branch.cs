@@ -78,15 +78,7 @@ public abstract class Branch : UnmanagedResource
     {
         ThrowIfDisposed();
 
-        var handle = BranchChannel.ReadTransaction(Handle);
-
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
-
-        return new Transaction(handle, Doc);
+        return Doc.ReadTransaction();
     }
 
     /// <inheritdoc />
