@@ -17,10 +17,4 @@ internal static class BranchChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ytype_kind")]
     public static extern byte Kind(nint branch);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ybranch_read_transaction")]
-    public static extern nint ReadTransaction(nint branch);
 }
