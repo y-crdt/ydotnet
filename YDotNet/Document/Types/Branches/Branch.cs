@@ -61,7 +61,7 @@ public abstract class Branch : UnmanagedResource
     ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
         ThrowIfDisposed();
@@ -73,7 +73,7 @@ public abstract class Branch : UnmanagedResource
     ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
         ThrowIfDisposed();

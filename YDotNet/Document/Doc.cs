@@ -323,7 +323,7 @@ public class Doc : UnmanagedResource
     /// </summary>
     /// <param name="origin">Optional byte marker to indicate the source of changes to be applied by this transaction.</param>
     /// <returns>The <see cref="Transaction" /> to perform write operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction(byte[]? origin = null)
     {
         ThrowIfDisposed();
@@ -343,7 +343,7 @@ public class Doc : UnmanagedResource
     ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform read operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
         ThrowIfDisposed();
