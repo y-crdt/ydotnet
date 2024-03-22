@@ -21,6 +21,7 @@ internal sealed class DelayedWriter
 
     public Task FlushAsync()
     {
+        writes.OnNext(value: true);
         writes.OnCompleted();
         return completion;
     }
