@@ -1,13 +1,16 @@
 using Microsoft.Extensions.Logging;
 using YDotNet.Document;
+using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
 
 internal sealed class DocumentContainer
 {
-    private readonly DocumentWriter documentWriter;
     private readonly DocumentManagerOptions options;
+    private readonly ILogger logger;
+    private readonly DelayedWriter delayedWriter;
     private readonly string documentName;
+    private readonly IDocumentStorage documentStorage;
     private readonly Task<Doc> loadingTask;
     private readonly SemaphoreSlim slimLock = new(1);
 
@@ -15,15 +18,18 @@ internal sealed class DocumentContainer
 
     public DocumentContainer(
         string documentName,
-        DocumentWriter documentWriter,
+        IDocumentStorage documentStorage,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,
         DocumentManagerOptions options,
         ILogger logger)
     {
         this.documentName = documentName;
-        this.documentWriter = documentWriter;
+        this.documentStorage = documentStorage;
         this.options = options;
+        this.logger = logger;
+
+        delayedWriter = new DelayedWriter(options.StoreDebounce, options.MaxWriteTimeInterval, WriteAsync);
 
         loadingTask = LoadInternalAsync(documentCallback, documentManager, logger);
     }
@@ -43,7 +49,7 @@ internal sealed class DocumentContainer
         {
             logger.LogDebug("Document {name} updated.", documentName);
 
-            _ = documentWriter.WriteAsync(documentName, this);
+            delayedWriter.Ping();
         });
 
         return doc;
@@ -51,7 +57,7 @@ internal sealed class DocumentContainer
 
     private async Task<Doc> LoadCoreAsync()
     {
-        var documentData = await documentWriter.GetDocAsync(documentName).ConfigureAwait(false);
+        var documentData = await documentStorage.GetDocAsync(documentName).ConfigureAwait(false);
 
         if (documentData != null)
         {
@@ -80,34 +86,14 @@ internal sealed class DocumentContainer
 
     public async Task DisposeAsync()
     {
-        var document = await loadingTask.ConfigureAwait(false);
-
-        await slimLock.WaitAsync().ConfigureAwait(false);
-        try
-        {
-            try
-            {
-                using var transaction = document.WriteTransaction();
-
-                var snapshot = transaction.Snapshot();
-
-                await documentWriter.WriteAsync(documentName, transaction.StateDiffV1(snapshot)).ConfigureAwait(false);
-            }
-            finally
-            {
-                document?.Dispose();
-            }
-        }
-        finally
-        {
-            slimLock.Release();
-        }
+        await delayedWriter.FlushAsync().ConfigureAwait(false);
     }
 
     public async Task<T> ApplyUpdateReturnAsync<T>(Func<Doc, Task<T>> action)
     {
         var document = await loadingTask.ConfigureAwait(false);
 
+        // This is the only option to get access to the document to prevent concurrency issues.
         await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
@@ -119,18 +105,34 @@ internal sealed class DocumentContainer
         }
     }
 
-    internal async Task<byte[]> GetStateAsync()
+    private async Task WriteAsync()
     {
         var document = await loadingTask.ConfigureAwait(false);
 
-        await slimLock.WaitAsync().ConfigureAwait(false);
+        logger.LogDebug("Document {documentName} will be saved.", documentName);
+        try
+        {
+            // All the writes are thread safe itself, but they have to be synchronized with a write.
+            var state = GetStateLocked(document);
+
+            await documentStorage.StoreDocAsync(documentName, state).ConfigureAwait(false);
+
+            logger.LogDebug("Document {documentName} with size {size} been saved.", documentName, state.Length);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Document {documentName} could not be saved.", documentName);
+        }
+    }
+
+    private byte[] GetStateLocked(Doc document)
+    {
+        slimLock.Wait();
         try
         {
             using var transaction = document.ReadTransaction();
 
-            var snapshot = transaction.Snapshot()!;
-
-            return transaction.StateDiffV1(snapshot)!;
+            return transaction.StateDiffV1(stateVector: null)!;
         }
         finally
         {

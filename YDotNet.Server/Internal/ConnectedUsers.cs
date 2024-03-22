@@ -20,7 +20,7 @@ public sealed class ConnectedUsers
 
     public bool AddOrUpdate(string documentName, ulong clientId, ulong clock, string? state, out string? existingState)
     {
-        var newUsers = this.users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
+        var newUsers = users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
 
         // We expect to have relatively few users per document, therefore we use normal lock here.
         lock (newUsers)
