@@ -1,3 +1,4 @@
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -14,15 +15,19 @@ internal sealed class DelayedWriter
     public DelayedWriter(TimeSpan delayTime, TimeSpan delayMax, Func<Task> action)
     {
         completion = ThrottleMax(writes, delayTime, delayMax)
-            .Select(m => Observable.FromAsync(action))
+            .Select(write =>
+                write
+                ? Observable.FromAsync(action)
+                : Observable.Return(Unit.Default))
             .Concat()
             .ToTask();
     }
 
     public Task FlushAsync()
     {
-        writes.OnNext(value: true);
+        writes.OnNext(value: false);
         writes.OnCompleted();
+
         return completion;
     }
 
