@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using StackExchange.Redis;
+using YDotNet.Server;
 using YDotNet.Server.MongoDB;
 
 namespace Demo;
@@ -18,6 +19,11 @@ public class Program
                 .AutoCleanup()
                 .AddCallback<Callback>()
                 .AddWebSockets();
+
+        builder.Services.Configure<DocumentManagerOptions>(options =>
+        {
+            options.CacheDuration = TimeSpan.FromSeconds(10);
+        });
 
         switch (builder.Configuration["Storage:Type"])
         {
