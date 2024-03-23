@@ -91,7 +91,7 @@ public abstract class Branch : UnmanagedResource
 
         var branchIdNative = BranchChannel.Id(Handle);
 
-        return new BranchId(branchIdNative);
+        return new BranchId(branchIdNative, Doc);
     }
 
     /// <inheritdoc />

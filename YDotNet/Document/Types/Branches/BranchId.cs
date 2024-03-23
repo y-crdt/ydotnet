@@ -1,3 +1,4 @@
+using YDotNet.Document.Transactions;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Branches;
 
@@ -8,8 +9,12 @@ namespace YDotNet.Document.Types.Branches;
 /// </summary>
 public class BranchId
 {
-    internal BranchId(BranchIdNative native)
+    private readonly Doc doc;
+
+    internal BranchId(BranchIdNative native, Doc doc)
     {
+        this.doc = doc;
+
         Native = native;
     }
 
