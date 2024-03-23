@@ -23,4 +23,16 @@ internal static class BranchChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ybranch_id")]
     public static extern BranchIdNative Id(nint branch);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ybranch_get")]
+    public static extern nint Get(nint branchId, nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ybranch_alive")]
+    public static extern byte Alive(nint branchId);
 }

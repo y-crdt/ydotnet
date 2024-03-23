@@ -46,4 +46,39 @@ public class BranchId
     ///     Gets the name of the root-level shared type.
     /// </summary>
     public string? Name => HasClientIdAndClock ? null : MemoryReader.ReadUtf8String(Native.BranchIdVariant.NamePointer);
+
+    public Branch? Get(Transaction transaction)
+    {
+        var handle = MemoryWriter.WriteStruct(Native);
+
+        var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
+
+        handle.Dispose();
+
+        if (branchHandle == nint.Zero)
+        {
+            return null;
+        }
+
+        var branchKind = (BranchKind) BranchChannel.Kind(branchHandle);
+        var branchDeleted = BranchChannel.Alive(branchHandle) == 0;
+
+        switch (branchKind)
+        {
+            case BranchKind.Array:
+                return doc.GetArray(branchHandle, branchDeleted);
+            case BranchKind.Map:
+                return doc.GetMap(branchHandle, branchDeleted);
+            case BranchKind.Text:
+                return doc.GetText(branchHandle, branchDeleted);
+            case BranchKind.XmlElement:
+                return doc.GetXmlElement(branchHandle, branchDeleted);
+            case BranchKind.XmlText:
+                return doc.GetXmlText(branchHandle, branchDeleted);
+            case BranchKind.XmlFragment:
+                return doc.GetXmlFragment(branchHandle, branchDeleted);
+            default:
+                return null;
+        }
+    }
 }
