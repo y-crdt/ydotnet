@@ -81,6 +81,15 @@ public abstract class Branch : UnmanagedResource
         return Doc.ReadTransaction();
     }
 
+    public BranchId Id()
+    {
+        ThrowIfDisposed();
+
+        var branchIdNative = BranchChannel.Id(Handle);
+
+        return new BranchId(branchIdNative);
+    }
+
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
