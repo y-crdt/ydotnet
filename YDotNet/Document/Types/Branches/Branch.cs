@@ -81,6 +81,10 @@ public abstract class Branch : UnmanagedResource
         return Doc.ReadTransaction();
     }
 
+    /// <summary>
+    ///     Returns the <see cref="BranchId" /> of this collection.
+    /// </summary>
+    /// <returns>The <see cref="BranchId" /> of this collection.</returns>
     public BranchId Id()
     {
         ThrowIfDisposed();
