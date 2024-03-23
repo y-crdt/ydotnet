@@ -94,6 +94,15 @@ public abstract class Branch : UnmanagedResource
         return new BranchId(branchIdNative, Doc);
     }
 
+    /// <summary>
+    ///     Indicates whether the <see cref="Branch" /> instance is alive.
+    /// </summary>
+    /// <returns>A value indicating whether the <see cref="Branch" /> is alive.</returns>
+    public bool Alive()
+    {
+        return BranchChannel.Alive(Handle) == 1;
+    }
+
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
