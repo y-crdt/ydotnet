@@ -20,9 +20,8 @@ public class IdTests
 
         // Assert
         Assert.That(id, Is.Not.Null);
-        Assert.That(id.HasLengthAndName, Is.True);
+        Assert.That(id.HasName, Is.True);
         Assert.That(id.HasClientIdAndClock, Is.False);
-        Assert.That(id.Length, Is.EqualTo(expected: 4));
         Assert.That(id.Name, Is.EqualTo("text"));
         Assert.That(id.ClientId, Is.EqualTo(expected: null));
         Assert.That(id.Clock, Is.EqualTo(expected: null));
@@ -49,9 +48,8 @@ public class IdTests
 
         // Assert
         Assert.That(id, Is.Not.Null);
-        Assert.That(id.HasLengthAndName, Is.False);
+        Assert.That(id.HasName, Is.False);
         Assert.That(id.HasClientIdAndClock, Is.True);
-        Assert.That(id.Length, Is.Null);
         Assert.That(id.Name, Is.Null);
         Assert.That(id.ClientId, Is.EqualTo(expected: 37));
         Assert.That(id.Clock, Is.EqualTo(expected: 0));
@@ -67,9 +65,8 @@ public class IdTests
 
         // Assert
         Assert.That(id, Is.Not.Null);
-        Assert.That(id.HasLengthAndName, Is.False);
+        Assert.That(id.HasName, Is.False);
         Assert.That(id.HasClientIdAndClock, Is.True);
-        Assert.That(id.Length, Is.Null);
         Assert.That(id.Name, Is.Null);
         Assert.That(id.ClientId, Is.EqualTo(expected: 37));
         Assert.That(id.Clock, Is.EqualTo(expected: 1));
