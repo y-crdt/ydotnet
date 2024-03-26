@@ -11,10 +11,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.RemoveRange(transaction, index: 0, length: 0);
         var text = xmlText.String(transaction);
         transaction.Commit();
@@ -28,9 +32,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 
@@ -49,9 +58,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 
@@ -70,9 +84,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         xmlText.InsertEmbed(transaction, index: 2, Input.Boolean(value: true));
         transaction.Commit();
@@ -101,9 +120,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         xmlText.InsertEmbed(
             transaction, index: 2, Input.Object(

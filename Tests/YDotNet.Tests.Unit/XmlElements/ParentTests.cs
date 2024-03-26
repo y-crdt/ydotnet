@@ -11,10 +11,14 @@ public class ParentTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var parentXmlElement = xmlElement.Parent(transaction);
         transaction.Commit();
 
@@ -69,9 +73,14 @@ public class ParentTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "width");
         xmlElement.InsertElement(transaction, index: 1, "color");
         transaction.Commit();
@@ -94,9 +103,14 @@ public class ParentTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         var childXmlElement = xmlElement.InsertElement(transaction, index: 0, "dimensions");
         childXmlElement.InsertElement(transaction, index: 0, "width");
         childXmlElement.InsertElement(transaction, index: 0, "height");

@@ -11,7 +11,11 @@ public class TagTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
         var tag = xmlElement.Tag;
@@ -25,11 +29,11 @@ public class TagTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         // Act
         var transaction = doc.WriteTransaction();
-        var childXmlElement = xmlElement.InsertElement(transaction, index: 0, "color");
+        var childXmlElement = xmlFragment.InsertElement(transaction, index: 0, "color");
         var tag = childXmlElement.Tag;
         transaction.Commit();
 
@@ -65,7 +69,7 @@ public class TagTests
         var array = doc.Array("array");
 
         var transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("color") });
+        array.InsertRange(transaction, index: 0, Input.XmlElement("color"));
         transaction.Commit();
 
         // Act

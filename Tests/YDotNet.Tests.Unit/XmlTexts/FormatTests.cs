@@ -84,9 +84,10 @@ public class FormatTests
     private (Doc, XmlText) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 

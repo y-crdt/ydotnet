@@ -10,10 +10,14 @@ public class InsertElementTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         var addedXmlElement = xmlElement.InsertElement(transaction, index: 0, "color");
         var childLength = xmlElement.ChildLength(transaction);
         transaction.Commit();
@@ -29,10 +33,14 @@ public class InsertElementTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         var xmlElement1 = xmlElement.InsertElement(transaction, index: 0, "color");
         var xmlElement2 = xmlElement.InsertElement(transaction, index: 0, "width");
         var xmlElement3 = xmlElement.InsertElement(transaction, index: 0, "height");

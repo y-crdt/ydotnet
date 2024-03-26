@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 
 namespace YDotNet.Tests.Unit.Branches;
 
@@ -10,12 +11,18 @@ public class XmlTextUnobserveDeepTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var map = doc.Map("map");
+
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "xml-text", Input.XmlText("xml-text"));
+        var xmlText = map.Get(transaction, "xml-text").XmlText;
+        transaction.Commit();
+
         var called = 0;
         var subscription = xmlText.ObserveDeep(_ => called++);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "World");
         transaction.Commit();
 

@@ -11,10 +11,14 @@ public class GetTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         var value = xmlElement.Get(transaction, index: 1);
         transaction.Commit();
 
@@ -55,9 +59,14 @@ public class GetTests
     private (Doc, XmlElement) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertText(transaction, index: 1);
         xmlElement.InsertElement(transaction, index: 2, "color");

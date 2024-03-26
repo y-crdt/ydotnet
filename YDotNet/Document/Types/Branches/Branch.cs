@@ -3,6 +3,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
@@ -14,7 +15,7 @@ public abstract class Branch : UnmanagedResource
 {
     private readonly EventSubscriber<EventBranch[]> onDeep;
 
-    internal protected Branch(nint handle, Doc doc, bool isDeleted)
+    protected internal Branch(nint handle, Doc doc, bool isDeleted)
         : base(handle, isDeleted)
     {
         Doc = doc;
@@ -36,7 +37,7 @@ public abstract class Branch : UnmanagedResource
 
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
-            (branch, s) => BranchChannel.UnobserveDeep(branch, s));
+            SubscriptionChannel.Unobserve);
 #pragma warning restore CA1806 // Do not ignore method results
     }
 
@@ -60,40 +61,46 @@ public abstract class Branch : UnmanagedResource
     ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
         ThrowIfDisposed();
 
-        var handle = BranchChannel.WriteTransaction(Handle);
-
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
-
-        return new Transaction(handle, Doc);
+        return Doc.WriteTransaction();
     }
 
     /// <summary>
     ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
         ThrowIfDisposed();
 
-        var handle = BranchChannel.ReadTransaction(Handle);
+        return Doc.ReadTransaction();
+    }
 
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
+    /// <summary>
+    ///     Returns the <see cref="BranchId" /> of this collection.
+    /// </summary>
+    /// <returns>The <see cref="BranchId" /> of this collection.</returns>
+    public BranchId Id()
+    {
+        ThrowIfDisposed();
 
-        return new Transaction(handle, Doc);
+        var branchIdNative = BranchChannel.Id(Handle);
+
+        return new BranchId(branchIdNative, Doc);
+    }
+
+    /// <summary>
+    ///     Indicates whether the <see cref="Branch" /> instance is alive.
+    /// </summary>
+    /// <returns>A value indicating whether the <see cref="Branch" /> is alive.</returns>
+    public bool Alive()
+    {
+        return BranchChannel.Alive(Handle) == 1;
     }
 
     /// <inheritdoc />

@@ -10,10 +10,14 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var iterator = xmlText.Iterate(transaction);
         var values = iterator.ToArray();
         transaction.Commit();
@@ -27,9 +31,10 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
         xmlText.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -49,9 +54,10 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
         xmlText.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         xmlText.InsertAttribute(transaction, "as", "document");
         xmlText.InsertAttribute(transaction, "rel", "preload");

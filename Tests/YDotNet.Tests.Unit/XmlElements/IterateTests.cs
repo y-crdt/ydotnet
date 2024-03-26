@@ -10,10 +10,14 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var iterator = xmlElement.Iterate(transaction);
         var values = iterator.ToArray();
         transaction.Commit();
@@ -27,9 +31,14 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -49,9 +58,14 @@ public class IterateTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         xmlElement.InsertAttribute(transaction, "as", "document");
         xmlElement.InsertAttribute(transaction, "rel", "preload");

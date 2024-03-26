@@ -10,10 +10,14 @@ public class TreeWalkerTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var xmlTreeWalker = xmlElement.TreeWalker(transaction);
         transaction.Commit();
 
@@ -27,9 +31,14 @@ public class TreeWalkerTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);
@@ -56,9 +65,14 @@ public class TreeWalkerTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         var childXmlElement = xmlElement.Get(transaction, index: 1).XmlElement;

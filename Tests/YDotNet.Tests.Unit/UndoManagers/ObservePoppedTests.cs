@@ -85,12 +85,7 @@ public class ObservePoppedTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Long(value: 2469L),
-                Input.Boolean(value: false),
-                Input.Undefined()
-            });
+            transaction, index: 0, Input.Long(value: 2469L), Input.Boolean(value: false), Input.Undefined());
         transaction.Commit();
         undoManager.Undo();
 
@@ -204,14 +199,19 @@ public class ObservePoppedTests
     {
         // Arrange
         var doc = new Doc(new DocOptions { Id = 7938 });
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
         var undoManager = new UndoManager(doc, xmlText, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
 
         UndoEvent? undoEvent = null;
         undoManager.ObservePopped(e => undoEvent = e);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
         undoManager.Undo();
@@ -291,14 +291,19 @@ public class ObservePoppedTests
     {
         // Arrange
         var doc = new Doc(new DocOptions { Id = 5903 });
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
         var undoManager = new UndoManager(doc, xmlElement, new UndoManagerOptions { CaptureTimeoutMilliseconds = 0 });
 
         UndoEvent? undoEvent = null;
         undoManager.ObservePopped(e => undoEvent = e);
 
         // Act (add element and undo)
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
         transaction.Commit();
         undoManager.Undo();

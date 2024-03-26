@@ -5,15 +5,17 @@ internal class EventSubscriber<TEvent> : IEventSubscriber
     private readonly EventManager manager;
     private readonly nint owner;
     private readonly EventPublisher<TEvent> publisher = new();
-    private readonly Func<nint, Action<TEvent>, (uint Handle, object Callback)> subscribe;
-    private readonly Action<nint, uint> unsubscribe;
-    private (uint Handle, object? Callback) nativeSubscription;
+    private readonly Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe;
+    private readonly Action<nint> unsubscribe;
+    private (nint Handle, object? Callback) nativeSubscription;
 
+    // The native callback, returned by `subscribe`, must be stored so it doesn't
+    // throw exceptions later if the Rust side invokes it after it's been collected.
     public EventSubscriber(
         EventManager manager,
         nint owner,
-        Func<nint, Action<TEvent>, (uint Handle, object Callback)> subscribe,
-        Action<nint, uint> unsubscribe)
+        Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe,
+        Action<nint> unsubscribe)
     {
         this.manager = manager;
         this.owner = owner;
@@ -56,7 +58,7 @@ internal class EventSubscriber<TEvent> : IEventSubscriber
         // If this is the last subscription, we can unsubscribe from the native source again.
         if (publisher.Count == 0 && nativeSubscription.Callback != null)
         {
-            unsubscribe(owner, nativeSubscription.Handle);
+            unsubscribe(nativeSubscription.Handle);
 
             nativeSubscription = default;
 

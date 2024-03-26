@@ -3,6 +3,7 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Types;
 using YDotNet.Native.UndoManager;
 using YDotNet.Native.UndoManager.Events;
 
@@ -25,7 +26,6 @@ public class UndoManager : UnmanagedResource
     public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
         : base(Create(doc, branch, options))
     {
-#pragma warning disable CA1806 // Do not ignore method results
         onAdded = new EventSubscriber<UndoEvent>(
             doc.EventManager,
             Handle,
@@ -36,7 +36,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
             },
-            (owner, s) => UndoManagerChannel.UnobserveAdded(owner, s));
+            SubscriptionChannel.Unobserve);
 
         onPopped = new EventSubscriber<UndoEvent>(
             doc.EventManager,
@@ -48,8 +48,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
             },
-            (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
-#pragma warning restore CA1806 // Do not ignore method results
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>

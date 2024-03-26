@@ -2,7 +2,9 @@ using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Maps.Events;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Document.Types.XmlElements.Events;
+using YDotNet.Document.Types.XmlFragments.Events;
 using YDotNet.Document.Types.XmlTexts.Events;
+using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Events;
 
@@ -14,25 +16,30 @@ public enum EventBranchTag : sbyte
     /// <summary>
     ///     This event holds an <see cref="ArrayEvent" /> instance.
     /// </summary>
-    Array = 1,
+    Array = BranchKind.Array,
 
     /// <summary>
     ///     This event holds an <see cref="MapEvent" /> instance.
     /// </summary>
-    Map = 2,
+    Map = BranchKind.Map,
 
     /// <summary>
     ///     This event holds an <see cref="TextEvent" /> instance.
     /// </summary>
-    Text = 3,
+    Text = BranchKind.Text,
 
     /// <summary>
     ///     This event holds an <see cref="XmlElementEvent" /> instance.
     /// </summary>
-    XmlElement = 4,
+    XmlElement = BranchKind.XmlElement,
 
     /// <summary>
     ///     This event holds an <see cref="XmlTextEvent" /> instance.
     /// </summary>
-    XmlText = 5,
+    XmlText = BranchKind.XmlText,
+
+    /// <summary>
+    ///     This event holds an <see cref="XmlFragmentEvent" /> instance.
+    /// </summary>
+    XmlFragment = BranchKind.XmlFragment
 }

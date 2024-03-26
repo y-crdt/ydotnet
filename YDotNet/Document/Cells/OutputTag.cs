@@ -78,11 +78,13 @@ public enum OutputTag
     /// </summary>
     XmlText = 5,
 
-    // The following constant is commented because it's not exposed by `Input` or `Output`.
-    // XmlFragment = 6,
+    /// <summary>
+    ///     Represents a cell with an <see cref="YDotNet.Document.Types.XmlFragments.XmlFragment" /> value.
+    /// </summary>
+    XmlFragment = 6,
 
     /// <summary>
     ///     Represents a cell with an <see cref="YDotNet.Document.Doc" /> value.
     /// </summary>
-    Doc = 7,
+    Doc = 7
 }

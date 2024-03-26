@@ -11,10 +11,14 @@ public class RemoveRangeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.RemoveRange(transaction, index: 0, length: 0);
         var childLength = xmlElement.ChildLength(transaction);
         transaction.Commit();
@@ -90,9 +94,14 @@ public class RemoveRangeTests
     private (Doc, XmlElement) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertText(transaction, index: 1);
         xmlElement.InsertElement(transaction, index: 2, "color");

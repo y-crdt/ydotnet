@@ -57,7 +57,7 @@ public class ReadTransactionTests
     {
         // Arrange
         var doc = new Doc();
-        Branch branch = doc.XmlElement("branch");
+        Branch branch = doc.XmlFragment("branch");
 
         // Act
         var writeTransaction = branch.WriteTransaction();
@@ -72,7 +72,7 @@ public class ReadTransactionTests
     {
         // Arrange
         var doc = new Doc();
-        Branch branch = doc.XmlText("branch");
+        Branch branch = doc.XmlFragment("branch");
 
         // Act
         var documentTransaction = doc.WriteTransaction();
@@ -125,7 +125,7 @@ public class ReadTransactionTests
     }
 
     [Test]
-    public void GetRootXmlTextWithOpenTransactionNotAllowed()
+    public void GetRootXmlFragmentWithOpenTransactionNotAllowed()
     {
         // Arrange
         var doc = new Doc();
@@ -135,20 +135,6 @@ public class ReadTransactionTests
         map.Length(map.ReadTransaction());
 
         // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlText("XmlText"));
-    }
-
-    [Test]
-    public void GetRootXmlElementWithOpenTransactionNotAllowed()
-    {
-        // Arrange
-        var doc = new Doc();
-        var map = doc.Map("Map");
-
-        // Keep the transaction open.
-        map.Length(map.ReadTransaction());
-
-        // Assert
-        Assert.Throws<YDotNetException>(() => doc.XmlElement("XmlElement"));
+        Assert.Throws<YDotNetException>(() => doc.XmlFragment("xml-fragment"));
     }
 }

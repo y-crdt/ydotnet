@@ -58,7 +58,7 @@ internal static class ArrayChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yarray_observe")]
-    public static extern uint Observe(nint array, nint state, ObserveCallback callback);
+    public static extern nint Observe(nint array, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -77,10 +77,4 @@ internal static class ArrayChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yarray_event_delta")]
     public static extern nint ObserveEventDelta(nint arrayEvent, out uint length);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yarray_unobserve")]
-    public static extern void Unobserve(nint array, uint subscriptionId);
 }

@@ -57,9 +57,14 @@ public class PreviousSiblingTests
     private (Doc, XmlElement) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "width");
         xmlElement.InsertText(transaction, index: 1);
         xmlElement.InsertElement(transaction, index: 2, "color");
