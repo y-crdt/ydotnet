@@ -6,7 +6,7 @@ namespace YDotNet.Tests.Server.Unit;
 public class DelayedWriterTests
 {
     [Test]
-    public void WriteImmediatly()
+    public async Task WriteImmediatly()
     {
         // Arrange
         var writeCount = 0;
@@ -19,6 +19,7 @@ public class DelayedWriterTests
 
         // Act
         sut.Ping();
+        await sut.FlushAsync();
 
         // Assert
         Assert.That(writeCount, Is.EqualTo(1));

@@ -15,9 +15,14 @@ internal sealed class DelayedWriter
     public DelayedWriter(TimeSpan delayTime, TimeSpan delayMax, Func<Task> action)
     {
         completion = ThrottleMax(writes, delayTime, delayMax)
+            .StartWith(false)
             .Select(write =>
                 write
-                ? Observable.FromAsync(action)
+                ? Observable.FromAsync(async () =>
+                {
+                    await Task.Yield();
+                    await action().ConfigureAwait(false);
+                })
                 : Observable.Return(Unit.Default))
             .Concat()
             .ToTask();
@@ -25,7 +30,6 @@ internal sealed class DelayedWriter
 
     public Task FlushAsync()
     {
-        writes.OnNext(value: false);
         writes.OnCompleted();
 
         return completion;
