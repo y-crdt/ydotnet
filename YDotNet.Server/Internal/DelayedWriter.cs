@@ -46,13 +46,18 @@ internal sealed class DelayedWriter
             var lastWrite = scheduler.Now;
             var dueTimeDisposable = new SerialDisposable();
 
-            void Next()
+            void Next(T value)
             {
                 dueTimeDisposable.Disposable = Disposable.Empty;
 
-                o.OnNext(lastValue!);
+                o.OnNext(value);
                 lastValue = default;
                 lastWrite = scheduler.Now;
+            }
+
+            void NextLast()
+            {
+                Next(lastValue);
             }
 
             return source.Subscribe(
@@ -60,12 +65,12 @@ internal sealed class DelayedWriter
                 {
                     if (scheduler.Now - lastWrite > maxTime && dueTimeDisposable.Disposable != Disposable.Empty)
                     {
-                        Next();
+                        Next(x);
                     }
                     else
                     {
                         lastValue = x;
-                        dueTimeDisposable.Disposable = scheduler.Schedule(dueTime, Next);
+                        dueTimeDisposable.Disposable = scheduler.Schedule(dueTime, NextLast);
                     }
                 },
                 o.OnError,
