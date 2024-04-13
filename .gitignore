@@ -47,3 +47,5 @@ node_modules
 apSettings.Development.json
 
 launchSettings.json
+
+.env
