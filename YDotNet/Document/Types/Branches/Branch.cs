@@ -11,19 +11,19 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-public abstract class Branch : UnmanagedResource
+public abstract class Branch
 {
-    private readonly EventSubscriber<EventBranch[]> onDeep;
+    private readonly EventSubscriberFromId<EventBranch[]> onDeep;
 
     protected internal Branch(nint handle, Doc doc, bool isDeleted)
-        : base(handle, isDeleted)
     {
         Doc = doc;
 
-#pragma warning disable CA1806 // Do not ignore method results
-        onDeep = new EventSubscriber<EventBranch[]>(
+        BranchId = BranchId.FromHandle(handle, isDeleted);
+
+        onDeep = new EventSubscriberFromId<EventBranch[]>(
             doc.EventManager,
-            handle,
+            this,
             (branch, action) =>
             {
                 BranchChannel.ObserveCallback callback = (_, length, ev) =>
@@ -38,8 +38,9 @@ public abstract class Branch : UnmanagedResource
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
             SubscriptionChannel.Unobserve);
-#pragma warning restore CA1806 // Do not ignore method results
     }
+
+    internal BranchId BranchId { get; }
 
     internal Doc Doc { get; }
 
@@ -64,8 +65,6 @@ public abstract class Branch : UnmanagedResource
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
-        ThrowIfDisposed();
-
         return Doc.WriteTransaction();
     }
 
@@ -76,37 +75,6 @@ public abstract class Branch : UnmanagedResource
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
-        ThrowIfDisposed();
-
         return Doc.ReadTransaction();
-    }
-
-    /// <summary>
-    ///     Returns the <see cref="BranchId" /> of this collection.
-    /// </summary>
-    /// <returns>The <see cref="BranchId" /> of this collection.</returns>
-    public BranchId Id()
-    {
-        ThrowIfDisposed();
-
-        var branchIdNative = BranchChannel.Id(Handle);
-
-        return new BranchId(branchIdNative, Doc);
-    }
-
-    /// <summary>
-    ///     Indicates whether the <see cref="Branch" /> instance is alive.
-    /// </summary>
-    /// <returns>A value indicating whether the <see cref="Branch" /> is alive.</returns>
-    public bool Alive()
-    {
-        return BranchChannel.Alive(Handle) == 1;
-    }
-
-    /// <inheritdoc />
-    protected override void DisposeCore(bool disposing)
-    {
-        // Nothing should be done to dispose `Branch` instances (shared types).
-        // They're disposed automatically when their parent `Doc` is disposed.
     }
 }

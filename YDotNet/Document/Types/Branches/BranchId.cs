@@ -7,15 +7,20 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     Represents a logical identifier for a shared collection.
 /// </summary>
-public class BranchId
+internal record struct BranchId
 {
-    private readonly Doc doc;
+    private readonly bool isDeleted;
 
-    internal BranchId(BranchIdNative native, Doc doc)
+    internal BranchId(BranchIdNative native, bool isDeleted)
     {
-        this.doc = doc;
-
         Native = native;
+
+        this.isDeleted = isDeleted;
+    }
+
+    public static BranchId FromHandle(nint handle, bool isDeleted)
+    {
+        return new BranchId(isDeleted ? default : BranchChannel.Id(handle), isDeleted);
     }
 
     private BranchIdNative Native { get; }
@@ -47,38 +52,24 @@ public class BranchId
     /// </summary>
     public string? Name => HasClientIdAndClock ? null : MemoryReader.ReadUtf8String(Native.BranchIdVariant.NamePointer);
 
-    public Branch? Get(Transaction transaction)
+    public nint GetHandle(Transaction transaction)
     {
+        if (isDeleted)
+        {
+            throw new ObjectDisposedException("Object is disposed.");
+        }
+
         var handle = MemoryWriter.WriteStruct(Native);
 
         var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
 
         handle.Dispose();
 
-        if (branchHandle == nint.Zero)
+        if (branchHandle == nint.Zero || BranchChannel.Alive(branchHandle) == 0)
         {
-            return null;
+            throw new ObjectDisposedException("Object is disposed.");
         }
 
-        var branchKind = (BranchKind) BranchChannel.Kind(branchHandle);
-        var branchDeleted = BranchChannel.Alive(branchHandle) == 0;
-
-        switch (branchKind)
-        {
-            case BranchKind.Array:
-                return doc.GetArray(branchHandle, branchDeleted);
-            case BranchKind.Map:
-                return doc.GetMap(branchHandle, branchDeleted);
-            case BranchKind.Text:
-                return doc.GetText(branchHandle, branchDeleted);
-            case BranchKind.XmlElement:
-                return doc.GetXmlElement(branchHandle, branchDeleted);
-            case BranchKind.XmlText:
-                return doc.GetXmlText(branchHandle, branchDeleted);
-            case BranchKind.XmlFragment:
-                return doc.GetXmlFragment(branchHandle, branchDeleted);
-            default:
-                return null;
-        }
+        return branchHandle;
     }
 }
