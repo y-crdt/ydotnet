@@ -3,11 +3,10 @@ import '@tldraw/tldraw/tldraw.css';
 import { useYjsTldrawStore } from '../hooks/useTldrawStore';
 
 /* 
-    see tldraw docs for more info
+    See tldraw docs for more info
     https://tldraw.dev/docs/collaboration
     https://github.com/tldraw/tldraw-yjs-example
 */
-
 const NameEditor = track(() => {
     const editor = useEditor();
 
@@ -36,8 +35,8 @@ const NameEditor = track(() => {
     );
 });
 
-const YjsTldrawEditor = (props: { id: string }) => {
-    const store = useYjsTldrawStore(props);
+const YjsTldrawEditor = () => {
+    const store = useYjsTldrawStore();
 
     return (
         <Tldraw

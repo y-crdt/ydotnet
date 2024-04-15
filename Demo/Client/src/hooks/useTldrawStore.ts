@@ -31,8 +31,6 @@ function step1(
     // 1.
     // Connect store to yjs store and vis versa, for both the document and awareness
 
-    /* -------------------- Document -------------------- */
-
     // Sync store changes to the yjs doc
     cleanUpItems.push(
         store.listen(
@@ -58,18 +56,20 @@ function step1(
     // Sync the yjs doc changes to the store
     const handleChange = (
         changes: Map<
-            string,
-            | { action: 'delete'; oldValue: TLRecord }
-            | {
-                  action: 'update';
-                  oldValue: TLRecord;
-                  newValue: TLRecord;
-              }
-            | { action: 'add'; newValue: TLRecord }
+        string,
+        | { action: 'delete'; oldValue: TLRecord }
+        | {
+            action: 'update';
+            oldValue: TLRecord;
+            newValue: TLRecord;
+        }
+        | { action: 'add'; newValue: TLRecord }
         >,
         transaction: Y.Transaction
     ) => {
-        if (transaction.local) return;
+        if (transaction.local) {
+            return;
+        }
 
         const toRemove: TLRecord['id'][] = [];
         const toPut: TLRecord[] = [];
@@ -147,8 +147,8 @@ function step1(
         removed: number[];
     }) => {
         const states = yjsConnector.awareness.getStates() as Map<
-            number,
-            { presence: TLInstancePresence }
+        number,
+        { presence: TLInstancePresence }
         >;
 
         const toRemove: TLInstancePresence['id'][] = [];
@@ -321,7 +321,7 @@ export function useYjsTldrawStore() {
             cleanUpItems.forEach((fn) => fn());
             cleanUpItems.length = 0;
         };
-    }, [yjsConnector, yjsDocument, store, yStore, meta]);
+    }, [yjsConnector, yjsDocument, store, yStore, meta, setStoreWithStatus]);
 
     return storeWithStatus;
 }

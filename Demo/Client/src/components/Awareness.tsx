@@ -9,7 +9,7 @@ export const Awareness = () => {
     React.useEffect(() => {
         const updateUsers = () => {
             const allStates: Record<string, unknown> = {};
-            
+
             awareness.getStates().forEach((value, key) => {
                 allStates[key.toString()] = value;
             });
@@ -19,7 +19,10 @@ export const Awareness = () => {
 
         updateUsers();
         awareness.on('change', updateUsers);
-        awareness.setLocalStateField('user', { random: Math.random(), message: 'Hello' });
+        awareness.setLocalStateField('user', {
+            random: Math.random(),
+            message: 'Hello',
+        });
 
         console.log(`Current CLIENT ID: ${awareness.clientID}`);
 
@@ -29,6 +32,10 @@ export const Awareness = () => {
     }, [awareness]);
 
     return (
-        <Input type='textarea' readOnly value={JSON.stringify(state, undefined, 2)} />
+        <Input
+            type="textarea"
+            readOnly
+            value={JSON.stringify(state, undefined, 2)}
+        />
     );
 };

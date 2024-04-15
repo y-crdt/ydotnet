@@ -18,7 +18,7 @@ export interface IYjsTldrawContext {
     readonly meta: Y.Map<SerializedSchema>;
     readonly storeWithStatus: TLStoreWithStatus;
     readonly setStoreWithStatus: React.Dispatch<
-        React.SetStateAction<TLStoreWithStatus>
+    React.SetStateAction<TLStoreWithStatus>
     >;
 }
 
