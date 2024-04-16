@@ -25,7 +25,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
         this.options = options.Value;
         callback = new CallbackInvoker(callbacks, logger);
 
-        cache = new DocumentCache(documentStorage, callback, this, options.Value);
+        cache = new DocumentCache(documentStorage, callback, this, options.Value, logger);
     }
 
     public async Task StartAsync(
@@ -44,51 +44,40 @@ public sealed class DefaultDocumentManager : IDocumentManager
         DocumentContext context,
         CancellationToken ct = default)
     {
-        var container = cache.GetContext(context.DocumentName);
-
-        return await container.ApplyUpdateReturnAsync(doc =>
+        return await cache.ApplyUpdateReturnAsync(context.DocumentName, doc =>
         {
-            using (var transaction = doc.ReadTransactionOrThrow())
+            using (var transaction = doc.ReadTransaction())
             {
-                return transaction.StateVectorV1();
+                return Task.FromResult(transaction.StateVectorV1());
             }
         }).ConfigureAwait(false);
     }
 
     public async ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector, CancellationToken ct = default)
     {
-        var container = cache.GetContext(context.DocumentName);
-
-        return await container.ApplyUpdateReturnAsync(doc =>
+        return await cache.ApplyUpdateReturnAsync(context.DocumentName, doc =>
         {
-            using (var transaction = doc.ReadTransactionOrThrow())
+            using (var transaction = doc.ReadTransaction())
             {
-                return transaction.StateDiffV1(stateVector);
+                return Task.FromResult(transaction.StateDiffV1(stateVector));
             }
         }).ConfigureAwait(false);
     }
 
     public async ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff, CancellationToken ct = default)
     {
-        var container = cache.GetContext(context.DocumentName);
-
-        var (result, doc) = await container.ApplyUpdateReturnAsync(doc =>
+        return await cache.ApplyUpdateReturnAsync(context.DocumentName, async doc =>
         {
             var result = new UpdateResult
             {
                 Diff = stateDiff,
             };
 
-            using (var transaction = doc.WriteTransactionOrThrow())
+            using (var transaction = doc.WriteTransaction())
             {
                 result.TransactionUpdateResult = transaction.ApplyV1(stateDiff);
             }
 
-            return (result, doc);
-        }).ConfigureAwait(false);
-
-        if (result.Diff != null)
-        {
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
@@ -96,34 +85,34 @@ public sealed class DefaultDocumentManager : IDocumentManager
                 Document = doc,
                 Source = this,
             }).ConfigureAwait(false);
-        }
 
-        return result;
+            return result;
+        }).ConfigureAwait(false);
     }
 
     public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action, CancellationToken ct = default)
     {
-        var container = cache.GetContext(context.DocumentName);
-
-        var (diff, doc) = await container.ApplyUpdateReturnAsync(doc =>
+        await cache.ApplyUpdateReturnAsync(context.DocumentName, async doc =>
         {
             using var subscribeOnce = new SubscribeToUpdatesV1Once(doc);
 
             action(doc);
 
-            return (subscribeOnce.Update, doc);
-        }).ConfigureAwait(false);
+            if (subscribeOnce.Update == null)
+            {
+                return false;
+            }
 
-        if (diff != null)
-        {
             await callback.OnDocumentChangedAsync(new DocumentChangedEvent
             {
                 Context = context,
-                Diff = diff,
+                Diff = subscribeOnce.Update,
                 Document = doc,
                 Source = this,
             }).ConfigureAwait(false);
-        }
+
+            return true;
+        }).ConfigureAwait(false);
     }
 
     public async ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null, CancellationToken ct = default)
@@ -168,7 +157,7 @@ public sealed class DefaultDocumentManager : IDocumentManager
             }).ConfigureAwait(false);
         }
 
-        cache.RemoveEvictedItems();
+        await cache.RemoveEvictedItemsAsync().ConfigureAwait(false);
     }
 
     public async ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(

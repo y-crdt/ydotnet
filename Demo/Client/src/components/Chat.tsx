@@ -40,7 +40,7 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
         if (!text) {
             return;
         }
-    
+
         yjsDocument.transact(() => {
             array.push([{ text }]);
         });
@@ -54,24 +54,22 @@ export const Chat = ({ isReadonly }: { isReadonly: boolean }) => {
 
     return (
         <>
-            <div className='chat' ref={container}>
-                {state.map((row, i) =>
-                    <div key={i}>
-                        {row.text}
-                    </div>
-                )}
+            <div className="chat" ref={container}>
+                {state.map((row, i) => (
+                    <div key={i}>{row.text}</div>
+                ))}
             </div>
 
-            {!isReadonly &&
-                <Row className='gap-0'>
+            {!isReadonly && (
+                <Row className="g-2">
                     <Col>
                         <Input value={text} onChange={_setText}></Input>
                     </Col>
-                    <Col xs='auto' className='ps-2'>
+                    <Col xs="auto">
                         <Button onClick={_comment}>Comment</Button>
                     </Col>
                 </Row>
-            }
+            )}
         </>
     );
 };

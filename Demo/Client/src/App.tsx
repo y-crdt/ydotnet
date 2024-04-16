@@ -1,69 +1,83 @@
-import { Col, Container, Row } from 'reactstrap';
-import { YjsMonacoEditor } from './components/YjsMonacoEditor';
-import { YjsProseMirror } from './components/YjsProseMirror';
-import { Increment } from './components/Increment';
+import { BrowserRouter, NavLink, redirect, useRoutes } from 'react-router-dom';
+import TldrawPage from './pages/Tldraw';
+import { Col, Container, Nav, NavItem, Navbar, Row } from 'reactstrap';
+import ChatPage from './pages/Chat';
+import MonacoPage from './pages/Monaco';
+import ProseMirrorPage from './pages/ProseMirror';
+import IncrementPage from './pages/Increment';
 import './App.css';
-import { YjsContextProvider } from './context/yjsContext';
-import { Chat } from './components/Chat';
-import { Awareness } from './components/Awareness';
+
+const Routes = () =>
+    useRoutes([
+        {
+            path: '/chat',
+            element: <ChatPage />,
+        },
+        {
+            path: '/monaco',
+            element: <MonacoPage />,
+        },
+        {
+            path: '/prosemirror',
+            element: <ProseMirrorPage />,
+        },
+        {
+            path: '/increment',
+            element: <IncrementPage />,
+        },
+        {
+            path: '/tldraw',
+            element: <TldrawPage />,
+        },
+        {
+            path: '/',
+            action: () => redirect('/monaco'),
+        },
+    ]);
 
 function App() {
     return (
-        <>
-            <Container>
-                <Row className='mt-5'>
+        <BrowserRouter>
+            <Navbar color="dark" expand dark fixed='top'>
+                <Nav navbar>
+                    <NavItem>
+                        <NavLink className="nav-link" to="/monaco">
+                            Monaco
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink className="nav-link" to="/prosemirror">
+                            Prosemirror
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink className="nav-link" to="/increment">
+                            Increment
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink className="nav-link" to="/chat">
+                            Chat
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink className="nav-link" to="/tldraw">
+                            Draw
+                        </NavLink>
+                    </NavItem>
+                </Nav>
+            </Navbar>
+
+            <Container style={{ paddingTop: '80px' }}>
+                <Row>
                     <Col>
-                        <h2>Awareness</h2>
+                        <h1 className='mb-4'>YDotNet Demo Page</h1>
 
-                        <Awareness />
-                    </Col>
-                </Row>
-                <Row className='mt-5'>
-                    <Col>
-                        <h2>Monaco Editor</h2>
-
-                        <YjsMonacoEditor />
-                    </Col>
-                </Row>
-                <Row className='mt-5'>
-                    <Col>
-                        <h2>Prose Mirror</h2>
-
-                        <YjsProseMirror />
-                    </Col>
-                </Row>
-                <Row className='mt-5'>
-                    <Col>
-                        <h2>Increment</h2>
-
-                        <Increment />
-                    </Col>
-                </Row>
-                <Row className='mt-5 pb-5'>
-                    <Col>
-                        <Row>
-                            <Col><h2>Chat</h2></Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <h5>Chat</h5>
-
-                                <Chat isReadonly={false} />
-                            </Col>
-                            <Col>
-                                <h5>Notifications</h5>
-
-                                <YjsContextProvider baseUrl={'ws://localhost:5000/collaboration2'} roomName='notifications'>
-                                    <Chat isReadonly />
-                                    
-                                    <Awareness />
-                                </YjsContextProvider>
-                            </Col>
-                        </Row>
+                        <Routes />
                     </Col>
                 </Row>
             </Container>
-        </>
+        </BrowserRouter>
     );
 }
 

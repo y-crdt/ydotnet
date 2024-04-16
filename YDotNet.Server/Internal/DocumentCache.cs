@@ -1,29 +1,40 @@
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using YDotNet.Document;
 using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
 
 internal sealed class DocumentCache : IAsyncDisposable
 {
+    private readonly ILogger logger;
     private readonly IDocumentStorage documentStorage;
     private readonly IDocumentCallback documentCallback;
     private readonly IDocumentManager documentManager;
     private readonly DocumentManagerOptions options;
-    private readonly MemoryCache memoryCache = new(Options.Create(new MemoryCacheOptions()));
-    private readonly Dictionary<string, DocumentContainer> livingContainers = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Item> documents = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim slimLock = new(1);
+
+    private sealed class Item
+    {
+        required public DocumentContainer Document { get; init; }
+
+        public DateTime ValidUntil { get; set; }
+    }
+
+    public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
 
     public DocumentCache(
         IDocumentStorage documentStorage,
         IDocumentCallback documentCallback,
         IDocumentManager documentManager,
-        DocumentManagerOptions options)
+        DocumentManagerOptions options,
+        ILogger logger)
     {
         this.documentStorage = documentStorage;
         this.documentCallback = documentCallback;
         this.documentManager = documentManager;
         this.options = options;
+        this.logger = logger;
     }
 
     public async ValueTask DisposeAsync()
@@ -31,74 +42,112 @@ internal sealed class DocumentCache : IAsyncDisposable
         await slimLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            foreach (var (_, container) in livingContainers)
+            foreach (var (_, item) in documents)
             {
-                await container.FlushAsync().ConfigureAwait(false);
+                await item.Document.DisposeAsync().ConfigureAwait(false);
+            }
+
+            documents.Clear();
+        }
+        finally
+        {
+            slimLock.Release();
+        }
+    }
+
+    public async Task RemoveEvictedItemsAsync()
+    {
+        // Keep the lock as short as possible.
+        var toCleanup = GetItemsToRemove();
+
+        foreach (var document in toCleanup)
+        {
+            // This is thread safe and will block all pending updates.
+            await document.DisposeAsync().ConfigureAwait(false);
+
+            await slimLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                // Remove the item after it has been removed.
+                // If another request is making an update while the cleanup is running it will wait and then
+                // abort with ObjectDisposedException.
+                documents.Remove(document.Name);
+            }
+            finally
+            {
+                slimLock.Release();
+            }
+        }
+    }
+
+    private List<DocumentContainer> GetItemsToRemove()
+    {
+        var removed = new List<DocumentContainer>();
+
+        slimLock.Wait();
+        try
+        {
+            var now = Clock();
+
+            foreach (var (_, item) in documents)
+            {
+                if (item.ValidUntil < now)
+                {
+                    removed.Add(item.Document);
+                }
             }
         }
         finally
         {
             slimLock.Release();
         }
+
+        return removed;
     }
 
-    public void RemoveEvictedItems()
+    public async ValueTask<T> ApplyUpdateReturnAsync<T>(string name, Func<Doc, Task<T>> action)
     {
-        memoryCache.Remove(true);
+        try
+        {
+            var container = GetContainer(name);
+
+            return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
+        }
+        catch (ObjectDisposedException)
+        {
+            // This happens when the document has been disposed while we are waiting to get the lock.
+            // Just get a new document from the cache and try it again.
+            var container = GetContainer(name);
+
+            return await container.ApplyUpdateReturnAsync(action).ConfigureAwait(false);
+        }
     }
 
-    public DocumentContainer GetContext(string name)
+    private DocumentContainer GetContainer(string name)
     {
-        // The memory cache does nto guarantees that the callback is called in parallel. Therefore we need the lock here.
         slimLock.Wait();
         try
         {
-            return memoryCache.GetOrCreate(name, entry =>
+            if (!documents.TryGetValue(name, out var item))
             {
-                // Check if there are any pending flushes. If the flush is still running we reuse the context.
-                if (livingContainers.TryGetValue(name, out var container))
+                var document = new DocumentContainer(
+                    name,
+                    documentStorage,
+                    documentCallback,
+                    documentManager,
+                    options,
+                    logger);
+
+                item = new Item
                 {
-                    livingContainers.Remove(name);
-                }
-                else
-                {
-                    container = new DocumentContainer(
-                        name,
-                        documentStorage,
-                        documentCallback,
-                        documentManager,
-                        options);
-                }
+                    Document = document,
+                };
 
-                // For each access we extend the lifetime of the cache entry.
-                entry.SlidingExpiration = options.CacheDuration;
-                entry.RegisterPostEvictionCallback((_, _, _, _) =>
-                {
-                    // There is no background thread for eviction. It is just done from
-                    _ = CleanupAsync(name, container);
-                });
+                documents[name] = item;
+            }
 
-                livingContainers.Add(name, container);
-                return container;
-            })!;
-        }
-        finally
-        {
-            slimLock.Release();
-        }
-    }
-
-    private async Task CleanupAsync(string name, DocumentContainer context)
-    {
-        // Flush all pending changes to the storage and then remove the context from the list of living entries.
-        await context.FlushAsync().ConfigureAwait(false);
-
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-        slimLock.Wait();
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
-        try
-        {
-            livingContainers.Remove(name);
+            item.ValidUntil = Clock() + options.CacheDuration;
+            return item.Document;
         }
         finally
         {
