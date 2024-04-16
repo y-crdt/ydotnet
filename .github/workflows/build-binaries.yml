@@ -115,13 +115,6 @@ jobs:
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
 
-      - name: Patch build (Git)
-        if: ${{ false }}
-        run: |
-          cd yrs
-          git apply ../native/build.patch
-        shell: bash
-
       - name: Build (Cargo)
         if: "!matrix.cross"
         run: |
