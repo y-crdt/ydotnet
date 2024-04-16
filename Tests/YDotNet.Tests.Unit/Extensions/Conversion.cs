@@ -21,7 +21,7 @@ internal class Conversion
         var doc = new Doc();
         var map = doc.Map("map");
 
-        using (var transaction = map.WriteTransaction())
+        using (var transaction = doc.WriteTransaction())
         {
             map.Insert(transaction, "inner", Input.Object(new Dictionary<string, Input>
             {
@@ -31,7 +31,7 @@ internal class Conversion
 
         // Act
         Expected result;
-        using (var transaction = map.WriteTransaction())
+        using (var transaction = doc.WriteTransaction())
         {
             var inner = map.Get(transaction, "inner");
 
@@ -77,7 +77,7 @@ internal class Conversion
         var doc = new Doc();
         var map = doc.Map("map");
 
-        using (var transaction = map.WriteTransaction())
+        using (var transaction = doc.WriteTransaction())
         {
             map.Insert(transaction, "inner", Input.Object(new Dictionary<string, Input>
             {
@@ -87,7 +87,7 @@ internal class Conversion
 
         // Act
         string json;
-        using (var transaction = map.WriteTransaction())
+        using (var transaction = doc.WriteTransaction())
         {
             var inner = map.Get(transaction, "inner");
 

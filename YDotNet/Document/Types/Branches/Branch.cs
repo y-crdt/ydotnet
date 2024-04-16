@@ -56,46 +56,6 @@ public abstract class Branch : UnmanagedResource
         return onDeep.Subscribe(action);
     }
 
-    /// <summary>
-    ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
-    /// </summary>
-    /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
-    public Transaction WriteTransaction()
-    {
-        ThrowIfDisposed();
-
-        var handle = BranchChannel.WriteTransaction(Handle);
-
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
-
-        return new Transaction(handle, Doc);
-    }
-
-    /// <summary>
-    ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
-    /// </summary>
-    /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
-    public Transaction ReadTransaction()
-    {
-        ThrowIfDisposed();
-
-        var handle = BranchChannel.ReadTransaction(Handle);
-
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
-
-        return new Transaction(handle, Doc);
-    }
-
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
