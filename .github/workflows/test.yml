@@ -10,6 +10,9 @@ on:
   push:
     branches:
       - 'main'
+  pull_request:
+    branches:
+      - 'main'
 
 jobs:
   test:
@@ -51,13 +54,14 @@ jobs:
         run: |
           cp output/${{ matrix.build }}/*.* YDotNet
 
-      - name: Build tests
-        run: |
-          cd Tests/YDotNet.Tests.Unit
-          dotnet build
-
       - name: Run tests
         run: |
-          dotnet test
+          dotnet test Tests/YDotNet.Tests.Unit
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Run tests server
+        run: |
+          dotnet test Tests/YDotNet.Tests.Server.Unit
         env:
           RUST_BACKTRACE: 1
