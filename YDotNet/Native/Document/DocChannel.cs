@@ -123,20 +123,8 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_clear")]
-    public static extern uint UnobserveClear(nint doc, uint subscriptionId);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_updates_v1")]
     public static extern uint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_updates_v1")]
-    public static extern uint UnobserveUpdatesV1(nint doc, uint subscriptionId);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -147,20 +135,8 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_updates_v2")]
-    public static extern uint UnobserveUpdatesV2(nint doc, uint subscriptionId);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_after_transaction")]
     public static extern uint ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_after_transaction")]
-    public static extern uint UnobserveAfterTransaction(nint doc, uint subscriptionId);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -171,6 +147,6 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_subdocs")]
-    public static extern uint UnobserveSubDocs(nint doc, uint subscriptionId);
+        EntryPoint = "yunobserve")]
+    public static extern uint Unobserve(uint subscriptionId);
 }

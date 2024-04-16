@@ -7,6 +7,7 @@ using YDotNet.Document.Types.XmlElements.Trees;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Document;
 using YDotNet.Native.Types;
 
 namespace YDotNet.Document.Types.XmlElements;
@@ -31,7 +32,7 @@ public class XmlElement : Branch
 
                 return (XmlElementChannel.Observe(xmlElement, nint.Zero, callback), callback);
             },
-            XmlElementChannel.Unobserve);
+            (_, s) => DocChannel.Unobserve(s));
     }
 
     /// <summary>

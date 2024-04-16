@@ -6,6 +6,7 @@ using YDotNet.Document.Types.Arrays.Events;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Document;
 using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types;
 
@@ -31,7 +32,7 @@ public class Array : Branch
 
                 return (ArrayChannel.Observe(array, nint.Zero, callback), callback);
             },
-            ArrayChannel.Unobserve);
+            (_, s) => DocChannel.Unobserve(s));
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using YDotNet.Document.Types.Branches;
 using YDotNet.Document.Types.Texts.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Document;
 using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types.Texts;
 
@@ -31,7 +32,7 @@ public class Text : Branch
 
                 return (TextChannel.Observe(text, nint.Zero, callback), callback);
             },
-            TextChannel.Unobserve);
+            (_, s) => DocChannel.Unobserve(s));
     }
 
     /// <summary>
