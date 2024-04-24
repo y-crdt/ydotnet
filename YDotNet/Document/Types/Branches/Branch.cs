@@ -11,17 +11,18 @@ namespace YDotNet.Document.Types.Branches;
 /// <summary>
 ///     The generic type that can be used to refer to all shared data type instances.
 /// </summary>
-public abstract class Branch
+public abstract class Branch : UnmanagedResource
 {
     private readonly EventSubscriberFromId<EventBranch[]> onDeep;
 
     protected internal Branch(nint handle, Doc doc, bool isDeleted)
+        : base(handle, isDeleted)
     {
-        Doc = doc;
+        this.Doc = doc;
 
-        BranchId = BranchId.FromHandle(handle, isDeleted);
+        this.BranchId = isDeleted ? null : BranchChannel.Id(handle);
 
-        onDeep = new EventSubscriberFromId<EventBranch[]>(
+        this.onDeep = new EventSubscriberFromId<EventBranch[]>(
             doc.EventManager,
             this,
             (branch, action) =>
@@ -40,7 +41,7 @@ public abstract class Branch
             SubscriptionChannel.Unobserve);
     }
 
-    internal BranchId BranchId { get; }
+    internal BranchIdNative? BranchId { get; }
 
     internal Doc Doc { get; }
 
@@ -55,7 +56,7 @@ public abstract class Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveDeep(Action<IEnumerable<EventBranch>> action)
     {
-        return onDeep.Subscribe(action);
+        return this.onDeep.Subscribe(action);
     }
 
     /// <summary>
@@ -65,7 +66,7 @@ public abstract class Branch
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
-        return Doc.WriteTransaction();
+        return this.Doc.WriteTransaction();
     }
 
     /// <summary>
@@ -75,6 +76,40 @@ public abstract class Branch
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
-        return Doc.ReadTransaction();
+        return this.Doc.ReadTransaction();
+    }
+
+    /// <summary>
+    ///     Gets a handle using the stored <see cref="BranchId" />.
+    /// </summary>
+    /// <param name="transaction">The transaction used to acquire the handle to the <see cref="Branch" />.</param>
+    /// <returns>The handle to the <see cref="Branch" />.</returns>
+    /// <exception cref="ObjectDisposedException">If <see cref="Branch.IsDisposed" /> is <c>true</c>.</exception>
+    protected internal nint GetHandle(Transaction transaction)
+    {
+        if (this.IsDisposed)
+        {
+            throw new ObjectDisposedException("Object is disposed.");
+        }
+
+        var handle = MemoryWriter.WriteStruct(this.BranchId);
+
+        var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
+
+        handle.Dispose();
+
+        if (branchHandle == nint.Zero || BranchChannel.Alive(branchHandle) == 0)
+        {
+            throw new ObjectDisposedException("Object is disposed.");
+        }
+
+        return branchHandle;
+    }
+
+    /// <inheritdoc />
+    protected override void DisposeCore(bool disposing)
+    {
+        // Nothing should be done to dispose `Branch` instances (shared types).
+        // They're disposed automatically when their parent `Doc` is disposed.
     }
 }

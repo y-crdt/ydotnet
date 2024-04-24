@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using YDotNet.Document.Types.Branches;
+﻿using YDotNet.Document.Types.Branches;
 
 namespace YDotNet.Document.Events;
 
@@ -28,50 +27,50 @@ internal class EventSubscriberFromId<TEvent> : IEventSubscriber
 
     public void Clear()
     {
-        publisher.Clear();
+        this.publisher.Clear();
 
-        UnsubscribeWhenSubscribed();
+        this.UnsubscribeWhenSubscribed();
     }
 
     public IDisposable Subscribe(Action<TEvent> handler)
     {
         // If this is the first native subscription, subscribe to the actual source by invoking the action.
-        if (nativeSubscription.Callback == null)
+        if (this.nativeSubscription.Callback == null)
         {
-            using (var transaction = owner.ReadTransaction())
+            using (var transaction = this.owner.ReadTransaction())
             {
-                var handle = owner.BranchId.GetHandle(transaction);
+                var handle = this.owner.GetHandle(transaction);
 
-                nativeSubscription = subscribe(handle, publisher.Publish);
+                this.nativeSubscription = this.subscribe(handle, this.publisher.Publish);
             }
 
             // Register the subscriber as active in the manager.
-            manager.Register(this);
+            this.manager.Register(this);
         }
 
-        publisher.Subscribe(handler);
+        this.publisher.Subscribe(handler);
 
-        return new DelegateDisposable(() => Unsubscribe(handler));
+        return new DelegateDisposable(() => this.Unsubscribe(handler));
     }
 
     private void Unsubscribe(Action<TEvent> handler)
     {
-        publisher.Unsubscribe(handler);
+        this.publisher.Unsubscribe(handler);
 
-        UnsubscribeWhenSubscribed();
+        this.UnsubscribeWhenSubscribed();
     }
 
     private void UnsubscribeWhenSubscribed()
     {
         // If this is the last subscription, we can unsubscribe from the native source again.
-        if (publisher.Count == 0 && nativeSubscription.Callback != null)
+        if (this.publisher.Count == 0 && this.nativeSubscription.Callback != null)
         {
-            unsubscribe(nativeSubscription.Handle);
+            this.unsubscribe(this.nativeSubscription.Handle);
 
-            nativeSubscription = default;
+            this.nativeSubscription = default;
 
             // The manager will clear all active subscriptions when the document where the manager belongs to is disposed.
-            manager.Unregister(this);
+            this.manager.Unregister(this);
         }
     }
 
@@ -79,7 +78,7 @@ internal class EventSubscriberFromId<TEvent> : IEventSubscriber
     {
         public void Dispose()
         {
-            Delegate();
+            this.Delegate();
         }
     }
 }

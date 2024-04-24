@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using YDotNet.Document.Cells;
 using YDotNet.Document.Events;
 using YDotNet.Document.StickyIndexes;
@@ -22,13 +21,13 @@ public class Array : Branch
     internal Array(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        onObserve = new EventSubscriberFromId<ArrayEvent>(
+        this.onObserve = new EventSubscriberFromId<ArrayEvent>(
             doc.EventManager,
             this,
             (array, action) =>
             {
                 ArrayChannel.ObserveCallback callback = (_, eventHandle) =>
-                    action(new ArrayEvent(eventHandle, Doc));
+                    action(new ArrayEvent(eventHandle, this.Doc));
 
                 return (ArrayChannel.Observe(array, nint.Zero, callback), callback);
             },
@@ -40,11 +39,11 @@ public class Array : Branch
     /// </summary>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <returns>
-    /// The length.
+    ///     The length.
     /// </returns>
     public uint Length(Transaction transaction)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         return ArrayChannel.Length(handle);
     }
@@ -57,11 +56,11 @@ public class Array : Branch
     /// <param name="inputs">The items to be inserted.</param>
     public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
-        ArrayChannel.InsertRange(handle, transaction.Handle, index, unsafeInputs.Handle, (uint)inputs.Length);
+        ArrayChannel.InsertRange(handle, transaction.Handle, index, unsafeInputs.Handle, (uint) inputs.Length);
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         ArrayChannel.RemoveRange(handle, transaction.Handle, index, length);
     }
@@ -90,11 +89,11 @@ public class Array : Branch
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         var outputHandle = ArrayChannel.Get(handle, transaction.Handle, index);
 
-        return outputHandle != nint.Zero ? Output.CreateAndRelease(outputHandle, Doc) : null;
+        return outputHandle != nint.Zero ? Output.CreateAndRelease(outputHandle, this.Doc) : null;
     }
 
     /// <summary>
@@ -108,7 +107,7 @@ public class Array : Branch
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         ArrayChannel.Move(handle, transaction.Handle, sourceIndex, targetIndex);
     }
@@ -121,11 +120,11 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
         var iteratorHandle = ArrayChannel.Iterator(handle, transaction.Handle);
 
-        return new ArrayIterator(iteratorHandle.Checked(), Doc);
+        return new ArrayIterator(iteratorHandle.Checked(), this.Doc);
     }
 
     /// <summary>
@@ -138,7 +137,7 @@ public class Array : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<ArrayEvent> action)
     {
-        return onObserve.Subscribe(action);
+        return this.onObserve.Subscribe(action);
     }
 
     /// <summary>
@@ -155,9 +154,9 @@ public class Array : Branch
     /// </returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        var handle = BranchId.GetHandle(transaction);
+        var handle = this.GetHandle(transaction);
 
-        var indexHandle = StickyIndexChannel.FromIndex(handle, transaction.Handle, index, (sbyte)associationType);
+        var indexHandle = StickyIndexChannel.FromIndex(handle, transaction.Handle, index, (sbyte) associationType);
 
         return indexHandle != nint.Zero ? new StickyIndex(indexHandle) : null;
     }
