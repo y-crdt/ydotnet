@@ -119,8 +119,8 @@ public class GetTests
         // Assert
         //Assert.That(value1, Is.EqualTo(new byte[] { 2, 4, 6, 9 }));
         Assert.That(value1.Count, Is.EqualTo(expected: 2));
-        Assert.That(value1[0].Long, Is.EqualTo(expected: 2469));
-        Assert.That(value1[1].Long, Is.EqualTo(expected: -420L));
+        Assert.That(value1[index: 0].Long, Is.EqualTo(expected: 2469));
+        Assert.That(value1[index: 1].Long, Is.EqualTo(expected: -420L));
         Assert.That(value2.Tag, Is.EqualTo(OutputTag.Boolean));
     }
 
@@ -226,11 +226,12 @@ public class GetTests
 
         // Act
         var value1 = map.Get(transaction, "value1").Array;
+        var value1Length = value1.Length(transaction);
         var value2 = map.Get(transaction, "value2");
 
         // Assert
         Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Length, Is.EqualTo(expected: 2));
+        Assert.That(value1Length, Is.EqualTo(expected: 2));
         Assert.That(value2.Tag, Is.EqualTo(OutputTag.Null));
     }
 

@@ -16,10 +16,11 @@ public class InsertRangeTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(transaction, index: 0);
+        var length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 0));
+        Assert.That(length, Is.EqualTo(expected: 0));
     }
 
     [Test]
@@ -32,14 +33,12 @@ public class InsertRangeTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true)
-            });
+            transaction, index: 0, Input.Boolean(value: true));
+        var length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 
     [Test]
@@ -52,14 +51,11 @@ public class InsertRangeTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L)
-            });
+            transaction, index: 0, Input.Boolean(value: true), Input.Long(value: 2469L));
+        var length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
     }
 }

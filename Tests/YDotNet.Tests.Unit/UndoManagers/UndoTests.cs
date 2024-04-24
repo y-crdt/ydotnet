@@ -102,8 +102,12 @@ public class UndoTests
         transaction.Commit();
         var result = undoManager.Undo();
 
+        transaction = doc.ReadTransaction();
+        var length = array.Length(transaction);
+        transaction.Commit();
+
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 3));
+        Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(result, Is.True);
 
         // Act (remove and undo)
@@ -112,10 +116,14 @@ public class UndoTests
         transaction.Commit();
         result = undoManager.Undo();
 
+        transaction = doc.ReadTransaction();
+        length = array.Length(transaction);
+        transaction.Commit();
+
         // Assert
 
         // TODO [LSViana] Check with the team why the amount of items isn't 3.
-        Assert.That(array.Length, Is.EqualTo(expected: 3));
+        Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(result, Is.True);
     }
 

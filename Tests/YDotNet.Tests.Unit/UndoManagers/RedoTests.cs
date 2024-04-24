@@ -107,8 +107,12 @@ public class RedoTests
         undoManager.Undo();
         var result = undoManager.Redo();
 
+        transaction = doc.ReadTransaction();
+        var length = array.Length(transaction);
+        transaction.Commit();
+
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 4));
+        Assert.That(length, Is.EqualTo(expected: 4));
         Assert.That(result, Is.True);
 
         // Act (remove, undo, and redo)
@@ -118,8 +122,12 @@ public class RedoTests
         undoManager.Undo();
         result = undoManager.Redo();
 
+        transaction = doc.ReadTransaction();
+        length = array.Length(transaction);
+        transaction.Commit();
+
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
         Assert.That(result, Is.True);
     }
 
