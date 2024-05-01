@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
-using YDotNet.Native.Document.State;
 
 namespace YDotNet.Native.UndoManager.Events;
 
@@ -12,10 +11,6 @@ internal struct UndoEventNative
     public nint OriginHandle { get; set; }
 
     public uint OriginLength { get; set; }
-
-    public DeleteSetNative Insertions { get; set; }
-
-    public DeleteSetNative Deletions { get; set; }
 
     public byte[]? Origin()
     {
