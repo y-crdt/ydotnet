@@ -12,7 +12,7 @@ public class ReadTransactionTests
         var doc = new Doc();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        var transaction = doc.ReadTransaction();
 
         // Assert
         Assert.That(transaction.Handle, Is.GreaterThan(nint.Zero));
