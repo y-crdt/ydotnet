@@ -43,9 +43,7 @@ public class Array : Branch
     /// </returns>
     public uint Length(Transaction transaction)
     {
-        var handle = this.GetHandle(transaction);
-
-        return ArrayChannel.Length(handle);
+        return ArrayChannel.Length(this.GetHandle(transaction));
     }
 
     /// <summary>
@@ -56,11 +54,14 @@ public class Array : Branch
     /// <param name="inputs">The items to be inserted.</param>
     public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
-        var handle = this.GetHandle(transaction);
-
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
-        ArrayChannel.InsertRange(handle, transaction.Handle, index, unsafeInputs.Handle, (uint) inputs.Length);
+        ArrayChannel.InsertRange(
+            this.GetHandle(transaction),
+            transaction.Handle,
+            index,
+            unsafeInputs.Handle,
+            (uint) inputs.Length);
     }
 
     /// <summary>
@@ -71,9 +72,7 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        var handle = this.GetHandle(transaction);
-
-        ArrayChannel.RemoveRange(handle, transaction.Handle, index, length);
+        ArrayChannel.RemoveRange(this.GetHandle(transaction), transaction.Handle, index, length);
     }
 
     /// <summary>
@@ -89,9 +88,7 @@ public class Array : Branch
     /// </returns>
     public Output? Get(Transaction transaction, uint index)
     {
-        var handle = this.GetHandle(transaction);
-
-        var outputHandle = ArrayChannel.Get(handle, transaction.Handle, index);
+        var outputHandle = ArrayChannel.Get(this.GetHandle(transaction), transaction.Handle, index);
 
         return outputHandle != nint.Zero ? Output.CreateAndRelease(outputHandle, this.Doc) : null;
     }
@@ -107,9 +104,7 @@ public class Array : Branch
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
-        var handle = this.GetHandle(transaction);
-
-        ArrayChannel.Move(handle, transaction.Handle, sourceIndex, targetIndex);
+        ArrayChannel.Move(this.GetHandle(transaction), transaction.Handle, sourceIndex, targetIndex);
     }
 
     /// <summary>
@@ -120,9 +115,7 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
-        var handle = this.GetHandle(transaction);
-
-        var iteratorHandle = ArrayChannel.Iterator(handle, transaction.Handle);
+        var iteratorHandle = ArrayChannel.Iterator(this.GetHandle(transaction), transaction.Handle);
 
         return new ArrayIterator(iteratorHandle.Checked(), this.Doc);
     }
@@ -154,9 +147,11 @@ public class Array : Branch
     /// </returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        var handle = this.GetHandle(transaction);
-
-        var indexHandle = StickyIndexChannel.FromIndex(handle, transaction.Handle, index, (sbyte) associationType);
+        var indexHandle = StickyIndexChannel.FromIndex(
+            this.GetHandle(transaction),
+            transaction.Handle,
+            index,
+            (sbyte) associationType);
 
         return indexHandle != nint.Zero ? new StickyIndex(indexHandle) : null;
     }
