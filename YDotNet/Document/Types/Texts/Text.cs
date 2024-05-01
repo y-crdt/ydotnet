@@ -22,13 +22,13 @@ public class Text : Branch
     internal Text(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        onObserve = new EventSubscriber<TextEvent>(
+        this.onObserve = new EventSubscriber<TextEvent>(
             doc.EventManager,
             handle,
             (text, action) =>
             {
                 TextChannel.ObserveCallback callback = (_, eventHandle) =>
-                    action(new TextEvent(eventHandle, Doc));
+                    action(new TextEvent(eventHandle, this.Doc));
 
                 return (TextChannel.Observe(text, nint.Zero, callback), callback);
             },
@@ -47,12 +47,15 @@ public class Text : Branch
     /// </param>
     public void Insert(Transaction transaction, uint index, string value, Input? attributes = null)
     {
-        ThrowIfDisposed();
-
         using var unsafeValue = MemoryWriter.WriteUtf8String(value);
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
-        TextChannel.Insert(Handle, transaction.Handle, index, unsafeValue.Handle, unsafeAttributes.Handle);
+        TextChannel.Insert(
+            this.GetHandle(transaction),
+            transaction.Handle,
+            index,
+            unsafeValue.Handle,
+            unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -67,12 +70,15 @@ public class Text : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
-        ThrowIfDisposed();
-
         var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
         var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
-        TextChannel.InsertEmbed(Handle, transaction.Handle, index, unsafeContent.Handle, unsafeAttributes.Handle);
+        TextChannel.InsertEmbed(
+            this.GetHandle(transaction),
+            transaction.Handle,
+            index,
+            unsafeContent.Handle,
+            unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -86,9 +92,7 @@ public class Text : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        ThrowIfDisposed();
-
-        TextChannel.RemoveRange(Handle, transaction.Handle, index, length);
+        TextChannel.RemoveRange(this.GetHandle(transaction), transaction.Handle, index, length);
     }
 
     /// <summary>
@@ -106,11 +110,9 @@ public class Text : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
-        ThrowIfDisposed();
-
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
-        TextChannel.Format(Handle, transaction.Handle, index, length, unsafeAttributes.Handle);
+        TextChannel.Format(this.GetHandle(transaction), transaction.Handle, index, length, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -120,11 +122,9 @@ public class Text : Branch
     /// <returns>The <see cref="TextChunks" /> that compose this <see cref="Text" />.</returns>
     public TextChunks Chunks(Transaction transaction)
     {
-        ThrowIfDisposed();
+        var handle = TextChannel.Chunks(this.GetHandle(transaction), transaction.Handle, out var length).Checked();
 
-        var handle = TextChannel.Chunks(Handle, transaction.Handle, out var length).Checked();
-
-        return new TextChunks(handle, length, Doc);
+        return new TextChunks(handle, length, this.Doc);
     }
 
     /// <summary>
@@ -134,9 +134,7 @@ public class Text : Branch
     /// <returns>The full string stored in the instance.</returns>
     public string String(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        var handle = TextChannel.String(Handle, transaction.Handle);
+        var handle = TextChannel.String(this.GetHandle(transaction), transaction.Handle);
 
         return MemoryReader.ReadStringAndDestroy(handle);
     }
@@ -151,9 +149,7 @@ public class Text : Branch
     /// <returns>The length, in bytes, of the string stored in the instance.</returns>
     public uint Length(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        return TextChannel.Length(Handle, transaction.Handle);
+        return TextChannel.Length(this.GetHandle(transaction), transaction.Handle);
     }
 
     /// <summary>
@@ -163,9 +159,7 @@ public class Text : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<TextEvent> action)
     {
-        ThrowIfDisposed();
-
-        return onObserve.Subscribe(action);
+        return this.onObserve.Subscribe(action);
     }
 
     /// <summary>
@@ -182,9 +176,11 @@ public class Text : Branch
     /// </returns>
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
-        ThrowIfDisposed();
-
-        var handle = StickyIndexChannel.FromIndex(Handle, transaction.Handle, index, (sbyte)associationType);
+        var handle = StickyIndexChannel.FromIndex(
+            this.GetHandle(transaction),
+            transaction.Handle,
+            index,
+            (sbyte) associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }
