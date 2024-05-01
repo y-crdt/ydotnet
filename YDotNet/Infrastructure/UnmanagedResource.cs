@@ -8,7 +8,7 @@ public abstract class UnmanagedResource : Resource
     protected internal UnmanagedResource(nint handle, bool isDisposed = false)
         : base(isDisposed)
     {
-        this.Handle = handle;
+        Handle = handle;
     }
 
     internal nint Handle { get; }

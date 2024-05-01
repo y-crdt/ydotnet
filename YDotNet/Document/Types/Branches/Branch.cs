@@ -18,11 +18,11 @@ public abstract class Branch : UnmanagedResource
     protected internal Branch(nint handle, Doc doc, bool isDeleted)
         : base(handle, isDeleted)
     {
-        this.Doc = doc;
+        Doc = doc;
 
-        this.BranchId = isDeleted ? null : BranchChannel.Id(handle);
+        BranchId = isDeleted ? null : BranchChannel.Id(handle);
 
-        this.onDeep = new EventSubscriberFromId<EventBranch[]>(
+        onDeep = new EventSubscriberFromId<EventBranch[]>(
             doc.EventManager,
             this,
             (branch, action) =>
@@ -56,7 +56,7 @@ public abstract class Branch : UnmanagedResource
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable ObserveDeep(Action<IEnumerable<EventBranch>> action)
     {
-        return this.onDeep.Subscribe(action);
+        return onDeep.Subscribe(action);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public abstract class Branch : UnmanagedResource
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
-        return this.Doc.WriteTransaction();
+        return Doc.WriteTransaction();
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public abstract class Branch : UnmanagedResource
     /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
-        return this.Doc.ReadTransaction();
+        return Doc.ReadTransaction();
     }
 
     /// <summary>
@@ -87,12 +87,12 @@ public abstract class Branch : UnmanagedResource
     /// <exception cref="ObjectDisposedException">If <see cref="Branch.IsDisposed" /> is <c>true</c>.</exception>
     protected internal nint GetHandle(Transaction transaction)
     {
-        if (this.IsDisposed)
+        if (IsDisposed)
         {
             throw new ObjectDisposedException("Object is disposed.");
         }
 
-        var handle = MemoryWriter.WriteStruct(this.BranchId);
+        var handle = MemoryWriter.WriteStruct(BranchId);
 
         var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
 
