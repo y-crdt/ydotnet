@@ -54,9 +54,7 @@ public class XmlFragment : Branch
     /// <returns>The number of direct child nodes of this <see cref="XmlFragment" />.</returns>
     public uint ChildLength(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        return XmlElementChannel.ChildLength(Handle, transaction.Handle);
+        return XmlElementChannel.ChildLength(GetHandle(transaction), transaction.Handle);
     }
 
     /// <summary>
@@ -68,9 +66,7 @@ public class XmlFragment : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlText InsertText(Transaction transaction, uint index)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.InsertText(Handle, transaction.Handle, index);
+        var handle = XmlElementChannel.InsertText(GetHandle(transaction), transaction.Handle, index);
 
         return Doc.GetXmlText(handle, isDeleted: false);
     }
@@ -85,11 +81,9 @@ public class XmlFragment : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
-        ThrowIfDisposed();
-
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
-        var handle = XmlElementChannel.InsertElement(Handle, transaction.Handle, index, unsafeName.Handle);
+        var handle = XmlElementChannel.InsertElement(GetHandle(transaction), transaction.Handle, index, unsafeName.Handle);
 
         return Doc.GetXmlElement(handle, isDeleted: false);
     }
@@ -103,9 +97,7 @@ public class XmlFragment : Branch
     /// <param name="length">The amount of child nodes to remove, starting at <paramref name="index" />.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        ThrowIfDisposed();
-
-        XmlElementChannel.RemoveRange(Handle, transaction.Handle, index, length);
+        XmlElementChannel.RemoveRange(GetHandle(transaction), transaction.Handle, index, length);
     }
 
     /// <summary>
@@ -116,9 +108,7 @@ public class XmlFragment : Branch
     /// <returns>An <see cref="Output" /> cell or <c>null</c> if the <paramref name="index" /> is out of bounds.</returns>
     public Output? Get(Transaction transaction, uint index)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.Get(Handle, transaction.Handle, index);
+        var handle = XmlElementChannel.Get(GetHandle(transaction), transaction.Handle, index);
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
@@ -134,9 +124,7 @@ public class XmlFragment : Branch
     /// </returns>
     public Output? FirstChild(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.FirstChild(Handle, transaction.Handle);
+        var handle = XmlElementChannel.FirstChild(GetHandle(transaction), transaction.Handle);
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }
@@ -151,9 +139,7 @@ public class XmlFragment : Branch
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlFragment" />.</returns>
     public XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        ThrowIfDisposed();
-
-        var handle = XmlElementChannel.TreeWalker(Handle, transaction.Handle);
+        var handle = XmlElementChannel.TreeWalker(GetHandle(transaction), transaction.Handle);
 
         return new XmlTreeWalker(handle.Checked(), Doc);
     }
@@ -168,8 +154,6 @@ public class XmlFragment : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<XmlFragmentEvent> action)
     {
-        ThrowIfDisposed();
-
         return onObserve.Subscribe(action);
     }
 }
