@@ -18,7 +18,7 @@ public class TagTests
         transaction.Commit();
 
         // Act
-        var tag = xmlElement.Tag;
+        var tag = xmlElement.Tag(transaction);
 
         // Assert
         Assert.That(tag, Is.EqualTo("xml-element"));
@@ -34,7 +34,7 @@ public class TagTests
         // Act
         var transaction = doc.WriteTransaction();
         var childXmlElement = xmlFragment.InsertElement(transaction, index: 0, "color");
-        var tag = childXmlElement.Tag;
+        var tag = childXmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert
@@ -54,7 +54,7 @@ public class TagTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = map.Get(transaction, "xml-element").XmlElement.Tag;
+        var tag = map.Get(transaction, "xml-element").XmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert
@@ -74,7 +74,7 @@ public class TagTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = array.Get(transaction, index: 0).XmlElement.Tag;
+        var tag = array.Get(transaction, index: 0).XmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert

@@ -276,7 +276,7 @@ public class GetTests
 
         // Assert
         Assert.That(value1, Is.Not.Null);
-        Assert.That(value1.Tag, Is.EqualTo("person"));
+        Assert.That(value1.Tag(transaction), Is.EqualTo("person"));
         Assert.That(value2.Tag, Is.EqualTo(OutputTag.Null));
     }
 

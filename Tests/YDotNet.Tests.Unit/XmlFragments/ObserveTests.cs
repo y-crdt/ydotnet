@@ -45,13 +45,17 @@ public class ObserveTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(eventChanges, Is.Not.Null);
         Assert.That(eventChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.First().Length, Is.EqualTo(expected: 3));
         Assert.That(eventChanges.First().Values.ElementAt(index: 0).XmlText, Is.Not.Null);
         Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement, Is.Not.Null);
-        Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement.Tag, Is.EqualTo("color"));
+        Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement.Tag(transaction), Is.EqualTo("color"));
         Assert.That(eventChanges.First().Values.ElementAt(index: 2).XmlText, Is.Not.Null);
+
+        transaction.Commit();
     }
 }

@@ -17,7 +17,6 @@ public class ChunksTests
 
         var transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "Lucas");
-        transaction.Commit();
 
         // Act
         var chunks = text.Chunks(transaction);
@@ -25,6 +24,8 @@ public class ChunksTests
         // Assert
         Assert.That(chunks.Count, Is.EqualTo(expected: 1));
         Assert.That(chunks.First().Attributes, Is.Empty);
+
+        transaction.Commit();
     }
 
     [Test]
