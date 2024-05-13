@@ -41,7 +41,7 @@ public abstract class Branch : UnmanagedResource
             SubscriptionChannel.Unobserve);
     }
 
-    internal BranchIdNative? BranchId { get; }
+    private BranchIdNative? BranchId { get; }
 
     internal Doc Doc { get; }
 
