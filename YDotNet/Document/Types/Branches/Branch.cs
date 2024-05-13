@@ -20,7 +20,7 @@ public abstract class Branch : UnmanagedResource
     {
         Doc = doc;
 
-        BranchId = isDeleted ? null : BranchChannel.Id(handle);
+        BranchId = isDeleted ? default : BranchChannel.Id(handle);
 
         onDeep = new EventSubscriberFromId<EventBranch[]>(
             doc.EventManager,
