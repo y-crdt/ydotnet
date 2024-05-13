@@ -17,14 +17,14 @@ namespace YDotNet.Document.Types.XmlTexts;
 /// </summary>
 public class XmlText : Branch
 {
-    private readonly EventSubscriber<XmlTextEvent> onObserve;
+    private readonly EventSubscriberFromId<XmlTextEvent> onObserve;
 
     internal XmlText(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        onObserve = new EventSubscriber<XmlTextEvent>(
+        onObserve = new EventSubscriberFromId<XmlTextEvent>(
             doc.EventManager,
-            handle,
+            this,
             (xmlText, action) =>
             {
                 XmlTextChannel.ObserveCallback callback = (_, eventHandle) =>

@@ -17,18 +17,18 @@ namespace YDotNet.Document.Types.Texts;
 /// </summary>
 public class Text : Branch
 {
-    private readonly EventSubscriber<TextEvent> onObserve;
+    private readonly EventSubscriberFromId<TextEvent> onObserve;
 
     internal Text(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        this.onObserve = new EventSubscriber<TextEvent>(
+        onObserve = new EventSubscriberFromId<TextEvent>(
             doc.EventManager,
-            handle,
+            this,
             (text, action) =>
             {
                 TextChannel.ObserveCallback callback = (_, eventHandle) =>
-                    action(new TextEvent(eventHandle, this.Doc));
+                    action(new TextEvent(eventHandle, Doc));
 
                 return (TextChannel.Observe(text, nint.Zero, callback), callback);
             },
@@ -51,7 +51,7 @@ public class Text : Branch
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
         TextChannel.Insert(
-            this.GetHandle(transaction),
+            GetHandle(transaction),
             transaction.Handle,
             index,
             unsafeValue.Handle,
@@ -74,7 +74,7 @@ public class Text : Branch
         var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
         TextChannel.InsertEmbed(
-            this.GetHandle(transaction),
+            GetHandle(transaction),
             transaction.Handle,
             index,
             unsafeContent.Handle,
@@ -92,7 +92,7 @@ public class Text : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
-        TextChannel.RemoveRange(this.GetHandle(transaction), transaction.Handle, index, length);
+        TextChannel.RemoveRange(GetHandle(transaction), transaction.Handle, index, length);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public class Text : Branch
     {
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
-        TextChannel.Format(this.GetHandle(transaction), transaction.Handle, index, length, unsafeAttributes.Handle);
+        TextChannel.Format(GetHandle(transaction), transaction.Handle, index, length, unsafeAttributes.Handle);
     }
 
     /// <summary>
@@ -122,9 +122,9 @@ public class Text : Branch
     /// <returns>The <see cref="TextChunks" /> that compose this <see cref="Text" />.</returns>
     public TextChunks Chunks(Transaction transaction)
     {
-        var handle = TextChannel.Chunks(this.GetHandle(transaction), transaction.Handle, out var length).Checked();
+        var handle = TextChannel.Chunks(GetHandle(transaction), transaction.Handle, out var length).Checked();
 
-        return new TextChunks(handle, length, this.Doc);
+        return new TextChunks(handle, length, Doc);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public class Text : Branch
     /// <returns>The full string stored in the instance.</returns>
     public string String(Transaction transaction)
     {
-        var handle = TextChannel.String(this.GetHandle(transaction), transaction.Handle);
+        var handle = TextChannel.String(GetHandle(transaction), transaction.Handle);
 
         return MemoryReader.ReadStringAndDestroy(handle);
     }
@@ -149,7 +149,7 @@ public class Text : Branch
     /// <returns>The length, in bytes, of the string stored in the instance.</returns>
     public uint Length(Transaction transaction)
     {
-        return TextChannel.Length(this.GetHandle(transaction), transaction.Handle);
+        return TextChannel.Length(GetHandle(transaction), transaction.Handle);
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public class Text : Branch
     /// <returns>The subscription for the event. It may be used to unsubscribe later.</returns>
     public IDisposable Observe(Action<TextEvent> action)
     {
-        return this.onObserve.Subscribe(action);
+        return onObserve.Subscribe(action);
     }
 
     /// <summary>
@@ -177,10 +177,10 @@ public class Text : Branch
     public StickyIndex? StickyIndex(Transaction transaction, uint index, StickyAssociationType associationType)
     {
         var handle = StickyIndexChannel.FromIndex(
-            this.GetHandle(transaction),
+            GetHandle(transaction),
             transaction.Handle,
             index,
-            (sbyte) associationType);
+            (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
     }

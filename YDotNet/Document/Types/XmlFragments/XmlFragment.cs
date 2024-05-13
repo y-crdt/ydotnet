@@ -25,14 +25,14 @@ namespace YDotNet.Document.Types.XmlFragments;
 /// </summary>
 public class XmlFragment : Branch
 {
-    private readonly EventSubscriber<XmlFragmentEvent> onObserve;
+    private readonly EventSubscriberFromId<XmlFragmentEvent> onObserve;
 
     internal XmlFragment(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        onObserve = new EventSubscriber<XmlFragmentEvent>(
+        onObserve = new EventSubscriberFromId<XmlFragmentEvent>(
             doc.EventManager,
-            handle,
+            this,
             (xmlFragment, action) =>
             {
                 XmlElementChannel.ObserveCallback callback = (_, eventHandle) =>

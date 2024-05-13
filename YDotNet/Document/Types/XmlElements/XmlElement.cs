@@ -17,14 +17,14 @@ namespace YDotNet.Document.Types.XmlElements;
 /// </summary>
 public class XmlElement : XmlFragment
 {
-    private readonly EventSubscriber<XmlElementEvent> onObserve;
+    private readonly EventSubscriberFromId<XmlElementEvent> onObserve;
 
     internal XmlElement(nint handle, Doc doc, bool isDeleted)
         : base(handle, doc, isDeleted)
     {
-        onObserve = new EventSubscriber<XmlElementEvent>(
+        onObserve = new EventSubscriberFromId<XmlElementEvent>(
             doc.EventManager,
-            handle,
+            this,
             (xmlElement, action) =>
             {
                 XmlElementChannel.ObserveCallback callback = (_, eventHandle) =>
