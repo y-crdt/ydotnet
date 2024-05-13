@@ -92,11 +92,9 @@ public abstract class Branch : UnmanagedResource
             throw new ObjectDisposedException("Object is disposed.");
         }
 
-        var handle = MemoryWriter.WriteStruct(BranchId);
+        using var handle = MemoryWriter.WriteStruct(BranchId);
 
         var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
-
-        handle.Dispose();
 
         if (branchHandle == nint.Zero || BranchChannel.Alive(branchHandle) == 0)
         {
