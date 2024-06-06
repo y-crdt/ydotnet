@@ -1,3 +1,5 @@
+using YDotNet.Native.Types.Events;
+
 namespace YDotNet.Document.Types.Events;
 
 /// <summary>
@@ -27,12 +29,14 @@ public class EventPathSegment
     public EventPathSegmentTag Tag { get; }
 
     /// <summary>
-    ///     Gets the <see cref="string" /> key, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Key" />, or <c>null</c> otherwise.
+    ///     Gets the <see cref="string" /> key, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Key" />, or <c>null</c>
+    ///     otherwise.
     /// </summary>
     public string? Key { get; }
 
     /// <summary>
-    ///     Gets the <see ref="uint" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or <c>null</c> otherwise.
+    ///     Gets the <see ref="uint" /> index, if <see cref="Tag" /> is <see cref="EventPathSegmentTag.Index" />, or
+    ///     <c>null</c> otherwise.
     /// </summary>
     public uint? Index { get; }
 }

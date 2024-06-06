@@ -1,7 +1,9 @@
+using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 
 namespace YDotNet.Native.Document.State;
 
+[StructLayout(LayoutKind.Sequential)]
 internal readonly struct StateVectorNative
 {
     public uint EntriesCount { get; }

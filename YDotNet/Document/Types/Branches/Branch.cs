@@ -84,7 +84,7 @@ public abstract class Branch : UnmanagedResource
     /// </summary>
     /// <param name="transaction">The transaction used to acquire the handle to the <see cref="Branch" />.</param>
     /// <returns>The handle to the <see cref="Branch" />.</returns>
-    /// <exception cref="ObjectDisposedException">If <see cref="Branch.IsDisposed" /> is <c>true</c>.</exception>
+    /// <exception cref="ObjectDisposedException">If <see cref="Resource.IsDisposed" /> is <c>true</c>.</exception>
     protected internal nint GetHandle(Transaction transaction)
     {
         if (IsDisposed)
