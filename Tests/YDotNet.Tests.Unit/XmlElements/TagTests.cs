@@ -18,7 +18,9 @@ public class TagTests
         transaction.Commit();
 
         // Act
+        transaction = doc.ReadTransaction();
         var tag = xmlElement.Tag(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(tag, Is.EqualTo("xml-element"));
