@@ -57,7 +57,7 @@ public class Transaction : UnmanagedResource
     /// </remarks>
     public void Commit()
     {
-        // The dispose method has a solution to prevent multiple dipose, so we can just use that.
+        // The dispose method has a solution to prevent multiple dispose, so we can just use that.
         Dispose();
     }
 
