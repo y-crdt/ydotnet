@@ -131,9 +131,13 @@ public class XmlElementObserveDeepTests
     private (Doc, XmlElement, XmlElement, XmlElement) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlElement1 = doc.XmlElement("xml-element-1");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement1 = xmlFragment.InsertElement(transaction, index: 0, "xml-element-1");
+        transaction.Commit();
+
+        transaction = doc.WriteTransaction();
         xmlElement1.InsertText(transaction, index: 0);
         xmlElement1.InsertText(transaction, index: 1);
         var xmlElement2 = xmlElement1.InsertElement(transaction, index: 2, "xml-element-2");

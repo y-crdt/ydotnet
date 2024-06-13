@@ -81,14 +81,8 @@ internal static class DocChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yxmlelem")]
-    public static extern nint XmlElement(nint doc, nint name);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yxmltext")]
-    public static extern nint XmlText(nint doc, nint name);
+        EntryPoint = "yxmlfragment")]
+    public static extern nint XmlFragment(nint doc, nint name);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -118,59 +112,29 @@ internal static class DocChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_clear")]
-    public static extern uint ObserveClear(nint doc, nint state, ObserveClearCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_clear")]
-    public static extern uint UnobserveClear(nint doc, uint subscriptionId);
+    public static extern nint ObserveClear(nint doc, nint state, ObserveClearCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_updates_v1")]
-    public static extern uint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_updates_v1")]
-    public static extern uint UnobserveUpdatesV1(nint doc, uint subscriptionId);
+    public static extern nint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_updates_v2")]
-    public static extern uint ObserveUpdatesV2(nint doc, nint state, ObserveUpdatesCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_updates_v2")]
-    public static extern uint UnobserveUpdatesV2(nint doc, uint subscriptionId);
+    public static extern nint ObserveUpdatesV2(nint doc, nint state, ObserveUpdatesCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_after_transaction")]
-    public static extern uint ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_after_transaction")]
-    public static extern uint UnobserveAfterTransaction(nint doc, uint subscriptionId);
+    public static extern nint ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_subdocs")]
-    public static extern uint ObserveSubDocs(nint doc, nint state, ObserveSubdocsCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ydoc_unobserve_subdocs")]
-    public static extern uint UnobserveSubDocs(nint doc, uint subscriptionId);
+    public static extern nint ObserveSubDocs(nint doc, nint state, ObserveSubdocsCallback callback);
 }

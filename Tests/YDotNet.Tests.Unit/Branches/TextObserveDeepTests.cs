@@ -53,5 +53,8 @@ public class TextObserveDeepTests
 
         // Assert
         Assert.That(pathSegments.Count(), Is.EqualTo(expected: 1));
+
+        // Act
+        subscription.Dispose();
     }
 }

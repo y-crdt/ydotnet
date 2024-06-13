@@ -10,13 +10,7 @@ internal static class BranchChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yobserve_deep")]
-    public static extern uint ObserveDeep(nint type, nint state, ObserveCallback callback);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yunobserve_deep")]
-    public static extern uint UnobserveDeep(nint type, uint subscriptionId);
+    public static extern nint ObserveDeep(nint type, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -27,12 +21,18 @@ internal static class BranchChannel
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ybranch_read_transaction")]
-    public static extern nint ReadTransaction(nint branch);
+        EntryPoint = "ybranch_id")]
+    public static extern BranchIdNative Id(nint branch);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "ybranch_write_transaction")]
-    public static extern nint WriteTransaction(nint branch);
+        EntryPoint = "ybranch_get")]
+    public static extern nint Get(nint branchId, nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ybranch_alive")]
+    public static extern byte Alive(nint branchId);
 }

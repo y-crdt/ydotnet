@@ -11,10 +11,14 @@ public class InsertTexts
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         var text = xmlText.String(transaction);
         transaction.Commit();
@@ -37,10 +41,14 @@ public class InsertTexts
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(
             transaction,
             index: 0,

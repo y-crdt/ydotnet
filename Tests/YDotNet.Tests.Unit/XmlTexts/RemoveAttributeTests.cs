@@ -45,9 +45,10 @@ public class RemoveAttributeTests
     private (Doc, XmlText) ArrangeDoc()
     {
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
         xmlText.InsertAttribute(transaction, "empty", string.Empty);
         xmlText.InsertAttribute(transaction, "number", "7️⃣");
         transaction.Commit();

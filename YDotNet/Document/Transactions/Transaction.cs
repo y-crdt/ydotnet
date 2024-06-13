@@ -1,8 +1,7 @@
 using YDotNet.Document.Options;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
-using YDotNet.Document.Types.XmlElements;
-using YDotNet.Document.Types.XmlTexts;
+using YDotNet.Document.Types.XmlFragments;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.Transaction;
@@ -58,7 +57,7 @@ public class Transaction : UnmanagedResource
     /// </remarks>
     public void Commit()
     {
-        // The dispose method has a solution to prevent multiple dipose, so we can just use that.
+        // The dispose method has a solution to prevent multiple dispose, so we can just use that.
         Dispose();
     }
 
@@ -121,7 +120,10 @@ public class Transaction : UnmanagedResource
     public byte[] StateDiffV1(byte[]? stateVector)
     {
         var handle = TransactionChannel.StateDiffV1(
-            Handle, stateVector, (uint)(stateVector?.Length ?? 0), out var length);
+            Handle,
+            stateVector,
+            (uint)(stateVector?.Length ?? 0),
+            out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
     }
@@ -330,36 +332,19 @@ public class Transaction : UnmanagedResource
     }
 
     /// <summary>
-    ///     Returns the <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />,
-    ///     or
-    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
+    ///     Returns the <see cref="XmlFragment" /> at the <see cref="Doc" /> root level, identified by
+    ///     <paramref name="name" />, or <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </summary>
-    /// <param name="name">The name of the <see cref="XmlElement" /> instance to get.</param>
+    /// <param name="name">The name of the <see cref="XmlFragment" /> instance to get.</param>
     /// <returns>
-    ///     The <see cref="XmlElement" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
-    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
+    ///     The <see cref="XmlFragment" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />,
+    ///     or <c>null</c> if no entry was defined under <paramref name="name" /> before.
     /// </returns>
-    public XmlElement? GetXmlElement(string name)
+    public XmlFragment? GetXmlFragment(string name)
     {
-        var handle = GetWithKind(name, BranchKind.XmlElement);
+        var handle = GetWithKind(name, BranchKind.XmlFragment);
 
-        return handle != nint.Zero ? doc.GetXmlElement(handle, isDeleted: false) : null;
-    }
-
-    /// <summary>
-    ///     Returns the <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
-    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
-    /// </summary>
-    /// <param name="name">The name of the <see cref="XmlText" /> instance to get.</param>
-    /// <returns>
-    ///     The <see cref="XmlText" /> at the <see cref="Doc" /> root level, identified by <paramref name="name" />, or
-    ///     <c>null</c> if no entry was defined under <paramref name="name" /> before.
-    /// </returns>
-    public XmlText? GetXmlText(string name)
-    {
-        var handle = GetWithKind(name, BranchKind.XmlText);
-
-        return handle != nint.Zero ? doc.GetXmlText(handle, isDeleted: false) : null;
+        return handle != nint.Zero ? doc.GetXmlFragment(handle, isDeleted: false) : null;
     }
 
     private nint GetWithKind(string name, BranchKind expectedKind)

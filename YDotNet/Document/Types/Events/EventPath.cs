@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Events;
 
 namespace YDotNet.Document.Types.Events;
 

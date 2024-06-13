@@ -19,7 +19,11 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Hello"));
+        
+        transaction.Commit();
     }
 
     [Test]
@@ -36,7 +40,11 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Hello, world!"));
+        
+        transaction.Commit();
     }
 
     [Test]
@@ -53,7 +61,11 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Lucas"));
+        
+        transaction.Commit();
     }
 
     [Test]
@@ -73,7 +85,11 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Hello"));
+        
+        transaction.Commit();
     }
 
     [Test]
@@ -94,7 +110,11 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Hello, world!"));
+        
+        transaction.Commit();
     }
 
     [Test]
@@ -115,6 +135,10 @@ public class InsertTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(text.String(transaction), Is.EqualTo("Lucas"));
+        
+        transaction.Commit();
     }
 }

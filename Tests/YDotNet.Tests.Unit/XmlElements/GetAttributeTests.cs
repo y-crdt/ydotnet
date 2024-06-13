@@ -10,10 +10,14 @@ public class GetAttributeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var value = xmlElement.GetAttribute(transaction, "href");
         transaction.Commit();
 
@@ -26,9 +30,14 @@ public class GetAttributeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", string.Empty);
         transaction.Commit();
 
@@ -46,9 +55,14 @@ public class GetAttributeTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 

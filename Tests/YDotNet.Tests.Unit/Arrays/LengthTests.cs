@@ -14,7 +14,9 @@ public class LengthTests
         var array = doc.Array("array");
 
         // Act
-        var length = array.Length;
+        var transaction = doc.ReadTransaction();
+        var length = array.Length(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(length, Is.EqualTo(expected: 0));
@@ -30,26 +32,22 @@ public class LengthTests
         // Act
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true)
-            });
+            transaction, index: 0, Input.Boolean(value: true));
+        var length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
 
         // Act
         transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true)
-            });
+            transaction, index: 0, Input.Boolean(value: true));
+        length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 2));
+        Assert.That(length, Is.EqualTo(expected: 2));
     }
 
     [Test]
@@ -60,23 +58,20 @@ public class LengthTests
         var array = doc.Array("array");
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Boolean(value: true),
-                Input.Long(value: 2469L),
-                Input.Undefined()
-            });
+            transaction, index: 0, Input.Boolean(value: true), Input.Long(value: 2469L), Input.Undefined());
+        var length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 3));
+        Assert.That(length, Is.EqualTo(expected: 3));
 
         // Act
         transaction = doc.WriteTransaction();
         array.RemoveRange(transaction, index: 1, length: 2);
+        length = array.Length(transaction);
         transaction.Commit();
 
         // Assert
-        Assert.That(array.Length, Is.EqualTo(expected: 1));
+        Assert.That(length, Is.EqualTo(expected: 1));
     }
 }

@@ -106,7 +106,7 @@ internal static class XmlElementChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmlelem_observe")]
-    public static extern uint Observe(nint handle, nint state, ObserveCallback callback);
+    public static extern nint Observe(nint handle, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
@@ -131,10 +131,4 @@ internal static class XmlElementChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmlelem_event_keys")]
     public static extern nint ObserveEventKeys(nint eventHandle, out uint length);
-
-    [DllImport(
-        ChannelSettings.NativeLib,
-        CallingConvention = CallingConvention.Cdecl,
-        EntryPoint = "yxmlelem_unobserve")]
-    public static extern void Unobserve(nint handle, uint subscriptionId);
 }

@@ -38,7 +38,7 @@ public class XmlTextEvent : UnmanagedResource
             {
                 var targetHandle = XmlTextChannel.ObserveEventTarget(handle).Checked();
 
-                return doc.GetXmlText(handle, isDeleted: false);
+                return doc.GetXmlText(targetHandle, isDeleted: false);
             });
     }
 

@@ -11,10 +11,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var text = xmlElement.String(transaction);
         transaction.Commit();
 
@@ -27,10 +31,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
         var xmlText = xmlElement.InsertText(transaction, index: 1);
         xmlText.Insert(transaction, index: 0, "red");
@@ -73,7 +81,7 @@ public class StringTests
         var array = doc.Array("array");
 
         var transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("color") });
+        array.InsertRange(transaction, index: 0, Input.XmlElement("color"));
         var xmlElement = array.Get(transaction, index: 0).XmlElement;
         var xmlText = xmlElement.InsertText(transaction, index: 0);
         xmlText.Insert(transaction, index: 0, "purple");

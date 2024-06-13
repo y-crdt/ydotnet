@@ -8,4 +8,5 @@ internal enum BranchKind
     Text = 3,
     XmlElement = 4,
     XmlText = 5,
+    XmlFragment = 6
 }

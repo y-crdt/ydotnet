@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
 using YDotNet.Document.Cells;
-using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Texts;
 
 namespace YDotNet.Tests.Unit.Texts;
@@ -17,7 +16,6 @@ public class ChunksTests
 
         var transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "Lucas");
-        transaction.Commit();
 
         // Act
         var chunks = text.Chunks(transaction);
@@ -25,16 +23,20 @@ public class ChunksTests
         // Assert
         Assert.That(chunks.Count, Is.EqualTo(expected: 1));
         Assert.That(chunks.First().Attributes, Is.Empty);
+
+        transaction.Commit();
     }
 
     [Test]
     public void ChunksFormattedAtBeginning()
     {
         // Arrange
-        var (text, transaction) = ArrangeText(index: 0, length: 2);
+        var text = ArrangeText(index: 0, length: 2);
 
         // Act
+        var transaction = text.ReadTransaction();
         var chunks = text.Chunks(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(chunks.Count, Is.EqualTo(expected: 2));
@@ -57,10 +59,12 @@ public class ChunksTests
     public void ChunksFormattedAtMiddle()
     {
         // Arrange
-        var (text, transaction) = ArrangeText(index: 2, length: 2);
+        var text = ArrangeText(index: 2, length: 2);
 
         // Act
+        var transaction = text.ReadTransaction();
         var chunks = text.Chunks(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(chunks.Count, Is.EqualTo(expected: 3));
@@ -88,10 +92,12 @@ public class ChunksTests
     public void ChunksFormattedAtEnding()
     {
         // Arrange
-        var (text, transaction) = ArrangeText(index: 3, length: 2);
+        var text = ArrangeText(index: 3, length: 2);
 
         // Act
+        var transaction = text.ReadTransaction();
         var chunks = text.Chunks(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(chunks.Count, Is.EqualTo(expected: 2));
@@ -110,7 +116,7 @@ public class ChunksTests
         Assert.That(secondChunkAttribute.Value.Boolean, Is.True);
     }
 
-    private (Text, Transaction) ArrangeText(uint index, uint length)
+    private Text ArrangeText(uint index, uint length)
     {
         var doc = new Doc();
         var text = doc.Text("value");
@@ -127,6 +133,6 @@ public class ChunksTests
 
         transaction.Commit();
 
-        return (text, transaction);
+        return text;
     }
 }

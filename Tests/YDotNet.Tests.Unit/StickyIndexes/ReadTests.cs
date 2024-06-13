@@ -54,7 +54,7 @@ public class ReadTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[] { Input.Long(value: 2469L), Input.Null(), Input.Boolean(value: false) });
+            transaction, index: 0, Input.Long(value: 2469L), Input.Null(), Input.Boolean(value: false));
         var stickyIndexBefore = array.StickyIndex(transaction, index: 1, StickyAssociationType.Before);
         var stickyIndexAfter = array.StickyIndex(transaction, index: 1, StickyAssociationType.After);
         transaction.Commit();
@@ -71,10 +71,10 @@ public class ReadTests
 
         // Act
         transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 1, new[] { Input.String("(") });
-        array.InsertRange(transaction, index: 3, new[] { Input.String(")") });
-        array.InsertRange(transaction, index: 4, new[] { Input.String(" Viana") });
-        array.InsertRange(transaction, index: 0, new[] { Input.String("Hello, ") });
+        array.InsertRange(transaction, index: 1, Input.String("("));
+        array.InsertRange(transaction, index: 3, Input.String(")"));
+        array.InsertRange(transaction, index: 4, Input.String(" Viana"));
+        array.InsertRange(transaction, index: 0, Input.String("Hello, "));
         beforeIndex = stickyIndexBefore.Read(transaction);
         afterIndex = stickyIndexAfter.Read(transaction);
         transaction.Commit();
@@ -89,9 +89,14 @@ public class ReadTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         var stickyIndexBefore = xmlText.StickyIndex(transaction, index: 3, StickyAssociationType.Before);
         var stickyIndexAfter = xmlText.StickyIndex(transaction, index: 3, StickyAssociationType.After);

@@ -11,10 +11,16 @@ public class TagTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var tag = xmlElement.Tag;
+        transaction = doc.ReadTransaction();
+        var tag = xmlElement.Tag(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(tag, Is.EqualTo("xml-element"));
@@ -25,12 +31,12 @@ public class TagTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         // Act
         var transaction = doc.WriteTransaction();
-        var childXmlElement = xmlElement.InsertElement(transaction, index: 0, "color");
-        var tag = childXmlElement.Tag;
+        var childXmlElement = xmlFragment.InsertElement(transaction, index: 0, "color");
+        var tag = childXmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert
@@ -50,7 +56,7 @@ public class TagTests
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = map.Get(transaction, "xml-element").XmlElement.Tag;
+        var tag = map.Get(transaction, "xml-element").XmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert
@@ -65,12 +71,12 @@ public class TagTests
         var array = doc.Array("array");
 
         var transaction = doc.WriteTransaction();
-        array.InsertRange(transaction, index: 0, new[] { Input.XmlElement("color") });
+        array.InsertRange(transaction, index: 0, Input.XmlElement("color"));
         transaction.Commit();
 
         // Act
         transaction = doc.ReadTransaction();
-        var tag = array.Get(transaction, index: 0).XmlElement.Tag;
+        var tag = array.Get(transaction, index: 0).XmlElement.Tag(transaction);
         transaction.Commit();
 
         // Assert
