@@ -101,6 +101,7 @@ public sealed class Input : Resource
         return new Input(InputChannel.Bytes(value, (uint) value.Length));
     }
 
+    // TODO [LSViana] Rename this to `JsonArray` to match the `Output` cell.
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
@@ -113,6 +114,7 @@ public sealed class Input : Resource
         return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint) value.Length), unsafeMemory);
     }
 
+    // TODO [LSViana] Rename this to `JsonObject` to match the `Output` cell.
     /// <summary>
     ///     Initializes a new instance of the <see cref="Input" /> class.
     /// </summary>
