@@ -2,4 +2,4 @@
 
 using YDotNet.Tests.Driver.Tasks.Maps;
 
-new Insert().Run();
+new Get().Run();
