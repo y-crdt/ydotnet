@@ -12,7 +12,7 @@ internal static class UndoManagerChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yundo_manager")]
-    public static extern nint NewWithOptions(nint doc, nint branch, nint options);
+    public static extern nint NewWithOptions(nint doc, nint options);
 
     [DllImport(
         ChannelSettings.NativeLib,
