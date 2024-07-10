@@ -25,6 +25,7 @@ jobs:
           path: ./output
           workflow: build-binaries.yml
           workflow_conclusion: success
+          bracnh: master
   
       - name: NuGet pack
         run: |
