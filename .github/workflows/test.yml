@@ -49,7 +49,7 @@ jobs:
           workflow_conclusion: success
           name: ${{ matrix.build }}
           name_is_regexp: true
-          branch: master
+          branch: main
 
       - name: Copy binaries
         run: |
