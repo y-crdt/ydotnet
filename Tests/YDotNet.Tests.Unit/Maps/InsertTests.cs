@@ -328,6 +328,35 @@ public class InsertTests
         Assert.That(length, Is.EqualTo(expected: 1));
     }
 
+    [Test]
+    public void InsertNestedMap()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        // Act
+        var transaction = doc.WriteTransaction();
+
+        var innerMap = Input.Map(new Dictionary<string, Input>
+        {
+            { "text", Input.String("Nested data") }
+        });
+
+        var outerMap = Input.Map(new Dictionary<string, Input>
+        {
+            { "innerMap", innerMap }
+        });
+
+        map.Insert(transaction, "outerMap", outerMap);
+        var length = map.Length(transaction);
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 1));
+    }
+
     private (Doc, Map) ArrangeDoc()
     {
         var doc = new Doc();
