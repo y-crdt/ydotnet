@@ -5,7 +5,6 @@ namespace YDotNet;
 /// <summary>
 /// Represents an YDotNetException.
 /// </summary>
-[Serializable]
 public class YDotNetException : Exception
 {
     /// <summary>
@@ -31,16 +30,6 @@ public class YDotNetException : Exception
     /// <param name="inner">The inner exception.</param>
     public YDotNetException(string message, Exception inner)
         : base(message, inner)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="YDotNetException"/> class for serialization.
-    /// </summary>
-    /// <param name="info">The serialization info.</param>
-    /// <param name="context">The serialization context.</param>
-    protected YDotNetException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
     {
     }
 }
