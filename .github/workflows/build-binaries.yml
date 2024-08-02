@@ -11,7 +11,7 @@ on:
 
 env:
   YRS_REPO: https://github.com/y-crdt/y-crdt
-  YRS_BRANCH: v0.17.4
+  YRS_BRANCH: release-v0.19.1
   CARGO_TERM_COLOR: always
 
 jobs:

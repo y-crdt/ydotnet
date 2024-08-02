@@ -18,12 +18,22 @@ public class UndoManager : UnmanagedResource
     private readonly EventSubscriber<UndoEvent> onPopped;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="UndoManager" /> class without a scope.
+    /// </summary>
+    /// <param name="doc">The <see cref="Doc" /> to operate over.</param>
+    /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
+    public UndoManager(Doc doc, UndoManagerOptions? options = null)
+        : this(doc, null, options)
+    {
+    }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
     /// </summary>
     /// <param name="doc">The <see cref="Doc" /> to operate over.</param>
-    /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over.</param>
+    /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over. To be added as a default scope..</param>
     /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
-    public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
+    public UndoManager(Doc doc, Branch? branch, UndoManagerOptions? options = null)
         : base(Create(doc, branch, options))
     {
         onAdded = new EventSubscriber<UndoEvent>(
@@ -186,10 +196,17 @@ public class UndoManager : UnmanagedResource
         UndoManagerChannel.Destroy(Handle);
     }
 
-    private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
+    private static nint Create(Doc doc, Branch? branch, UndoManagerOptions? options)
     {
         var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
 
-        return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
+        var handle = UndoManagerChannel.NewWithOptions(doc.Handle, unsafeOptions.Handle);
+
+        if (branch != null)
+        {
+            UndoManagerChannel.AddScope(handle, branch.Handle);
+        }
+
+        return handle;
     }
 }
