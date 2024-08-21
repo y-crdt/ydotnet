@@ -39,6 +39,7 @@ internal class DefaultDocumentCleaner : BackgroundService
                 var now = Clock();
 
                 var timeSinceLastLogging = now - lastLogging;
+                
                 // We run this loop very often. If there is an exception, it could flood the log with duplicate log entries.
                 if (timeSinceLastLogging < options.LogWaitTime)
                 {

@@ -12,7 +12,7 @@ public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
     private readonly IMongoClient mongoClient;
     private IMongoCollection<DocumentEntity>? collection;
 
-    public Func<DateTime> Clock = () => DateTime.UtcNow;
+    public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
 
     public MongoDocumentStorage(IMongoClient mongoClient, IOptions<MongoDocumentStorageOptions> options)
     {
