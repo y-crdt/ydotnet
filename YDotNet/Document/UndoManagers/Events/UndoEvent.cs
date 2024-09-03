@@ -1,4 +1,3 @@
-using YDotNet.Document.State;
 using YDotNet.Native.UndoManager.Events;
 
 namespace YDotNet.Document.UndoManagers.Events;
@@ -16,12 +15,8 @@ public class UndoEvent
         {
             UndoEventKindNative.Undo => UndoEventKind.Undo,
             UndoEventKindNative.Redo => UndoEventKind.Redo,
-            _ => throw new NotSupportedException($"The value \"{native.KindNative}\" for {nameof(UndoEventKindNative)} is not supported."),
+            _ => throw new NotSupportedException($"The value \"{native.KindNative}\" for {nameof(UndoEventKindNative)} is not supported.")
         };
-
-        Insertions = new DeleteSet(native.Insertions);
-
-        Deletions = new DeleteSet(native.Deletions);
     }
 
     /// <summary>
@@ -36,14 +31,4 @@ public class UndoEvent
     ///     The <see cref="Origin" /> is a binary marker.
     /// </remarks>
     public byte[]? Origin { get; }
-
-    /// <summary>
-    ///     Gets the <see cref="DeleteSet" /> entries for inserted content.
-    /// </summary>
-    public DeleteSet Insertions { get; }
-
-    /// <summary>
-    ///     Gets the <see cref="DeleteSet" /> entries for deleted content.
-    /// </summary>
-    public DeleteSet Deletions { get; }
 }

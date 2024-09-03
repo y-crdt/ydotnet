@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
 
+namespace YDotNet.Native.Types.Events;
+
 [StructLayout(LayoutKind.Explicit)]
 internal readonly struct EventPathSegmentNative
 {

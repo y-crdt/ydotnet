@@ -12,13 +12,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         XmlElement? target = null;
         xmlElement.Observe(e => target = e.Target);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         transaction.Commit();
 
@@ -32,27 +36,35 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         IEnumerable<EventChange>? eventChanges = null;
         xmlElement.Observe(e => eventChanges = e.Delta.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
+
         Assert.That(eventChanges, Is.Not.Null);
         Assert.That(eventChanges.Count(), Is.EqualTo(expected: 1));
         Assert.That(eventChanges.First().Tag, Is.EqualTo(EventChangeTag.Add));
         Assert.That(eventChanges.First().Length, Is.EqualTo(expected: 3));
         Assert.That(eventChanges.First().Values.ElementAt(index: 0).XmlText, Is.Not.Null);
         Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement, Is.Not.Null);
-        Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement.Tag, Is.EqualTo("color"));
+        Assert.That(eventChanges.First().Values.ElementAt(index: 1).XmlElement.Tag(transaction), Is.EqualTo("color"));
         Assert.That(eventChanges.First().Values.ElementAt(index: 2).XmlText, Is.Not.Null);
+
+        transaction.Commit();
     }
 
     [Test]
@@ -60,13 +72,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         IEnumerable<EventChange>? eventChanges = null;
         xmlElement.Observe(e => eventChanges = e.Delta.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -80,13 +96,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         IEnumerable<EventKeyChange>? keyChanges = null;
         xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         xmlElement.InsertAttribute(transaction, "rel", "preload");
         xmlElement.InsertAttribute(transaction, "as", "document");
@@ -112,9 +132,14 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -140,9 +165,14 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertAttribute(transaction, "href", "https://lsviana.github.io/");
         transaction.Commit();
 
@@ -167,13 +197,17 @@ public class ObserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        transaction.Commit();
 
         IEnumerable<EventKeyChange>? keyChanges = null;
         xmlElement.Observe(e => keyChanges = e.Keys.ToArray());
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);

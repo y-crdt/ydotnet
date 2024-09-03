@@ -24,8 +24,12 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
         var chunks = text.Chunks(transaction);
+
         Assert.That(chunks.Count, Is.EqualTo(expected: 2));
+
+        transaction.Commit();
     }
 
     [Test]
@@ -45,8 +49,12 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
         var chunks = text.Chunks(transaction);
+
         Assert.That(chunks.Count, Is.EqualTo(expected: 3));
+
+        transaction.Commit();
     }
 
     [Test]
@@ -66,8 +74,12 @@ public class FormatTests
         transaction.Commit();
 
         // Assert
+        transaction = doc.ReadTransaction();
         var chunks = text.Chunks(transaction);
+
         Assert.That(chunks.Count, Is.EqualTo(expected: 2));
+
+        transaction.Commit();
     }
 
     private (Doc, Text) ArrangeText()

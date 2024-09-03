@@ -3,6 +3,7 @@ using YDotNet.Document.Events;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Document.UndoManagers.Events;
 using YDotNet.Infrastructure;
+using YDotNet.Native.Types;
 using YDotNet.Native.UndoManager;
 using YDotNet.Native.UndoManager.Events;
 
@@ -17,15 +18,24 @@ public class UndoManager : UnmanagedResource
     private readonly EventSubscriber<UndoEvent> onPopped;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="UndoManager" /> class without a scope.
+    /// </summary>
+    /// <param name="doc">The <see cref="Doc" /> to operate over.</param>
+    /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
+    public UndoManager(Doc doc, UndoManagerOptions? options = null)
+        : this(doc, null, options)
+    {
+    }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="UndoManager" /> class.
     /// </summary>
     /// <param name="doc">The <see cref="Doc" /> to operate over.</param>
-    /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over.</param>
+    /// <param name="branch">The shared type in the <see cref="Doc" /> to operate over. To be added as a default scope..</param>
     /// <param name="options">The options to initialize the <see cref="UndoManager" />.</param>
-    public UndoManager(Doc doc, Branch branch, UndoManagerOptions? options = null)
+    public UndoManager(Doc doc, Branch? branch, UndoManagerOptions? options = null)
         : base(Create(doc, branch, options))
     {
-#pragma warning disable CA1806 // Do not ignore method results
         onAdded = new EventSubscriber<UndoEvent>(
             doc.EventManager,
             Handle,
@@ -36,7 +46,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
             },
-            (owner, s) => UndoManagerChannel.UnobserveAdded(owner, s));
+            SubscriptionChannel.Unobserve);
 
         onPopped = new EventSubscriber<UndoEvent>(
             doc.EventManager,
@@ -48,8 +58,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
             },
-            (owner, s) => UndoManagerChannel.UnobservePopped(owner, s));
-#pragma warning restore CA1806 // Do not ignore method results
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
@@ -187,10 +196,17 @@ public class UndoManager : UnmanagedResource
         UndoManagerChannel.Destroy(Handle);
     }
 
-    private static nint Create(Doc doc, Branch branch, UndoManagerOptions? options)
+    private static nint Create(Doc doc, Branch? branch, UndoManagerOptions? options)
     {
         var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
 
-        return UndoManagerChannel.NewWithOptions(doc.Handle, branch.Handle, unsafeOptions.Handle);
+        var handle = UndoManagerChannel.NewWithOptions(doc.Handle, unsafeOptions.Handle);
+
+        if (branch != null)
+        {
+            UndoManagerChannel.AddScope(handle, branch.Handle);
+        }
+
+        return handle;
     }
 }

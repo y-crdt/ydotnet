@@ -13,9 +13,12 @@ public class CreateTests
 
         // Act
         var array = doc.Array("array");
+        var transaction = doc.ReadTransaction();
+        var length = array.Length(transaction);
+        transaction.Commit();
 
         // Assert
         Assert.That(array.Handle, Is.GreaterThan(nint.Zero));
-        Assert.That(array.Length, Is.EqualTo(expected: 0));
+        Assert.That(length, Is.EqualTo(expected: 0));
     }
 }

@@ -15,7 +15,7 @@ public class MoveTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        array.Move(transaction, sourceIndex: 0, array.Length);
+        array.Move(transaction, sourceIndex: 0, array.Length(transaction));
         transaction.Commit();
 
         // Assert
@@ -30,7 +30,7 @@ public class MoveTests
 
         // Act
         var transaction = doc.WriteTransaction();
-        array.Move(transaction, array.Length - 1, targetIndex: 0);
+        array.Move(transaction, array.Length(transaction) - 1, targetIndex: 0);
         transaction.Commit();
 
         // Assert
@@ -74,13 +74,8 @@ public class MoveTests
 
         var transaction = doc.WriteTransaction();
         array.InsertRange(
-            transaction, index: 0, new[]
-            {
-                Input.Long(value: 1),
-                Input.Long(value: 2),
-                Input.Long(value: 3),
-                Input.Long(value: 4)
-            });
+            transaction, index: 0, Input.Long(value: 1), Input.Long(value: 2), Input.Long(value: 3),
+            Input.Long(value: 4));
         transaction.Commit();
 
         return (doc, array);

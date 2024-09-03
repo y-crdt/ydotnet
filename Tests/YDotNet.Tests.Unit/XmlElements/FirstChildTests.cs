@@ -10,10 +10,14 @@ public class FirstChildTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var childXmlElement = xmlElement.FirstChild(transaction);
         transaction.Commit();
 
@@ -26,9 +30,14 @@ public class FirstChildTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertText(transaction, index: 0);
         xmlElement.InsertElement(transaction, index: 1, "color");
         xmlElement.InsertText(transaction, index: 2);
@@ -48,9 +57,14 @@ public class FirstChildTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
         var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
         transaction.Commit();
@@ -69,9 +83,14 @@ public class FirstChildTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlElement = doc.XmlElement("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
 
         var transaction = doc.WriteTransaction();
+        var xmlElement = xmlFragment.InsertElement(transaction, 0, "xml-element");
+        transaction.Commit();
+
+        // Act
+        transaction = doc.WriteTransaction();
         xmlElement.InsertElement(transaction, index: 0, "color");
         var childXmlElement = xmlElement.Get(transaction, index: 0).XmlElement;
         childXmlElement.InsertElement(transaction, index: 0, "alpha");

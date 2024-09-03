@@ -15,9 +15,10 @@ public class StringTests
         // Act
         var transaction = doc.WriteTransaction();
         text.Insert(transaction, index: 0, "Star. ⭐");
-        transaction.Commit();
 
         // Assert
         Assert.That(text.String(transaction), Is.EqualTo("Star. ⭐"));
+
+        transaction.Commit();
     }
 }

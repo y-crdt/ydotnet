@@ -34,7 +34,7 @@ jobs:
             os: ubuntu-latest
 
           # macOS
-          - build:  macos-x86_64
+          - build: macos-aarch64
             os: macos-latest
 
     steps:
@@ -49,6 +49,7 @@ jobs:
           workflow_conclusion: success
           name: ${{ matrix.build }}
           name_is_regexp: true
+          branch: main
 
       - name: Copy binaries
         run: |

@@ -4,6 +4,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
+using YDotNet.Document.Types.XmlFragments;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document;
@@ -77,7 +78,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
             },
-            (doc, s) => DocChannel.UnobserveClear(doc, s));
+            SubscriptionChannel.Unobserve);
 
         onUpdateV1 = new EventSubscriber<UpdateEvent>(
             EventManager,
@@ -89,7 +90,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveUpdatesV1(Handle, nint.Zero, callback), callback);
             },
-            (doc, s) => DocChannel.UnobserveUpdatesV1(doc, s));
+            SubscriptionChannel.Unobserve);
 
         onUpdateV2 = new EventSubscriber<UpdateEvent>(
             EventManager,
@@ -101,7 +102,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveUpdatesV2(Handle, nint.Zero, callback), callback);
             },
-            (doc, s) => DocChannel.UnobserveUpdatesV2(doc, s));
+            SubscriptionChannel.Unobserve);
 
         onAfterTransaction = new EventSubscriber<AfterTransactionEvent>(
             EventManager,
@@ -114,7 +115,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveAfterTransaction(doc, nint.Zero, callback), callback);
             },
-            (doc, s) => DocChannel.UnobserveAfterTransaction(doc, s));
+            SubscriptionChannel.Unobserve);
 
         onSubDocs = new EventSubscriber<SubDocsEvent>(
             EventManager,
@@ -126,7 +127,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveSubDocs(doc, nint.Zero, callback), callback);
             },
-            (doc, s) => DocChannel.UnobserveSubDocs(doc, s));
+            SubscriptionChannel.Unobserve);
     }
 
     /// <summary>
@@ -298,43 +299,23 @@ public class Doc : UnmanagedResource
     }
 
     /// <summary>
-    ///     Gets or creates a new shared <see cref="Types.XmlElements.XmlElement" /> data type instance as a
+    ///     Gets or creates a new shared <see cref="Types.XmlFragments.XmlFragment" /> data type instance as a
     ///     root-level type in this document.
     /// </summary>
     /// <remarks>
     ///     This structure can later be accessed using its <c>name</c>.
     /// </remarks>
-    /// <param name="name">The name of the <see cref="Types.XmlElements.XmlElement" /> instance to get.</param>
-    /// <returns>The <see cref="Types.XmlElements.XmlElement" /> instance related to the <c>name</c> provided.</returns>
-    public XmlElement XmlElement(string name)
+    /// <param name="name">The name of the <see cref="Types.XmlFragments.XmlFragment" /> instance to get.</param>
+    /// <returns>The <see cref="Types.XmlFragments.XmlFragment" /> instance related to the <c>name</c> provided.</returns>
+    public XmlFragment XmlFragment(string name)
     {
         ThrowIfDisposed();
         ThrowIfOpenTransaction();
 
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
-        var handle = DocChannel.XmlElement(Handle, unsafeName.Handle);
+        var handle = DocChannel.XmlFragment(Handle, unsafeName.Handle);
 
-        return GetXmlElement(handle, isDeleted: false);
-    }
-
-    /// <summary>
-    ///     Gets or creates a new shared <see cref="Types.XmlTexts.XmlText" /> data type instance as a
-    ///     root-level type in this document.
-    /// </summary>
-    /// <remarks>
-    ///     This structure can later be accessed using its <c>name</c>.
-    /// </remarks>
-    /// <param name="name">The name of the <see cref="Types.XmlTexts.XmlText" /> instance to get.</param>
-    /// <returns>The <see cref="Types.XmlTexts.XmlText" /> instance related to the <c>name</c> provided.</returns>
-    public XmlText XmlText(string name)
-    {
-        ThrowIfDisposed();
-        ThrowIfOpenTransaction();
-
-        using var unsafeName = MemoryWriter.WriteUtf8String(name);
-        var handle = DocChannel.XmlText(Handle, unsafeName.Handle);
-
-        return GetXmlText(handle, isDeleted: false);
+        return GetXmlFragment(handle, isDeleted: false);
     }
 
     /// <summary>
@@ -342,12 +323,12 @@ public class Doc : UnmanagedResource
     /// </summary>
     /// <param name="origin">Optional byte marker to indicate the source of changes to be applied by this transaction.</param>
     /// <returns>The <see cref="Transaction" /> to perform write operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction(byte[]? origin = null)
     {
         ThrowIfDisposed();
 
-        var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
+        var handle = DocChannel.WriteTransaction(Handle, (uint) (origin?.Length ?? 0), origin);
 
         if (handle == nint.Zero)
         {
@@ -362,7 +343,7 @@ public class Doc : UnmanagedResource
     ///     Starts a new read-only <see cref="Transaction" /> on this document.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform read operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
         ThrowIfDisposed();
@@ -530,6 +511,11 @@ public class Doc : UnmanagedResource
     internal XmlElement GetXmlElement(nint handle, bool isDeleted)
     {
         return GetOrAdd(handle, (h, doc) => new XmlElement(h, doc, isDeleted));
+    }
+
+    internal XmlFragment GetXmlFragment(nint handle, bool isDeleted)
+    {
+        return GetOrAdd(handle, (h, doc) => new XmlFragment(h, doc, isDeleted));
     }
 
     /// <inheritdoc />

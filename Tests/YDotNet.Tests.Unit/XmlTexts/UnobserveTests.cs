@@ -10,13 +10,17 @@ public class UnobserveTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-element");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         var called = 0;
         var subscription = xmlText.Observe(_ => called++);
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas");
         transaction.Commit();
 

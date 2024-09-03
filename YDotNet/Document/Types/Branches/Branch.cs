@@ -3,6 +3,7 @@ using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Document.Events;
+using YDotNet.Native.Types;
 using YDotNet.Native.Types.Branches;
 
 namespace YDotNet.Document.Types.Branches;
@@ -12,17 +13,18 @@ namespace YDotNet.Document.Types.Branches;
 /// </summary>
 public abstract class Branch : UnmanagedResource
 {
-    private readonly EventSubscriber<EventBranch[]> onDeep;
+    private readonly EventSubscriberFromId<EventBranch[]> onDeep;
 
-    internal protected Branch(nint handle, Doc doc, bool isDeleted)
+    protected internal Branch(nint handle, Doc doc, bool isDeleted)
         : base(handle, isDeleted)
     {
         Doc = doc;
 
-#pragma warning disable CA1806 // Do not ignore method results
-        onDeep = new EventSubscriber<EventBranch[]>(
+        BranchId = isDeleted ? default : BranchChannel.Id(handle);
+
+        onDeep = new EventSubscriberFromId<EventBranch[]>(
             doc.EventManager,
-            handle,
+            this,
             (branch, action) =>
             {
                 BranchChannel.ObserveCallback callback = (_, length, ev) =>
@@ -36,9 +38,10 @@ public abstract class Branch : UnmanagedResource
 
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
-            (branch, s) => BranchChannel.UnobserveDeep(branch, s));
-#pragma warning restore CA1806 // Do not ignore method results
+            SubscriptionChannel.Unobserve);
     }
+
+    private BranchIdNative? BranchId { get; }
 
     internal Doc Doc { get; }
 
@@ -60,40 +63,45 @@ public abstract class Branch : UnmanagedResource
     ///     Starts a new read-write <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the document.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction WriteTransaction()
     {
-        ThrowIfDisposed();
-
-        var handle = BranchChannel.WriteTransaction(Handle);
-
-        if (handle == nint.Zero)
-        {
-            ThrowHelper.PendingTransaction();
-            return default!;
-        }
-
-        return new Transaction(handle, Doc);
+        return Doc.WriteTransaction();
     }
 
     /// <summary>
     ///     Starts a new read-only <see cref="Transaction" /> on this <see cref="Branch" /> instance.
     /// </summary>
     /// <returns>The <see cref="Transaction" /> to perform operations in the branch.</returns>
-    /// <exception cref="YDotNetException">Another write transaction has been created and not commited yet.</exception>
+    /// <exception cref="YDotNetException">Another write transaction has been created and not committed yet.</exception>
     public Transaction ReadTransaction()
     {
-        ThrowIfDisposed();
+        return Doc.ReadTransaction();
+    }
 
-        var handle = BranchChannel.ReadTransaction(Handle);
-
-        if (handle == nint.Zero)
+    /// <summary>
+    ///     Gets a handle using the stored <see cref="BranchId" />.
+    /// </summary>
+    /// <param name="transaction">The transaction used to acquire the handle to the <see cref="Branch" />.</param>
+    /// <returns>The handle to the <see cref="Branch" />.</returns>
+    /// <exception cref="ObjectDisposedException">If <see cref="Resource.IsDisposed" /> is <c>true</c>.</exception>
+    protected internal nint GetHandle(Transaction transaction)
+    {
+        if (IsDisposed)
         {
-            ThrowHelper.PendingTransaction();
-            return default!;
+            throw new ObjectDisposedException("Object is disposed.");
         }
 
-        return new Transaction(handle, Doc);
+        using var handle = MemoryWriter.WriteStruct(BranchId);
+
+        var branchHandle = BranchChannel.Get(handle.Handle, transaction.Handle);
+
+        if (branchHandle == nint.Zero || BranchChannel.Alive(branchHandle) == 0)
+        {
+            throw new ObjectDisposedException("Object is disposed.");
+        }
+
+        return branchHandle;
     }
 
     /// <inheritdoc />

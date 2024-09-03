@@ -11,10 +11,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.ReadTransaction();
+        transaction = doc.ReadTransaction();
         var text = xmlText.String(transaction);
         transaction.Commit();
 
@@ -27,10 +31,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas Viana");
         var text = xmlText.String(transaction);
         transaction.Commit();
@@ -44,10 +52,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas Viana");
         xmlText.InsertAttribute(transaction, "color", "red");
         var text = xmlText.String(transaction);
@@ -62,10 +74,14 @@ public class StringTests
     {
         // Arrange
         var doc = new Doc();
-        var xmlText = doc.XmlText("xml-text");
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.WriteTransaction();
+        var xmlText = xmlFragment.InsertText(transaction, index: 0);
+        transaction.Commit();
 
         // Act
-        var transaction = doc.WriteTransaction();
+        transaction = doc.WriteTransaction();
         xmlText.Insert(transaction, index: 0, "Lucas Viana");
         xmlText.InsertEmbed(transaction, index: 3, Input.Boolean(value: true));
         xmlText.InsertEmbed(transaction, index: 8, Input.Long(value: 2469L));
