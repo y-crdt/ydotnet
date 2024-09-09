@@ -136,6 +136,9 @@ public static class YDotNetExtensions
                 case OutputTag.String:
                     jsonWriter.WriteStringValue(output.String);
                     break;
+                case OutputTag.Text:
+                    jsonWriter.WriteStringValue(output.Text.String(transaction));
+                    break;
                 case OutputTag.JsonArray:
                     WriteCollection(output.JsonArray, jsonWriter, transaction);
                     break;
@@ -157,7 +160,7 @@ public static class YDotNetExtensions
                 case OutputTag.Doc:
                     break;
                 default:
-                    throw new InvalidOperationException("Unsupported data type.");
+                    throw new InvalidOperationException($"Unsupported data type \"{output.Tag}\".");
             }
         }
     }

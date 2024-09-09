@@ -71,6 +71,33 @@ internal class Conversion
     }
 
     [Test]
+    public void CanParseTextToString()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        using (var transaction = doc.WriteTransaction())
+        {
+            map.Insert(transaction, "inner", Input.Map(new Dictionary<string, Input>
+            {
+                {"value", Input.Text("Hello YDotNet")}
+            }));
+        }
+
+        using (var transaction = doc.ReadTransaction())
+        {
+            var inner = map.Get(transaction, "inner");
+            
+            // Act
+            var parsed = inner.To<Expected>(transaction);
+
+            // Assert
+            Assert.That(parsed.Value, Is.EqualTo("Hello YDotNet"));
+        }
+    }
+
+    [Test]
     public void ConvertToJson()
     {
         // Arrange
@@ -87,13 +114,41 @@ internal class Conversion
 
         // Act
         string json;
-        using (var transaction = map.WriteTransaction())
+        using (var transaction = map.ReadTransaction())
         {
             var inner = map.Get(transaction, "inner");
 
             json = inner.ToJson(transaction);
         }
 
+        // Assert
+        StringAssert.Contains("Hello YDotNet", json);
+    }
+
+    [Test]
+    public void ConvertTextToJson()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        using (var transaction = doc.WriteTransaction())
+        {
+            map.Insert(transaction, "inner", Input.Map(new Dictionary<string, Input>
+            {
+                {"value", Input.Text("Hello YDotNet")}
+            }));
+        }
+        
+        // Act
+        string json;
+        using (var transaction = map.WriteTransaction())
+        {
+            var inner = map.Get(transaction, "inner");
+
+            json = inner.ToJson(transaction);
+        }
+        
         // Assert
         StringAssert.Contains("Hello YDotNet", json);
     }

@@ -329,6 +329,68 @@ public class InsertTests
     }
 
     [Test]
+    public void InsertNestedString()
+    {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+		
+        var item1 = Input.Map(new Dictionary<string, Input>
+        {
+            { "id", Input.String(Guid.NewGuid().ToString()) },
+            { "text", Input.String("Test") }
+        });
+		
+        var item2 = Input.Map(new Dictionary<string, Input>
+        {
+            { "id", Input.String(Guid.NewGuid().ToString()) },
+            { "text", Input.String("Describe the problem") }
+        });
+
+        var data = Input.Array(new[] { item1, item2 });
+        map.Insert(transaction, "data", data);
+        var length = map.Length(transaction);
+		
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 1));
+    }
+
+    [Test]
+    public void InsertNestedText()
+    {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+		
+        var item1 = Input.Map(new Dictionary<string, Input>
+        {
+            { "id", Input.String(Guid.NewGuid().ToString()) },
+            { "text", Input.Text("Test") }
+        });
+		
+        var item2 = Input.Map(new Dictionary<string, Input>
+        {
+            { "id", Input.String(Guid.NewGuid().ToString()) },
+            { "text", Input.Text("Describe the problem") }
+        });
+
+        var data = Input.Array(new[] { item1, item2 });
+        map.Insert(transaction, "data", data);
+        var length = map.Length(transaction);
+		
+        transaction.Commit();
+
+        // Assert
+        Assert.That(length, Is.EqualTo(expected: 1));
+    }
+
+    [Test]
     public void InsertNestedMap()
     {
         // Arrange
