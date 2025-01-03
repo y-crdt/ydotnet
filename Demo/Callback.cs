@@ -5,15 +5,8 @@ using YDotNet.Server;
 
 namespace Demo;
 
-public sealed class Callback : IDocumentCallback
+public sealed class Callback(ILogger<Callback> log) : IDocumentCallback
 {
-    private readonly ILogger<Callback> log;
-
-    public Callback(ILogger<Callback> log)
-    {
-        this.log = log;
-    }
-
     public ValueTask OnAwarenessUpdatedAsync(ClientAwarenessEvent @event)
     {
         log.LogInformation("Client {clientId} awareness changed.", @event.Context.ClientId);

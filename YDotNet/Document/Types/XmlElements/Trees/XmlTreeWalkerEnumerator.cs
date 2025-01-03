@@ -8,22 +8,16 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 ///     Represents the tree walker to provide instances of <see cref="Output" /> or
 ///     <c>null</c> to <see cref="XmlTreeWalker" />.
 /// </summary>
-internal class XmlTreeWalkerEnumerator : IEnumerator<Output>
+/// <remarks>
+///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
+/// </remarks>
+/// <param name="treeWalker">
+///     The <see cref="XmlTreeWalker" /> instance used by this enumerator.
+///     Check <see cref="XmlTreeWalker" /> for more details.
+/// </param>
+internal class XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker) : IEnumerator<Output>
 {
-    private readonly XmlTreeWalker treeWalker;
     private Output? current;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="XmlTreeWalkerEnumerator" /> class.
-    /// </summary>
-    /// <param name="treeWalker">
-    ///     The <see cref="XmlTreeWalker" /> instance used by this enumerator.
-    ///     Check <see cref="XmlTreeWalker" /> for more details.
-    /// </param>
-    public XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker)
-    {
-        this.treeWalker = treeWalker;
-    }
 
     /// <inheritdoc />
     public Output Current => current!;

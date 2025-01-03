@@ -1,3 +1,5 @@
+namespace YDotNet.Tests.Server.Unit;
+
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -5,8 +7,6 @@ using YDotNet.Document.Cells;
 using YDotNet.Server;
 using YDotNet.Server.Internal;
 using YDotNet.Server.Storage;
-
-namespace YDotNet.Tests.Server.Unit;
 
 public class DocumentContainerTests
 {
@@ -31,7 +31,7 @@ public class DocumentContainerTests
                 map.Insert(transaction, "key", Input.Double(42));
             }
 
-            await Task.Delay(100);
+            await Task.Delay(100).ConfigureAwait(false);
             return true;
         });
 
@@ -43,7 +43,12 @@ public class DocumentContainerTests
     {
         options ??= new DocumentManagerOptions();
 
-        return new DocumentContainer(name, documentStorage, documentCallback, documentManager, options,
+        return new DocumentContainer(
+            name,
+            documentStorage,
+            documentCallback,
+            documentManager,
+            options,
             A.Fake<ILogger>());
     }
 }

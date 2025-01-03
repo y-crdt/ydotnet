@@ -170,14 +170,9 @@ public class WriteAndRead
         return result;
     }
 
-    class BufferDecoder : Decoder
+    class BufferDecoder(byte[] buffer) : Decoder
     {
-        private readonly Stream stream;
-
-        public BufferDecoder(byte[] buffer)
-        {
-            stream = new MemoryStream(buffer);
-        }
+        private readonly Stream stream = new MemoryStream(buffer);
 
         protected override ValueTask<byte> ReadByteAsync(
             CancellationToken ct)

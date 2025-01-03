@@ -33,7 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Native.MacOS", "nat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Native", "native\YDotNet.Native\YDotNet.Native.csproj", "{95D7DB70-2794-44FF-A196-BBD0FC3988A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Tests.Server.Unit", "Tests\YDotNet.Tests.Server.Unit\YDotNet.Tests.Server.Unit.csproj", "{751DFB77-8526-4289-8C59-5A9ECBCC7019}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YDotNet.Tests.Server.Unit", "Tests\YDotNet.Tests.Server.Unit\YDotNet.Tests.Server.Unit.csproj", "{751DFB77-8526-4289-8C59-5A9ECBCC7019}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YDotNet.Server.EntityFramework", "YDotNet.Server.EntityFramework\YDotNet.Server.EntityFramework.csproj", "{B0606891-6F3B-48DA-BD68-80759B005187}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{751DFB77-8526-4289-8C59-5A9ECBCC7019}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{751DFB77-8526-4289-8C59-5A9ECBCC7019}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{751DFB77-8526-4289-8C59-5A9ECBCC7019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0606891-6F3B-48DA-BD68-80759B005187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0606891-6F3B-48DA-BD68-80759B005187}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0606891-6F3B-48DA-BD68-80759B005187}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0606891-6F3B-48DA-BD68-80759B005187}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

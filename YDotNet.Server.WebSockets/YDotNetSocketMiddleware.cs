@@ -9,18 +9,11 @@ using YDotNet.Protocol;
 
 namespace YDotNet.Server.WebSockets;
 
-public sealed class YDotNetSocketMiddleware : IDocumentCallback
+public sealed class YDotNetSocketMiddleware(IOptions<YDotNetWebSocketOptions> options, ILogger<YDotNetSocketMiddleware> logger) : IDocumentCallback
 {
     private readonly ConcurrentDictionary<string, List<ClientState>> statesPerDocumentName = new(StringComparer.Ordinal);
-    private readonly YDotNetWebSocketOptions options;
-    private readonly ILogger<YDotNetSocketMiddleware> logger;
+    private readonly YDotNetWebSocketOptions options = options.Value;
     private IDocumentManager? documentManager;
-
-    public YDotNetSocketMiddleware(IOptions<YDotNetWebSocketOptions> options, ILogger<YDotNetSocketMiddleware> logger)
-    {
-        this.options = options.Value;
-        this.logger = logger;
-    }
 
     public ValueTask OnInitializedAsync(IDocumentManager manager)
     {

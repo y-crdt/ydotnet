@@ -4,21 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace YDotNet.Server;
 
-internal class DefaultDocumentCleaner : BackgroundService
+internal class DefaultDocumentCleaner(IDocumentManager documentManager, IOptions<CleanupOptions> options, ILogger<DefaultDocumentCleaner> logger) : BackgroundService
 {
-    private readonly IDocumentManager documentManager;
-    private readonly ILogger<DefaultDocumentCleaner> logger;
-    private readonly CleanupOptions options;
+    private readonly CleanupOptions options = options.Value;
     private DateTime lastLogging;
 
     public Func<DateTime> Clock { get; } = () => DateTime.UtcNow;
-
-    public DefaultDocumentCleaner(IDocumentManager documentManager, IOptions<CleanupOptions> options, ILogger<DefaultDocumentCleaner> logger)
-    {
-        this.documentManager = documentManager;
-        this.logger = logger;
-        this.options = options.Value;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -39,7 +30,7 @@ internal class DefaultDocumentCleaner : BackgroundService
                 var now = Clock();
 
                 var timeSinceLastLogging = now - lastLogging;
-                
+
                 // We run this loop very often. If there is an exception, it could flood the log with duplicate log entries.
                 if (timeSinceLastLogging < options.LogWaitTime)
                 {
@@ -47,7 +38,7 @@ internal class DefaultDocumentCleaner : BackgroundService
                     return;
                 }
 
-                logger.LogError(ex, "Failed to cleanup document manager.");
+                logger.LogError(ex, "Failed to cleanup document manager");
                 lastLogging = now;
             }
         }

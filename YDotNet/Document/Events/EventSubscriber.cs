@@ -1,27 +1,13 @@
 namespace YDotNet.Document.Events;
 
-internal class EventSubscriber<TEvent> : IEventSubscriber
+internal class EventSubscriber<TEvent>(
+    EventManager manager,
+    nint owner,
+    Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe,
+    Action<nint> unsubscribe) : IEventSubscriber
 {
-    private readonly EventManager manager;
-    private readonly nint owner;
     private readonly EventPublisher<TEvent> publisher = new();
-    private readonly Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe;
-    private readonly Action<nint> unsubscribe;
     private (nint Handle, object? Callback) nativeSubscription;
-
-    // The native callback, returned by `subscribe`, must be stored so it doesn't
-    // throw exceptions later if the Rust side invokes it after it's been collected.
-    public EventSubscriber(
-        EventManager manager,
-        nint owner,
-        Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe,
-        Action<nint> unsubscribe)
-    {
-        this.manager = manager;
-        this.owner = owner;
-        this.subscribe = subscribe;
-        this.unsubscribe = unsubscribe;
-    }
 
     public void Clear()
     {

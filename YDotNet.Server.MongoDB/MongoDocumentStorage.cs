@@ -1,24 +1,17 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using YDotNet.Server.Storage;
-
 namespace YDotNet.Server.MongoDB;
 
-public sealed class MongoDocumentStorage : IDocumentStorage, IHostedService
+using global::MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using YDotNet.Server.Storage;
+
+public sealed class MongoDocumentStorage(IMongoClient mongoClient, IOptions<MongoDocumentStorageOptions> options) : IDocumentStorage, IHostedService
 {
     private readonly UpdateOptions upsert = new() { IsUpsert = true };
-    private readonly MongoDocumentStorageOptions options;
-    private readonly IMongoClient mongoClient;
+    private readonly MongoDocumentStorageOptions options = options.Value;
     private IMongoCollection<DocumentEntity>? collection;
 
     public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
-
-    public MongoDocumentStorage(IMongoClient mongoClient, IOptions<MongoDocumentStorageOptions> options)
-    {
-        this.options = options.Value;
-        this.mongoClient = mongoClient;
-    }
 
     public async Task StartAsync(
         CancellationToken cancellationToken)
