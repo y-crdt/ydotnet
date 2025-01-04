@@ -1,6 +1,9 @@
+using Demo.Db;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using YDotNet.Server;
+using YDotNet.Server.EntityFramework;
 using YDotNet.Server.MongoDB;
 
 namespace Demo;
@@ -49,6 +52,20 @@ public class Program
                             ConfigurationOptions.Parse(
                                 builder.Configuration["Storage:Redis:ConnectionString"]!);
                     });
+
+                    break;
+                }
+
+            case "Postgres":
+                {
+                    builder.Services.AddHostedService<DbInitializer>();
+                    builder.Services.AddDbContext<AppDbContext>(options =>
+                    {
+                        options.UseNpgsql(
+                            builder.Configuration["Storage:Postgres:ConnectionString"]!);
+                    });
+
+                    yDotNet.AddEntityFrameworkStorage<AppDbContext>();
 
                     break;
                 }

@@ -5,11 +5,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-public sealed class EFDocumentCleaner(
-    IDbContextFactory<YDotNetContext> dbContextFactory,
-    ILogger<EFDocumentCleaner> logger,
+public sealed class EFDocumentCleaner<T>(
+    IDbContextFactory<T> dbContextFactory,
+    ILogger<EFDocumentCleaner<T>> logger,
     IOptions<EFDocumentStorageOptions> options)
     : BackgroundService
+    where T : DbContext
 {
     private readonly EFDocumentStorageOptions options = options.Value;
 
@@ -50,7 +51,7 @@ public sealed class EFDocumentCleaner(
         await using (context.ConfigureAwait(false))
         {
             var now = Clock();
-            var deletion = context.Documents.Where(x => x.Expiration < now);
+            var deletion = context.Set<YDotNetDocument>().Where(x => x.Expiration < now);
 
             var deleted = await deletion.ExecuteDeleteAsync(ct).ConfigureAwait(false);
             if (deleted > 0)

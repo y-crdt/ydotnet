@@ -1,39 +1,18 @@
 namespace YDotNet.Server.EntityFramework;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using YDotNet.Server.Storage;
 
-internal class EFDocumentStorage(
-    IDbContextFactory<YDotNetContext> dbContextFactory,
+internal class EFDocumentStorage<T>(
+    IDbContextFactory<T> dbContextFactory,
     IOptions<EFDocumentStorageOptions> options)
-    : IDocumentStorage, IHostedService
+    : IDocumentStorage
+    where T : DbContext
 {
     private readonly EFDocumentStorageOptions options = options.Value;
 
     public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
-
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-        var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-
-        await using (context.ConfigureAwait(false))
-        {
-            var databaseCreator =
-    (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
-            await databaseCreator.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
-
-            await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
 
     public async ValueTask<byte[]?> GetDocAsync(string name, CancellationToken ct = default)
     {
@@ -41,7 +20,8 @@ internal class EFDocumentStorage(
 
         await using (context.ConfigureAwait(false))
         {
-            var document = await context.Documents.Where(x => x.Id == name).FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            var document = await context.Set<YDotNetDocument>().Where(x => x.Id == name)
+                .FirstOrDefaultAsync(ct).ConfigureAwait(false);
 
             return document?.Data;
         }
@@ -53,7 +33,8 @@ internal class EFDocumentStorage(
 
         await using (context.ConfigureAwait(false))
         {
-            var document = await context.Documents.Where(x => x.Id == name).FirstOrDefaultAsync(ct).ConfigureAwait(false);
+            var document = await context.Set<YDotNetDocument>().Where(x => x.Id == name)
+                .FirstOrDefaultAsync(ct).ConfigureAwait(false);
 
             if (document != null)
             {
@@ -63,7 +44,7 @@ internal class EFDocumentStorage(
             }
             else
             {
-                document = new DocumentEntity { Id = name, Data = doc, Expiration = GetExpiration(name) };
+                document = new YDotNetDocument { Id = name, Data = doc, Expiration = GetExpiration(name) };
                 await context.AddAsync(document, ct).ConfigureAwait(false);
             }
 

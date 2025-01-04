@@ -8,20 +8,33 @@ using YDotNet.Server.Storage;
 
 public static class ServiceExtensions
 {
-    public static YDotnetRegistration AddEntityFrameworkStorage(this YDotnetRegistration registration, Action<DbContextOptionsBuilder> build, Action<EFDocumentStorageOptions>? configure = null)
+    public static YDotnetRegistration AddEntityFrameworkStorage<T>(this YDotnetRegistration registration, Action<EFDocumentStorageOptions>? configure = null)
+        where T : DbContext
     {
         registration.Services.Configure(configure ?? (x => { }));
-        registration.Services.AddSingleton<EFDocumentStorage>();
+        registration.Services.AddSingleton<EFDocumentStorage<T>>();
 
         registration.Services.AddSingleton<IDocumentStorage>(
-            c => c.GetRequiredService<EFDocumentStorage>());
+            c => c.GetRequiredService<EFDocumentStorage<T>>());
 
-        registration.Services.AddSingleton<IHostedService>(
-            c => c.GetRequiredService<EFDocumentStorage>());
-
-        registration.Services.AddSingleton<IHostedService, EFDocumentCleaner>();
-        registration.Services.AddDbContextFactory<YDotNetContext>(build);
+        registration.Services.AddDbContextFactory<T>();
+        registration.Services.AddSingleton<IHostedService, EFDocumentCleaner<T>>();
 
         return registration;
+    }
+
+    public static ModelBuilder UseYDotNet(this ModelBuilder builder)
+    {
+        builder.Entity<YDotNetDocument>(b =>
+        {
+            b.ToTable("YDotNetDocument");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.Id)
+                .HasMaxLength(1000);
+        });
+
+        return builder;
     }
 }

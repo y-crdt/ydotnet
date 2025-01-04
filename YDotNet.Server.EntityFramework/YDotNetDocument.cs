@@ -2,10 +2,8 @@ namespace YDotNet.Server.EntityFramework;
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("YDotNetDocuments")]
-public sealed class DocumentEntity
+public sealed class YDotNetDocument
 {
     [Key]
     required public string Id { get; set; }

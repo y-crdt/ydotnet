@@ -1,6 +1,8 @@
 namespace YDotNet.Tests.Server.Unit;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
@@ -13,6 +15,15 @@ public class EFDocumentStorageFixture : DocumentStorageTests
 {
     private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();
     private IServiceProvider services;
+
+    public class AppDbContext(DbContextOptions options) : DbContext(options)
+    {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.UseYDotNet();
+            base.OnModelCreating(modelBuilder);
+        }
+    }
 
     [OneTimeSetUp]
     public async Task OneTimeSetup()
@@ -31,11 +42,12 @@ public class EFDocumentStorageFixture : DocumentStorageTests
     {
         services = new ServiceCollection()
             .AddLogging()
-            .AddYDotNet()
-            .AddEntityFrameworkStorage(options =>
+            .AddDbContext<AppDbContext>(options =>
             {
                 options.UseNpgsql(postgres.GetConnectionString());
             })
+            .AddYDotNet()
+            .AddEntityFrameworkStorage<AppDbContext>()
             .Services
             .BuildServiceProvider();
 
@@ -43,6 +55,12 @@ public class EFDocumentStorageFixture : DocumentStorageTests
         {
             await service.StartAsync(default);
         }
+
+        var factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+        var context = await factory.CreateDbContextAsync();
+        var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
+
+        await creator.EnsureCreatedAsync();
     }
 
     [TearDown]
