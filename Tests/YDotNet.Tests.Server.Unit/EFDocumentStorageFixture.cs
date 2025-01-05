@@ -11,6 +11,7 @@ using YDotNet.Server.EntityFramework;
 using YDotNet.Server.Storage;
 
 [TestFixture]
+[Category("Docker")]
 public class EFDocumentStorageFixture : DocumentStorageTests
 {
     private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();
