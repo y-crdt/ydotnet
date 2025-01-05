@@ -1,8 +1,8 @@
+namespace YDotNet.Server.MongoDB;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using YDotNet.Server.Storage;
-
-namespace YDotNet.Server.MongoDB;
 
 public static class ServiceExtensions
 {

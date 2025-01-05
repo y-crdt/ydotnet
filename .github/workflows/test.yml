@@ -25,6 +25,7 @@ jobs:
           # Windows
           - build: win-x64
             os: windows-latest
+            test: --filter Category!=Docker
             
             # Linux
           - build: linux-x64
@@ -36,6 +37,7 @@ jobs:
           # macOS
           - build: macos-aarch64
             os: macos-latest
+            test: --filter Category!=Docker
 
     steps:
       - name: Checkout
@@ -63,6 +65,6 @@ jobs:
 
       - name: Run tests server
         run: |
-          dotnet test Tests/YDotNet.Tests.Server.Unit
+          dotnet test Tests/YDotNet.Tests.Server.Unit ${{ matrix.test }}
         env:
           RUST_BACKTRACE: 1

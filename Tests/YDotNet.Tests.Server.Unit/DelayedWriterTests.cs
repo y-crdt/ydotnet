@@ -1,7 +1,7 @@
+namespace YDotNet.Tests.Server.Unit;
+
 using NUnit.Framework;
 using YDotNet.Server.Internal;
-
-namespace YDotNet.Tests.Server.Unit;
 
 public class DelayedWriterTests
 {
@@ -81,6 +81,7 @@ public class DelayedWriterTests
         {
             sut.Ping();
         }
+
         await Task.Delay(300);
 
         // Assert

@@ -3,15 +3,9 @@ using YDotNet.Protocol;
 
 namespace YDotNet.Server.WebSockets;
 
-public sealed class WebSocketEncoder : Encoder, IDisposable
+public sealed class WebSocketEncoder(WebSocket webSocket) : Encoder, IDisposable
 {
     private readonly byte[] buffer = new byte[1];
-    private readonly WebSocket webSocket;
-
-    public WebSocketEncoder(WebSocket webSocket)
-    {
-        this.webSocket = webSocket;
-    }
 
     public void Dispose()
     {

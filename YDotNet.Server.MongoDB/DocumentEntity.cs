@@ -6,5 +6,5 @@ internal sealed class DocumentEntity
 
     required public byte[] Data { get; set; }
 
-    public DateTime? Expiration { get; private set; }
+    public DateTime? Expiration { get; set; }
 }

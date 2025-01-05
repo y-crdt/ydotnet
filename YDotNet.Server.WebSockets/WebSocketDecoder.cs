@@ -4,17 +4,11 @@ using YDotNet.Protocol;
 
 namespace YDotNet.Server.WebSockets;
 
-public sealed class WebSocketDecoder : Decoder, IDisposable
+public sealed class WebSocketDecoder(WebSocket webSocket) : Decoder, IDisposable
 {
-    private readonly WebSocket webSocket;
     private readonly byte[] buffer = ArrayPool<byte>.Shared.Rent(1024 * 4);
     private int bufferLength;
     private int bufferIndex;
-
-    public WebSocketDecoder(WebSocket webSocket)
-    {
-        this.webSocket = webSocket;
-    }
 
     public bool CanRead { get; private set; } = true;
 

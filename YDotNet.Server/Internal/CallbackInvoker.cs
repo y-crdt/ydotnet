@@ -2,16 +2,9 @@ using Microsoft.Extensions.Logging;
 
 namespace YDotNet.Server.Internal;
 
-public sealed class CallbackInvoker : IDocumentCallback
+public sealed class CallbackInvoker(IEnumerable<IDocumentCallback> callbacks, ILogger logger) : IDocumentCallback
 {
-    private readonly List<IDocumentCallback> callbacks;
-    private readonly ILogger logger;
-
-    public CallbackInvoker(IEnumerable<IDocumentCallback> callbacks, ILogger logger)
-    {
-        this.callbacks = callbacks.ToList();
-        this.logger = logger;
-    }
+    private readonly List<IDocumentCallback> callbacks = callbacks.ToList();
 
     public ValueTask OnInitializedAsync(IDocumentManager manager)
     {

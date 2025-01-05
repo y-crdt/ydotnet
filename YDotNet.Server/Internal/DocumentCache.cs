@@ -4,13 +4,13 @@ using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
 
-internal sealed class DocumentCache : IAsyncDisposable
+internal sealed class DocumentCache(
+    IDocumentStorage documentStorage,
+    IDocumentCallback documentCallback,
+    IDocumentManager documentManager,
+    DocumentManagerOptions options,
+    ILogger logger) : IAsyncDisposable
 {
-    private readonly ILogger logger;
-    private readonly IDocumentStorage documentStorage;
-    private readonly IDocumentCallback documentCallback;
-    private readonly IDocumentManager documentManager;
-    private readonly DocumentManagerOptions options;
     private readonly Dictionary<string, Item> documents = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim slimLock = new(1);
 
@@ -22,20 +22,6 @@ internal sealed class DocumentCache : IAsyncDisposable
     }
 
     public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
-
-    public DocumentCache(
-        IDocumentStorage documentStorage,
-        IDocumentCallback documentCallback,
-        IDocumentManager documentManager,
-        DocumentManagerOptions options,
-        ILogger logger)
-    {
-        this.documentStorage = documentStorage;
-        this.documentCallback = documentCallback;
-        this.documentManager = documentManager;
-        this.options = options;
-        this.logger = logger;
-    }
 
     public async ValueTask DisposeAsync()
     {
