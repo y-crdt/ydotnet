@@ -9,6 +9,7 @@ using YDotNet.Server.MongoDB;
 using YDotNet.Server.Storage;
 
 [TestFixture]
+[Category("Docker")]
 public class MongoDocumentStorageFixture : DocumentStorageTests
 {
     private readonly MongoDbContainer mongo = new MongoDbBuilder().Build();
