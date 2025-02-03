@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\YDotNet.Extensions\YDotNet.Extensions.csproj" />
+    <ProjectReference Include="..\YDotNet.Server.EntityFramework\YDotNet.Server.EntityFramework.csproj" />
     <ProjectReference Include="..\YDotNet.Server.MongoDB\YDotNet.Server.MongoDB.csproj" />
     <ProjectReference Include="..\YDotNet.Server.Redis\YDotNet.Server.Redis.csproj" />
     <ProjectReference Include="..\YDotNet.Server.WebSockets\YDotNet.Server.WebSockets.csproj" />

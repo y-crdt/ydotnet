@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using Testcontainers.PostgreSql;
+using Testcontainers.MySql;
 using YDotNet.Server.EntityFramework;
 using YDotNet.Server.Storage;
 
 [TestFixture]
 [Category("Docker")]
-public class EFDocumentStorageFixture : DocumentStorageTests
+public class EFDocumentStorageMySqlFixture : DocumentStorageTests
 {
-    private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();
+    private readonly MySqlContainer mysql = new MySqlBuilder().Build();
     private IServiceProvider services;
 
     public class AppDbContext(DbContextOptions options) : DbContext(options)
@@ -29,13 +29,13 @@ public class EFDocumentStorageFixture : DocumentStorageTests
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
-        await postgres.StartAsync();
+        await mysql.StartAsync();
     }
 
     [OneTimeTearDown]
     public async Task OneTimeTeardown()
     {
-        await postgres.StopAsync();
+        await mysql.StopAsync();
     }
 
     [SetUp]
@@ -45,7 +45,7 @@ public class EFDocumentStorageFixture : DocumentStorageTests
             .AddLogging()
             .AddDbContext<AppDbContext>(options =>
             {
-                options.UseNpgsql(postgres.GetConnectionString());
+                options.UseMySql(mysql.GetConnectionString(), ServerVersion.AutoDetect(mysql.GetConnectionString()));
             })
             .AddYDotNet()
             .AddEntityFrameworkStorage<AppDbContext>()
