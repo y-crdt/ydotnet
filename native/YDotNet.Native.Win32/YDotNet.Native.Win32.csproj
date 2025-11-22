@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Include="..\..\output\win-x64\yrs.dll" Pack="True" PackagePath="runtimes\win-x64\native\%(Filename)%(Extension)" />
+    <Content Include="..\..\output\win-arm64\yrs.dll" Pack="True" PackagePath="runtimes\win-arm64\native\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

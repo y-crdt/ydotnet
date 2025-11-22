@@ -26,6 +26,10 @@ jobs:
           - build: win-x64
             os: windows-latest
             test: --filter Category!=Docker
+
+          - build: win-arm64
+            os: windows-11-arm
+            test: --filter Category!=Docker
             
             # Linux
           - build: linux-x64
