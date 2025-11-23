@@ -12,6 +12,9 @@ on:
       - 'v*.*.*'
 
 jobs:
+  build:
+    uses: ./.github/workflows/build-binaries.yml
+
   pack-nuget:
     runs-on: ubuntu-latest
     

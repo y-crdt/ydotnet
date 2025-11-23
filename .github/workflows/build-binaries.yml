@@ -8,6 +8,7 @@ name: Build binaries
 
 on:
   workflow_dispatch:
+  workflow_call:  # Makes this workflow reusable
 
 env:
   YRS_REPO: https://github.com/y-crdt/y-crdt
@@ -15,7 +16,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # Based on https://www.rohanjain.in/cargo-cross/
   build-native-binaries:
     runs-on: ${{matrix.os}}
     strategy:
@@ -94,50 +94,60 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Cache the built binaries based on yrs branch/commit
+      - name: Cache built binaries
+        id: cache-binaries
+        uses: actions/cache@v4
+        with:
+          path: yrs/target/${{ matrix.target }}/release/
+          key: yrs-${{ matrix.target }}-${{ env.YRS_BRANCH }}-${{ hashFiles('.cargo/config', '.cargo/config.github') }}
+
       - name: Install Cross
-        if: matrix.cross
+        if: matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true'
         uses: taiki-e/install-action@v2
         with:
           tool: cross
 
       - name: Install musl tools
+        if: endsWith(matrix.build, '-musl') && steps.cache-binaries.outputs.cache-hit != 'true'
         run: sudo apt install -y musl musl-dev musl-tools
-        if: endsWith(matrix.build, '-musl')
 
       - name: Install Linker
-        if: matrix.cross
+        if: matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true'
         run: |
           sudo apt update
           sudo apt install ${{ matrix.linker }}
           cat .cargo/config.github >> .cargo/config
 
       - name: Install Rust
+        if: steps.cache-binaries.outputs.cache-hit != 'true'
         run: |
           rustup install ${{ matrix.rust }}
           rustup target add ${{ matrix.target }}
           rustup show
 
       - name: Clone Yrs
+        if: steps.cache-binaries.outputs.cache-hit != 'true'
         run: |
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
 
       - name: Patch build (Git)
-        if: ${{ false }}
+        if: steps.cache-binaries.outputs.cache-hit != 'true' && false
         run: |
           cd yrs
           git apply ../native/build.patch
         shell: bash
 
       - name: Build (Cargo)
-        if: "!matrix.cross"
+        if: ${{ !matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true' }}
         run: |
           cd yrs
           RUSTFLAGS="-C target-feature=-crt-static" cargo build --release --target ${{ matrix.target }}
         shell: bash
 
       - name: Build (Cross)
-        if: matrix.cross
+        if: matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true'
         run: |
           cd yrs
           RUSTFLAGS="-C target-feature=-crt-static" cross build --release --target ${{ matrix.target }}

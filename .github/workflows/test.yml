@@ -15,6 +15,9 @@ on:
       - 'main'
 
 jobs:
+  build:
+    uses: ./.github/workflows/build-binaries.yml
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
