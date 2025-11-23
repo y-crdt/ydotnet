@@ -29,6 +29,13 @@ jobs:
             linker: mingw-w64
             cross: false
 
+          - build: win-arm64
+            os: windows-latest
+            rust: stable
+            target: aarch64-pc-windows-msvc
+            linker: mingw-arm64
+            cross: false
+
           # Linux
           - build: linux-x64
             os: ubuntu-latest
