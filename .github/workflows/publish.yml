@@ -26,7 +26,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./output
-        continue-on-error: true
   
       - name: NuGet pack
         run: |

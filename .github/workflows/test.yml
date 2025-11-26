@@ -53,9 +53,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.build }}
-          path: ./output/${{ matrix.build }}
-        continue-on-error: true
+          path: ./output
 
       - name: Copy binaries
         run: |
