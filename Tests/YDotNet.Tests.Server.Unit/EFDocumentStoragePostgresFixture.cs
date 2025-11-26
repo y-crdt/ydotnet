@@ -1,4 +1,4 @@
-namespace YDotNet.Tests.Server.Unit;
+﻿namespace YDotNet.Tests.Server.Unit;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -12,7 +12,7 @@ using YDotNet.Server.Storage;
 
 [TestFixture]
 [Category("Docker")]
-public class EFDocumentStorageFixture : DocumentStorageTests
+public class EFDocumentStoragePostgresFixture : DocumentStorageTests
 {
 #pragma warning disable NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
     private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();

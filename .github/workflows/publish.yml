@@ -12,20 +12,21 @@ on:
       - 'v*.*.*'
 
 jobs:
+  build:
+    uses: ./.github/workflows/build-binaries.yml
+
   pack-nuget:
+    needs: build
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-  
+
       - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           path: ./output
-          workflow: build-binaries.yml
-          workflow_conclusion: success
-          branch: main
   
       - name: NuGet pack
         run: |
@@ -36,7 +37,7 @@ jobs:
           dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }}
   
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: |
             **/*.nupkg

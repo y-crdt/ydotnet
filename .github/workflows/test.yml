@@ -15,7 +15,11 @@ on:
       - 'main'
 
 jobs:
+  build:
+    uses: ./.github/workflows/build-binaries.yml
+
   test:
+    needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -25,6 +29,10 @@ jobs:
           # Windows
           - build: win-x64
             os: windows-latest
+            test: --filter Category!=Docker
+
+          - build: win-arm64
+            os: windows-11-arm
             test: --filter Category!=Docker
             
             # Linux
@@ -44,14 +52,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           path: ./output
-          workflow: build-binaries.yml
-          workflow_conclusion: success
-          name: ${{ matrix.build }}
-          name_is_regexp: true
-          branch: main
 
       - name: Copy binaries
         run: |

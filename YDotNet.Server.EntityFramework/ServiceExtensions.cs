@@ -32,7 +32,7 @@ public static class ServiceExtensions
             b.HasKey(x => x.Id);
 
             b.Property(x => x.Id)
-                .HasMaxLength(1000);
+                .HasMaxLength(256);
         });
 
         return builder;

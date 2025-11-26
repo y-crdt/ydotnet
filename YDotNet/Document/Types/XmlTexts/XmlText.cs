@@ -3,12 +3,14 @@ using YDotNet.Document.Events;
 using YDotNet.Document.StickyIndexes;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
+using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlElements;
 using YDotNet.Document.Types.XmlTexts.Events;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
 using YDotNet.Native.StickyIndex;
 using YDotNet.Native.Types;
+using YDotNet.Native.Types.Texts;
 
 namespace YDotNet.Document.Types.XmlTexts;
 
@@ -245,5 +247,17 @@ public class XmlText : Branch
         var handle = StickyIndexChannel.FromIndex(GetHandle(transaction), transaction.Handle, index, (sbyte)associationType);
 
         return handle != nint.Zero ? new StickyIndex(handle) : null;
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="TextChunks" /> that compose this <see cref="XmlText" />.
+    /// </summary>
+    /// <param name="transaction">The transaction that wraps this read operation.</param>
+    /// <returns>The <see cref="TextChunks" /> that compose this <see cref="XmlText" />.</returns>
+    public TextChunks Chunks(Transaction transaction)
+    {
+        var handle = TextChannel.Chunks(GetHandle(transaction), transaction.Handle, out var length).Checked();
+
+        return new TextChunks(handle, length, Doc);
     }
 }
