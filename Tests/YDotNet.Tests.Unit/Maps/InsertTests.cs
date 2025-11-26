@@ -336,13 +336,13 @@ public class InsertTests
 
         // Act
         var transaction = doc.WriteTransaction();
-		
+
         var item1 = Input.Map(new Dictionary<string, Input>
         {
             { "id", Input.String(Guid.NewGuid().ToString()) },
             { "text", Input.String("Test") }
         });
-		
+
         var item2 = Input.Map(new Dictionary<string, Input>
         {
             { "id", Input.String(Guid.NewGuid().ToString()) },
@@ -352,7 +352,7 @@ public class InsertTests
         var data = Input.Array(new[] { item1, item2 });
         map.Insert(transaction, "data", data);
         var length = map.Length(transaction);
-		
+
         transaction.Commit();
 
         // Assert
@@ -367,13 +367,13 @@ public class InsertTests
 
         // Act
         var transaction = doc.WriteTransaction();
-		
+
         var item1 = Input.Map(new Dictionary<string, Input>
         {
             { "id", Input.String(Guid.NewGuid().ToString()) },
             { "text", Input.Text("Test") }
         });
-		
+
         var item2 = Input.Map(new Dictionary<string, Input>
         {
             { "id", Input.String(Guid.NewGuid().ToString()) },
@@ -383,7 +383,7 @@ public class InsertTests
         var data = Input.Array(new[] { item1, item2 });
         map.Insert(transaction, "data", data);
         var length = map.Length(transaction);
-		
+
         transaction.Commit();
 
         // Assert

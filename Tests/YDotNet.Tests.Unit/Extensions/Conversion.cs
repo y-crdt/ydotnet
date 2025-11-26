@@ -61,10 +61,10 @@ internal class Conversion
         using (var transaction = doc.ReadTransaction())
         {
             var map = items.Get(transaction, 0);
-            
+
             // Act
             var parsed = map.To<Expected>(transaction);
-            
+
             // Assert
             Assert.That(parsed.Value, Is.EqualTo("Hello YDotNet"));
         }
@@ -88,7 +88,7 @@ internal class Conversion
         using (var transaction = doc.ReadTransaction())
         {
             var inner = map.Get(transaction, "inner");
-            
+
             // Act
             var parsed = inner.To<Expected>(transaction);
 
@@ -122,7 +122,7 @@ internal class Conversion
         }
 
         // Assert
-        StringAssert.Contains("Hello YDotNet", json);
+        Assert.That(json, Does.Contain("Hello YDotNet"));
     }
 
     [Test]
@@ -139,7 +139,7 @@ internal class Conversion
                 {"value", Input.Text("Hello YDotNet")}
             }));
         }
-        
+
         // Act
         string json;
         using (var transaction = map.WriteTransaction())
@@ -148,8 +148,8 @@ internal class Conversion
 
             json = inner.ToJson(transaction);
         }
-        
+
         // Assert
-        StringAssert.Contains("Hello YDotNet", json);
+        Assert.That(json, Does.Contain("Hello YDotNet"));
     }
 }

@@ -19,7 +19,7 @@ public class EventBranch
 
     internal EventBranch(NativeWithHandle<EventBranchNative> native, Doc doc)
     {
-        Tag = (EventBranchTag) native.Value.Tag;
+        Tag = (EventBranchTag)native.Value.Tag;
 
         value = BuildValue(native, doc, Tag);
     }
@@ -88,6 +88,6 @@ public class EventBranch
             throw new YDotNetException($"Expected {expectedType}, got {Tag}.");
         }
 
-        return (T) value;
+        return (T)value;
     }
 }

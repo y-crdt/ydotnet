@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using YDotNet.Server;
-using YDotNet.Server.EntityFramework;
 using YDotNet.Server.MongoDB;
+using YDotNet.Server.EntityFramework;
 
 namespace Demo;
 
-public class Program
+public static class Program
 {
     public static void Main(string[] args)
     {
