@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: yrs/target/${{ matrix.target }}/release/
-          key: yrs-${{ matrix.target }}-${{ env.YRS_BRANCH }}-${{ hashFiles('.cargo/config', '.cargo/config.github') }}
+          key: yrs-${{ matrix.target }}-${{ env.YRS_BRANCH }}
 
       - name: Install Cross
         if: matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true'
