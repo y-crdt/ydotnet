@@ -1,4 +1,4 @@
-﻿namespace YDotNet.Tests.Server.Unit;
+namespace YDotNet.Tests.Server.Unit;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -14,9 +14,7 @@ using YDotNet.Server.Storage;
 [Category("Docker")]
 public class EFDocumentStoragePostgresFixture : DocumentStorageTests
 {
-#pragma warning disable NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
     private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder().Build();
-#pragma warning restore NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
     private IServiceProvider services;
 
     public class AppDbContext(DbContextOptions options) : DbContext(options)
@@ -38,6 +36,7 @@ public class EFDocumentStoragePostgresFixture : DocumentStorageTests
     public async Task OneTimeTeardown()
     {
         await postgres.StopAsync();
+        await postgres.DisposeAsync();
     }
 
     [SetUp]
@@ -78,8 +77,6 @@ public class EFDocumentStoragePostgresFixture : DocumentStorageTests
         {
             disposable.Dispose();
         }
-
-        await postgres.DisposeAsync();
     }
 
     protected override IDocumentStorage CreateSut()
