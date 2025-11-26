@@ -12,7 +12,9 @@ using YDotNet.Server.Storage;
 [Category("Docker")]
 public class MongoDocumentStorageFixture : DocumentStorageTests
 {
+#pragma warning disable NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
     private readonly MongoDbContainer mongo = new MongoDbBuilder().Build();
+#pragma warning restore NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
     private IServiceProvider services;
 
     [OneTimeSetUp]
@@ -50,6 +52,11 @@ public class MongoDocumentStorageFixture : DocumentStorageTests
         foreach (var service in services.GetRequiredService<IEnumerable<IHostedService>>())
         {
             await service.StopAsync(default);
+        }
+
+        if (services is IDisposable disposable)
+        {
+            disposable.Dispose();
         }
     }
 

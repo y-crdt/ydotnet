@@ -63,7 +63,9 @@ public class Doc : UnmanagedResource
     {
     }
 
+#pragma warning disable MA0051 // Method is too long
     internal Doc(nint handle, Doc? parent, bool isDeleted)
+#pragma warning restore MA0051 // Method is too long
         : base(handle, isDeleted)
     {
         this.parent = parent;
@@ -202,7 +204,7 @@ public class Doc : UnmanagedResource
     ///     Gets the collection identifier of this <see cref="Doc" /> instance.
     /// </summary>
     /// <remarks>
-    ///     If none was defined, a <c>null</c> will be returned.
+    ///     If none was defined, a <see langword="null"/> will be returned.
     /// </remarks>
     public string? CollectionId
     {
@@ -328,7 +330,7 @@ public class Doc : UnmanagedResource
     {
         ThrowIfDisposed();
 
-        var handle = DocChannel.WriteTransaction(Handle, (uint) (origin?.Length ?? 0), origin);
+        var handle = DocChannel.WriteTransaction(Handle, (uint)(origin?.Length ?? 0), origin);
 
         if (handle == nint.Zero)
         {
@@ -474,12 +476,12 @@ public class Doc : UnmanagedResource
         return GetOrAdd(handle, (_, doc) => new Doc(handle, doc, isDeleted));
     }
 
-    // TODO This is a temporary solution to track the amount of transactions a document has open.
-    // It's fragile because a cloned instance of the same document won't be synchronized and if a `Transaction`
-    // is opened in the cloned instance, it'll receive `null` from the Rust side and will cause the
-    // `ThrowHelper.PendingTransaction()` to run (which is acceptable since it's a managed exception).
     internal void NotifyTransactionStarted()
     {
+        // This is a temporary solution to track the amount of transactions a document has open.
+        // It's fragile because a cloned instance of the same document won't be synchronized and if a `Transaction`
+        // is opened in the cloned instance, it'll receive `null` from the Rust side and will cause the
+        // `ThrowHelper.PendingTransaction()` to run (which is acceptable since it's a managed exception).
         openTransactions++;
     }
 
@@ -558,7 +560,9 @@ public class Doc : UnmanagedResource
         return parent?.GetRootDoc() ?? this;
     }
 
+#pragma warning disable SA1204 // Static elements should appear before instance elements
     private static nint CreateDoc(DocOptions options)
+#pragma warning restore SA1204 // Static elements should appear before instance elements
     {
         return DocChannel.NewWithOptions(options.ToNative());
     }

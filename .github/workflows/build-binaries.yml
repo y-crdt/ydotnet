@@ -123,7 +123,7 @@ jobs:
         shell: bash
 
       - name: Build (Cargo)
-        if: "!matrix.cross"
+        if: !matrix.cross
         run: |
           cd yrs
           RUSTFLAGS="-C target-feature=-crt-static" cargo build --release --target ${{ matrix.target }}
