@@ -19,6 +19,7 @@ jobs:
     uses: ./.github/workflows/build-binaries.yml
 
   test:
+    needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
