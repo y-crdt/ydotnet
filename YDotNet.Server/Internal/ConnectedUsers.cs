@@ -18,7 +18,7 @@ public sealed class ConnectedUsers
         }
     }
 
-    public bool AddOrUpdate(string documentName, ulong clientId, ulong clock, string? state, out string? existingState)
+    public AddOrUpdateResult AddOrUpdate(string documentName, ulong clientId, ulong clock, string? state)
     {
         var newUsers = users.GetOrAdd(documentName, _ => new Dictionary<ulong, ConnectedUser>());
 
@@ -36,12 +36,10 @@ public sealed class ConnectedUsers
                     isChanged = true;
                 }
 
-                existingState = user.ClientState;
-
                 // Always update the timestamp, because every call is an activity.
                 user.LastActivity = Clock();
 
-                return isChanged;
+                return new AddOrUpdateResult(isChanged, IsNew: false, user.ClientState);
             }
 
             newUsers.Add(clientId, new ConnectedUser
@@ -51,8 +49,7 @@ public sealed class ConnectedUsers
                 LastActivity = Clock(),
             });
 
-            existingState = state;
-            return true;
+            return new AddOrUpdateResult(IsChanged: true, IsNew: true, state);
         }
     }
 
@@ -102,4 +99,6 @@ public sealed class ConnectedUsers
             }
         }
     }
+
+    public record AddOrUpdateResult(bool IsChanged, bool IsNew, string? ClientState);
 }

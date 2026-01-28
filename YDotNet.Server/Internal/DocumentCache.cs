@@ -51,6 +51,12 @@ internal sealed class DocumentCache(
             // This is thread safe and will block all pending updates.
             await document.DisposeAsync().ConfigureAwait(false);
 
+            await documentCallback.OnDocumentOffloadedAsync(new DocumentOffloadedEvent
+            {
+                DocumentName = document.Name,
+                Source = documentManager,
+            }).ConfigureAwait(false);
+
             await slimLock.WaitAsync().ConfigureAwait(false);
             try
             {
