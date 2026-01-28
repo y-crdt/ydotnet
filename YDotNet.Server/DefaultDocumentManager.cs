@@ -117,13 +117,26 @@ public sealed class DefaultDocumentManager : IDocumentManager
 
     public async ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null, CancellationToken ct = default)
     {
-        if (users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state, out var newState))
+        var result = users.AddOrUpdate(context.DocumentName, context.ClientId, clock, state);
+
+        if (result.IsChanged)
         {
             await callback.OnAwarenessUpdatedAsync(new ClientAwarenessEvent
             {
                 Context = context,
                 ClientClock = clock,
-                ClientState = newState,
+                ClientState = result.ClientState,
+                Source = this,
+            }).ConfigureAwait(false);
+        }
+
+        if (result.IsNew)
+        {
+            await callback.OnClientConnectedAsync(new ClientConnectedEvent
+            {
+                Context = context,
+                ClientClock = clock,
+                ClientState = result.ClientState,
                 Source = this,
             }).ConfigureAwait(false);
         }

@@ -40,6 +40,20 @@ public sealed class ClientAwarenessEvent : DocumentEvent
     required public ulong ClientClock { get; set; }
 }
 
+public sealed class ClientConnectedEvent : DocumentEvent
+{
+    required public string? ClientState { get; init; }
+
+    required public ulong ClientClock { get; init; }
+}
+
+public sealed class DocumentOffloadedEvent
+{
+    required public IDocumentManager Source { get; init; }
+
+    required public string DocumentName { get; init; }
+}
+
 public enum DisconnectReason
 {
     Disconnect,

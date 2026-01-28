@@ -31,6 +31,16 @@ public sealed class CallbackInvoker(IEnumerable<IDocumentCallback> callbacks, IL
         return InvokeCallbackAsync(@event, (c, e) => c.OnAwarenessUpdatedAsync(e));
     }
 
+    public ValueTask OnClientConnectedAsync(ClientConnectedEvent @event)
+    {
+        return InvokeCallbackAsync(@event, (c, e) => c.OnClientConnectedAsync(e));
+    }
+
+    public ValueTask OnDocumentOffloadedAsync(DocumentOffloadedEvent @event)
+    {
+        return InvokeCallbackAsync(@event, (c, e) => c.OnDocumentOffloadedAsync(e));
+    }
+
     private async ValueTask InvokeCallbackAsync<T>(T @event, Func<IDocumentCallback, T, ValueTask> action)
     {
         foreach (var callback in callbacks)

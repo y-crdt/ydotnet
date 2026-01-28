@@ -26,4 +26,14 @@ public interface IDocumentCallback
     {
         return default;
     }
+
+    ValueTask OnClientConnectedAsync(ClientConnectedEvent @event)
+    {
+        return default;
+    }
+
+    ValueTask OnDocumentOffloadedAsync(DocumentOffloadedEvent @event)
+    {
+        return default;
+    }
 }
