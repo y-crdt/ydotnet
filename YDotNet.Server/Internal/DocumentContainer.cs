@@ -48,7 +48,6 @@ internal sealed class DocumentContainer
         doc.ObserveUpdatesV1(e =>
         {
             logger.LogDebug("Document {name} updated.", documentName);
-
             delayedWriter.Ping();
         });
 

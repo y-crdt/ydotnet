@@ -1,4 +1,4 @@
-﻿namespace YDotNet.Tests.Server.Unit;
+namespace YDotNet.Tests.Server.Unit;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -36,6 +36,7 @@ public class EFDocumentStoragePostgresFixture : DocumentStorageTests
     public async Task OneTimeTeardown()
     {
         await postgres.StopAsync();
+        await postgres.DisposeAsync();
     }
 
     [SetUp]
@@ -70,6 +71,11 @@ public class EFDocumentStoragePostgresFixture : DocumentStorageTests
         foreach (var service in services.GetRequiredService<IEnumerable<IHostedService>>())
         {
             await service.StopAsync(default);
+        }
+
+        if (services is IDisposable disposable)
+        {
+            disposable.Dispose();
         }
     }
 

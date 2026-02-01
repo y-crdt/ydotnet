@@ -61,7 +61,7 @@ public class Array : Branch
             transaction.Handle,
             index,
             unsafeInputs.Handle,
-            (uint) inputs.Length);
+            (uint)inputs.Length);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class Array : Branch
             this.GetHandle(transaction),
             transaction.Handle,
             index,
-            (sbyte) associationType);
+            (sbyte)associationType);
 
         return indexHandle != nint.Zero ? new StickyIndex(indexHandle) : null;
     }

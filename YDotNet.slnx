@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Demo/">
+    <Project Path="Demo/Demo.csproj" />
+  </Folder>
+  <Folder Name="/Native/">
+    <Project Path="native/YDotNet.Native.Linux/YDotNet.Native.Linux.csproj" />
+    <Project Path="native/YDotNet.Native.MacOS/YDotNet.Native.MacOS.csproj" />
+    <Project Path="native/YDotNet.Native.Win32/YDotNet.Native.Win32.csproj" />
+    <Project Path="native/YDotNet.Native/YDotNet.Native.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/YDotNet.Tests.Server.Unit/YDotNet.Tests.Server.Unit.csproj" />
+    <Project Path="Tests/YDotNet.Tests.Unit/YDotNet.Tests.Unit.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+  </Folder>
+  <Project Path="YDotNet.Extensions/YDotNet.Extensions.csproj" />
+  <Project Path="YDotNet.Server.EntityFramework/YDotNet.Server.EntityFramework.csproj" />
+  <Project Path="YDotNet.Server.MongoDB/YDotNet.Server.MongoDB.csproj" />
+  <Project Path="YDotNet.Server.Redis/YDotNet.Server.Redis.csproj" />
+  <Project Path="YDotNet.Server.WebSockets/YDotNet.Server.WebSockets.csproj" />
+  <Project Path="YDotNet.Server/YDotNet.Server.csproj" />
+  <Project Path="YDotNet/YDotNet.csproj" />
+</Solution>
