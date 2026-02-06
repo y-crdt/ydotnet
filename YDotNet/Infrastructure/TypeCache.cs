@@ -16,12 +16,12 @@ internal class TypeCache
 
         if (cache.TryGetValue(handle, out var weakRef) && weakRef.TryGetTarget(out var item))
         {
-            if (item is T typed)
+            if (item is T typed && item.MatchesHandle(handle))
             {
                 return typed;
             }
 
-            // The native handle has been reused for a different type (e.g. after CRDT garbage collection
+            // The native handle has been reused for a different resource (e.g. after CRDT garbage collection
             // freed the old Branch and the allocator reused the address). The cached entry is stale, so
             // fall through to replace it with a new instance of the correct type.
         }

@@ -104,6 +104,27 @@ public abstract class Branch : UnmanagedResource
         return branchHandle;
     }
 
+    /// <summary>
+    ///     Checks whether this Branch still corresponds to the native resource at the given handle
+    ///     by comparing the stored <see cref="BranchId" /> with the one currently at the handle address.
+    ///     Returns <c>false</c> when the native allocator has reused the address for a different branch
+    ///     after CRDT garbage collection freed the original.
+    /// </summary>
+    /// <param name="handle">The native handle to validate against.</param>
+    /// <returns><c>true</c> if this Branch still represents the resource at <paramref name="handle"/>.</returns>
+    internal override bool MatchesHandle(nint handle)
+    {
+        if (BranchId is not { } id)
+        {
+            return false;
+        }
+
+        var currentId = BranchChannel.Id(handle);
+
+        return id.ClientIdOrLength == currentId.ClientIdOrLength
+            && id.BranchIdVariant.NamePointer == currentId.BranchIdVariant.NamePointer;
+    }
+
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
