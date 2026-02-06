@@ -155,4 +155,26 @@ public class RemoveRangeTests
         // Assert
         Assert.That(text, Is.EqualTo("Lucs"));
     }
+
+    [Test]
+    public void RemoveMultipleTimes()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        // Act
+        for (var i = 0; i < 100; i++)
+        {
+            using (var tx = xmlFragment.WriteTransaction())
+            {
+                xmlFragment.InsertElement(tx, 0, "paragraph").InsertText(tx, 0).Insert(tx, 0, "Hello world");
+            }
+
+            using (var tx = xmlFragment.WriteTransaction())
+            {
+                xmlFragment.RemoveRange(tx, 0, 1);
+            }
+        }
+    }
 }
