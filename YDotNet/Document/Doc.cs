@@ -39,7 +39,6 @@ public class Doc : UnmanagedResource
     private readonly EventSubscriber<UpdateEvent> onUpdateV1;
     private readonly EventSubscriber<UpdateEvent> onUpdateV2;
     private readonly Doc? parent;
-    private readonly TypeCache typeCache = new();
     private int openTransactions;
 
     /// <summary>
@@ -542,7 +541,7 @@ public class Doc : UnmanagedResource
     {
         var doc = GetRootDoc();
 
-        return doc.typeCache.GetOrAdd(handle, h => factory(h, doc));
+        return factory(handle, doc);
     }
 
     private void ThrowIfOpenTransaction()
