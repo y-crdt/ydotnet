@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Types.XmlElements;
 
 namespace YDotNet.Tests.Unit.XmlElements;
 
@@ -54,5 +55,42 @@ public class InsertElementTests
         Assert.That(childLength, Is.EqualTo(expected: 3));
 
         transaction.Commit();
+    }
+
+    [Test]
+    public void InsertAndRemoveMultipleTimes()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+        XmlElement xmlElement;
+        using (var transaction = doc.WriteTransaction())
+        {
+            xmlElement = xmlFragment.InsertElement(transaction, index: 0, "xml-element");
+        }
+
+        // Act
+        for (var i = 0; i < 100; i++)
+        {
+            // Assert
+            Assert.DoesNotThrow(() =>
+            {
+                using (var transaction = doc.WriteTransaction())
+                {
+                    for (uint j = 0; j < 100; j++)
+                    {
+                        xmlElement
+                            .InsertElement(transaction, index: j, "paragraph")
+                            .InsertText(transaction, index: 0)
+                            .Insert(transaction, index: 0, "Hello world");
+                    }
+                }
+
+                using (var transaction = doc.WriteTransaction())
+                {
+                    xmlElement.RemoveRange(transaction, index: 0, length: 100);
+                }
+            });
+        }
     }
 }

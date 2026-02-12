@@ -47,4 +47,36 @@ public class InsertElementTests
 
         transaction.Commit();
     }
+
+    [Test]
+    public void InsertAndRemoveMultipleTimes()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        // Act
+        for (var i = 0; i < 100; i++)
+        {
+            // Assert
+            Assert.DoesNotThrow(() =>
+            {
+                using (var transaction = doc.WriteTransaction())
+                {
+                    for (uint j = 0; j < 100; j++)
+                    {
+                        xmlFragment
+                            .InsertElement(transaction, index: j, "paragraph")
+                            .InsertText(transaction, index: 0)
+                            .Insert(transaction, index: 0, "Hello world");
+                    }
+                }
+
+                using (var transaction = doc.WriteTransaction())
+                {
+                    xmlFragment.RemoveRange(transaction, index: 0, length: 100);
+                }
+            });
+        }
+    }
 }
