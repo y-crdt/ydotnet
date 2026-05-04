@@ -25,6 +25,7 @@ public class MongoDocumentStorageFixture : DocumentStorageTests
     public async Task OneTimeTeardown()
     {
         await mongo.StopAsync();
+        await mongo.DisposeAsync();
     }
 
     [SetUp]
@@ -50,6 +51,11 @@ public class MongoDocumentStorageFixture : DocumentStorageTests
         foreach (var service in services.GetRequiredService<IEnumerable<IHostedService>>())
         {
             await service.StopAsync(default);
+        }
+
+        if (services is IDisposable disposable)
+        {
+            disposable.Dispose();
         }
     }
 

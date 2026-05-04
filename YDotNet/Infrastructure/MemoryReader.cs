@@ -12,7 +12,7 @@ internal static class MemoryReader
     {
         var data = new byte[length];
 
-        Marshal.Copy(handle, data, startIndex: 0, (int) length);
+        Marshal.Copy(handle, data, startIndex: 0, (int)length);
 
         return data;
     }

@@ -50,7 +50,7 @@ public sealed class RedisDocumentStorage : IDocumentStorage
             return;
         }
 
-        await database.StringSetAsync(Key(name), doc, redisOptions.Expiration?.Invoke(name)).ConfigureAwait(false);
+        await database.StringSetAsync(Key(name), doc, redisOptions.Expiration?.Invoke(name), When.Always).ConfigureAwait(false);
     }
 
     private string Key(string name)

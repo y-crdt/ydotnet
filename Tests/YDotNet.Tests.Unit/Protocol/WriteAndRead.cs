@@ -54,7 +54,7 @@ public class WriteAndRead
     [TestCase(1000)]
     public async Task EncodeAndDecodeBytes(int length)
     {
-        var input = Bytes(length);
+        var input = GenerateBytes(length);
 
         // Arrange
         var encoder = new BufferEncoder();
@@ -151,14 +151,17 @@ public class WriteAndRead
         var client1Clock = await decoder.ReadVarUintAsync();
         var client1State = await decoder.ReadVarStringAsync();
 
-        // Assert
-        Assert.That(clientCount, Is.EqualTo(1));
-        Assert.That(client1Id, Is.EqualTo(3826503548));
-        Assert.That(client1Clock, Is.EqualTo(4));
-        Assert.That(client1State, Is.EqualTo("{\"user\":{\"random\":0.7179662724977696,\"message\":\"Hello\"}}"));
+        using (Assert.EnterMultipleScope())
+        {
+            // Assert
+            Assert.That(clientCount, Is.EqualTo(1));
+            Assert.That(client1Id, Is.EqualTo(3826503548));
+            Assert.That(client1Clock, Is.EqualTo(4));
+            Assert.That(client1State, Is.EqualTo("{\"user\":{\"random\":0.7179662724977696,\"message\":\"Hello\"}}"));
+        }
     }
 
-    private byte[] Bytes(int length)
+    private static byte[] GenerateBytes(int length)
     {
         var result = new byte[length];
 
@@ -172,7 +175,7 @@ public class WriteAndRead
 
     class BufferDecoder(byte[] buffer) : Decoder
     {
-        private readonly Stream stream = new MemoryStream(buffer);
+        private readonly MemoryStream stream = new(buffer);
 
         protected override ValueTask<byte> ReadByteAsync(
             CancellationToken ct)
@@ -190,7 +193,7 @@ public class WriteAndRead
         protected override async ValueTask ReadBytesAsync(Memory<byte> bytes,
             CancellationToken ct)
         {
-            await stream.ReadAsync(bytes, ct);
+            await stream.ReadExactlyAsync(bytes, ct);
         }
     }
 }
