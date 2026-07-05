@@ -1,13 +1,15 @@
+using YDotNet.Native.Types;
+
 namespace YDotNet.Document.Events;
 
 internal class EventSubscriber<TEvent>(
     EventManager manager,
     nint owner,
-    Func<nint, Action<TEvent>, (nint Handle, object Callback)> subscribe,
-    Action<nint> unsubscribe) : IEventSubscriber
+    Func<nint, Action<TEvent>, (SubscriptionHandle Handle, object Callback)> subscribe,
+    Action<SubscriptionHandle> unsubscribe) : IEventSubscriber
 {
     private readonly EventPublisher<TEvent> publisher = new();
-    private (nint Handle, object? Callback) nativeSubscription;
+    private (SubscriptionHandle Handle, object? Callback) nativeSubscription;
 
     public void Clear()
     {

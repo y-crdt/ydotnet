@@ -79,7 +79,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveClear(doc, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
 
         onUpdateV1 = new EventSubscriber<UpdateEvent>(
             EventManager,
@@ -91,7 +91,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveUpdatesV1(Handle, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
 
         onUpdateV2 = new EventSubscriber<UpdateEvent>(
             EventManager,
@@ -103,7 +103,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveUpdatesV2(Handle, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
 
         onAfterTransaction = new EventSubscriber<AfterTransactionEvent>(
             EventManager,
@@ -116,7 +116,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveAfterTransaction(doc, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
 
         onSubDocs = new EventSubscriber<SubDocsEvent>(
             EventManager,
@@ -128,7 +128,7 @@ public class Doc : UnmanagedResource
 
                 return (DocChannel.ObserveSubDocs(doc, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>

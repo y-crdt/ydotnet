@@ -40,7 +40,7 @@ public class XmlFragment : Branch
 
                 return (XmlElementChannel.Observe(xmlFragment, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>

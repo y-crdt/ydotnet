@@ -30,7 +30,7 @@ public class Map : Branch
 
                 return (MapChannel.Observe(map, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>

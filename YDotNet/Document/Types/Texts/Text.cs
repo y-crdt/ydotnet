@@ -32,7 +32,7 @@ public class Text : Branch
 
                 return (TextChannel.Observe(text, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>

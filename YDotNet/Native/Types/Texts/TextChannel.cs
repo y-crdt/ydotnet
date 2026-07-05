@@ -52,7 +52,7 @@ internal static class TextChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ytext_observe")]
-    public static extern nint Observe(nint text, nint state, ObserveCallback callback);
+    public static extern SubscriptionHandle Observe(nint text, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,

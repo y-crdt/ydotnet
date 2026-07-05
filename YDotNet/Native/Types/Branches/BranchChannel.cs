@@ -10,7 +10,7 @@ internal static class BranchChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yobserve_deep")]
-    public static extern nint ObserveDeep(nint type, nint state, ObserveCallback callback);
+    public static extern SubscriptionHandle ObserveDeep(nint type, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,

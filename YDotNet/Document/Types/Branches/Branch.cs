@@ -38,7 +38,7 @@ public abstract class Branch : UnmanagedResource
 
                 return (BranchChannel.ObserveDeep(branch, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     private BranchIdNative? BranchId { get; }

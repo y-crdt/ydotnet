@@ -106,7 +106,7 @@ internal static class XmlElementChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmlelem_observe")]
-    public static extern nint Observe(nint handle, nint state, ObserveCallback callback);
+    public static extern SubscriptionHandle Observe(nint handle, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,

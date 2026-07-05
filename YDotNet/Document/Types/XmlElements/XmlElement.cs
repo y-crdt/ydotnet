@@ -32,7 +32,7 @@ public class XmlElement : XmlFragment
 
                 return (XmlElementChannel.Observe(xmlElement, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>
