@@ -20,12 +20,11 @@ public class ClearTests
 
         // Act
         var canUndo1 = undoManager.CanUndo();
-        var clear = undoManager.Clear();
+        undoManager.Clear();
         var canUndo2 = undoManager.CanUndo();
 
         // Assert
         Assert.That(canUndo1, Is.True);
-        Assert.That(clear, Is.True);
         Assert.That(canUndo2, Is.False);
 
         // Act
@@ -57,12 +56,11 @@ public class ClearTests
         // Act
         undoManager.Undo();
         var canRedo1 = undoManager.CanRedo();
-        var clear = undoManager.Clear();
+        undoManager.Clear();
         var canRedo2 = undoManager.CanRedo();
 
         // Assert
         Assert.That(canRedo1, Is.True);
-        Assert.That(clear, Is.True);
         Assert.That(canRedo2, Is.False);
 
         // Act

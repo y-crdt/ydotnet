@@ -126,7 +126,7 @@ public class UndoManager : UnmanagedResource
     /// <returns><see cref="bool" /> indicating whether it's possible to undo changes.</returns>
     public bool CanUndo()
     {
-        return UndoManagerChannel.CanUndo(Handle) == 1;
+        return UndoManagerChannel.UndoStackLength(Handle) > 0;
     }
 
     /// <summary>
@@ -135,16 +135,15 @@ public class UndoManager : UnmanagedResource
     /// <returns><see cref="bool" /> indicating whether it's possible to redo changes.</returns>
     public bool CanRedo()
     {
-        return UndoManagerChannel.CanRedo(Handle) == 1;
+        return UndoManagerChannel.RedoStackLength(Handle) > 0;
     }
 
     /// <summary>
     ///     Resets the <see cref="UndoManager" /> and removes history to undo/redo changes.
     /// </summary>
-    /// <returns><see cref="bool" /> indicating whether the state was reset.</returns>
-    public bool Clear()
+    public void Clear()
     {
-        return UndoManagerChannel.Clear(Handle) == 1;
+        UndoManagerChannel.Clear(Handle);
     }
 
     /// <summary>

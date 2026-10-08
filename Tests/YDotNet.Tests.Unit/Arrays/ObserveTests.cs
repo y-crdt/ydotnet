@@ -4,6 +4,8 @@ using YDotNet.Document.Cells;
 using YDotNet.Document.Types.Events;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
+#pragma warning disable CS0618 // Array.Move is deprecated, but these tests cover it until it is removed
+
 namespace YDotNet.Tests.Unit.Arrays;
 
 public class ObserveTests
