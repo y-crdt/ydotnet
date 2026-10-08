@@ -66,6 +66,8 @@ public class XmlFragment : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlText InsertText(Transaction transaction, uint index)
     {
+        ThrowHelper.CheckInsertIndex(index, ChildLength(transaction));
+
         var handle = XmlElementChannel.InsertText(GetHandle(transaction), transaction.Handle, index);
 
         return Doc.GetXmlText(handle, isDeleted: false);
@@ -81,6 +83,8 @@ public class XmlFragment : Branch
     /// <returns>The inserted <see cref="XmlText" /> at the given <paramref name="index" />.</returns>
     public XmlElement InsertElement(Transaction transaction, uint index, string name)
     {
+        ThrowHelper.CheckInsertIndex(index, ChildLength(transaction));
+
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
 
         var handle = XmlElementChannel.InsertElement(GetHandle(transaction), transaction.Handle, index, unsafeName.Handle);
@@ -97,6 +101,8 @@ public class XmlFragment : Branch
     /// <param name="length">The amount of child nodes to remove, starting at <paramref name="index" />.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowHelper.CheckRange(index, length, ChildLength(transaction));
+
         XmlElementChannel.RemoveRange(GetHandle(transaction), transaction.Handle, index, length);
     }
 
