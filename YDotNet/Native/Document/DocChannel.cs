@@ -52,12 +52,14 @@ internal static class DocChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_should_load")]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool ShouldLoad(nint doc);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_auto_load")]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool AutoLoad(nint doc);
 
     [DllImport(
@@ -100,7 +102,7 @@ internal static class DocChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_clear")]
-    public static extern void Clear(nint doc);
+    public static extern void Clear(nint doc, nint parentTransaction);
 
     [DllImport(
         ChannelSettings.NativeLib,
