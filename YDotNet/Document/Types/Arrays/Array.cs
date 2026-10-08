@@ -97,11 +97,26 @@ public class Array : Branch
     ///     Moves the element at <paramref name="sourceIndex" /> to the <paramref name="targetIndex" />.
     /// </summary>
     /// <remarks>
-    ///     Both indexes must be lower than the <see cref="Length" />.
+    ///     <para>
+    ///         Both indexes must be lower than the <see cref="Length" />.
+    ///     </para>
+    ///     <para>
+    ///         This method is deprecated because yrs 0.27 and later removed the move feature. Documents and updates
+    ///         that contain moves cannot be decoded by newer versions of YDotNet. Instead of moving an element, remove
+    ///         it and insert it at the new position. This gives the element a new identity, and concurrent moves of the
+    ///         same element no longer converge, so they can result in duplicates.
+    ///     </para>
+    ///     <para>
+    ///         See <c>docs/array-move-deprecation.md</c> for how to prepare existing data.
+    ///     </para>
     /// </remarks>
     /// <param name="transaction">The transaction that wraps this operation.</param>
     /// <param name="sourceIndex">The index of the item that will be moved.</param>
     /// <param name="targetIndex">The index to which the item will be moved to.</param>
+    [Obsolete(
+        "Array moves are removed in yrs 0.27 and later, and documents containing moves cannot be loaded by newer " +
+        "versions. Remove the element and insert it at the new position instead. " +
+        "See docs/array-move-deprecation.md.")]
     public void Move(Transaction transaction, uint sourceIndex, uint targetIndex)
     {
         ArrayChannel.Move(this.GetHandle(transaction), transaction.Handle, sourceIndex, targetIndex);

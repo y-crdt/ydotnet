@@ -2,6 +2,8 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using YDotNet.Tests.Driver.Abstractions;
 
+#pragma warning disable CS0618 // Array.Move is deprecated, but these tests cover it until it is removed
+
 namespace YDotNet.Tests.Driver.Tasks.Arrays;
 
 public class Move : ITask
