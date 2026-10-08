@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using YDotNet.Document;
+using YDotNet.Document.Transactions;
 using YDotNet.Server.Storage;
 
 namespace YDotNet.Server.Internal;
@@ -69,7 +70,14 @@ internal sealed class DocumentContainer
                     throw new InvalidOperationException("Transaction cannot be acquired.");
                 }
 
-                transaction.ApplyV1(documentData);
+                var result = transaction.ApplyV1(documentData);
+
+                // Continuing with an empty document would overwrite the stored data on the next write.
+                if (result != TransactionUpdateResult.Ok)
+                {
+                    throw new YDotNetException(
+                        $"The stored data of document '{documentName}' could not be applied: {result}.");
+                }
             }
 
             return document;
