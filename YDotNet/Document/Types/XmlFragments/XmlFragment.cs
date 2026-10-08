@@ -124,7 +124,7 @@ public class XmlFragment : Branch
     /// </returns>
     public Output? FirstChild(Transaction transaction)
     {
-        var handle = XmlElementChannel.FirstChild(GetHandle(transaction), transaction.Handle);
+        var handle = XmlElementChannel.FirstChild(GetHandle(transaction));
 
         return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc) : null;
     }

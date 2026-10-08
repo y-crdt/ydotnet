@@ -367,7 +367,21 @@ public class Doc : UnmanagedResource
     {
         ThrowIfDisposed();
 
-        DocChannel.Clear(Handle);
+        // The native call requires a write transaction of the parent document. A root document has no parent, so a
+        // transaction on a throwaway document is used instead; it is only touched when sub-documents are tracked.
+        if (parent != null)
+        {
+            using var parentTransaction = parent.WriteTransaction();
+
+            DocChannel.Clear(Handle, parentTransaction.Handle);
+        }
+        else
+        {
+            using var scratch = new Doc();
+            using var scratchTransaction = scratch.WriteTransaction();
+
+            DocChannel.Clear(Handle, scratchTransaction.Handle);
+        }
 
         onClear.Clear();
         onUpdateV1.Clear();
