@@ -162,6 +162,8 @@ public class XmlText : Branch
     /// </param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowHelper.CheckRange(index, length, Length(transaction));
+
         XmlTextChannel.RemoveRange(GetHandle(transaction), transaction.Handle, index, length);
     }
 
@@ -180,6 +182,9 @@ public class XmlText : Branch
     /// </param>
     public void Format(Transaction transaction, uint index, uint length, Input attributes)
     {
+        // A range running past the end is clamped natively, but a start beyond the end is not.
+        ThrowHelper.CheckInsertIndex(index, Length(transaction));
+
         using var unsafeAttributes = MemoryWriter.WriteStruct(attributes.InputNative);
 
         XmlTextChannel.Format(GetHandle(transaction), transaction.Handle, index, length, unsafeAttributes.Handle);
