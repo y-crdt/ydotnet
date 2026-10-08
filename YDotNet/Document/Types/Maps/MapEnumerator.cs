@@ -40,7 +40,7 @@ internal class MapEnumerator : IEnumerator<KeyValuePair<string, Output>>
 
             Current = new KeyValuePair<string, Output>(
                 native.Key(),
-                new Output(native.ValueHandle(handle), iterator.Doc, isDeleted: false));
+                new Output(native.ValueHandle, iterator.Doc, isDeleted: false));
 
             // We are done reading and can destroy the resource.
             MapChannel.EntryDestroy(handle);

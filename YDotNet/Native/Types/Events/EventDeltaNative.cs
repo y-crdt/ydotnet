@@ -11,22 +11,22 @@ internal readonly struct EventDeltaNative
 
     public uint Length { get; }
 
-    public nint InsertHandle { get; }
-
     public uint AttributesLength { get; }
 
     public nint AttributesHandle { get; }
 
-    public NativeWithHandle<MapEntryNative>[] Attributes
+    public nint InsertHandle { get; }
+
+    public NativeWithHandle<DeltaAttributeNative>[] Attributes
     {
         get
         {
             if (AttributesHandle == nint.Zero || AttributesLength == 0)
             {
-                return Array.Empty<NativeWithHandle<MapEntryNative>>();
+                return Array.Empty<NativeWithHandle<DeltaAttributeNative>>();
             }
 
-            return MemoryReader.ReadStructsWithHandles<MapEntryNative>(AttributesHandle, AttributesLength).ToArray();
+            return MemoryReader.ReadStructsWithHandles<DeltaAttributeNative>(AttributesHandle, AttributesLength).ToArray();
         }
     }
 }

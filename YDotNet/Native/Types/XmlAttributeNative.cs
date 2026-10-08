@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using YDotNet.Infrastructure;
+using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Cells.Outputs;
 
 namespace YDotNet.Native.Types;
 
@@ -17,6 +19,7 @@ internal readonly struct XmlAttributeNative
 
     public string Value()
     {
-        return MemoryReader.ReadUtf8String(ValueHandle);
+        // The value is stored as an output cell, but attributes are always strings.
+        return MemoryReader.ReadUtf8String(OutputChannel.String(ValueHandle).Checked());
     }
 }
