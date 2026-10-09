@@ -34,7 +34,7 @@ public class XmlText : Branch
 
                 return (XmlTextChannel.Observe(xmlText, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>

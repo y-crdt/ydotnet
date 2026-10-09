@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Native.Types;
 
 namespace YDotNet.Native.UndoManager;
 
@@ -24,13 +25,13 @@ internal static class UndoManagerChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yundo_manager_observe_added")]
-    public static extern nint ObserveAdded(nint undoManager, nint state, ObserveAddedCallback callback);
+    public static extern SubscriptionHandle ObserveAdded(nint undoManager, nint state, ObserveAddedCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yundo_manager_observe_popped")]
-    public static extern nint ObservePopped(nint undoManager, nint state, ObservePoppedCallback callback);
+    public static extern SubscriptionHandle ObservePopped(nint undoManager, nint state, ObservePoppedCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,

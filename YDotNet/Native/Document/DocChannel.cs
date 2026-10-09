@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using YDotNet.Native.Types;
 
 namespace YDotNet.Native.Document;
 
@@ -112,29 +113,29 @@ internal static class DocChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_clear")]
-    public static extern nint ObserveClear(nint doc, nint state, ObserveClearCallback callback);
+    public static extern SubscriptionHandle ObserveClear(nint doc, nint state, ObserveClearCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_updates_v1")]
-    public static extern nint ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
+    public static extern SubscriptionHandle ObserveUpdatesV1(nint doc, nint state, ObserveUpdatesCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_updates_v2")]
-    public static extern nint ObserveUpdatesV2(nint doc, nint state, ObserveUpdatesCallback callback);
+    public static extern SubscriptionHandle ObserveUpdatesV2(nint doc, nint state, ObserveUpdatesCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_after_transaction")]
-    public static extern nint ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
+    public static extern SubscriptionHandle ObserveAfterTransaction(nint doc, nint state, ObserveAfterTransactionCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ydoc_observe_subdocs")]
-    public static extern nint ObserveSubDocs(nint doc, nint state, ObserveSubdocsCallback callback);
+    public static extern SubscriptionHandle ObserveSubDocs(nint doc, nint state, ObserveSubdocsCallback callback);
 }

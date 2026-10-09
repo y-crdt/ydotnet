@@ -70,7 +70,7 @@ internal static class XmlTextChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmltext_observe")]
-    public static extern nint Observe(nint handle, nint state, ObserveCallback callback);
+    public static extern SubscriptionHandle Observe(nint handle, nint state, ObserveCallback callback);
 
     [DllImport(
         ChannelSettings.NativeLib,

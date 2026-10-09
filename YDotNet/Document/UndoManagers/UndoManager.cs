@@ -46,7 +46,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObserveAdded(Handle, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
 
         onPopped = new EventSubscriber<UndoEvent>(
             doc.EventManager,
@@ -58,7 +58,7 @@ public class UndoManager : UnmanagedResource
 
                 return (UndoManagerChannel.ObservePopped(Handle, nint.Zero, callback), callback);
             },
-            SubscriptionChannel.Unobserve);
+            SubscriptionHandle.Unobserve);
     }
 
     /// <summary>
