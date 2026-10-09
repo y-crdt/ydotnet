@@ -11,14 +11,27 @@ using YDotNet.Server.Storage;
 
 public class DocumentContainerTests
 {
-    private readonly IDocumentStorage documentStorage = A.Fake<IDocumentStorage>();
-    private readonly IDocumentCallback documentCallback = A.Fake<IDocumentCallback>();
-    private readonly IDocumentManager documentManager = A.Fake<IDocumentManager>();
-    private readonly string name = Guid.NewGuid().ToString();
+    private IDocumentStorage documentStorage = null!;
+    private IDocumentCallback documentCallback = null!;
+    private IDocumentManager documentManager = null!;
+    private string name = null!;
+
+    [SetUp]
+    public void Setup()
+    {
+        // NUnit shares one fixture instance between tests, so the fakes must not carry over configuration.
+        documentStorage = A.Fake<IDocumentStorage>();
+        documentCallback = A.Fake<IDocumentCallback>();
+        documentManager = A.Fake<IDocumentManager>();
+        name = Guid.NewGuid().ToString();
+    }
 
     [Test]
     public async Task StoreImmediately()
     {
+        A.CallTo(() => documentStorage.GetDocAsync(name, A<CancellationToken>._))
+            .Returns(new ValueTask<byte[]?>((byte[]?)null));
+
         var sut = CreateSut(new DocumentManagerOptions
         {
             StoreDebounce = TimeSpan.Zero,
