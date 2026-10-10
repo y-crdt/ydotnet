@@ -1,9 +1,11 @@
 using YDotNet.Document.Options;
+using YDotNet.Document.State;
 using YDotNet.Document.Types.Maps;
 using YDotNet.Document.Types.Texts;
 using YDotNet.Document.Types.XmlFragments;
 using YDotNet.Infrastructure;
 using YDotNet.Infrastructure.Extensions;
+using YDotNet.Native.Document.State;
 using YDotNet.Native.Transaction;
 using YDotNet.Native.Types.Branches;
 using Array = YDotNet.Document.Types.Arrays.Array;
@@ -207,6 +209,56 @@ public class Transaction : UnmanagedResource
         var handle = TransactionChannel.Snapshot(Handle, out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle.Checked(), length);
+    }
+
+    /// <summary>
+    ///     Gets the update that is waiting to be integrated into the <see cref="Doc" /> associated to this
+    ///     <see cref="Transaction" />.
+    /// </summary>
+    /// <remarks>
+    ///     Updates stay pending while updates they depend on are missing. Once those arrive and are applied, the
+    ///     pending update is integrated automatically.
+    /// </remarks>
+    /// <returns>The pending update, or <c>null</c> if there is none.</returns>
+    public PendingUpdate? PendingUpdate()
+    {
+        var handle = TransactionChannel.PendingUpdate(Handle);
+        if (handle == nint.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return new PendingUpdate(MemoryReader.ReadStruct<PendingUpdateNative>(handle));
+        }
+        finally
+        {
+            TransactionChannel.PendingUpdateDestroy(handle);
+        }
+    }
+
+    /// <summary>
+    ///     Gets the delete set that is waiting for missing updates before it can be integrated into the
+    ///     <see cref="Doc" /> associated to this <see cref="Transaction" />.
+    /// </summary>
+    /// <returns>The pending delete set, or <c>null</c> if all deletions have been applied.</returns>
+    public DeleteSet? PendingDeleteSet()
+    {
+        var handle = TransactionChannel.PendingDeleteSet(Handle);
+        if (handle == nint.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            return new DeleteSet(MemoryReader.ReadStruct<DeleteSetNative>(handle));
+        }
+        finally
+        {
+            TransactionChannel.DeleteSetDestroy(handle);
+        }
     }
 
     /// <summary>
