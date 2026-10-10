@@ -95,7 +95,8 @@ public class XmlText : Branch
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
-        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
+        using var input = Input.String(value);
+        using var unsafeValue = MemoryWriter.WriteStruct(input.InputNative);
 
         XmlTextChannel.InsertAttribute(GetHandle(transaction), transaction.Handle, unsafeName.Handle, unsafeValue.Handle);
     }
@@ -124,7 +125,7 @@ public class XmlText : Branch
 
         var handle = XmlTextChannel.GetAttribute(GetHandle(transaction), transaction.Handle, unsafeName.Handle);
 
-        return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc).String : null;
     }
 
     /// <summary>

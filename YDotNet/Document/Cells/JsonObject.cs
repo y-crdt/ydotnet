@@ -22,9 +22,9 @@ public sealed class JsonObject : ReadOnlyDictionary<string, Output>
 
         var result = new Dictionary<string, Output>(StringComparer.Ordinal);
 
-        foreach (var (native, itemHandle) in MemoryReader.ReadStructsWithHandles<MapEntryNative>(entriesHandle, length))
+        foreach (var native in MemoryReader.ReadStructs<MapEntryNative>(entriesHandle, length))
         {
-            result[native.Key()] = new Output(native.ValueHandle(itemHandle), doc, isDeleted);
+            result[native.Key()] = new Output(native.ValueHandle, doc, isDeleted);
         }
 
         return result;

@@ -15,4 +15,10 @@ internal static class EventChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yevent_delta_destroy")]
     public static extern void DeltaDestroy(nint eventHandle, uint length);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytext_delta_destroy")]
+    public static extern void TextDeltaDestroy(nint deltaHandle, uint length);
 }

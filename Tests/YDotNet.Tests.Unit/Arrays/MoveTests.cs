@@ -3,6 +3,8 @@ using YDotNet.Document;
 using YDotNet.Document.Cells;
 using Array = YDotNet.Document.Types.Arrays.Array;
 
+#pragma warning disable CS0618 // Array.Move is deprecated, but these tests cover it until it is removed
+
 namespace YDotNet.Tests.Unit.Arrays;
 
 public class MoveTests
