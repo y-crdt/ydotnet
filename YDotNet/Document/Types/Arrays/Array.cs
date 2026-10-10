@@ -54,6 +54,8 @@ public class Array : Branch
     /// <param name="inputs">The items to be inserted.</param>
     public void InsertRange(Transaction transaction, uint index, params Input[] inputs)
     {
+        ThrowHelper.CheckInsertIndex(index, Length(transaction));
+
         using var unsafeInputs = MemoryWriter.WriteStructArray(inputs.Select(x => x.InputNative).ToArray());
 
         ArrayChannel.InsertRange(
@@ -72,6 +74,8 @@ public class Array : Branch
     /// <param name="length">The amount of items to remove.</param>
     public void RemoveRange(Transaction transaction, uint index, uint length)
     {
+        ThrowHelper.CheckRange(index, length, Length(transaction));
+
         ArrayChannel.RemoveRange(this.GetHandle(transaction), transaction.Handle, index, length);
     }
 
