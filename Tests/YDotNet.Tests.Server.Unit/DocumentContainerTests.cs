@@ -18,6 +18,11 @@ public class DocumentContainerTests
     [Test]
     public async Task StoreImmediately()
     {
+        var stored = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        A.CallTo(() => documentStorage.StoreDocAsync(name, A<byte[]>._, A<CancellationToken>._))
+            .Invokes(() => stored.TrySetResult());
+
         var sut = CreateSut(new DocumentManagerOptions
         {
             StoreDebounce = TimeSpan.Zero,
@@ -34,6 +39,10 @@ public class DocumentContainerTests
             await Task.Delay(100).ConfigureAwait(false);
             return true;
         });
+
+        // The write runs in the background and needs the lock that the action above held, so it can only
+        // start once the action has returned. Wait for it instead of asserting immediately.
+        await stored.Task.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
 
         A.CallTo(() => documentStorage.StoreDocAsync(name, A<byte[]>._, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
