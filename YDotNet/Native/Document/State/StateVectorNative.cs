@@ -19,6 +19,6 @@ internal readonly struct StateVectorNative
 
     public uint[] Clocks()
     {
-        return MemoryReader.ReadStructs<uint>(ClientIdsHandle, EntriesCount);
+        return MemoryReader.ReadStructs<uint>(ClocksHandle, EntriesCount);
     }
 }
