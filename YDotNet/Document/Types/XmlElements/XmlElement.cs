@@ -247,7 +247,7 @@ public class XmlElement : XmlFragment
     /// </returns>
     public XmlElement? Parent(Transaction transaction)
     {
-        var handle = XmlElementChannel.Parent(GetHandle(transaction), transaction.Handle);
+        var handle = XmlElementChannel.Parent(GetHandle(transaction));
 
         if (handle == nint.Zero)
         {
