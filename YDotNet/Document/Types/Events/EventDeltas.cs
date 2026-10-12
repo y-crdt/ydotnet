@@ -25,7 +25,7 @@ public class EventDeltas : ReadOnlyCollection<EventDelta>
         }
 
         // We are done reading and can destroy the resource.
-        EventChannel.DeltaDestroy(handle, length);
+        EventChannel.TextDeltaDestroy(handle, length);
 
         return result;
     }

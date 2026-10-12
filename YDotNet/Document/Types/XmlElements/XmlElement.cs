@@ -77,7 +77,8 @@ public class XmlElement : XmlFragment
     public void InsertAttribute(Transaction transaction, string name, string value)
     {
         using var unsafeName = MemoryWriter.WriteUtf8String(name);
-        using var unsafeValue = MemoryWriter.WriteUtf8String(value);
+        using var input = Input.String(value);
+        using var unsafeValue = MemoryWriter.WriteStruct(input.InputNative);
 
         XmlElementChannel.InsertAttribute(
             GetHandle(transaction),
@@ -110,7 +111,7 @@ public class XmlElement : XmlFragment
 
         var handle = XmlElementChannel.GetAttribute(GetHandle(transaction), transaction.Handle, unsafeName.Handle);
 
-        return handle != nint.Zero ? MemoryReader.ReadStringAndDestroy(handle) : null;
+        return handle != nint.Zero ? Output.CreateAndRelease(handle, Doc).String : null;
     }
 
     /// <summary>
