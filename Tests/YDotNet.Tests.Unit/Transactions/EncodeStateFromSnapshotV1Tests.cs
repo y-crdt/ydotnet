@@ -19,7 +19,7 @@ public class EncodeStateFromSnapshotV1Tests
 
         // Assert
         Assert.That(stateDiff, Is.Not.Null);
-        Assert.That(stateDiff.Length, Is.EqualTo(expected: 18));
+        Assert.That(stateDiff.Length, Is.EqualTo(expected: 19));
 
         // Act
         var targetDoc = new Doc();
@@ -52,6 +52,8 @@ public class EncodeStateFromSnapshotV1Tests
         var doc = new Doc(
             new DocOptions
             {
+                // The client id is encoded in the state diff, so a random id would make its length vary.
+                Id = 1234,
                 SkipGarbageCollection = skipGarbageCollection
             }
         );
