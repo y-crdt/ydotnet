@@ -8,7 +8,6 @@ namespace YDotNet.Tests.Unit.UndoManagers;
 public class UndoTests
 {
     [Test]
-    [Ignore("Waiting for fix on yffi.")]
     public void ReturnsFalseWhenNoChangesApplied()
     {
         // Arrange
@@ -83,7 +82,6 @@ public class UndoTests
     }
 
     [Test]
-    [Ignore("Waiting for fix on yffi.")]
     public void UndoAddingAndUpdatingAndRemovingContentOnArray()
     {
         // Arrange
@@ -121,8 +119,6 @@ public class UndoTests
         transaction.Commit();
 
         // Assert
-
-        // TODO [LSViana] Check with the team why the amount of items isn't 3.
         Assert.That(length, Is.EqualTo(expected: 3));
         Assert.That(result, Is.True);
     }
