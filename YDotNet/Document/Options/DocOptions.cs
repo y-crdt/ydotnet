@@ -90,11 +90,13 @@ public class DocOptions
     /// </summary>
     public bool ShouldLoad { get; init; }
 
-    internal DocOptionsNative ToNative()
+    internal DocOptionsNative ToNative(out IDisposable allocatedMemory)
     {
-        // We can never release the memory because y-crdt just receives a pointer to that.
+        // Yrs copies both strings while creating the document, so they can be released right after that.
         var unsafeGuid = MemoryWriter.WriteUtf8String(Guid);
         var unsafeCollection = MemoryWriter.WriteUtf8String(CollectionId);
+
+        allocatedMemory = new MemoryWriter.DisposableHandles(unsafeGuid, unsafeCollection);
 
         return new DocOptionsNative
         {

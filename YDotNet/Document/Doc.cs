@@ -577,6 +577,11 @@ public class Doc : UnmanagedResource
     private static nint CreateDoc(DocOptions options)
 #pragma warning restore SA1204 // Static elements should appear before instance elements
     {
-        return DocChannel.NewWithOptions(options.ToNative());
+        var native = options.ToNative(out var allocatedMemory);
+
+        using (allocatedMemory)
+        {
+            return DocChannel.NewWithOptions(native);
+        }
     }
 }

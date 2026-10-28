@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Benchmarks/">
+    <Project Path="Benchmarks/YDotNet.Benchmarks.Memory/YDotNet.Benchmarks.Memory.csproj" />
+  </Folder>
   <Folder Name="/Demo/">
     <Project Path="Demo/Demo.csproj" />
   </Folder>
