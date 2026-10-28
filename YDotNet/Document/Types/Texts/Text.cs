@@ -70,8 +70,8 @@ public class Text : Branch
     /// </param>
     public void InsertEmbed(Transaction transaction, uint index, Input content, Input? attributes = null)
     {
-        var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
-        var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
+        using var unsafeContent = MemoryWriter.WriteStruct(content.InputNative);
+        using var unsafeAttributes = MemoryWriter.WriteStruct(attributes?.InputNative);
 
         TextChannel.InsertEmbed(
             GetHandle(transaction),
