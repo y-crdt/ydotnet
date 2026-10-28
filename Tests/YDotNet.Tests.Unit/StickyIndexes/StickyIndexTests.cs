@@ -66,4 +66,28 @@ public class StickyIndexTests
         Assert.That(stickyIndexBefore, Is.Not.Null);
         Assert.That(stickyIndexBefore.Handle, Is.GreaterThan(nint.Zero));
     }
+
+    [Test]
+    public void ThrowsWhenUsedAfterDispose()
+    {
+        // Arrange
+        var doc = new Doc();
+        var text = doc.Text("text");
+
+        var transaction = doc.WriteTransaction();
+        text.Insert(transaction, index: 0, "Lucas");
+        var stickyIndex = text.StickyIndex(transaction, index: 3, StickyAssociationType.Before);
+        transaction.Commit();
+
+        // Act
+        stickyIndex!.Dispose();
+
+        // Assert
+        transaction = doc.ReadTransaction();
+        Assert.That(stickyIndex.IsDisposed, Is.True);
+        Assert.Throws<ObjectDisposedException>(() => _ = stickyIndex.AssociationType);
+        Assert.Throws<ObjectDisposedException>(() => stickyIndex.Encode());
+        Assert.Throws<ObjectDisposedException>(() => stickyIndex.Read(transaction));
+        transaction.Commit();
+    }
 }

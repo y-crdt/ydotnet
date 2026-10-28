@@ -23,13 +23,30 @@ public class StickyIndex : UnmanagedResource
     }
 
     /// <summary>
+    ///     Finalizes an instance of the <see cref="StickyIndex" /> class.
+    /// </summary>
+    ~StickyIndex()
+    {
+        Dispose(disposing: false);
+    }
+
+    /// <summary>
     ///     Gets the <see cref="StickyAssociationType" /> of the current <see cref="StickyIndex" />.
     /// </summary>
-    public StickyAssociationType AssociationType => (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
+    public StickyAssociationType AssociationType
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            return (StickyAssociationType)StickyIndexChannel.AssociationType(Handle);
+        }
+    }
 
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
+        StickyIndexChannel.Destroy(Handle);
     }
 
     /// <summary>
@@ -54,6 +71,8 @@ public class StickyIndex : UnmanagedResource
     /// </returns>
     public uint Read(Transaction transaction)
     {
+        ThrowIfDisposed();
+
         StickyIndexChannel.Read(Handle, transaction.Handle, out _, out var index);
 
         return index;
@@ -65,6 +84,8 @@ public class StickyIndex : UnmanagedResource
     /// <returns>The binary representation of the <see cref="StickyIndex" /> index.</returns>
     public byte[] Encode()
     {
+        ThrowIfDisposed();
+
         var handle = StickyIndexChannel.Encode(Handle, out var length);
 
         return MemoryReader.ReadAndDestroyBytes(handle, length);
