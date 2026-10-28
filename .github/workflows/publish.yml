@@ -36,6 +36,30 @@ jobs:
       - name: NuGet pack
         run: |
           dotnet pack -c Release
+
+      - name: Verify native packages
+        run: |
+          check() {
+            pkg=$(find . -name "$1.*.nupkg" | head -n 1)
+            if [ -z "$pkg" ]; then echo "Missing package $1"; exit 1; fi
+            shift
+            for entry in "$@"; do
+              unzip -l "$pkg" | grep -q " $entry$" || { echo "Missing $entry in $pkg"; exit 1; }
+            done
+          }
+          check YDotNet.Native.Win32 \
+            runtimes/win-x64/native/yrs.dll \
+            runtimes/win-arm64/native/yrs.dll
+          check YDotNet.Native.MacOS \
+            runtimes/osx-x64/native/libyrs.dylib \
+            runtimes/osx-arm64/native/libyrs.dylib
+          check YDotNet.Native.Linux \
+            runtimes/linux-x64/native/libyrs.so \
+            runtimes/linux-arm64/native/libyrs.so \
+            runtimes/linux-arm/native/libyrs.so \
+            runtimes/linux-musl-x64/native/libyrs.so \
+            runtimes/linux-musl-arm64/native/libyrs.so \
+            runtimes/linux-musl-arm/native/libyrs.so
   
       - name: NuGet publish
         run: |
