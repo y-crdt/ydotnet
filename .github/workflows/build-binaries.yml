@@ -132,13 +132,6 @@ jobs:
           git clone ${YRS_REPO} --branch ${YRS_BRANCH} --single-branch yrs
         shell: bash
 
-      - name: Patch build (Git)
-        if: steps.cache-binaries.outputs.cache-hit != 'true' && false
-        run: |
-          cd yrs
-          git apply ../native/build.patch
-        shell: bash
-
       - name: Build (Cargo)
         if: ${{ !matrix.cross && steps.cache-binaries.outputs.cache-hit != 'true' }}
         run: |
