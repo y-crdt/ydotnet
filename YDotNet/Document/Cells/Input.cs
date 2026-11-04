@@ -10,6 +10,9 @@ public sealed class Input : Resource
 {
     private readonly IDisposable[] allocatedMemory;
 
+    // The native cell points to memory owned by these objects, so they must not be finalized before this one.
+    private object[]? references;
+
     internal Input(InputNative native, params IDisposable[] allocatedMemory)
     {
         this.allocatedMemory = allocatedMemory;
@@ -37,6 +40,8 @@ public sealed class Input : Resource
         {
             memory.Dispose();
         }
+
+        GC.KeepAlive(references);
     }
 
     /// <summary>
@@ -46,7 +51,7 @@ public sealed class Input : Resource
     /// <returns>The <see cref="Input" /> cell that represents the provided value.</returns>
     public static Input Doc(Doc value)
     {
-        return new Input(InputChannel.Doc(value.Handle));
+        return new Input(InputChannel.Doc(value.Handle)) { references = new object[] { value } };
     }
 
     /// <summary>
@@ -110,7 +115,10 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
+        return new Input(InputChannel.Collection(unsafeMemory.Handle, (uint)value.Length), unsafeMemory)
+        {
+            references = value,
+        };
     }
 
     /// <summary>
@@ -126,7 +134,10 @@ public sealed class Input : Resource
         return new Input(
             InputChannel.Object(unsafeKeys.Head, unsafeValues.Handle, (uint)value.Count),
             unsafeKeys,
-            unsafeValues);
+            unsafeValues)
+        {
+            references = value.Values.ToArray<object>(),
+        };
     }
 
     /// <summary>
@@ -156,7 +167,10 @@ public sealed class Input : Resource
     {
         var unsafeMemory = MemoryWriter.WriteStructArray(value.Select(x => x.InputNative).ToArray());
 
-        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint)value.Length), unsafeMemory);
+        return new Input(InputChannel.Array(unsafeMemory.Handle, (uint)value.Length), unsafeMemory)
+        {
+            references = value,
+        };
     }
 
     /// <summary>
@@ -172,7 +186,10 @@ public sealed class Input : Resource
         return new Input(
             InputChannel.Map(unsafeKeys.Head, unsafeValues.Handle, (uint)value.Count),
             unsafeKeys,
-            unsafeValues);
+            unsafeValues)
+        {
+            references = value.Values.ToArray<object>(),
+        };
     }
 
     /// <summary>
