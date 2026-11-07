@@ -1,3 +1,4 @@
+using YDotNet.Document;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure.Extensions;
@@ -42,6 +43,11 @@ public abstract class NativeIterator : UnmanagedResource
     /// <param name="transactionHandle">The native handle of the transaction that wraps the iteration.</param>
     /// <returns>The native handle of the new iterator, or <c>0</c> if it couldn't be created.</returns>
     internal delegate nint CreateHandleFunction(nint branchHandle, nint transactionHandle);
+
+    /// <summary>
+    ///     Gets the document that owns the iterated branch.
+    /// </summary>
+    internal Doc Doc => branch.Doc;
 
     /// <summary>
     ///     Recreates the native iterator so the enumeration starts again from the first item.

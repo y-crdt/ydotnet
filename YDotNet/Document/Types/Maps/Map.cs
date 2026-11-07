@@ -108,7 +108,7 @@ public class Map : Branch
     /// <returns>The <see cref="MapIterator" /> instance.</returns>
     public MapIterator Iterate(Transaction transaction)
     {
-        return new MapIterator(this, transaction, Doc);
+        return new MapIterator(this, transaction);
     }
 
     /// <summary>

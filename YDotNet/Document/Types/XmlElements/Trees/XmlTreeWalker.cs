@@ -18,13 +18,10 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </remarks>
 public class XmlTreeWalker : NativeIterator, IEnumerable<Output>
 {
-    internal XmlTreeWalker(XmlFragment xmlFragment, Transaction transaction, Doc doc)
+    internal XmlTreeWalker(XmlFragment xmlFragment, Transaction transaction)
         : base(xmlFragment, transaction, XmlElementChannel.TreeWalker)
     {
-        Doc = doc;
     }
-
-    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()

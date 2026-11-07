@@ -18,13 +18,10 @@ namespace YDotNet.Document.Types.Maps;
 /// </remarks>
 public class MapIterator : NativeIterator, IEnumerable<KeyValuePair<string, Output>>
 {
-    internal MapIterator(Map map, Transaction transaction, Doc doc)
+    internal MapIterator(Map map, Transaction transaction)
         : base(map, transaction, MapChannel.Iterator)
     {
-        Doc = doc;
     }
-
-    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, Output>> GetEnumerator()
