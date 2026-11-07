@@ -14,13 +14,10 @@ namespace YDotNet.Document.Types.Arrays;
 /// </remarks>
 public class ArrayIterator : NativeIterator, IEnumerable<Output>
 {
-    internal ArrayIterator(Array array, Transaction transaction, Doc doc)
+    internal ArrayIterator(Array array, Transaction transaction)
         : base(array, transaction, ArrayChannel.Iterator)
     {
-        Doc = doc;
     }
-
-    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()

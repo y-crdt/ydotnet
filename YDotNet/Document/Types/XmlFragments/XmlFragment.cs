@@ -145,7 +145,7 @@ public class XmlFragment : Branch
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlFragment" />.</returns>
     public XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        return new XmlTreeWalker(this, transaction, Doc);
+        return new XmlTreeWalker(this, transaction);
     }
 
     /// <summary>
