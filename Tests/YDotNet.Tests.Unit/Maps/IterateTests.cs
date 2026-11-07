@@ -66,4 +66,73 @@ public class IterateTests
 
         return (map, transaction);
     }
+
+    [Test]
+    public void ResetRestartsTheEnumeration()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        var setup = doc.WriteTransaction();
+        map.Insert(setup, "value-1", Input.Long(value: 1L));
+        map.Insert(setup, "value-2", Input.Long(value: 2L));
+        setup.Commit();
+
+        var transaction = doc.ReadTransaction();
+        using var enumerator = map.Iterate(transaction).GetEnumerator();
+        var firstPass = new List<string>();
+        while (enumerator.MoveNext())
+        {
+            firstPass.Add(enumerator.Current.Key);
+        }
+
+        // Act
+        enumerator.Reset();
+        var secondPass = new List<string>();
+        while (enumerator.MoveNext())
+        {
+            secondPass.Add(enumerator.Current.Key);
+        }
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(firstPass, Has.Count.EqualTo(expected: 2));
+        Assert.That(secondPass, Is.EqualTo(firstPass));
+    }
+
+    [Test]
+    public void ResetThrowsAfterTransactionIsCommitted()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        var setup = doc.WriteTransaction();
+        map.Insert(setup, "value-1", Input.Long(value: 1L));
+        map.Insert(setup, "value-2", Input.Long(value: 2L));
+        setup.Commit();
+
+        var transaction = doc.ReadTransaction();
+        var enumerator = map.Iterate(transaction).GetEnumerator();
+        transaction.Commit();
+
+        // Act and Assert
+        Assert.Throws<ObjectDisposedException>(() => enumerator.Reset());
+    }
+
+    [Test]
+    public void ThrowsWhenTransactionIsCommitted()
+    {
+        // Arrange
+        var doc = new Doc();
+        var map = doc.Map("map");
+
+        var transaction = doc.ReadTransaction();
+        transaction.Commit();
+
+        // Act and Assert
+        Assert.Throws<ObjectDisposedException>(() => map.Iterate(transaction));
+    }
 }
