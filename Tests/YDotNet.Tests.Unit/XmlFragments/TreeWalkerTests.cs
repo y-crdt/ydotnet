@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using YDotNet.Document;
+using YDotNet.Document.Cells;
 
 namespace YDotNet.Tests.Unit.XmlFragments;
 
@@ -89,5 +90,74 @@ public class TreeWalkerTests
         Assert.That(xmlNodes.ElementAt(index: 4).XmlText, Is.Not.Null);
 
         transaction.Commit();
+    }
+
+    [Test]
+    public void ResetRestartsTheEnumeration()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var setup = doc.WriteTransaction();
+        xmlFragment.InsertText(setup, index: 0);
+        xmlFragment.InsertElement(setup, index: 1, "color");
+        setup.Commit();
+
+        var transaction = doc.ReadTransaction();
+        using var enumerator = xmlFragment.TreeWalker(transaction).GetEnumerator();
+        var firstPass = new List<OutputTag>();
+        while (enumerator.MoveNext())
+        {
+            firstPass.Add(enumerator.Current.Tag);
+        }
+
+        // Act
+        enumerator.Reset();
+        var secondPass = new List<OutputTag>();
+        while (enumerator.MoveNext())
+        {
+            secondPass.Add(enumerator.Current.Tag);
+        }
+
+        transaction.Commit();
+
+        // Assert
+        Assert.That(firstPass, Has.Count.EqualTo(expected: 2));
+        Assert.That(secondPass, Is.EqualTo(firstPass));
+    }
+
+    [Test]
+    public void ResetThrowsAfterTransactionIsCommitted()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var setup = doc.WriteTransaction();
+        xmlFragment.InsertText(setup, index: 0);
+        xmlFragment.InsertElement(setup, index: 1, "color");
+        setup.Commit();
+
+        var transaction = doc.ReadTransaction();
+        var enumerator = xmlFragment.TreeWalker(transaction).GetEnumerator();
+        transaction.Commit();
+
+        // Act and Assert
+        Assert.Throws<ObjectDisposedException>(() => enumerator.Reset());
+    }
+
+    [Test]
+    public void ThrowsWhenTransactionIsCommitted()
+    {
+        // Arrange
+        var doc = new Doc();
+        var xmlFragment = doc.XmlFragment("xml-fragment");
+
+        var transaction = doc.ReadTransaction();
+        transaction.Commit();
+
+        // Act and Assert
+        Assert.Throws<ObjectDisposedException>(() => xmlFragment.TreeWalker(transaction));
     }
 }

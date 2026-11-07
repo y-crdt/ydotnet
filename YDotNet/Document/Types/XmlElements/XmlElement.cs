@@ -122,9 +122,7 @@ public class XmlElement : XmlFragment
     /// <returns>The <see cref="XmlAttributeIterator" /> instance or <c>null</c> if failed.</returns>
     public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        var handle = XmlElementChannel.AttributeIterator(GetHandle(transaction), transaction.Handle);
-
-        return new XmlAttributeIterator(handle.Checked());
+        return new XmlAttributeIterator(this, transaction, XmlElementChannel.AttributeIterator);
     }
 
     /// <summary>

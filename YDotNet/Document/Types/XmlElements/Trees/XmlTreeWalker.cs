@@ -1,5 +1,7 @@
 using System.Collections;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.XmlFragments;
 using YDotNet.Document.Types.XmlTexts;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
@@ -12,21 +14,14 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// <remarks>
 ///     The <see cref="XmlTreeWalker" /> traverses values using depth-first and nodes can be either
 ///     <see cref="XmlElement" /> or <see cref="XmlText" /> nodes.
+///     Check <see cref="NativeIterator" /> for how many times the tree walker can be enumerated.
 /// </remarks>
-public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
+public class XmlTreeWalker : NativeIterator, IEnumerable<Output>
 {
-    internal XmlTreeWalker(nint handle, Doc doc)
-        : base(handle)
+    internal XmlTreeWalker(XmlFragment xmlFragment, Transaction transaction, Doc doc)
+        : base(xmlFragment, transaction, XmlElementChannel.TreeWalker)
     {
         Doc = doc;
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="XmlTreeWalker" /> class.
-    /// </summary>
-    ~XmlTreeWalker()
-    {
-        Dispose(disposing: false);
     }
 
     internal Doc Doc { get; }
@@ -44,8 +39,8 @@ public class XmlTreeWalker : UnmanagedResource, IEnumerable<Output>
     }
 
     /// <inheritdoc />
-    protected override void DisposeCore(bool disposing)
+    private protected override void DestroyHandle(nint handle)
     {
-        XmlElementChannel.TreeWalkerDestroy(Handle);
+        XmlElementChannel.TreeWalkerDestroy(handle);
     }
 }
