@@ -46,7 +46,7 @@ internal static class ArrayChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yarray_iter_destroy")]
-    public static extern nint IteratorDestroy(nint arrayIterator);
+    public static extern void IteratorDestroy(nint arrayIterator);
 
     [DllImport(
         ChannelSettings.NativeLib,
