@@ -145,9 +145,7 @@ public class XmlFragment : Branch
     /// <returns>An <see cref="XmlTreeWalker" /> for this <see cref="XmlFragment" />.</returns>
     public XmlTreeWalker TreeWalker(Transaction transaction)
     {
-        var handle = XmlElementChannel.TreeWalker(GetHandle(transaction), transaction.Handle);
-
-        return new XmlTreeWalker(handle.Checked(), Doc);
+        return new XmlTreeWalker(this, transaction, Doc);
     }
 
     /// <summary>

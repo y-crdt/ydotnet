@@ -1,5 +1,6 @@
 using System.Collections;
 using YDotNet.Document.Cells;
+using YDotNet.Document.Transactions;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types.Maps;
 
@@ -12,16 +13,13 @@ namespace YDotNet.Document.Types.Maps;
 ///     Two important details about <see cref="MapIterator" />.
 ///     <ul>
 ///         <li>The entries instances are unordered when iterating;</li>
-///         <li>
-///             The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate
-///             values.
-///         </li>
+///         <li>Check <see cref="NativeIterator" /> for how many times the iterator can be enumerated.</li>
 ///     </ul>
 /// </remarks>
-public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, Output>>
+public class MapIterator : NativeIterator, IEnumerable<KeyValuePair<string, Output>>
 {
-    internal MapIterator(nint handle, Doc doc)
-        : base(handle)
+    internal MapIterator(Map map, Transaction transaction, Doc doc)
+        : base(map, transaction, MapChannel.Iterator)
     {
         Doc = doc;
     }
@@ -41,17 +39,9 @@ public class MapIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, O
         return GetEnumerator();
     }
 
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="MapIterator" /> class.
-    /// </summary>
-    ~MapIterator()
-    {
-        Dispose(disposing: false);
-    }
-
     /// <inheritdoc />
-    protected override void DisposeCore(bool disposing)
+    private protected override void DestroyHandle(nint handle)
     {
-        MapChannel.IteratorDestroy(Handle);
+        MapChannel.IteratorDestroy(handle);
     }
 }

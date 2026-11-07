@@ -1,4 +1,6 @@
 using System.Collections;
+using YDotNet.Document.Transactions;
+using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure;
 using YDotNet.Native.Types;
 
@@ -9,23 +11,13 @@ namespace YDotNet.Document.Types.XmlElements;
 ///     <see cref="XmlElements.XmlElement" /> or <see cref="XmlTexts.XmlText" />.
 /// </summary>
 /// <remarks>
-///     The iterator can't be reused. If needed, use <see cref="Enumerable.ToArray{TSource}" /> to accumulate values.
+///     Check <see cref="NativeIterator" /> for how many times the iterator can be enumerated.
 /// </remarks>
-public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<string, string>>
+public class XmlAttributeIterator : NativeIterator, IEnumerable<KeyValuePair<string, string>>
 {
-    internal XmlAttributeIterator(nint handle)
-        : base(handle)
+    internal XmlAttributeIterator(Branch branch, Transaction transaction, CreateHandleFunction createHandle)
+        : base(branch, transaction, createHandle)
     {
-    }
-
-    /// <summary>
-    ///     Finalizes an instance of the <see cref="XmlAttributeIterator" /> class.
-    /// </summary>
-#pragma warning disable MA0055 // Do not use finalizer
-    ~XmlAttributeIterator()
-#pragma warning restore MA0055 // Do not use finalizer
-    {
-        Dispose(disposing: false);
     }
 
     /// <inheritdoc />
@@ -41,8 +33,8 @@ public class XmlAttributeIterator : UnmanagedResource, IEnumerable<KeyValuePair<
     }
 
     /// <inheritdoc />
-    protected override void DisposeCore(bool disposing)
+    private protected override void DestroyHandle(nint handle)
     {
-        XmlAttributeChannel.IteratorDestroy(Handle);
+        XmlAttributeChannel.IteratorDestroy(handle);
     }
 }

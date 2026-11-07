@@ -135,9 +135,7 @@ public class XmlText : Branch
     /// <returns>The <see cref="XmlAttributeIterator" /> instance.</returns>
     public XmlAttributeIterator Iterate(Transaction transaction)
     {
-        var handle = XmlTextChannel.AttributeIterator(GetHandle(transaction), transaction.Handle).Checked();
-
-        return new XmlAttributeIterator(handle);
+        return new XmlAttributeIterator(this, transaction, XmlTextChannel.AttributeIterator);
     }
 
     /// <summary>

@@ -62,6 +62,18 @@ public class Transaction : UnmanagedResource
     }
 
     /// <summary>
+    ///     Returns the native handle of this transaction after checking that it is still open.
+    /// </summary>
+    /// <returns>The native handle of this transaction.</returns>
+    /// <exception cref="ObjectDisposedException">The transaction has been committed or disposed.</exception>
+    internal nint CheckedHandle()
+    {
+        ThrowIfDisposed();
+
+        return Handle;
+    }
+
+    /// <summary>
     ///     Returns the sub-documents existing within current document.
     /// </summary>
     /// <returns>The sub-documents existing within current document.</returns>
