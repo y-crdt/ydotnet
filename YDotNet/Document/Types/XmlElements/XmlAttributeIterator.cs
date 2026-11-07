@@ -16,7 +16,7 @@ namespace YDotNet.Document.Types.XmlElements;
 public class XmlAttributeIterator : NativeIterator, IEnumerable<KeyValuePair<string, string>>
 {
     internal XmlAttributeIterator(Branch branch, Transaction transaction, CreateHandleFunction createHandle)
-        : base(branch, transaction, createHandle)
+        : base(branch, transaction, createHandle, XmlAttributeChannel.IteratorDestroy)
     {
     }
 
@@ -30,11 +30,5 @@ public class XmlAttributeIterator : NativeIterator, IEnumerable<KeyValuePair<str
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    /// <inheritdoc />
-    private protected override void DestroyHandle(nint handle)
-    {
-        XmlAttributeChannel.IteratorDestroy(handle);
     }
 }
