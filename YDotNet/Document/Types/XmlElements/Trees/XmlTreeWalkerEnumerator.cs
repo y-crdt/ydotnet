@@ -49,6 +49,7 @@ internal class XmlTreeWalkerEnumerator(XmlTreeWalker treeWalker) : IEnumerator<O
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotSupportedException();
+        treeWalker.Reset();
+        current = null;
     }
 }

@@ -52,6 +52,7 @@ internal class XmlAttributeEnumerator : IEnumerator<KeyValuePair<string, string>
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotSupportedException();
+        iterator.Reset();
+        Current = default;
     }
 }
