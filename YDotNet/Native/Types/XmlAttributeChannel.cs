@@ -14,7 +14,7 @@ internal static class XmlAttributeChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "yxmlattr_iter_destroy")]
-    public static extern nint IteratorDestroy(nint handle);
+    public static extern void IteratorDestroy(nint handle);
 
     [DllImport(
         ChannelSettings.NativeLib,

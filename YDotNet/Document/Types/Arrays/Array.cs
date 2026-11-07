@@ -134,7 +134,7 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
-        return new ArrayIterator(this, transaction, this.Doc);
+        return new ArrayIterator(this, transaction);
     }
 
     /// <summary>

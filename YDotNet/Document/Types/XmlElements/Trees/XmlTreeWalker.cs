@@ -18,13 +18,10 @@ namespace YDotNet.Document.Types.XmlElements.Trees;
 /// </remarks>
 public class XmlTreeWalker : NativeIterator, IEnumerable<Output>
 {
-    internal XmlTreeWalker(XmlFragment xmlFragment, Transaction transaction, Doc doc)
-        : base(xmlFragment, transaction, XmlElementChannel.TreeWalker)
+    internal XmlTreeWalker(XmlFragment xmlFragment, Transaction transaction)
+        : base(xmlFragment, transaction, XmlElementChannel.TreeWalker, XmlElementChannel.TreeWalkerDestroy)
     {
-        Doc = doc;
     }
-
-    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()
@@ -36,11 +33,5 @@ public class XmlTreeWalker : NativeIterator, IEnumerable<Output>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    /// <inheritdoc />
-    private protected override void DestroyHandle(nint handle)
-    {
-        XmlElementChannel.TreeWalkerDestroy(handle);
     }
 }
