@@ -197,7 +197,7 @@ public class UndoManager : UnmanagedResource
 
     private static nint Create(Doc doc, Branch? branch, UndoManagerOptions? options)
     {
-        var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
+        using var unsafeOptions = MemoryWriter.WriteStruct(options?.ToNative() ?? default);
 
         var handle = UndoManagerChannel.NewWithOptions(doc.Handle, unsafeOptions.Handle);
 

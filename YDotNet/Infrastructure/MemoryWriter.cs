@@ -107,4 +107,15 @@ internal static class MemoryWriter
             }
         }
     }
+
+    internal sealed record DisposableHandles(params IDisposable[] Items) : IDisposable
+    {
+        public void Dispose()
+        {
+            foreach (var item in Items)
+            {
+                item.Dispose();
+            }
+        }
+    }
 }

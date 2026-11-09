@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <StartupObject>YDotNet.Tests.Unit.Program</StartupObject>
+    <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\YDotNet.Extensions\YDotNet.Extensions.csproj" />
     <ProjectReference Include="..\..\YDotNet\YDotNet.csproj" />
+    <ProjectReference Include="..\..\Benchmarks\YDotNet.Benchmarks.Memory\YDotNet.Benchmarks.Memory.csproj" />
   </ItemGroup>
 
 </Project>

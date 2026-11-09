@@ -143,6 +143,29 @@ public class InsertTests
     }
 
     [Test]
+    public void InsertObjectAfterNestedInputsAreCollected()
+    {
+        // Arrange
+        var (doc, map) = ArrangeDoc();
+        var input = CreateObjectWithNestedStrings();
+
+        // Only the object input references the nested inputs now, so they must not be finalized before it.
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+
+        // Act
+        var transaction = doc.WriteTransaction();
+        map.Insert(transaction, "value", input);
+        var value = map.Get(transaction, "value")!.JsonObject;
+        transaction.Commit();
+
+        // Assert
+        Assert.That(value["name"].String, Is.EqualTo("Lucas"));
+        Assert.That(value["surname"].String, Is.EqualTo("Viana"));
+    }
+
+    [Test]
     public void InsertNull()
     {
         // Arrange
@@ -425,5 +448,15 @@ public class InsertTests
         var map = doc.Map("map");
 
         return (doc, map);
+    }
+
+    private static Input CreateObjectWithNestedStrings()
+    {
+        return Input.Object(
+            new Dictionary<string, Input>
+            {
+                { "name", Input.String("Lucas") },
+                { "surname", Input.String("Viana") }
+            });
     }
 }
