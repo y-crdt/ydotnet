@@ -1,3 +1,4 @@
+using YDotNet.Document;
 using YDotNet.Document.Transactions;
 using YDotNet.Document.Types.Branches;
 using YDotNet.Infrastructure.Extensions;
@@ -13,18 +14,24 @@ namespace YDotNet.Infrastructure;
 ///     restarts it from the beginning. To read the values more than once, use
 ///     <see cref="Enumerable.ToArray{TSource}" /> to accumulate them.
 /// </remarks>
-public abstract class NativeIterator : UnmanagedResource
+public class NativeIterator : UnmanagedResource
 {
     private readonly Branch branch;
     private readonly Transaction transaction;
     private readonly CreateHandleFunction createHandle;
+    private readonly DestroyHandleFunction destroyHandle;
 
-    private protected NativeIterator(Branch branch, Transaction transaction, CreateHandleFunction createHandle)
-        : base(CreateInitialHandle(branch, transaction, createHandle))
+    private protected NativeIterator(
+        Branch branch,
+        Transaction transaction,
+        CreateHandleFunction createHandle,
+        DestroyHandleFunction destroyHandle)
+        : base(CreateInitialHandle(branch, transaction, createHandle, destroyHandle))
     {
         this.branch = branch;
         this.transaction = transaction;
         this.createHandle = createHandle;
+        this.destroyHandle = destroyHandle;
     }
 
     /// <summary>
@@ -44,6 +51,17 @@ public abstract class NativeIterator : UnmanagedResource
     internal delegate nint CreateHandleFunction(nint branchHandle, nint transactionHandle);
 
     /// <summary>
+    ///     Releases a native iterator.
+    /// </summary>
+    /// <param name="handle">The native handle of the iterator to release.</param>
+    internal delegate void DestroyHandleFunction(nint handle);
+
+    /// <summary>
+    ///     Gets the document that owns the iterated branch.
+    /// </summary>
+    internal Doc Doc => branch.Doc;
+
+    /// <summary>
     ///     Recreates the native iterator so the enumeration starts again from the first item.
     /// </summary>
     /// <exception cref="ObjectDisposedException">
@@ -54,27 +72,32 @@ public abstract class NativeIterator : UnmanagedResource
         ThrowIfDisposed();
 
         var newHandle = CreateHandle(branch, transaction, createHandle);
-        DestroyHandle(Handle);
+        destroyHandle(Handle);
         ReplaceHandle(newHandle);
     }
-
-    /// <summary>
-    ///     Releases the native iterator identified by <paramref name="handle" />.
-    /// </summary>
-    /// <param name="handle">The handle of the native iterator.</param>
-    private protected abstract void DestroyHandle(nint handle);
 
     /// <inheritdoc />
     protected override void DisposeCore(bool disposing)
     {
-        DestroyHandle(Handle);
+        // The finalizer also runs when the constructor threw, before the handle and the fields were set.
+        if (Handle == nint.Zero)
+        {
+            return;
+        }
+
+        destroyHandle(Handle);
     }
 
-    private static nint CreateInitialHandle(Branch branch, Transaction transaction, CreateHandleFunction createHandle)
+    private static nint CreateInitialHandle(
+        Branch branch,
+        Transaction transaction,
+        CreateHandleFunction createHandle,
+        DestroyHandleFunction destroyHandle)
     {
         ArgumentNullException.ThrowIfNull(branch);
         ArgumentNullException.ThrowIfNull(transaction);
         ArgumentNullException.ThrowIfNull(createHandle);
+        ArgumentNullException.ThrowIfNull(destroyHandle);
 
         return CreateHandle(branch, transaction, createHandle);
     }

@@ -14,13 +14,10 @@ namespace YDotNet.Document.Types.Arrays;
 /// </remarks>
 public class ArrayIterator : NativeIterator, IEnumerable<Output>
 {
-    internal ArrayIterator(Array array, Transaction transaction, Doc doc)
-        : base(array, transaction, ArrayChannel.Iterator)
+    internal ArrayIterator(Array array, Transaction transaction)
+        : base(array, transaction, ArrayChannel.Iterator, ArrayChannel.IteratorDestroy)
     {
-        Doc = doc;
     }
-
-    internal Doc Doc { get; }
 
     /// <inheritdoc />
     public IEnumerator<Output> GetEnumerator()
@@ -33,11 +30,5 @@ public class ArrayIterator : NativeIterator, IEnumerable<Output>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    /// <inheritdoc />
-    private protected override void DestroyHandle(nint handle)
-    {
-        ArrayChannel.IteratorDestroy(handle);
     }
 }

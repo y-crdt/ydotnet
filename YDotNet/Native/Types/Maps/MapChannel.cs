@@ -52,7 +52,7 @@ internal static class MapChannel
         ChannelSettings.NativeLib,
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ymap_iter_destroy")]
-    public static extern nint IteratorDestroy(nint mapIterator);
+    public static extern void IteratorDestroy(nint mapIterator);
 
     [DllImport(
         ChannelSettings.NativeLib,
