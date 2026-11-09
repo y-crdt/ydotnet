@@ -108,9 +108,7 @@ public class Map : Branch
     /// <returns>The <see cref="MapIterator" /> instance.</returns>
     public MapIterator Iterate(Transaction transaction)
     {
-        var handle = MapChannel.Iterator(GetHandle(transaction), transaction.Handle).Checked();
-
-        return new MapIterator(handle, Doc);
+        return new MapIterator(this, transaction, Doc);
     }
 
     /// <summary>

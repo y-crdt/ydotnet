@@ -134,9 +134,7 @@ public class Array : Branch
     /// <returns>The <see cref="ArrayIterator" /> instance.</returns>
     public ArrayIterator Iterate(Transaction transaction)
     {
-        var iteratorHandle = ArrayChannel.Iterator(this.GetHandle(transaction), transaction.Handle);
-
-        return new ArrayIterator(iteratorHandle.Checked(), this.Doc);
+        return new ArrayIterator(this, transaction, this.Doc);
     }
 
     /// <summary>

@@ -49,6 +49,7 @@ internal class ArrayEnumerator : IEnumerator<Output>
     /// <inheritdoc />
     public void Reset()
     {
-        throw new NotSupportedException();
+        iterator.Reset();
+        current = null;
     }
 }

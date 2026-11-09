@@ -11,5 +11,17 @@ public abstract class UnmanagedResource : Resource
         Handle = handle;
     }
 
-    internal nint Handle { get; }
+    internal nint Handle { get; private set; }
+
+    /// <summary>
+    ///     Replaces the native handle of this resource.
+    /// </summary>
+    /// <remarks>
+    ///     The caller is responsible for releasing the previous handle.
+    /// </remarks>
+    /// <param name="handle">The new native handle.</param>
+    private protected void ReplaceHandle(nint handle)
+    {
+        Handle = handle;
+    }
 }
