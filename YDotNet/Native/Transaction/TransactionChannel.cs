@@ -97,4 +97,28 @@ internal static class TransactionChannel
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "ytype_get")]
     public static extern nint Get(nint transaction, nint name);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_pending_update")]
+    public static extern nint PendingUpdate(nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ytransaction_pending_ds")]
+    public static extern nint PendingDeleteSet(nint transaction);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ypending_update_destroy")]
+    public static extern void PendingUpdateDestroy(nint pendingUpdate);
+
+    [DllImport(
+        ChannelSettings.NativeLib,
+        CallingConvention = CallingConvention.Cdecl,
+        EntryPoint = "ydelete_set_destroy")]
+    public static extern void DeleteSetDestroy(nint deleteSet);
 }
